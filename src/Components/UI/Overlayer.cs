@@ -12,6 +12,8 @@ using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Math = System.Math;
 using MonoGame.Extended.Tweening;
+using System.Reflection;
+using System.Linq;
 
 #nullable enable
 
@@ -26,6 +28,17 @@ namespace STOLON
         {
             _overlays = new Dictionary<string, IOverlay>();
             _initialized = new List<string>();
+
+            STOLON.Debug.Log(">searching for overlays");
+            IEnumerable<IOverlay> overlays = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => typeof(IOverlay).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                .Select(t => (Activator.CreateInstance(t) as IOverlay)!);
+            foreach (IOverlay overlay in overlays)
+            {
+                STOLON.Debug.Log($"found overlay with id \"{overlay.ID}\".");
+                AddOverlay(overlay);
+            }
+            STOLON.Debug.Success();
         }
 
         public void AddOverlay<TOverlay>() where TOverlay : IOverlay, new() => AddOverlay(new TOverlay());

@@ -16,6 +16,8 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using DiscordRPC;
 using DiscordRPC.Events;
+using System.Reflection;
+using System.Linq;
 
 #nullable enable
 
@@ -60,23 +62,27 @@ namespace STOLON
         }
         internal void Initialize()
         {
-            RegisterEntity(new GoldsilkEntity());
-            RegisterEntity(new StoEntity());
-            // RegisterCharacter(new DeadlineEntity());
+            STOLON.Debug.Log(">[s]initialising environment");
+            STOLON.Debug.Log(">searching for entities");
+            IEnumerable<EntityBase> entities = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => typeof(EntityBase).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                .Select(t => (Activator.CreateInstance(t) as EntityBase)!);
+            foreach (EntityBase entity in entities)
+            {
+                STOLON.Debug.Log($"found entity with id \"{entity.Id}\" and name \"{entity.Name}\".");
+                RegisterEntity(entity);
+            }
+            STOLON.Debug.Success();
 
             _userInterface = new UserInterface();
             _userInterface.Initialize();
 
             _overlayer = new OverlayEngine();
-
-            _overlayer.AddOverlay(new TransitionOverlay());
-            _overlayer.AddOverlay(new LoadOverlay());
-            _overlayer.AddOverlay(new TransitionDitherOverlay(STOLON.Instance.GraphicsDevice));
-
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"
             //));
+            STOLON.Debug.Success();
         }
         public override void Update(int elapsedMiliseconds)
         {
