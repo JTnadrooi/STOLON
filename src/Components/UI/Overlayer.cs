@@ -175,7 +175,8 @@ namespace STOLON
         public bool Ended => _ended;
 
         private Texture2D _ditherTexture;
-        private int _pixelsToRemovePerFrame; // Number of pixels to turn transparent each frame
+        private const int FRAME_PIXELS_TO_REMOVE = 11150 / RESOLUTION; // Number of pixels to turn transparent each frame
+        private const int RESOLUTION = 2;
         private Color[] _pixelData; // Holds the pixel data for the dither texture
         private Random _random;
         private GraphicsDevice _graphicsDevice;
@@ -185,17 +186,16 @@ namespace STOLON
         private int _height;
         private Tweener<float> _tweener;
 
-        public TransitionDitherOverlay(GraphicsDevice graphicsDevice, int pixelsToRemovePerFrame = 11150, int time = 2, int resolution = 2)
+        public TransitionDitherOverlay()
         {
-            this._pixelsToRemovePerFrame = pixelsToRemovePerFrame / (resolution);
-            this._graphicsDevice = graphicsDevice;
-            this._resolution = resolution;
+            this._graphicsDevice = STOLON.Instance.GraphicsDevice;
+            this._resolution = RESOLUTION;
             _random = new Random();
 
 
-            _tweener = new Tweener<float>(1, this._pixelsToRemovePerFrame, 5f, Ease.Expo.In);
-            _height = STOLON.Instance.VirtualDimensions.Y / resolution;
-            _width = STOLON.Instance.VirtualDimensions.X / resolution;
+            _tweener = new Tweener<float>(1, FRAME_PIXELS_TO_REMOVE, 5f, Ease.Expo.In);
+            _height = STOLON.Instance.VirtualDimensions.Y / RESOLUTION;
+            _width = STOLON.Instance.VirtualDimensions.X / RESOLUTION;
 
             _ditherTexture = null!;
             _pixelData = null!;
