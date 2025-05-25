@@ -91,14 +91,14 @@ namespace STOLON
         public StolonReplaceColorEffect()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("effects\\ReplaceColor");
-        }
-
-        public void SetParameters()
-        {
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
             Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
             Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
+        }
+
+        public void SetParameters()
+        {
         }
     }
     public class CRTEffect : IEffect
@@ -108,15 +108,15 @@ namespace STOLON
         public CRTEffect()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("effects\\CRT-Lottes");
-        }
-
-        public void SetParameters()
-        {
             Effect.Parameters["brightboost"].SetValue(0.92f);
 
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
             //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+        }
+
+        public void SetParameters()
+        {
         }
     }
 }
