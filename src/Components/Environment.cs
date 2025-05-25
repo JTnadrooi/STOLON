@@ -60,9 +60,7 @@ namespace STOLON
         {
             STOLON.Debug.Log(">[s]initialising environment");
             STOLON.Debug.Log(">searching for entities");
-            IEnumerable<EntityBase> entities = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => typeof(EntityBase).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-                .Select(t => (Activator.CreateInstance(t) as EntityBase)!);
+            EntityBase[] entities = STOLON.Scan<EntityBase>();
             foreach (EntityBase entity in entities)
             {
                 STOLON.Debug.Log($"found entity with id \"{entity.Id}\" and name \"{entity.Name}\".");

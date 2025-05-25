@@ -30,9 +30,7 @@ namespace STOLON
             _initialized = new List<string>();
 
             STOLON.Debug.Log(">searching for overlays");
-            IEnumerable<IOverlay> overlays = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => typeof(IOverlay).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-                .Select(t => (Activator.CreateInstance(t) as IOverlay)!);
+            IOverlay[] overlays = STOLON.Scan<IOverlay>();
             foreach (IOverlay overlay in overlays)
             {
                 STOLON.Debug.Log($"found overlay with id \"{overlay.ID}\".");

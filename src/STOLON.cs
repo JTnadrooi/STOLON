@@ -16,6 +16,8 @@ using DiscordRPC.Events;
 using Microsoft.Xna.Framework.Media;
 using System.Drawing;
 using Microsoft.Xna.Framework.Content;
+using System.Reflection;
+using System.Linq;
 
 
 
@@ -235,5 +237,13 @@ namespace STOLON
         public const string MEDIUM_FONT_ID = "fonts\\pixeloidMono";
         public const string SMALL_FONT_ID = "fonts\\smollerMono";
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        public static T[] Scan<T>() where T : class
+        {
+            Debug.Log($"called assembly scan for type \"{typeof(T).FullName}\".");
+            return Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => typeof(T).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                .Select(t => (Activator.CreateInstance(t) as T)!).ToArray();
+        }
     }
 }
