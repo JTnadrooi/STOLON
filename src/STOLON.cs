@@ -158,7 +158,7 @@ namespace STOLON
                 System.Drawing.ColorTranslator.FromHtml("#171219").ToColor(),
             };
 
-            _post = new EffectPipeline(GraphicsDevice, _spriteBatch, VirtualDimensions.X, VirtualDimensions.Y);
+            _post = new EffectPipeline();
 
             Debug.Success();
             base.LoadContent();
