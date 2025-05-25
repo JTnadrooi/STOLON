@@ -29,10 +29,6 @@ namespace STOLON
     public class GameEnvironment : GameComponent, IDialogueProvider
     {
         /// <summary>
-        /// The <see cref="UserInterface"/>.
-        /// </summary>
-        public UserInterface UI => _userInterface;
-        /// <summary>
         /// The <see cref="OverlayEngine"/>.
         /// </summary>
         public OverlayEngine Overlayer => _overlayer;
@@ -75,7 +71,9 @@ namespace STOLON
             STOLON.Debug.Success();
 
             _userInterface = new UserInterface();
+            STOLON.UI = _userInterface;
             _userInterface.Initialize();
+
 
             _overlayer = new OverlayEngine();
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(

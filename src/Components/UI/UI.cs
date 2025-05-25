@@ -204,8 +204,6 @@ namespace STOLON
             _AllUIElements.Remove(elementID);
             STOLON.Debug.Log("ui-element with id " + elementID + " removed.");
         }
-
-        public static UserInterface UI => STOLON.Environment.UI;
     }
 
     public struct UIPath : IEnumerable<string>

@@ -40,7 +40,6 @@ namespace STOLON
         private EffectPipeline _post;
 
         public DiscordRichPresence DRP { get; set; }
-        public UserInterface UserInterface => _environment.UI;
         public Rectangle VirtualBounds => new Rectangle(Point.Zero, VirtualDimensions);
         public Point VirtualDimensions => new Point(_aspectRatio.X * _virtualModifier, _aspectRatio.Y * _virtualModifier); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
         public Point DesiredDimensions => new Point(_aspectRatio.X * _desiredModifier, _aspectRatio.Y * _desiredModifier);
@@ -190,7 +189,7 @@ namespace STOLON
                 STOLON.Input.CurrentKeyboard = Keyboard.GetState();
 
                 if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = GameInputManager.MouseDomain.OfScreen;
-                else if (Environment.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInputManager.MouseDomain.Dialogue;
+                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInputManager.MouseDomain.Dialogue;
                 else if (GameStateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)GameStateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)GameStateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputManager.MouseDomain.Board;
                 else STOLON.Input.Domain = GameInputManager.MouseDomain.UserInterfaceLow;
 
@@ -232,6 +231,7 @@ namespace STOLON
         public static GameEnvironment Environment { get; private set; }
         public static GameInputManager Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
+        public static UserInterface UI { get; internal set; }
         public const string MEDIUM_FONT_ID = "fonts\\pixeloidMono";
         public const string SMALL_FONT_ID = "fonts\\smollerMono";
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
