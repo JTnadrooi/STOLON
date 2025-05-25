@@ -12,7 +12,7 @@ using AsitLib;
 using NAudio.Mixer;
 using Salaros.Configuration;
 
-#nullable enable
+
 
 namespace STOLON
 {

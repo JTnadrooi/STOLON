@@ -10,7 +10,7 @@ using AsitLib;
 
 using Point = Microsoft.Xna.Framework.Point;
 
-#nullable enable
+
 
 namespace STOLON
 {

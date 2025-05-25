@@ -19,7 +19,7 @@ using DiscordRPC.Events;
 using System.Reflection;
 using System.Linq;
 
-#nullable enable
+
 
 namespace STOLON
 {

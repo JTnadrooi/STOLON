@@ -29,7 +29,7 @@ using System.IO;
 using MonoGame.Extended.Content;
 using Microsoft.Xna.Framework.Content;
 
-#nullable enable
+
 
 
 namespace STOLON

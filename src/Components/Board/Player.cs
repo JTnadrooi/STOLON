@@ -1,6 +1,6 @@
 ﻿using System;
 
-#nullable enable
+
 
 namespace STOLON
 {

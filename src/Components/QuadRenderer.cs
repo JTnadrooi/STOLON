@@ -7,7 +7,7 @@ using DiscordRPC.Events;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-#nullable enable
+
 
 namespace STOLON
 {

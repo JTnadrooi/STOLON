@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Linq;
 
-#nullable enable
+
 
 namespace STOLON
 {

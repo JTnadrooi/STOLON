@@ -11,7 +11,7 @@ using System.Collections.ObjectModel;
 using AsitLib;
 
 
-#nullable enable
+
 
 namespace STOLON
 {

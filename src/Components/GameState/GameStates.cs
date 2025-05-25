@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Content;
 using Betwixt;
 using MonoGame.Extended;
 
-#nullable enable
+
 
 namespace STOLON
 {

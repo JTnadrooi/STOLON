@@ -19,7 +19,7 @@ using Point = Microsoft.Xna.Framework.Point;
 using Math = System.Math;
 using RectangleF = MonoGame.Extended.RectangleF;
 
-#nullable enable
+
 namespace STOLON
 {
     public class DiscordRichPresence

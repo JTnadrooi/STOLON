@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 using Point = Microsoft.Xna.Framework.Point;
 
-#nullable enable
+
 
 namespace STOLON
 {

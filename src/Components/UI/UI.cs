@@ -18,7 +18,7 @@ using Math = System.Math;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-#nullable enable
+
 
 namespace STOLON
 {

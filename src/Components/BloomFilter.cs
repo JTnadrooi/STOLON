@@ -15,7 +15,7 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using DiscordRPC;
 using DiscordRPC.Events;
 
-#nullable enable
+
 #pragma warning disable
 
 namespace STOLON

@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.Collections;
 using AsitLib.Collections;
 using System.Xml;
-#nullable enable
+
 
 namespace STOLON
 {

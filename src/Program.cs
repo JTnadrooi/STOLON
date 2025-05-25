@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using AsitLib;
+﻿using AsitLib;
 using DiscordRPC;
 using System;
 using System.Collections.Generic;
