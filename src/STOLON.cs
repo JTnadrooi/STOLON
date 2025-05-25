@@ -167,6 +167,7 @@ namespace STOLON
                 Replace1 = _palette[0],
                 Replace2 = _palette[1]
             });
+            _post.AddEffect(new CRTEffect(Content.Load<Effect>("effects\\CRT-Lottes")));
 
             Debug.Success();
             base.LoadContent();

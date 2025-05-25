@@ -322,3 +322,8 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /build:../content/effects/ReplaceColor.fx;effects/ReplaceColor.fx
+
+#begin ../content/effects/CRT-Lottes.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:../content/effects/CRT-Lottes.fx;effects/CRT-Lottes.fx

@@ -104,4 +104,31 @@ namespace STOLON
             Shader.Parameters["color2"].SetValue(Replace2.ToVector4());
         }
     }
+    public class CRTEffect : IEffect
+    {
+        public Effect Shader { get; }
+
+        public CRTEffect(Effect effect) => Shader = effect;
+
+        public void SetParameters()
+        {
+            Shader.Parameters["hardScan"]?.SetValue(-8.0f);
+            Shader.Parameters["hardPix"]?.SetValue(-13.0f);
+            Shader.Parameters["warpX"]?.SetValue(0.031f);
+            Shader.Parameters["warpY"]?.SetValue(0.041f);
+            Shader.Parameters["maskDark"]?.SetValue(0.5f);
+            Shader.Parameters["maskLight"]?.SetValue(1.5f);
+            Shader.Parameters["scaleInLinearGamma"]?.SetValue(1.0f);
+            Shader.Parameters["shadowMask"]?.SetValue(3.0f);
+            Shader.Parameters["brightboost"]?.SetValue(1.0f);
+            Shader.Parameters["hardBloomScan"]?.SetValue(-11.5f);
+            Shader.Parameters["hardBloomPix"]?.SetValue(-2.0f);
+            Shader.Parameters["bloomAmount"]?.SetValue(0.15f);
+            Shader.Parameters["shape"]?.SetValue(2.0f);
+
+            Shader.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Shader.Parameters["outputSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+        }
+    }
 }
