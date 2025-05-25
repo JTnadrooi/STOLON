@@ -112,6 +112,7 @@ namespace STOLON
             }
 
             _graphics.ApplyChanges();
+            //_post.UpdateResolution(new Point(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
@@ -124,7 +125,6 @@ namespace STOLON
                 SetBackBufferSize(new Point(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
                 _graphics.ApplyChanges();
             }
-
             _graphics.ToggleFullScreen();
             _graphics.ApplyChanges();
         }

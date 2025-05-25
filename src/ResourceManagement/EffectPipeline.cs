@@ -30,8 +30,6 @@ namespace STOLON
 
         public EffectPipeline()
         {
-            RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.Instance.VirtualDimensions.X, STOLON.Instance.VirtualDimensions.Y);
-            RenderTarget2D GetDesired() => new RenderTarget2D(_graphics, STOLON.Instance.DesiredDimensions.X, STOLON.Instance.DesiredDimensions.Y);
 
             STOLON.Debug.Log(">[s]initialising effect pipeline");
             _spriteBatch = STOLON.Instance.SpriteBatch;
@@ -53,11 +51,19 @@ namespace STOLON
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
+        private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.Instance.VirtualDimensions.X, STOLON.Instance.VirtualDimensions.Y);
+        private RenderTarget2D GetDesired() => new RenderTarget2D(_graphics, STOLON.Instance.DesiredDimensions.X, STOLON.Instance.DesiredDimensions.Y);
 
         public void BeginScene()
         {
             _graphics.SetRenderTarget(_vrt1);
             _graphics.Clear(Color.Transparent);
+        }
+
+        public void UpdateResolution(Point newRes)
+        {
+            _rt1 = GetDesired();
+            _rt2 = GetDesired();
         }
         public void EndScene()
         {
@@ -77,9 +83,31 @@ namespace STOLON
                 (_vrt1, _vrt2) = (_vrt2, _vrt1);
             }
 
-            _graphics.SetRenderTarget(null); // non-virtual
+            _graphics.SetRenderTarget(_rt1);
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, STOLON.Instance.DesiredDimensions), Color.White);
+            _spriteBatch.End();
+
+            RenderTarget2D finalTarget = _rt1;
+
+
+            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual))
+            {
+                effect.SetParameters();
+
+                _graphics.SetRenderTarget(_rt2);
+                _graphics.Clear(Color.LightSeaGreen);
+
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Effect);
+                _spriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
+                _spriteBatch.End();
+
+                finalTarget = _rt2;
+                (_rt1, _rt2) = (_rt2, _rt1);
+            }
+            _graphics.SetRenderTarget(null);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
         }
 
@@ -87,6 +115,8 @@ namespace STOLON
         {
             _vrt1.Dispose();
             _vrt2.Dispose();
+            _rt1.Dispose();
+            _rt2.Dispose();
             foreach (IEffect post in _effects.Values) (post as IDisposable)?.Dispose();
         }
     }
