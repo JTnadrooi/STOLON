@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Common;
+using MonoGame.Extended.ECS;
 
 namespace STOLON
 {
     public interface IEffect
     {
-        public Effect Shader { get; }
+        public Effect Effect { get; }
         public void SetParameters();
     }
 
@@ -20,49 +21,48 @@ namespace STOLON
         private readonly GraphicsDevice _graphics;
         private readonly SpriteBatch _spriteBatch;
         private readonly RenderTarget2D _sceneTarget;
-        private readonly List<IEffect> _effects;
+        private readonly Dictionary<string, IEffect> _effects;
         private readonly RenderTarget2D _rt1;
         private readonly RenderTarget2D _rt2;
 
         public EffectPipeline(GraphicsDevice graphics, SpriteBatch sb, int w, int h)
         {
+            STOLON.Debug.Log(">[s]initialising effect pipeline");
+            STOLON.Debug.Log(">searching for effects");
             _graphics = graphics;
             _spriteBatch = sb;
             _rt1 = new RenderTarget2D(graphics, w, h);
             _rt2 = new RenderTarget2D(graphics, w, h);
             _sceneTarget = _rt1;
-            _effects = new List<IEffect>();
+            _effects = new Dictionary<string, IEffect>();
+            IEffect[] tempEffects = STOLON.Scan<IEffect>();
+            foreach (IEffect effect in tempEffects)
+            {
+                STOLON.Debug.Log($"found effect with name \"{effect.Effect.Name}\".");
+                _effects.Add(effect.Effect.Name, effect);
+            }
+            STOLON.Debug.Success();
+            STOLON.Debug.Success();
         }
 
-        public void AddEffect(IEffect effect) => _effects.Add(effect);
-
-        /// <summary>
-        /// Call this at the top of Draw: all subsequent sprite-draws get routed into
-        /// an offscreen buffer instead of the backbuffer.
-        /// </summary>
         public void BeginScene()
         {
             _graphics.SetRenderTarget(_sceneTarget);
             _graphics.Clear(Color.Transparent);
         }
-
-        /// <summary>
-        /// Call this at the end of Draw: applies each effect in order, then
-        /// presents the final result to the screen.
-        /// </summary>
         public void EndScene()
         {
             RenderTarget2D src = _sceneTarget;
             RenderTarget2D dst = _rt2;
 
-            foreach (IEffect effect in _effects)
+            foreach (IEffect effect in _effects.Values)
             {
                 effect.SetParameters();
 
                 _graphics.SetRenderTarget(dst);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Shader);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Effect);
                 _spriteBatch.Draw(src, Vector2.Zero, Color.White);
                 _spriteBatch.End();
 
@@ -81,42 +81,42 @@ namespace STOLON
         {
             _rt1.Dispose();
             _rt2.Dispose();
-            foreach (IEffect post in _effects) (post as IDisposable)?.Dispose();
+            foreach (IEffect post in _effects.Values) (post as IDisposable)?.Dispose();
         }
     }
 
-    public class ReplaceColorEffect : IEffect
+    public class StolonReplaceColorEffect : IEffect
     {
-        public Effect Shader { get; }
-
-        public Color Target1 { get; set; }
-        public Color Replace1 { get; set; }
-        public Color Target2 { get; set; }
-        public Color Replace2 { get; set; }
-
-        public ReplaceColorEffect(Effect effect) => Shader = effect;
+        public Effect Effect { get; }
+        public StolonReplaceColorEffect()
+        {
+            Effect = STOLON.Instance.Content.Load<Effect>("effects\\ReplaceColor");
+        }
 
         public void SetParameters()
         {
-            Shader.Parameters["dcolor1"].SetValue(Target1.ToVector4());
-            Shader.Parameters["color1"].SetValue(Replace1.ToVector4());
-            Shader.Parameters["dcolor2"].SetValue(Target2.ToVector4());
-            Shader.Parameters["color2"].SetValue(Replace2.ToVector4());
+            Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
+            Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
+            Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
+            Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
         }
     }
     public class CRTEffect : IEffect
     {
-        public Effect Shader { get; }
+        public Effect Effect { get; }
 
-        public CRTEffect(Effect effect) => Shader = effect;
+        public CRTEffect()
+        {
+            Effect = STOLON.Instance.Content.Load<Effect>("effects\\CRT-Lottes");
+        }
 
         public void SetParameters()
         {
-            Shader.Parameters["brightboost"].SetValue(0.92f);
+            Effect.Parameters["brightboost"].SetValue(0.92f);
 
-            Shader.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Effect.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
             //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
-            Shader.Parameters["outputSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Effect.Parameters["outputSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
         }
     }
 }

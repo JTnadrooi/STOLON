@@ -160,15 +160,6 @@ namespace STOLON
 
             _post = new EffectPipeline(GraphicsDevice, _spriteBatch, VirtualDimensions.X, VirtualDimensions.Y);
 
-            _post.AddEffect(new ReplaceColorEffect(Content.Load<Effect>("effects\\ReplaceColor"))
-            {
-                Target1 = Color.White,
-                Target2 = Color.Black,
-                Replace1 = _palette[0],
-                Replace2 = _palette[1]
-            });
-            _post.AddEffect(new CRTEffect(Content.Load<Effect>("effects\\CRT-Lottes")));
-
             Debug.Success();
             base.LoadContent();
         }
