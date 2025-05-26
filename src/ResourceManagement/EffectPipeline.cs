@@ -63,15 +63,9 @@ namespace STOLON
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
-            //Point oldRes = _rt1.Bounds.Size;
             _rt1 = GetDesired(newRes);
             _rt2 = GetDesired(newRes);
-            //newRes = STOLON.Instance.DesiredDimensions;
-            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual))
-            {
-                effect.UpdateResolution(newRes);
-            }
-            Console.WriteLine(newRes.ToString());
+            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
         }
         public void EndScene()
         {
@@ -121,7 +115,7 @@ namespace STOLON
             _vrt2.Dispose();
             _rt1.Dispose();
             _rt2.Dispose();
-            foreach (IEffect post in _effects.Values) (post as IDisposable)?.Dispose();
+            foreach (IEffect effect in _effects.Values) (effect as IDisposable)?.Dispose();
         }
     }
 
@@ -137,9 +131,7 @@ namespace STOLON
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
             Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
         }
-        public void UpdateResolution(Point newDesiredRes)
-        {
-        }
+        public void UpdateResolution(Point newDesiredRes) { }
     }
     public class CRTEffect : IEffect
     {
