@@ -75,10 +75,10 @@ namespace STOLON
         public MenuGameState()
         {
             const string menuDataFolder = "menuLogoMid";
-            _menuLogoLines = STOLON.Textures.GetReference("textures\\" + menuDataFolder + "\\lines");
-            _menuLogoDummyTiles = STOLON.Textures.GetReference("textures\\" + menuDataFolder + "\\dummyTiles");
-            _menuLogoFilledTiles = STOLON.Textures.GetReference("textures\\" + menuDataFolder + "\\filledTiles");
-            _menuLogoLowResFonted = STOLON.Textures.GetReference("textures\\" + menuDataFolder + "\\lowResFonted");
+            _menuLogoLines = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\lines");
+            _menuLogoDummyTiles = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\dummyTiles");
+            _menuLogoFilledTiles = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\filledTiles");
+            _menuLogoLowResFonted = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\lowResFonted");
             _dither32 = STOLON.Textures.GetReference("textures\\dither_32");
             _drawMenuLogoLines = true;
             _drawMenuLogoDummyTiles = true;
