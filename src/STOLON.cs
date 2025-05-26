@@ -112,7 +112,7 @@ namespace STOLON
             }
 
             _graphics.ApplyChanges();
-            //_post.UpdateResolution(new Point(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
+            _post.UpdateResolution(new Point(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight));
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;

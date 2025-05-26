@@ -14,7 +14,7 @@ namespace STOLON
     {
         public Effect Effect { get; }
         public bool Virtual { get; }
-        public void SetParameters();
+        public void UpdateResolution(Point newDesiredRes);
     }
 
     public class EffectPipeline : IDisposable
@@ -37,8 +37,8 @@ namespace STOLON
 
             _vrt1 = GetVirtual();
             _vrt2 = GetVirtual();
-            _rt1 = GetDesired();
-            _rt2 = GetDesired();
+            _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
+            _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
 
             _effects = new Dictionary<string, IEffect>();
             IEffect[] tempEffects = STOLON.Scan<IEffect>();
@@ -52,7 +52,7 @@ namespace STOLON
             STOLON.Debug.Success();
         }
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.Instance.VirtualDimensions.X, STOLON.Instance.VirtualDimensions.Y);
-        private RenderTarget2D GetDesired() => new RenderTarget2D(_graphics, STOLON.Instance.DesiredDimensions.X, STOLON.Instance.DesiredDimensions.Y);
+        private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
 
         public void BeginScene()
         {
@@ -62,17 +62,20 @@ namespace STOLON
 
         public void UpdateResolution(Point newRes)
         {
-            _rt1 = GetDesired();
-            _rt2 = GetDesired();
+            _rt1 = GetDesired(newRes);
+            _rt2 = GetDesired(newRes);
+            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual))
+            {
+                effect.UpdateResolution(newRes);
+            }
+            Console.WriteLine(newRes.ToString());
         }
         public void EndScene()
         {
             RenderTarget2D finalVTarget = _vrt1;
-            foreach (IEffect effect in _effects.Values.Where(e => e.Virtual))
+            foreach (IEffect effect in _effects.Values.Where(e => e.Virtual)) // apply virtual effects.
             {
-                effect.SetParameters();
-
-                _graphics.SetRenderTarget(_vrt2); // virtual
+                _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
                 _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Effect);
@@ -83,18 +86,15 @@ namespace STOLON
                 (_vrt1, _vrt2) = (_vrt2, _vrt1);
             }
 
-            _graphics.SetRenderTarget(_rt1);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _graphics.SetRenderTarget(_rt1); // draw and upscale to normal sized rt.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, STOLON.Instance.DesiredDimensions), Color.White);
             _spriteBatch.End();
 
             RenderTarget2D finalTarget = _rt1;
 
-
-            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual))
+            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) // apply normal effects.
             {
-                effect.SetParameters();
-
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
@@ -105,8 +105,9 @@ namespace STOLON
                 finalTarget = _rt2;
                 (_rt1, _rt2) = (_rt2, _rt1);
             }
-            _graphics.SetRenderTarget(null);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+
+            _graphics.SetRenderTarget(null); // and draw to screen.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
         }
@@ -133,8 +134,7 @@ namespace STOLON
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
             Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
         }
-
-        public void SetParameters()
+        public void UpdateResolution(Point newDesiredRes)
         {
         }
     }
@@ -148,13 +148,15 @@ namespace STOLON
             Effect = STOLON.Instance.Content.Load<Effect>("effects\\CRT-Lottes");
             Effect.Parameters["brightboost"].SetValue(0.92f);
 
+            Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
+            //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
+        }
+        public void UpdateResolution(Point newDesiredRes)
+        {
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
             //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
-            Effect.Parameters["outputSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
-        }
-
-        public void SetParameters()
-        {
+            Effect.Parameters["outputSize"].SetValue(newDesiredRes.ToVector2());
         }
     }
 }
