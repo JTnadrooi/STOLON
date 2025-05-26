@@ -156,7 +156,6 @@ namespace STOLON
     {
         public Effect Effect { get; }
         public bool Virtual => false;
-        public bool Enabled => false;
 
         public CRTEffect()
         {
