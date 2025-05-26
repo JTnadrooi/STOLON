@@ -14,8 +14,8 @@ namespace STOLON
     public interface IEffect
     {
         public Effect Effect { get; }
-        public bool Virtual { get; }
-        public void UpdateResolution(Point newDesiredRes);
+        public bool Virtual => true;
+        public void UpdateResolution(Point newDesiredRes) { }
     }
 
     public class EffectPipeline : IDisposable
@@ -70,10 +70,11 @@ namespace STOLON
             foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
         }
 
-        //public bool DisableEffect()
-        //{
+        public bool DisableEffect()
+        {
 
-        //}
+        }
+
         public void EndScene()
         {
             RenderTarget2D finalVTarget = _vrt1;
