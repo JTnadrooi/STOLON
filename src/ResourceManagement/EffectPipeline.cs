@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Common;
 using MonoGame.Extended.ECS;
+using System.Collections.ObjectModel;
 
 namespace STOLON
 {
@@ -28,9 +29,10 @@ namespace STOLON
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
 
+        public ReadOnlyDictionary<string, IEffect> Effects => _effects.AsReadOnly();
+
         public EffectPipeline()
         {
-
             STOLON.Debug.Log(">[s]initialising effect pipeline");
             _spriteBatch = STOLON.Instance.SpriteBatch;
             _graphics = STOLON.Instance.GraphicsDevice;
@@ -67,6 +69,11 @@ namespace STOLON
             _rt2 = GetDesired(newRes);
             foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
         }
+
+        //public bool DisableEffect()
+        //{
+
+        //}
         public void EndScene()
         {
             RenderTarget2D finalVTarget = _vrt1;
