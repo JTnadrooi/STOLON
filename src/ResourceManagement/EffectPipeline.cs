@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Data.Common;
 using MonoGame.Extended.ECS;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace STOLON
 {
@@ -15,6 +16,7 @@ namespace STOLON
     {
         public Effect Effect { get; }
         public bool Virtual => true;
+        public bool Enabled { get => true; set { } }
         public void UpdateResolution(Point newDesiredRes) { }
     }
 
@@ -53,6 +55,7 @@ namespace STOLON
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
+
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.Instance.VirtualDimensions.X, STOLON.Instance.VirtualDimensions.Y);
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
 
@@ -68,17 +71,25 @@ namespace STOLON
             _rt1 = GetDesired(newRes);
             _rt2 = GetDesired(newRes);
             foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
+            STOLON.Debug.Log($"updated fx pipeline res.");
         }
 
-        public bool DisableEffect()
+        public void DisableEffect(string name)
         {
-
+            _effects[name].Enabled = false;
+            STOLON.Debug.Log($"disabled effect with name \"{name}\".");
+        }
+        public bool IsEnabled(string name) => _effects[name].Enabled;
+        public void EnableEffect(string name)
+        {
+            _effects[name].Enabled = false;
+            STOLON.Debug.Log($"enabled effect with name \"{name}\".");
         }
 
         public void EndScene()
         {
             RenderTarget2D finalVTarget = _vrt1;
-            foreach (IEffect effect in _effects.Values.Where(e => e.Virtual)) // apply virtual effects.
+            foreach (IEffect effect in _effects.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
             {
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -98,7 +109,7 @@ namespace STOLON
 
             RenderTarget2D finalTarget = _rt1;
 
-            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) // apply normal effects.
+            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
             {
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -145,12 +156,12 @@ namespace STOLON
     {
         public Effect Effect { get; }
         public bool Virtual => false;
+        public bool Enabled => false;
 
         public CRTEffect()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("effects\\CRT-Lottes");
             Effect.Parameters["brightboost"].SetValue(0.92f);
-
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
         }
