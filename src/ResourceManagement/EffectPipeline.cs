@@ -42,12 +42,12 @@ namespace STOLON
 
             _effects = new Dictionary<string, IEffect>();
             IEffect[] tempEffects = STOLON.Scan<IEffect>();
+            STOLON.Debug.Log(">searching for effects");
             foreach (IEffect effect in tempEffects)
             {
                 STOLON.Debug.Log($"found effect with name \"{effect.Effect.Name}\".");
                 _effects.Add(effect.Effect.Name, effect);
             }
-            STOLON.Debug.Log(">searching for effects");
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
@@ -60,10 +60,13 @@ namespace STOLON
             _graphics.Clear(Color.Transparent);
         }
 
-        public void UpdateResolution(Point newRes)
+        public void UpdateResolution()
         {
+            Point newRes = STOLON.Instance.DesiredDimensions;
+            //Point oldRes = _rt1.Bounds.Size;
             _rt1 = GetDesired(newRes);
             _rt2 = GetDesired(newRes);
+            //newRes = STOLON.Instance.DesiredDimensions;
             foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual))
             {
                 effect.UpdateResolution(newRes);
@@ -88,7 +91,7 @@ namespace STOLON
 
             _graphics.SetRenderTarget(_rt1); // draw and upscale to normal sized rt.
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
-            _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, STOLON.Instance.DesiredDimensions), Color.White);
+            _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, _rt1.Bounds.Size), Color.White);
             _spriteBatch.End();
 
             RenderTarget2D finalTarget = _rt1;
@@ -149,13 +152,11 @@ namespace STOLON
             Effect.Parameters["brightboost"].SetValue(0.92f);
 
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
-            //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
         }
         public void UpdateResolution(Point newDesiredRes)
         {
-            Effect.Parameters["textureSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
-            //Shader.Parameters["videoSize"].SetValue(STOLON.Instance.VirtualDimensions.ToVector2());
+            Effect.Parameters["textureSize"].SetValue(newDesiredRes.ToVector2());
             Effect.Parameters["outputSize"].SetValue(newDesiredRes.ToVector2());
         }
     }

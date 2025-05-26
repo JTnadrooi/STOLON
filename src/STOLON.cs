@@ -112,9 +112,12 @@ namespace STOLON
             }
 
             _graphics.ApplyChanges();
-            _post.UpdateResolution(new Point(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight));
-            _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
+            _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
+            ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
+            _desiredModifier = (int)(_virtualModifier * ScreenScale);
+
+            _post.UpdateResolution();
             Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
         public void GoFullscreen()
@@ -187,8 +190,6 @@ namespace STOLON
                 else if (GameStateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)GameStateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)GameStateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputManager.MouseDomain.Board;
                 else STOLON.Input.Domain = GameInputManager.MouseDomain.UserInterfaceLow;
 
-                ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
-                _desiredModifier = (int)(_virtualModifier * ScreenScale);
 
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
 
