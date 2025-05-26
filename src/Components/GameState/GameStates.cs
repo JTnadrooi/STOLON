@@ -407,6 +407,8 @@ namespace STOLON
         private float _uiLeftOffset;
         private float _uiRightOffset;
 
+        public const int UI_HEIGHT = 1000;
+
         private Board? _board;
         public Board Board => _board ?? throw new Exception();
         /// <summary>
@@ -454,10 +456,10 @@ namespace STOLON
         {
             _board?.Draw(spriteBatch, elapsedMiliseconds);
 
-            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle(Point.Zero, new Point((int)_lineX1, 500)), Color.Black);
-            spriteBatch.DrawLine(_lineX1, -10f, _lineX1, 500f, Color.White, UserInterface.LINE_WIDTH);
-            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, 500), Color.Black);
-            spriteBatch.DrawLine(_lineX2, -10f, _lineX2, 500f, Color.White, UserInterface.LINE_WIDTH);
+            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
+            spriteBatch.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
+            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
+            spriteBatch.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
         }
     }
 }
