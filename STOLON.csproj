@@ -33,9 +33,7 @@
 		<EmbeddedResource Include="Icon.bmp" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Betwixt" Version="1.4.1">
-			<NoWarn>NU1701</NoWarn>
-		</PackageReference>
+		<PackageReference Include="Betwixt" Version="1.4.1" />
 		<PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
 		<PackageReference Include="MonoGame.Extended" Version="4.1.0" />
 		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
