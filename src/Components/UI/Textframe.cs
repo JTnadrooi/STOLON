@@ -126,14 +126,14 @@ namespace STOLON
             STOLON.Debug.Success();
         }
 
-        public void Queue(int count, Func<string, int, string>? selector = null)
-        {
-            STOLON.Debug.Log(">mass queueing a stream of size: " + count);
-            selector ??= new Func<string, int, string>((s, i) => s);
-            //for (int i = 0; i < count; i++) Queue(new DialogueInfo(StolonEnvironment.Instance, selector.Invoke((()StolonGame.Instance.Environment.GameStateManager.Current).GetRandomSplashText(), i)));
-            throw new NotImplementedException();
-            STOLON.Debug.Success();
-        }
+        //public void Queue(int count, Func<string, int, string>? selector = null)
+        //{
+        //    STOLON.Debug.Log(">mass queueing a stream of size: " + count);
+        //    selector ??= new Func<string, int, string>((s, i) => s);
+        //    //for (int i = 0; i < count; i++) Queue(new DialogueInfo(StolonEnvironment.Instance, selector.Invoke((()StolonGame.Instance.Environment.GameStateManager.Current).GetRandomSplashText(), i)));
+        //    throw new NotImplementedException();
+        //    STOLON.Debug.Success();
+        //}
 
         public override void Update(int elapsedMiliseconds)
         {
@@ -162,7 +162,7 @@ namespace STOLON
                 else if (_msSinceLastChar > _currentDialogueDrawArgs!.Value.TimeMap[_charsRead]) // else if its time for a new char..
                 {
                     _toDrawDialogueText += _currentDialogue.Value.Text[_charsRead]; // ..add said char.
-                    _charsRead++; 
+                    _charsRead++;
                     _msSinceLastChar = 0;
                 }
 
@@ -172,7 +172,7 @@ namespace STOLON
                 _dialogueTextPos = _dialoguebounds.Location
                     + new Point((int)(_dialoguebounds.Width / 2f - _font.FastMeasure(_toDrawDialogueText).X / 2f),
                     (int)(_dialoguebounds.Height / 2f - _font.Dimensions.Y));
-                 
+
                 _providerTextPos = _dialoguebounds.Location
                     + new Point((int)(_dialoguebounds.Width / 2f - _font.FastMeasure(_currentDialogue.Value.Provider.Name).X * _providerTextScaleCoefficient / 2f), 2);
             }
