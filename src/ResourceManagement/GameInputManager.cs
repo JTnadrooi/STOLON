@@ -14,7 +14,6 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using DiscordRPC;
 using DiscordRPC.Events;
 using Microsoft.Xna.Framework.Media;
-using System.Drawing;
 using Microsoft.Xna.Framework.Content;
 
 

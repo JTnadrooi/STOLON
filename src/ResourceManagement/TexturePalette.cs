@@ -4,9 +4,6 @@ using Microsoft.Xna.Framework.Input;
 
 using System.Linq;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.Drawing;
 using System;
 using System.Runtime.Versioning;
 using System.Reflection.Metadata;
@@ -119,12 +116,6 @@ namespace STOLON
 
         private readonly Color[] _colors;
 
-        public TexturePalette4(string name, Bitmap bitmap, bool unique = true)
-        {
-            _colors = new Color[4];
-            Name = name;
-            Array.Copy(Utils.GetColors(bitmap, unique), 0, _colors, 0, _colors.Length);
-        }
         public TexturePalette4(string name, params Color[] colors)
         {
             Name = name;

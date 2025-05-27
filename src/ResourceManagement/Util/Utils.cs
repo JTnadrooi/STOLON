@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -194,29 +193,6 @@ namespace STOLON
 
             key = (char)0;
             return false;
-        }
-        public static Color[] GetColors(Bitmap source, bool unique = true)
-        {
-            if (unique)
-            {
-                HashSet<Color> uniqueColors = new HashSet<Color>();
-                for (int y = 0; y < source.Height; y++)
-                    for (int x = 0; x < source.Width; x++)
-                        uniqueColors.Add(source.GetPixel(x, y).ToColor());
-                return uniqueColors.ToArray();
-            }
-            else
-            {
-                List<Color> colorsList = new List<Color>();
-                for (int y = 0; y < source.Height; y++)
-                    for (int x = 0; x < source.Width; x++)
-                        colorsList.Add(source.GetPixel(x, y).ToColor());
-                return colorsList.ToArray();
-            }
-        }
-        public static Microsoft.Xna.Framework.Rectangle ToRectangle(this RectangleF source)
-        {
-            return new Rectangle(source.Location.ToPoint(), source.Size.ToPointF().ToPoint());
         }
         //public static RectangleF ToRectangleF(this Rectangle source)
         //{
