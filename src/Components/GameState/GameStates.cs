@@ -53,8 +53,6 @@ namespace STOLON
 
         private int _menuRemoveLineY;
 
-        private bool _loadingFinished;
-
         private float _menuLogoScaling;
 
         private List<UIElement> _depthPath;
@@ -354,7 +352,6 @@ namespace STOLON
             _menuRemoveTweener.Update(elapsedMiliseconds / 1000f);
             TaskHeap.Instance.SafePush("menuLogoDisapear", new DynamicTask(() => // fire and forget game logic ftw
             {
-                _loadingFinished = true;
                 _onLeave?.Invoke();
                 _onLeave = null;
                 STOLON.StateManager.ChangeState<BoardGameState>(true);
