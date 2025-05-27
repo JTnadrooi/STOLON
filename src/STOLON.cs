@@ -186,7 +186,7 @@ namespace STOLON
 
                 if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = GameInputManager.MouseDomain.OfScreen;
                 else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInputManager.MouseDomain.Dialogue;
-                else if (GameStateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)GameStateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)GameStateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputManager.MouseDomain.Board;
+                else if (STOLON.StateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputManager.MouseDomain.Board;
                 else STOLON.Input.Domain = GameInputManager.MouseDomain.UserInterfaceLow;
 
                 ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
