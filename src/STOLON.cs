@@ -32,7 +32,6 @@ namespace STOLON
         private GameEnvironment _environment;
         private Point _aspectRatio = new Point(16, 9);
         private float AspectRatioFloat => _aspectRatio.X / _aspectRatio.Y * 1.7776f;
-        private int _virtualModifier;
         private int _desiredModifier;
         private Color[] _palette;
         private GameTextureCollection _textures;
@@ -40,9 +39,9 @@ namespace STOLON
         private Point _oldWindowSize;
         private EffectPipeline _post;
 
-        public DiscordRichPresence DRP { get; set; }
+        public DiscordRichPresence DRP { get; private set; }
         public Rectangle VirtualBounds => new Rectangle(Point.Zero, VirtualDimensions);
-        public Point VirtualDimensions => new Point(_aspectRatio.X * _virtualModifier, _aspectRatio.Y * _virtualModifier); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
+        public Point VirtualDimensions => new Point(_aspectRatio.X * VIRTUAL_MODIFIER, _aspectRatio.Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
         public Point DesiredDimensions => new Point(_aspectRatio.X * _desiredModifier, _aspectRatio.Y * _desiredModifier);
         public Point ScreenCenter => new Point(VirtualDimensions.X / 2, VirtualDimensions.Y / 2);
         public float ScreenScale { get; private set; }
@@ -52,7 +51,6 @@ namespace STOLON
         public Color Color1 => _palette[0];
         public Color Color2 => _palette[1];
 
-        public const string VERSION_STRING = "0.051 (Open Alpha)";
 
 #pragma warning disable CS8618
         public STOLON()
@@ -77,7 +75,6 @@ namespace STOLON
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             _desiredModifier = 57;
-            _virtualModifier = 57; //(prev = 30, so = x1.9)
 
             _graphics.PreferredBackBufferWidth = DesiredDimensions.X;
             _graphics.PreferredBackBufferHeight = DesiredDimensions.Y;
@@ -114,7 +111,7 @@ namespace STOLON
 
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
             ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
-            _desiredModifier = (int)(_virtualModifier * ScreenScale);
+            _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
             _post.UpdateResolution();
             Window.ClientSizeChanged += Window_ClientSizeChanged;
@@ -183,7 +180,7 @@ namespace STOLON
                 else STOLON.Input.Domain = GameInputManager.MouseDomain.UserInterfaceLow;
 
                 ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
-                _desiredModifier = (int)(_virtualModifier * ScreenScale);
+                _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
 
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
@@ -224,6 +221,8 @@ namespace STOLON
         public static UserInterface UI { get; internal set; }
         public const string MEDIUM_FONT_ID = "fonts\\pixeloidMono";
         public const string SMALL_FONT_ID = "fonts\\smollerMono";
+        public const string VERSION_STRING = "0.051 (Open Alpha)";
+        public const int VIRTUAL_MODIFIER = 57;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static T[] Scan<T>() where T : class
