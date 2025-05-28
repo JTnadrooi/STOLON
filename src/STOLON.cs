@@ -195,7 +195,6 @@ namespace STOLON
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 
             _environment.Draw(_spriteBatch, gameTime.ElapsedGameTime.Milliseconds);
-            //_spriteBatch.Draw(STOLON.Textures.GetReference("textures\\characters\\silo"), new Vector2(500, 0), Color.White);
             _spriteBatch.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(VirtualDimensions.X / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 1f), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
             _spriteBatch.DrawRectangle(new Rectangle(Point.Zero, VirtualDimensions), Color.White, 1);
 
