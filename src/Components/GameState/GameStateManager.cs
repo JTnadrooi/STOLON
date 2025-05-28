@@ -26,12 +26,12 @@ namespace STOLON
 
     public static class GameStateExtensions
     {
-        public static string GetID(this IGameState state) => GameStateHelpers.GetID(state.GetType());
+        public static string GetId(this IGameState state) => GameStateHelpers.GetId(state.GetType());
     }
     public static class GameStateHelpers
     {
-        public static string GetID<T>() where T : IGameState, new() => GetID(typeof(T));
-        public static string GetID(Type type) => type.FullName ?? throw new Exception();
+        public static string GetId<T>() where T : IGameState, new() => GetId(typeof(T));
+        public static string GetId(Type type) => type.FullName ?? throw new Exception();
     }
     public class GameStateManager
     {
@@ -47,8 +47,8 @@ namespace STOLON
 
         public void ChangeState<T>(bool @override = false) where T : IGameState, new()
         {
-            if (@override) _currentState = _stateMemory[GameStateHelpers.GetID<T>()] = new T();
-            else _currentState = _stateMemory[GameStateHelpers.GetID<T>()] = _stateMemory.GetValueOrDefault(GameStateHelpers.GetID<T>()) ?? new T();
+            if (@override) _currentState = _stateMemory[GameStateHelpers.GetId<T>()] = new T();
+            else _currentState = _stateMemory[GameStateHelpers.GetId<T>()] = _stateMemory.GetValueOrDefault(GameStateHelpers.GetId<T>()) ?? new T();
         }
 
         public void Update(int elapsedMilliseconds)

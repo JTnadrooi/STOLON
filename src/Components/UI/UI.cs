@@ -131,7 +131,7 @@ namespace STOLON
             MenuPath = GetSelfPath(TITLE_PARENT_ID);
 
             STOLON.Debug.Log(">autogenerating _back_ buttons");
-            HashSet<string> parentIds = GetParentIDs();
+            HashSet<string> parentIds = GetParentIds();
             foreach (string id in parentIds) AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
             STOLON.Debug.Success();
             STOLON.Debug.Success();
@@ -147,10 +147,10 @@ namespace STOLON
                 _updateData.Add(uiElement.Id, new UIElementUpdateData(false, uiElement.Id));
             _drawData.Clear();
         }
-        public HashSet<string> GetTopIDs() => UIElements.Values.Where(e => e.IsTop).Select(e => e.Id).ToHashSet();
-        public HashSet<string> GetParentIDs()
+        public HashSet<string> GetTopIds() => UIElements.Values.Where(e => e.IsTop).Select(e => e.Id).ToHashSet();
+        public HashSet<string> GetParentIds()
         {
-            var topIds = GetTopIDs();
+            var topIds = GetTopIds();
             return UIElements.Values.WhereSelect(e => (e.ChildOf, !e.IsTop && !topIds.Contains(e.ChildOf))).ToHashSet();
         }
         public override void Update(int elapsedMiliseconds)
@@ -173,7 +173,7 @@ namespace STOLON
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
         {
-            string id = STOLON.StateManager.Current.GetID();
+            string id = STOLON.StateManager.Current.GetId();
             foreach (UIElementDrawData elementDrawData in _drawData)
             {
                 spriteBatch.DrawString(STOLON.Fonts[elementDrawData.FontName], elementDrawData.Text, elementDrawData.Position, Color.White, 0f, Vector2.Zero, STOLON.Fonts[elementDrawData.FontName].Scale, SpriteEffects.None, 1f);
@@ -208,9 +208,9 @@ namespace STOLON
 
     public struct UIPath : IEnumerable<string>
     {
-        public string TopID => segments[0];
-        public string ParentID => segments[^1];
-        public string UIElementID => segments.Last();
+        public string TopId => segments[0];
+        public string ParentId => segments[^1];
+        public string DestinationId => segments.Last();
         public int Lenght => segments.Count;
         public ReadOnlyCollection<string> Segments => segments.AsReadOnly();
         private readonly List<string> segments;

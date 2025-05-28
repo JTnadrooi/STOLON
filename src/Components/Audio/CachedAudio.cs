@@ -40,11 +40,11 @@ namespace STOLON
     public class CachedAudio
     {
         public float[] AudioData { get; private set; }
-        public string ID { get; }
+        public string Id { get; }
         public WaveFormat WaveFormat { get; private set; }
-        public CachedAudio(string audioFileName, string ID)
+        public CachedAudio(string audioFileName, string id)
         {
-            this.ID = ID;
+            this.Id = id;
             using var audioFileReader = new AudioFileReader(audioFileName);
             WaveFormat = audioFileReader.WaveFormat;
             List<float> wholeFile = new List<float>((int)(audioFileReader.Length / 4));

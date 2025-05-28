@@ -78,7 +78,7 @@ namespace STOLON
         /// </summary>
         /// <param name="tile">The tile to check.</param>
         /// <returns>The <strong>board relative id</strong> of the player occupying the <paramref name="tile"/> or <strong>-1</strong> if no player occupy the <paramref name="tile"/>.</returns>
-        public static int GetOccupiedByPlayerID(this Tile tile)
+        public static int GetOccupiedByPlayerId(this Tile tile)
         {
             if (tile.HasAttribute((TileAttributeBase)Attributes["Player0Occupied"])) return 0;
             if (tile.HasAttribute((TileAttributeBase)Attributes["Player1Occupied"])) return 1;
@@ -87,11 +87,11 @@ namespace STOLON
         /// <summary>
         /// Get a new <see cref="HashSet{T}"/> containing a list of <see cref="TileAttributeBase"/> objects fit for indicating a <see cref="Tile"/> is occupied.
         /// </summary>
-        /// <param name="playerID">The <strong>board-relative-id</strong> of the player to base the created <see cref="HashSet{T}"/> on.</param>
+        /// <param name="playerId">The <strong>board-relative-id</strong> of the player to base the created <see cref="HashSet{T}"/> on.</param>
         /// <returns>A new <see cref="HashSet{T}"/> containing a list of <see cref="TileAttributeBase"/> objects fit for indicating a <see cref="Tile"/> is occupied.</returns>
-        public static HashSet<TileAttributeBase> GetNewPlayerAttributes(int playerID) => new HashSet<TileAttributeBase>()
+        public static HashSet<TileAttributeBase> GetNewPlayerAttributes(int playerId) => new HashSet<TileAttributeBase>()
             {
-                (TileAttributeBase)TileAttributes.Attributes["Player" + playerID + "Occupied"],
+                (TileAttributeBase)TileAttributes.Attributes["Player" + playerId + "Occupied"],
                 TileAttributes.Get<TileAttributes.TileAttributeSolid>(),
             }; // keep new
         /// <summary>

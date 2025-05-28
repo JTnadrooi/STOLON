@@ -102,7 +102,7 @@ namespace STOLON
             _ostMixer.ReadFully = true;
             _ostMixer.PauzeWhenInactive = true;
             _ostVolumeSampleProvider = new VolumeSampleProvider(_ostMixer);
-            
+
             _masterMixer.AddMixerInput(_fxVolumeSampleProvider);
             _masterMixer.AddMixerInput(_ostVolumeSampleProvider);
 
@@ -138,13 +138,13 @@ namespace STOLON
         {
             DictionaryMixingSampleProvider mixer = GetMixer(domain);
 
-            AddMixerInput(new CachedAudioSampleProvider(audio), audio.ID, domain);
+            AddMixerInput(new CachedAudioSampleProvider(audio), audio.Id, domain);
             return audio;
         }
         /// <summary>
         /// Cancel a <see cref="CachedAudio"/> from playing. 
         /// </summary>
-        /// <param name="audioId">The <see cref="CachedAudio.ID"/> of the <see cref="CachedAudio"/> object.</param>
+        /// <param name="audioId">The <see cref="CachedAudio.Id"/> of the <see cref="CachedAudio"/> object.</param>
         /// <returns>The canceled <see cref="CachedAudio"/> object.</returns>
         public CachedAudio CancelCashed(string audioId, AudioDomain domain)
         {
@@ -214,7 +214,7 @@ namespace STOLON
         //{
         //    trackQueue.Clear();
         //    currentPlaylist = null;
-        
+
         //    if (fade)
         //    {
 
@@ -299,9 +299,9 @@ namespace STOLON
             return toret;
         }
 
-        public static Playlist GetLooped(string trackId) 
+        public static Playlist GetLooped(string trackId)
             => new Playlist(trackId.ToSingleArray(), false, true);
-        public static Playlist Merged(Playlist playlist1, Playlist playlist2, bool scramble, bool loop) 
+        public static Playlist Merged(Playlist playlist1, Playlist playlist2, bool scramble, bool loop)
             => new Playlist(playlist1.Get().Concat(playlist2.Get()).ToHashSet().ToArray(), scramble, loop);
     }
 }

@@ -69,7 +69,7 @@ namespace STOLON
 
             Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
             string elementText = element.Text;
-            if(_capitalise) element.Text = element.Text.ToUpper();
+            if (_capitalise) element.Text = element.Text.ToUpper();
 
             string postPre = element.Id switch
             {
@@ -79,9 +79,9 @@ namespace STOLON
             };
             bool elementIsHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
 
-            return (new UIElementDrawData(element.Id, elementIsHovered 
-                ? (postPre + " " + elementText + " " + postPre.Replace(">", "<")) 
-                :  elementText, _font.Name, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false), 
+            return (new UIElementDrawData(element.Id, elementIsHovered
+                ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
+                : elementText, _font.Name, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
                 elementIsHovered);
         }
     }
@@ -109,16 +109,16 @@ namespace STOLON
         public static void Order(UIElement[] uIElements, UIPath path, ICollection<UIElementDrawData> drawDump, IDictionary<string, UIElementUpdateData> updateDump,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
-            Order(uIElements, path.UIElementID, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
+            Order(uIElements, path.DestinationId, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
         }
-        public static void Order(UIElement[] uIElements, string parentID, ICollection<UIElementDrawData> drawDump, IDictionary<string, UIElementUpdateData> updateDump,
+        public static void Order(UIElement[] uIElements, string parentId, ICollection<UIElementDrawData> drawDump, IDictionary<string, UIElementUpdateData> updateDump,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             int orderIndex = 0;
             for (int i = 0; i < uIElements.Length; i++)
             {
                 UIElement element = uIElements[i];
-                if (element.ChildOf != parentID) continue;
+                if (element.ChildOf != parentId) continue;
 
                 var ret = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++);
                 updateDump[element.Id] = new UIElementUpdateData(ret.isHovered && isMouseRelevant, element.Id);

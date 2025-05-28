@@ -47,7 +47,7 @@ namespace STOLON
         public GoldsilkCom(GoldsilkEntity source) : base(source) { }
         public override void DoMove(Board board)
         {
-            int current = board.State.CurrentPlayerID;
+            int current = board.State.CurrentPlayerId;
             board.State.Alter(Search(board.State, board.UniqueMoveBoardMap, 3).Move, true);
 
             int ret = board.State.SearchAny();
@@ -64,7 +64,7 @@ namespace STOLON
 
             ConcurrentDictionary<int, TTEntry> tt = new ConcurrentDictionary<int, TTEntry>();
             List<Move> moves = map.GetAllMoves(state);
-            int color = state.CurrentPlayerID == 1 ? 1 : -1;
+            int color = state.CurrentPlayerId == 1 ? 1 : -1;
             List<(int score, Move move)> negaMaxedMoves = new List<(int score, Move move)>();
             List<(int score, Move move)> evaluatedMoves = new List<(int score, Move move)>();
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -119,7 +119,7 @@ namespace STOLON
             int randomScore;
             int outScore;
 
-            Tile sim = move.ToTile(state.CurrentPlayerID, state).Simulate(state);
+            Tile sim = move.ToTile(state.CurrentPlayerId, state).Simulate(state);
             state.Alter(move, true);
 
             connectScore = state.DeepSearchFrom(sim.TiledPosition, out _, null).Score;

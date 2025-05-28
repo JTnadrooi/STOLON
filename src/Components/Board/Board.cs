@@ -250,7 +250,7 @@ namespace STOLON
                 {
                     Tile tile = _state.Tiles[x, y];
                     _boardSpriteBatch.Draw(tile.TileType.Texture, tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    int playerid = tile.GetOccupiedByPlayerID();
+                    int playerid = tile.GetOccupiedByPlayerId();
                     if (playerid != -1)
                     {
                         _boardSpriteBatch.Draw(STOLON.Textures.GetReference("textures\\player" + playerid + "item_96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
@@ -338,11 +338,11 @@ namespace STOLON
             Origin = origin;
         }
 
-        public Tile ToTile(int playerID, BoardState state) => ToTile(playerID, state.Tiles);
-        public Tile ToTile(int playerID, Tile[,] tiles) => ToTile(playerID, tiles[Origin.X, Origin.Y].Attributes);
-        public Tile ToTile(int playerID, HashSet<TileAttributeBase> OGattributes)
+        public Tile ToTile(int playerId, BoardState state) => ToTile(playerId, state.Tiles);
+        public Tile ToTile(int playerId, Tile[,] tiles) => ToTile(playerId, tiles[Origin.X, Origin.Y].Attributes);
+        public Tile ToTile(int playerId, HashSet<TileAttributeBase> OGattributes)
         {
-            HashSet<TileAttributeBase> a = TileAttributes.GetNewPlayerAttributes(playerID);
+            HashSet<TileAttributeBase> a = TileAttributes.GetNewPlayerAttributes(playerId);
             a.UnionWith(OGattributes);
             return new Tile(new Point(Origin.X, Origin.Y), null, a);
         }

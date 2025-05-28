@@ -33,7 +33,7 @@ namespace STOLON
             IOverlay[] overlays = STOLON.Scan<IOverlay>();
             foreach (IOverlay overlay in overlays)
             {
-                STOLON.Debug.Log($"found overlay with id \"{overlay.ID}\".");
+                STOLON.Debug.Log($"found overlay with id \"{overlay.Id}\".");
                 AddOverlay(overlay);
             }
             STOLON.Debug.Success();
@@ -42,8 +42,8 @@ namespace STOLON
         public void AddOverlay<TOverlay>() where TOverlay : IOverlay, new() => AddOverlay(new TOverlay());
         public void AddOverlay(IOverlay overlay)
         {
-            STOLON.Debug.Log(">adding overlay of id " + overlay.ID + ".");
-            _overlays.Add(overlay.ID, overlay);
+            STOLON.Debug.Log(">adding overlay of id " + overlay.Id + ".");
+            _overlays.Add(overlay.Id, overlay);
             STOLON.Debug.Success();
         }
 
@@ -67,7 +67,7 @@ namespace STOLON
             }
         }
 
-        public bool IsActive(IOverlay overlay) => IsActive(overlay.ID);
+        public bool IsActive(IOverlay overlay) => IsActive(overlay.Id);
         public bool IsActive(string overlayId)
         {
             return _initialized.Contains(overlayId);
@@ -93,8 +93,8 @@ namespace STOLON
                 overlay.Update(elapsedMiliseconds);
                 if (overlay.Ended)
                 {
-                    STOLON.Debug.Log(">deactivating and resetting ended overlay of id " + overlay.ID + ".");
-                    Deactivate(overlay.ID);
+                    STOLON.Debug.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
+                    Deactivate(overlay.Id);
                     STOLON.Debug.Success();
                 }
             }
@@ -119,12 +119,12 @@ namespace STOLON
         public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds);
         public void Reset();
 
-        public string ID { get; }
+        public string Id { get; }
         public bool Ended { get; }
     }
     public class LoadOverlay : IOverlay
     {
-        public string ID => "loading";
+        public string Id => "loading";
         public bool Ended { get; private set; }
 
         private Texture2D lineTexture;
@@ -168,7 +168,7 @@ namespace STOLON
     }
     public class TransitionDitherOverlay : IOverlay
     {
-        public string ID => "transitionDither";
+        public string Id => "transitionDither";
 
         public bool Ended => _ended;
 
@@ -252,7 +252,7 @@ namespace STOLON
     }
     public class TransitionOverlay : IOverlay
     {
-        public string ID => "transition";
+        public string Id => "transition";
 
         public bool Ended { get; private set; }
 

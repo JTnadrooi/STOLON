@@ -80,14 +80,14 @@ namespace STOLON
         public Tile[,] Tiles => tiles;
         public Player[] Players => players;
         public SearchTargetCollection WinSearchTargets => winSearchTargets;
-        public int CurrentPlayerID { get; private set; }
+        public int CurrentPlayerId { get; private set; }
         //public int TileCount { get; set; }
-        public Player CurrentPlayer => Players[CurrentPlayerID];
+        public Player CurrentPlayer => Players[CurrentPlayerId];
 
         public Stack<UndoObj> undoStack;
         public Collection<UndoObj> undoSet;
 
-        public int NextPlayer => CurrentPlayerID == 0 ? 1 : 0; //NONPOLYPLAYER
+        public int NextPlayer => CurrentPlayerId == 0 ? 1 : 0; //NONPOLYPLAYER
 
         private readonly Tile[,] tiles;
         private readonly Player[] players;
@@ -101,13 +101,13 @@ namespace STOLON
             this.players = players;
             dimensions = new Point(tiles.GetLength(0), tiles.GetLength(1));
             this.winSearchTargets = searchTargets ?? new SearchTargetCollection();
-            CurrentPlayerID = currentPlayer;
+            CurrentPlayerId = currentPlayer;
             undoStack = new Stack<UndoObj>();
             undoSet = new Collection<UndoObj>();
         }
         public void GoNextPlayer()
         {
-            CurrentPlayerID = NextPlayer;
+            CurrentPlayerId = NextPlayer;
         }
         public int DistanceFromCenter(int x) => Math.Min(x, 8 / 2);
         public BoardState DeepCopy()
@@ -116,7 +116,7 @@ namespace STOLON
             for (int x = 0; x < dimensions.X; x++)
                 for (int y = 0; y < dimensions.Y; y++)
                     tiles2[x, y] = tiles[x, y].Clone();
-            BoardState toret = new BoardState(tiles2, players, winSearchTargets, CurrentPlayerID);
+            BoardState toret = new BoardState(tiles2, players, winSearchTargets, CurrentPlayerId);
             return toret;
         }
         public Tile GetTile(Point p) => tiles[p.X, p.Y];
@@ -150,7 +150,7 @@ namespace STOLON
             {
                 for (int y = 0; y < dimensions.Y; y++)
                 {
-                    int playerid = tiles[x, y].GetOccupiedByPlayerID();
+                    int playerid = tiles[x, y].GetOccupiedByPlayerId();
                     if (playerid == -1 || playerid != targetPlayer) continue;
                     if (SearchFrom(new Point(x, y), target, false, playerid).Succes)
                     {
@@ -164,7 +164,7 @@ namespace STOLON
         public SquaredSearchData DeepSearchFrom(Point pos, out int outPlayerId, SearchTargetCollection? targets = null)
         {
             targets ??= winSearchTargets;
-            int playerid = tiles[pos.X, pos.Y].GetOccupiedByPlayerID();
+            int playerid = tiles[pos.X, pos.Y].GetOccupiedByPlayerId();
             int score = 0;
             outPlayerId = playerid;
             if (playerid == -1) return SquaredSearchData.False;
@@ -183,7 +183,7 @@ namespace STOLON
         public SearchData SearchFrom(Point pos, out int outPlayerId, SearchTargetCollection? targets = null, bool twotry = false)
         {
             targets ??= winSearchTargets;
-            int playerid = tiles[pos.X, pos.Y].GetOccupiedByPlayerID();
+            int playerid = tiles[pos.X, pos.Y].GetOccupiedByPlayerId();
             int score = 0;
             outPlayerId = playerid;
             if (playerid == -1)
@@ -203,8 +203,8 @@ namespace STOLON
 
         public SearchData SearchFrom(Point pos, SearchTarget target, bool twotry = false, int occuPlayerId = -1)
         {
-            occuPlayerId = occuPlayerId == -1 ? tiles[pos.X, pos.Y].GetOccupiedByPlayerID() : occuPlayerId;
-            if (occuPlayerId == -1) 
+            occuPlayerId = occuPlayerId == -1 ? tiles[pos.X, pos.Y].GetOccupiedByPlayerId() : occuPlayerId;
+            if (occuPlayerId == -1)
                 return SearchData.False;
             int SearchFromInternallly(Point[] nodes, Point newPos)
             {
@@ -219,7 +219,7 @@ namespace STOLON
                         tile = GetTile(nodes[i] + newPos);
                     }
                     catch { continue; }
-                    if (tile.GetOccupiedByPlayerID() == occuPlayerId) score++;
+                    if (tile.GetOccupiedByPlayerId() == occuPlayerId) score++;
                 }
                 return score;
             }
@@ -238,7 +238,7 @@ namespace STOLON
             return new SearchData(score, false);
         }
 
-        public int GetPlayerID(Player player) => players.GetFirstIndexWhere(p => p.Equals(player));
+        public int GetPlayerId(Player player) => players.GetFirstIndexWhere(p => p.Equals(player));
         public bool Alter(Tile overridenTile)
         {
             Tiles[overridenTile.TiledPosition.X, overridenTile.TiledPosition.Y].Attributes = overridenTile.Attributes;
@@ -259,7 +259,7 @@ namespace STOLON
             //toadd.UnionWith(Tiles[move.Origin.X, move.Origin.Y].Attributes);
 
             //Tile sim = new Tile(new Point(move.Origin.X, move.Origin.Y), null, toadd).Simulate(this);
-            Tile sim = move.ToTile(CurrentPlayerID, Tiles[move.Origin.X, move.Origin.Y].Attributes).Simulate(this);
+            Tile sim = move.ToTile(CurrentPlayerId, Tiles[move.Origin.X, move.Origin.Y].Attributes).Simulate(this);
 
 
             Alter(sim);
@@ -287,9 +287,9 @@ namespace STOLON
             UndoObj undoObj = undoStack.Pop();
             undoSet.Remove(undoObj);
 
-            if (undoObj.NextPlayer) CurrentPlayerID = CurrentPlayerID == 0 ? 1 : 0;
+            if (undoObj.NextPlayer) CurrentPlayerId = CurrentPlayerId == 0 ? 1 : 0;
 
-            undoObj.Sim.Attributes.Remove((TileAttributeBase)TileAttributes.Attributes["Player" + CurrentPlayerID + "Occupied"]);
+            undoObj.Sim.Attributes.Remove((TileAttributeBase)TileAttributes.Attributes["Player" + CurrentPlayerId + "Occupied"]);
             undoObj.Sim.Attributes.Remove(TileAttributes.Get<TileAttributes.TileAttributeSolid>());
 
             Alter(new Tile(undoObj.Sim.TiledPosition, undoObj.Sim.TileType, undoObj.Sim.Attributes));
