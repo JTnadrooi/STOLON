@@ -23,6 +23,5 @@ namespace STOLON
         public static SizeF ToSizeF(this Vector2 vector) => new SizeF(vector.X, vector.Y);
         public static Point ToPoint(this SizeF size) => new Point((int)size.Width, (int)size.Height);
         public static Vector2 ToVector(this SizeF size) => new Vector2(size.Width, size.Height);
-        public static Rectangle ToRectangle(this Point point) => new Rectangle(Point.Zero, point);
     }
 }
