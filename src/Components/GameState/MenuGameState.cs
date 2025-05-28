@@ -360,7 +360,7 @@ namespace STOLON
             }), 2000, false);
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
 
-            _tipPos = Centering.MiddleX((int)(STOLON.Fonts["fonts\\smollerMono"].FastMeasure(_tips[_tipId]).X),
+            _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
                 _menuLogoDrawPos.Y + _menuLogoLines.Height + (menuLogoBoundingBoxClearing * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
 
             _menuRemoveLineY = (int)(_menuRemoveTweener.Value * STOLON.Instance.VirtualDimensions.Y);
@@ -374,7 +374,7 @@ namespace STOLON
         {
             spriteBatch.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             spriteBatch.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone) spriteBatch.DrawString(STOLON.Fonts["fonts\\smollerMono"], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts["fonts\\smollerMono"].Scale, SpriteEffects.None, 1f);
+            if (_menuDone) spriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
 
             if (_drawMenuLogoLowResFonted)
             {
