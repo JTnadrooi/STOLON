@@ -141,23 +141,16 @@ namespace STOLON
             Debug.Log(">[s]loading stolon content");
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _textures = new GameTextureCollection(Content);
-            _fonts = new GameFontCollection(Content);
-            _input = new GameInputManager();
-
-            STOLON.Textures = _textures;
-            STOLON.Fonts = _fonts;
-            STOLON.Input = _input;
-
-            _environment = new GameEnvironment();
-            STOLON.Environment = _environment;
-
+            STOLON.Textures = _textures = new GameTextureCollection(Content);
+            STOLON.Fonts = _fonts = new GameFontCollection(Content);
+            STOLON.Input = _input = new GameInputManager();
+            STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
             _palette = new Color[]
             {
-                System.Drawing.ColorTranslator.FromHtml("#f2fbeb").ToColor(),
-                System.Drawing.ColorTranslator.FromHtml("#171219").ToColor(),
+                new Color(242, 251, 235), // #f2fbeb
+                new Color(23, 18, 25), // #171219
             };
 
             _post = new EffectPipeline();

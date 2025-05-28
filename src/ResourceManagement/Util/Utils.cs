@@ -202,10 +202,6 @@ namespace STOLON
         //{
         //    return new Point((int)v.X, (int)v.Y);
         //}
-        public static string ToHex(this System.Drawing.Color color)
-        {
-            return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
-        }
         public static string ToHex(this Color color)
         {
             return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
