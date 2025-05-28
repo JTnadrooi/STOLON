@@ -27,7 +27,6 @@ namespace STOLON
         private GraphicsDeviceManager _graphics;
         private GameInputManager _input;
         private SpriteBatch _spriteBatch;
-        private RenderTarget2D _renderTarget;
 
         private GameEnvironment _environment;
         private Point _aspectRatio = new Point(16, 9);
@@ -83,7 +82,6 @@ namespace STOLON
             Window.AllowUserResizing = true;
             _graphics.ApplyChanges();
 
-            _renderTarget = new RenderTarget2D(GraphicsDevice, VirtualDimensions.X, VirtualDimensions.Y, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
             Debug.Success();
