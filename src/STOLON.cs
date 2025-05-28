@@ -60,14 +60,14 @@ namespace STOLON
             Content.RootDirectory = "content";
             IsMouseVisible = true;
 
-            Debug = new DebugStream(header: "stolon");
+            Debug = new DebugStream(header: "STOLON");
             Debug.Silent = false;
             Audio = new AudioEngine();
         }
 
         protected override void Initialize()
         {
-            Debug.Log(">[s]initializing stolon");
+            Debug.Log(">[s]initializing STOLON");
             DRP = new DiscordRichPresence();
             DRP.UpdateDetails("Initializing..");
 
