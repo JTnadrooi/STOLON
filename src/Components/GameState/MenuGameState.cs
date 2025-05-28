@@ -352,8 +352,9 @@ namespace STOLON
             {
                 _onLeave?.Invoke();
                 _onLeave = null;
-                STOLON.StateManager.ChangeState<BoardGameState>(true);
-                ((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
+                //STOLON.StateManager.ChangeState<BoardGameState>(true);
+                //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
+                STOLON.StateManager.ChangeState<EntitySelectGameState>(true);
                 _boardPlayers = null;
             }), 2000, false);
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
