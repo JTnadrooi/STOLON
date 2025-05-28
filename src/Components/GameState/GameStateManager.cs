@@ -30,7 +30,7 @@ namespace STOLON
     }
     public static class GameStateHelpers
     {
-        public static string GetId<T>() where T : IGameState, new() => GetId(typeof(T));
+        public static string GetId<T>() where T : IGameState => GetId(typeof(T));
         public static string GetId(Type type) => type.FullName ?? throw new Exception();
     }
     public class GameStateManager
@@ -63,5 +63,7 @@ namespace STOLON
 
         public TGameState GetCurrent<TGameState>() where TGameState : IGameState => (TGameState)Current;
         public bool IsCurrent<TGameState>() where TGameState : IGameState => Current is TGameState;
+        public bool TryGetState<TGameState>(out TGameState? state) where TGameState : IGameState
+            => _stateMemory.TryGetValue(GameStateHelpers.GetId<TGameState>(), out var s) & (state = (TGameState?)s) != null;
     }
 }
