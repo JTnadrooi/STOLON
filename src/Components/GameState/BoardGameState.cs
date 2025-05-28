@@ -17,8 +17,6 @@ namespace STOLON
 {
     public class BoardGameState : IGameState
     {
-        public string DRPStatus => "BoardState";
-
         private int _lineX1;
         private int _lineX2;
         private float _lineOffset;

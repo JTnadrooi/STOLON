@@ -17,8 +17,6 @@ namespace STOLON
 {
     public class EntitySelectGameState : IGameState
     {
-        public string DRPStatus => nameof(EntitySelectGameState);
-
         public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
         {
         }

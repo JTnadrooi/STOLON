@@ -21,8 +21,7 @@ namespace STOLON
     {
         public void Update(int elapsedMilliseconds);
         public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds);
-        public string DRPStatus { get; }
-        //public string DRPStatus => this.GetType().Name;
+        public string DRPStatus => this.GetType().Name;
     }
 
     public static class GameStateExtensions

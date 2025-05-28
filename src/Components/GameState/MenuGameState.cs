@@ -17,8 +17,6 @@ namespace STOLON
 {
     public class MenuGameState : IGameState
     {
-        public string DRPStatus => "MenuState";
-
         private Texture2D _menuLogoLines;
         private Texture2D _menuLogoDummyTiles;
         private Texture2D _menuLogoFilledTiles;
