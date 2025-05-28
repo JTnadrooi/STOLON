@@ -48,8 +48,8 @@ namespace STOLON
         private int _menuLineWidth;
 
         private int _menuRemoveLineY;
-        private int _menuRemoveLine1x;
-        private int _menuRemoveLine2x;
+        internal int MenuRemoveLine1x;
+        internal int MenuRemoveLine2x;
 
         private float _menuLogoScaling;
 
@@ -364,8 +364,8 @@ namespace STOLON
 
             _menuRemoveLineY = (int)(_menuRemoveTweener.Value * STOLON.Instance.VirtualDimensions.Y);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
-            _menuRemoveLine1x = lDelta;
-            _menuRemoveLine2x = STOLON.Instance.VirtualDimensions.X - lDelta;
+            MenuRemoveLine1x = lDelta;
+            MenuRemoveLine2x = STOLON.Instance.VirtualDimensions.X - lDelta;
 
             Centering.OnPixel(ref _menuLogoDrawPos);
         }
@@ -391,8 +391,8 @@ namespace STOLON
             spriteBatch.Draw(STOLON.Textures.Pixel, _menuLogoTileHider, Color.Black);
             if (_drawMenuLogoLines) spriteBatch.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);
 
-            spriteBatch.DrawLine(_menuRemoveLine1x, -10f, _menuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
-            spriteBatch.DrawLine(_menuRemoveLine2x, -10f, _menuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            spriteBatch.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            spriteBatch.DrawLine(MenuRemoveLine2x, -10f, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
         }
     }
 }
