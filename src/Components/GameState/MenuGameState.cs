@@ -175,6 +175,7 @@ namespace STOLON
                 "That translates to \"flour\".",
                 "Index is jealous.",
                 "the chairs have eyes",
+                "\"Its funny. You.\"",
             };
 
             _tipId = new Random().Next(0, _tips.Length);
