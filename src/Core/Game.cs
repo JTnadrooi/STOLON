@@ -25,7 +25,7 @@ namespace STOLON
     public partial class STOLON : Game
     {
         private GraphicsDeviceManager _graphics;
-        private GameInputManager _input;
+        private GameInputHelper _input;
         private SpriteBatch _spriteBatch;
 
         private GameEnvironment _environment;
@@ -138,7 +138,7 @@ namespace STOLON
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             STOLON.Textures = _textures = new GameTextureCollection(Content);
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
-            STOLON.Input = _input = new GameInputManager();
+            STOLON.Input = _input = new GameInputHelper();
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
@@ -169,10 +169,10 @@ namespace STOLON
                 STOLON.Input.PreviousKeyboard = STOLON.Input.CurrentKeyboard;
                 STOLON.Input.CurrentKeyboard = Keyboard.GetState();
 
-                if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = GameInputManager.MouseDomain.OfScreen;
-                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInputManager.MouseDomain.Dialogue;
-                else if (STOLON.StateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputManager.MouseDomain.Board;
-                else STOLON.Input.Domain = GameInputManager.MouseDomain.UserInterfaceLow;
+                if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = GameInputHelper.MouseDomain.OfScreen;
+                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInputHelper.MouseDomain.Dialogue;
+                else if (STOLON.StateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInputHelper.MouseDomain.Board;
+                else STOLON.Input.Domain = GameInputHelper.MouseDomain.UserInterfaceLow;
 
                 ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
@@ -210,7 +210,7 @@ namespace STOLON
         public static AudioEngine Audio { get; private set; }
         public static DebugStream Debug { get; private set; }
         public static GameEnvironment Environment { get; private set; }
-        public static GameInputManager Input { get; private set; }
+        public static GameInputHelper Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
         public static UserInterface UI { get; internal set; }
         public const string MEDIUM_FONT_ID = "fonts\\pixeloidMono";

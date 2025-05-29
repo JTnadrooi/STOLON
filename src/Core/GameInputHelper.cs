@@ -20,7 +20,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace STOLON
 {
-    public class GameInputManager
+    public class GameInputHelper
     {
         public enum MouseButton
         {
