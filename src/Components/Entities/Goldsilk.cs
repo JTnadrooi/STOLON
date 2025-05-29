@@ -23,7 +23,7 @@ namespace STOLON
     /// </summary>
     public class GoldsilkEntity : EntityBase
     {
-        public override SLComputer Computer => _computer;
+        public override Computer Computer => _computer;
         public override Texture2D Splash => STOLON.Textures.GetReference("textures\\splash\\goldsilk"); // unrelevant in first ver
         public override string? Description => "This shoulden't be readable in the current verion.";
 
@@ -42,7 +42,7 @@ namespace STOLON
     /// <summary>
     /// The computer <see cref="GoldsilkEntity"/> uses to play.
     /// </summary>
-    public class GoldsilkCom : SLComputer
+    public class GoldsilkCom : Computer
     {
         public GoldsilkCom(GoldsilkEntity source) : base(source) { }
         public override void DoMove(Board board)

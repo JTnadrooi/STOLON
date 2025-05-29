@@ -39,9 +39,9 @@ namespace STOLON
             return new Player(Name, Computer);
         }
         /// <summary>
-        /// Get the <see cref="SLComputer"/> of this <see cref="EntityBase"/>.
+        /// Get the <see cref="global::STOLON.Computer"/> of this <see cref="EntityBase"/>.
         /// </summary>
-        public abstract SLComputer Computer { get; }
+        public abstract Computer Computer { get; }
         /// <summary>
         /// The texture thats gets drawn when this entity is selected in the selectEntityMernu. (Unused for now)
         /// </summary>
@@ -71,17 +71,17 @@ namespace STOLON
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
     /// </summary>
-    public abstract class SLComputer
+    public abstract class Computer
     {
         /// <summary>
         /// The source <see cref="EntityBase"/>.
         /// </summary>
         public EntityBase? Source { get; }
         /// <summary>
-        /// Create a new <see cref="SLComputer"/> with a set <see cref="Source"/> <see cref="EntityBase"/>.
+        /// Create a new <see cref="Computer"/> with a set <see cref="Source"/> <see cref="EntityBase"/>.
         /// </summary>
         /// <param name="source">The source <see cref="EntityBase"/>.</param>
-        public SLComputer(EntityBase? source)
+        public Computer(EntityBase? source)
         {
             Source = source;
         }
@@ -92,10 +92,10 @@ namespace STOLON
         public abstract void DoMove(Board board);
 
         /// <summary>
-        /// Gets the <see cref="Player"/> this <see cref="SLComputer"/> plays for.
+        /// Gets the <see cref="Player"/> this <see cref="Computer"/> plays for.
         /// </summary>
         /// <param name="state">The current state of the <see cref="Board"/>.</param>
-        /// <returns>The <see cref="Player"/> this <see cref="SLComputer"/> plays for.</returns>
+        /// <returns>The <see cref="Player"/> this <see cref="Computer"/> plays for.</returns>
         public Player GetPlayer(BoardState state)
         {
             Player[] players = state.Players.ToArray();

@@ -14,9 +14,9 @@ namespace STOLON
         /// </summary>
         public string Name { get; }
         /// <summary>
-        /// The <see cref="SLComputer"/> responsible for this player's actions.
+        /// The <see cref="global::STOLON.Computer"/> responsible for this player's actions.
         /// </summary>
-        public SLComputer? Computer { get; }
+        public Computer? Computer { get; }
         /// <summary>
         /// A value indicating if this <see cref="Player"/> is a computer or not.
         /// </summary>
@@ -25,8 +25,8 @@ namespace STOLON
         /// Create a new <see cref="Player"/> with set properties.
         /// </summary>
         /// <param name="name">The name of the player. <strong>Does not need to be unique.</strong></param>
-        /// <param name="computer">The <see cref="SLComputer"/> responsible for this player's actions.</param>
-        public Player(string name, SLComputer? computer = null)
+        /// <param name="computer">The <see cref="global::STOLON.Computer"/> responsible for this player's actions.</param>
+        public Player(string name, Computer? computer = null)
         {
             Name = name;
             Computer = computer;
