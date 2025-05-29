@@ -155,12 +155,9 @@ namespace STOLON
         }
         protected override void UnloadContent()
         {
-        }
-        public void SLExit()
-        {
-            MediaPlayer.Stop();
             Audio.Dispose();
-            Exit();
+            MediaPlayer.Stop();
+            base.UnloadContent();
         }
         protected override void Update(GameTime gameTime)
         {

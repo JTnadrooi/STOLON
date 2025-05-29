@@ -343,7 +343,7 @@ namespace STOLON
             }
             if (STOLON.UI.UIElementUpdateData["quit"].IsClicked)
             {
-                STOLON.Instance.SLExit();
+                STOLON.Instance.Exit();
             }
 
             if (!_menuDone) return;
