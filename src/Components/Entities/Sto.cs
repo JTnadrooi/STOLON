@@ -23,17 +23,11 @@ namespace STOLON
     public class StoEntity : EntityBase
     {
         public override Computer Computer => null!;
-        public override Texture2D Splash => STOLON.Textures.GetReference("textures\\splash\\goldsilk"); // unrelevant in first ver
         public override string? Description => "This also shoulden't be readable in the current verion.";
 
         public StoEntity() : base("sto", "Sto", "St")
         {
 
-        }
-
-        public override DialogueInfo GetReaction(PrimitiveReactOption reactOption)
-        {
-            return new DialogueInfo(this, "");
         }
     }
 }

@@ -9,10 +9,6 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public static class Entities
-    {
-
-    }
     /// <summary>
     /// Represent the main component of a <see cref="EntityBase"/>.
     /// </summary>
@@ -43,30 +39,15 @@ namespace STOLON
         /// </summary>
         public abstract Computer Computer { get; }
         /// <summary>
-        /// The texture thats gets drawn when this entity is selected in the selectEntityMernu. (Unused for now)
-        /// </summary>
-        public abstract Texture2D Splash { get; }
-        /// <summary>
         /// A short description of this <see cref="EntityBase"/>.
         /// </summary>
         public virtual string? Description { get; }
-
-        public abstract DialogueInfo GetReaction(PrimitiveReactOption reactOption); // unused.
         /// <summary>
         /// The unique ID of this <see cref="EntityBase"/>, no capital letters.
         /// </summary>
         public string Id { get; private set; }
         public string Name { get; private set; }
         public string SymbolNotation { get; protected set; }
-
-        public enum PrimitiveReactOption // uh
-        {
-            Afk,
-            Distressed,
-            Calm,
-            GameLost,
-            GameWon,
-        }
     }
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
