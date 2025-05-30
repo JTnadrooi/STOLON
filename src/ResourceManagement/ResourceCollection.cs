@@ -34,8 +34,7 @@ namespace STOLON
     {
         public ContentManager ContentManager { get; }
         public TContent GetReference(string path);
-        public void UnLoadAll();
-        public void UnLoad(string path);
+        public void UnloadContent();
         public void Add(TContent resource, string? newName = null);
     }
     public abstract class ResourceCollection<TContent> : IResourceCollection<TContent>
@@ -80,15 +79,7 @@ namespace STOLON
                 throw new KeyNotFoundException($"Resource '{path}' not found.");
             return item;
         }
-
-        public virtual void UnLoad(string path)
-        {
-            if (dictionary[path] is IDisposable disposable)
-                disposable.Dispose();
-            dictionary.Remove(path);
-        }
-
-        public virtual void UnLoadAll()
+        public virtual void UnloadContent()
         {
             foreach (var item in dictionary.Values)
                 if (item is IDisposable disposable)
@@ -105,7 +96,7 @@ namespace STOLON
         {
             if (!_disposedValue && disposing)
             {
-                UnLoadAll();
+                UnloadContent();
                 _disposedValue = true;
             }
         }

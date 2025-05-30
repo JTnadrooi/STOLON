@@ -157,6 +157,8 @@ namespace STOLON
         {
             Audio.Dispose();
             MediaPlayer.Stop();
+            Textures.UnloadContent();
+            Fonts.UnloadContent();
             base.UnloadContent();
         }
         protected override void Update(GameTime gameTime)
