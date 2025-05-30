@@ -52,21 +52,13 @@ namespace STOLON
             catch { return null; }
         })
         {
-
             _pixel = new GameTexture(new Texture2D(contentManager.GetGraphicsDevice(), 1, 1));
-            ((Texture2D)_pixel).SetData(new[] { Color.White });
+            ((Texture2D)_pixel).SetData(new Color[] { Color.White });
         }
-
-        public TContent HardLoad<TContent>(string path)
-        {
-            STOLON.Debug.Log("hardloading path: " + path);
-            return ContentManager.Load<TContent>(path);
-        }
-
         public override void UnLoadAll()
         {
-            base.UnLoadAll();
             _pixel.Dispose();
+            base.UnLoadAll();
         }
     }
 }
