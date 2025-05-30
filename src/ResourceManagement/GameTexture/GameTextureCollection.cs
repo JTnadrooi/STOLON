@@ -41,19 +41,11 @@ namespace STOLON
         {
             try
             {
-                GameTexture texture = new GameTexture(TexturePalette.Debug, contentManager.Load<Texture2D>(toLoad));
+                GameTexture texture = new GameTexture(contentManager.Load<Texture2D>(toLoad));
                 if (debug)
                 {
                     Color[] data = new Color[texture.Width * texture.Height];
                     texture.GetColorData(data);
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        if (!TexturePalette.Debug.Contains(data[i]) && data[i].A == 1)
-                        {
-                            STOLON.Debug.Log("found DEBUG texture: " + texture.Name);
-                            break;
-                        }
-                    }
                 }
                 return texture;
             }
@@ -61,7 +53,7 @@ namespace STOLON
         })
         {
 
-            _pixel = new GameTexture(TexturePalette.Empty, new Texture2D(contentManager.GetGraphicsDevice(), 1, 1));
+            _pixel = new GameTexture(new Texture2D(contentManager.GetGraphicsDevice(), 1, 1));
             ((Texture2D)_pixel).SetData(new[] { Color.White });
         }
 

@@ -39,12 +39,11 @@ namespace STOLON
             {
                 return collection.GetReference(newName);
             }
-            GameTexture texture2 = new GameTexture(texture.Palette, graphicsDevice, texture.Width, texture.Height);
+            GameTexture texture2 = new GameTexture(graphicsDevice, texture.Width, texture.Height);
             Color[] data = new Color[texture.Width * texture.Height];
             texture.GetColorData(data);
             texture2.SetColorData(data);
             texture2.Name = newName;
-            texture2.Tag = texture.Tag;
 
             if (lazyCopy)
             {
