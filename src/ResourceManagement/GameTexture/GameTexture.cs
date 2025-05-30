@@ -26,9 +26,6 @@ using System.IO;
 using MonoGame.Extended.Content;
 using Microsoft.Xna.Framework.Content;
 
-
-
-
 namespace STOLON
 {
     public class GameTexture
@@ -41,7 +38,6 @@ namespace STOLON
 
         private Texture2D _texture;
         private bool _disposedValue;
-
         public GameTexture(Texture2D texture)
         {
             this._texture = texture;
@@ -53,14 +49,6 @@ namespace STOLON
         }
         public void GetColorData(Color[] data) => _texture.GetData(data);
         public void SetColorData(Color[] data) => _texture.SetData(data);
-        public static GameTexture GetPixel(GraphicsDevice graphicsDevice, string name = "pixel")
-        {
-            GameTexture pixel = new GameTexture(graphicsDevice, 1, 1);
-            pixel.SetColorData(new Color[] { Color.White });
-            pixel.Name = name;
-            return pixel;
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
@@ -69,7 +57,6 @@ namespace STOLON
                 _disposedValue = true;
             }
         }
-
         public void Dispose()
         {
             Dispose(disposing: true);
