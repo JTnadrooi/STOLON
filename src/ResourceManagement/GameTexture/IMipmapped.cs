@@ -33,7 +33,7 @@ namespace STOLON
 {
     public interface IMipmapped
     {
-        public IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
+        public IReadOnlyDictionary<int, GameTexture?> Mipmaps { get; }
     }
 
     public static class MipmappedExtensions

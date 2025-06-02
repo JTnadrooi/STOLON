@@ -14,7 +14,7 @@ namespace STOLON
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
-        public abstract IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
+        public abstract IReadOnlyDictionary<int, GameTexture?> Mipmaps { get; }
         /// <summary>
         /// Create a new <see cref="Entity"/> with set values.
         /// </summary>
