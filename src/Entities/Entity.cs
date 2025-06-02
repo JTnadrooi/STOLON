@@ -10,42 +10,42 @@ using System.Threading.Tasks;
 namespace STOLON
 {
     /// <summary>
-    /// Represent the main component of a <see cref="EntityBase"/>.
+    /// Represent the main component of a <see cref="Entity"/>.
     /// </summary>
-    public abstract class EntityBase : IDialogueProvider, IMipmapped
+    public abstract class Entity : IDialogueProvider, IMipmapped
     {
         public abstract IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
         /// <summary>
-        /// Create a new <see cref="EntityBase"/> with set values.
+        /// Create a new <see cref="Entity"/> with set values.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
         /// <param name="symbolNotation"></param>
-        public EntityBase(string id, string name, string symbolNotation)
+        public Entity(string id, string name, string symbolNotation)
         {
             Id = id;
             Name = name;
             SymbolNotation = symbolNotation;
         }
         /// <summary>
-        /// Get the <see cref="Player"/> of this <see cref="EntityBase"/>.
+        /// Get the <see cref="Player"/> of this <see cref="Entity"/>.
         /// </summary>
-        /// <returns>A new <see cref="Player"/> created from this <see cref="EntityBase"/>.</returns>
+        /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
         public Player GetPlayer()
         {
             return new Player(Name, Computer);
         }
 
         /// <summary>
-        /// Get the <see cref="Computer"/> of this <see cref="EntityBase"/>.
+        /// Get the <see cref="Computer"/> of this <see cref="Entity"/>.
         /// </summary>
         public abstract Computer Computer { get; }
         /// <summary>
-        /// A short description of this <see cref="EntityBase"/>.
+        /// A short description of this <see cref="Entity"/>.
         /// </summary>
         public virtual string? Description { get; }
         /// <summary>
-        /// The unique ID of this <see cref="EntityBase"/>, no capital letters.
+        /// The unique ID of this <see cref="Entity"/>, no capital letters.
         /// </summary>
         public string Id { get; private set; }
         public string Name { get; private set; }
@@ -57,19 +57,19 @@ namespace STOLON
     public abstract class Computer
     {
         /// <summary>
-        /// The source <see cref="EntityBase"/>.
+        /// The source <see cref="Entity"/>.
         /// </summary>
-        public EntityBase? Source { get; }
+        public Entity? Source { get; }
         /// <summary>
-        /// Create a new <see cref="Computer"/> with a set <see cref="Source"/> <see cref="EntityBase"/>.
+        /// Create a new <see cref="Computer"/> with a set <see cref="Source"/> <see cref="Entity"/>.
         /// </summary>
-        /// <param name="source">The source <see cref="EntityBase"/>.</param>
-        public Computer(EntityBase? source)
+        /// <param name="source">The source <see cref="Entity"/>.</param>
+        public Computer(Entity? source)
         {
             Source = source;
         }
         /// <summary>
-        /// Do a move best for the <see cref="Source"/> <see cref="EntityBase"/> on the <paramref name="board"/>.
+        /// Do a move best for the <see cref="Source"/> <see cref="Entity"/> on the <paramref name="board"/>.
         /// </summary>
         /// <param name="board">The <see cref="Board"/> to do a move on.</param>
         public abstract void DoMove(Board board);

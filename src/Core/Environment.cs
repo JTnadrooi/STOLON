@@ -33,9 +33,9 @@ namespace STOLON
         /// </summary>
         public OverlayEngine Overlayer => _overlayer;
         /// <summary>
-        /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="EntityBase"/> objects and their <see cref="EntityBase.Id"/>.
+        /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="Entity"/> objects and their <see cref="Entity.Id"/>.
         /// </summary>
-        public ReadOnlyDictionary<string, EntityBase> Entities => new ReadOnlyDictionary<string, EntityBase>(_entities);
+        public ReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_entities);
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
 
@@ -43,12 +43,12 @@ namespace STOLON
 
         private UserInterface _userInterface;
         private OverlayEngine _overlayer;
-        private Dictionary<string, EntityBase> _entities;
+        private Dictionary<string, Entity> _entities;
         private GameStateManager _gameStateManager;
 
         internal GameEnvironment() : base(null)
         {
-            _entities = new Dictionary<string, EntityBase>();
+            _entities = new Dictionary<string, Entity>();
             _userInterface = null!;
             _overlayer = null!;
             _gameStateManager = new GameStateManager();
@@ -60,8 +60,8 @@ namespace STOLON
         {
             STOLON.Debug.Log(">[s]initialising environment");
             STOLON.Debug.Log(">searching for entities");
-            EntityBase[] entities = STOLON.Scan<EntityBase>();
-            foreach (EntityBase entity in entities)
+            Entity[] entities = STOLON.Scan<Entity>();
+            foreach (Entity entity in entities)
             {
                 STOLON.Debug.Log($"found entity with id \"{entity.Id}\" and name \"{entity.Name}\".");
                 RegisterEntity(entity);
@@ -104,15 +104,15 @@ namespace STOLON
         }
 
         /// <summary>
-        /// Register a new <see cref="EntityBase"/>.
+        /// Register a new <see cref="Entity"/>.
         /// </summary>
         /// <param name="entity">The entity to register.</param>
-        public void RegisterEntity(EntityBase entity)
+        public void RegisterEntity(Entity entity)
         {
             _entities.Add(entity.Id, entity);
         }
         /// <summary>
-        /// Deregister a new <see cref="EntityBase"/>. <strong>Should never be used.</strong>
+        /// Deregister a new <see cref="Entity"/>. <strong>Should never be used.</strong>
         /// </summary>
         /// <param name="entity">The entity to deregister.</param>
         public void DeregisterEntity(string characterId)

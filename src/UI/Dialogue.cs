@@ -13,11 +13,11 @@ namespace STOLON
     public interface IDialogueProvider
     {
         /// <summary>
-        /// The symbolnotation of this <see cref="EntityBase"/>, example: DL for Deadline.
+        /// The symbolnotation of this <see cref="Entity"/>, example: DL for Deadline.
         /// </summary>
         public string SymbolNotation { get; }
         /// <summary>
-        /// The name of this <see cref="EntityBase"/>, example: Deadline.
+        /// The name of this <see cref="Entity"/>, example: Deadline.
         /// </summary>
         public string Name { get; }
     }

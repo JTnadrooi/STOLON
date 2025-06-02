@@ -21,7 +21,7 @@ namespace STOLON
     /// <summary>
     /// Goldsilk hates the player.
     /// </summary>
-    public class GoldsilkEntity : EntityBase
+    public class GoldsilkEntity : Entity
     {
         public override Computer Computer => _computer;
         public override string? Description => "This shoulden't be readable in the current verion.";
