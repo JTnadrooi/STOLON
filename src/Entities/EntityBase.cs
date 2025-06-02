@@ -12,8 +12,9 @@ namespace STOLON
     /// <summary>
     /// Represent the main component of a <see cref="EntityBase"/>.
     /// </summary>
-    public abstract class EntityBase : IDialogueProvider
+    public abstract class EntityBase : IDialogueProvider, IMipmapped
     {
+        public abstract IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
         /// <summary>
         /// Create a new <see cref="EntityBase"/> with set values.
         /// </summary>
@@ -34,8 +35,9 @@ namespace STOLON
         {
             return new Player(Name, Computer);
         }
+
         /// <summary>
-        /// Get the <see cref="global::STOLON.Computer"/> of this <see cref="EntityBase"/>.
+        /// Get the <see cref="Computer"/> of this <see cref="EntityBase"/>.
         /// </summary>
         public abstract Computer Computer { get; }
         /// <summary>

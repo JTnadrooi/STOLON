@@ -33,26 +33,11 @@ namespace STOLON
 {
     public interface IMipmapped
     {
-        public GameTexture? Texture32x => null;
-        public GameTexture? Texture64x => null;
-        public GameTexture? Texture96x => null;
-        public GameTexture? Texture128x => null;
-        public GameTexture? Texture256x => null;
-        public GameTexture? Texture512x => null;
+        public IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
     }
 
     public static class MipmappedExtensions
     {
-        public static GameTexture GetMipmap(this IMipmapped graphicsItem, int res) => res switch
-        {
-            32 => graphicsItem.Texture32x,
-            64 => graphicsItem.Texture64x,
-            96 => graphicsItem.Texture96x,
-            128 => graphicsItem.Texture128x,
-            256 => graphicsItem.Texture256x,
-            512 => graphicsItem.Texture512x,
-            _ => throw new ArgumentException($"Unsupported resolution: {res}")
-        } ?? throw new InvalidOperationException($"Texture for resolution {res} is not set (null).");
-    }
 
+    }
 }

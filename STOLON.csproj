@@ -45,9 +45,6 @@
 		<PackageReference Include="Salaros.ConfigParser" Version="0.3.8" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="content\textures\characters\" />
-	</ItemGroup>
-	<ItemGroup>
 		<NPLContentReferences Remove="content\bin\**" />
 	</ItemGroup>
 	<ItemGroup>
@@ -58,5 +55,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<MGCBContentReferences Remove="content\obj\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="content\textures\characters\goldsilk\" />
 	</ItemGroup>
 </Project>
