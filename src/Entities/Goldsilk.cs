@@ -40,6 +40,8 @@ namespace STOLON
     /// </summary>
     public class GoldsilkCom : Computer
     {
+        private static int negaCount = 0;
+        private const int EVAL_SCORE = 10000;
         public GoldsilkCom(GoldsilkEntity source) : base(source) { }
         public override void DoMove(Board board)
         {
@@ -53,7 +55,6 @@ namespace STOLON
                     board.Reset();
                 }, "4 Connected found for player " + board.GetPlayerTile(ret) + "!");
         }
-        private static int negaCount = 0;
         public static NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
         {
             STOLON.Debug.Log(">[s]initializing parallel alpha-beta algorithm..");
@@ -74,7 +75,7 @@ namespace STOLON
                 BoardState child = state.DeepCopy();
                 Point sim = child.Alter(moves[i], true);
 
-                int score = -Negamax(child, sim, map, tt, depth, -evalNum, evalNum, color);
+                int score = -Negamax(child, sim, map, tt, depth, -EVAL_SCORE, EVAL_SCORE, color);
 
                 lock (lockObj)
                 {
@@ -105,7 +106,6 @@ namespace STOLON
             STOLON.Debug.Success();
             return new NegamaxEndResult(bestItem.move, negaCount, (int)stopwatch.ElapsedMilliseconds);
         }
-        public const int evalNum = 10000;
         public static int MoveEvaluate(BoardState state, Move move, int score)
         {
             STOLON.Debug.Log(">starting eval of move " + move + "..");
@@ -171,10 +171,10 @@ namespace STOLON
             //}
 
             negaCount++;
-            if (node.SearchFrom(sim, null, true).Succes) return -evalNum;
+            if (node.SearchFrom(sim, null, true).Succes) return -EVAL_SCORE;
             if (depth == 0) return 0;
             List<Move> moves = map.GetAllMoves(node);
-            int value = -evalNum;
+            int value = -EVAL_SCORE;
             for (int i = 0; i < moves.Count; i++)
             {
                 sim = node.Alter(moves[i], true);
