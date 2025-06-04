@@ -12,6 +12,7 @@ using Point = Microsoft.Xna.Framework.Point;
 using Microsoft.Xna.Framework.Content;
 using Betwixt;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace STOLON
 {
@@ -35,7 +36,7 @@ namespace STOLON
         public EntitySelectGameState()
         {
             _tileTexture = STOLON.Textures.GetReference("textures\\temp\\temp_" + TILE_SIZE);
-            STOLON.StateManager.TryGetState(out _menuGameState!);
+            if (!STOLON.StateManager.TryGetState(out _menuGameState!)) throw new Exception();
             _lineTweener = new Tweener<float>(0, 1, 2, Ease.Quad.InOut);
             _lineTweener.Start();
 
@@ -52,8 +53,8 @@ namespace STOLON
             _lineTweener.Update(elapsedMilliseconds / 1000f);
             _initDone = !_lineTweener.Running;
             //int line1Target = STOLON.Instance.VirtualDimensions.X - (_menuGameState.MenuRemoveLine2x - _menuGameState.MenuRemoveLine1x) + 144;
-            int line1Target = TILE_SIZE * 4;
-            int line2Target = STOLON.Instance.VirtualDimensions.X - 32;
+            int line1Target = TILE_SIZE * TILE_ROW_AMOUNT;
+            int line2Target = STOLON.Instance.VirtualDimensions.X - 16;
 
             _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
@@ -63,15 +64,17 @@ namespace STOLON
         {
             if (_initDone)
             {
-                spriteBatch.Draw(STOLON.Textures.GetReference("textures\\characters\\silo"), new Vector2(448, 0), Color.White);
+                //spriteBatch.Draw(STOLON.Textures.GetReference("textures\\characters\\silo"), new Vector2(448, 0), Color.White);
                 spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 foreach (Vector2 tilePos in _tilePositions)
                 {
                     spriteBatch.Draw(_tileTexture, tilePos, Color.White);
+                    spriteBatch.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.Instance.VirtualDimensions.X - 4f, 10f), Color.White, 1.57079633f, Vector2.Zero, STOLON.Fonts[STOLON.MEDIUM_FONT_ID].Scale, SpriteEffects.None, 1f);
                 }
             }
             spriteBatch.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);
             spriteBatch.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, UserInterface.LINE_WIDTH);
+
         }
     }
 }
