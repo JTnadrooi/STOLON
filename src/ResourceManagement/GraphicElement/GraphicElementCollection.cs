@@ -48,7 +48,7 @@ namespace STOLON
         }
         public GraphicElement AddGraphicElement(GameTextureCollection textures, string textureKey, string? newName = null)
         {
-            GraphicElement element = new GraphicElement(Source, textures.GetReference("textures\\" + textureKey));
+            GraphicElement element = new GraphicElement(Source, textures.GetReference(textureKey));
             _elements.Add(newName ?? textureKey.Split("\\").Last(), element);
             return element;
         }

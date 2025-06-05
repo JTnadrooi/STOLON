@@ -35,7 +35,7 @@ namespace STOLON
 
         public EntitySelectGameState()
         {
-            _tileTexture = STOLON.Textures.GetReference("textures\\temp\\temp_" + TILE_SIZE);
+            _tileTexture = STOLON.Textures.GetReference("Debug\\temp-" + TILE_SIZE);
             if (!STOLON.StateManager.TryGetState(out _menuGameState!)) throw new Exception();
             _lineTweener = new Tweener<float>(0, 1, 2, Ease.Quad.InOut);
             _lineTweener.Start();
@@ -64,7 +64,7 @@ namespace STOLON
         {
             if (_initDone)
             {
-                //spriteBatch.Draw(STOLON.Textures.GetReference("textures\\characters\\silo"), new Vector2(448, 0), Color.White);
+                //spriteBatch.Draw(STOLON.Textures.GetReference("characters\\silo"), new Vector2(448, 0), Color.White);
                 spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 foreach (Vector2 tilePos in _tilePositions)
                 {

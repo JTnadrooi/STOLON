@@ -50,7 +50,7 @@ namespace STOLON
                 return texture;
             }
             catch { return null; }
-        })
+        }, "Textures")
         {
             _pixel = new GameTexture(new Texture2D(contentManager.GetGraphicsDevice(), 1, 1));
             ((Texture2D)_pixel).SetData(new Color[] { Color.White });

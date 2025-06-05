@@ -55,10 +55,7 @@ namespace STOLON
         private bool _capitalise = true;
         public MenuOrderProvider()
         {
-            //_font = StolonGame.Instance.Fonts["fonts\\smollerMono"];
-            //_font = StolonGame.Instance.Fonts["fonts\\monogram"];
             _font = STOLON.Fonts[STOLON.MEDIUM_FONT_ID];
-            //_font = StolonGame.Instance.Fonts["fonts\\fixedsys"];
         }
         public (UIElementDrawData drawData, bool isHovered) GetElementDrawData(UIElement element, Vector2 UIOrgin, int index)
         {
@@ -81,7 +78,7 @@ namespace STOLON
 
             return (new UIElementDrawData(element.Id, elementIsHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
-                : elementText, _font.Name, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
+                : elementText, STOLON.MEDIUM_FONT_ID, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
                 elementIsHovered);
         }
     }

@@ -36,16 +36,16 @@ namespace STOLON
         {
             try
             {
-                float scale = toLoad switch
+                float scale = toLoad[6..] switch
                 {
-                    "fonts\\smollerMono" => 0.5f,
+                    STOLON.SMALL_FONT_ID => 0.5f,
                     _ => 1f,
                 };
                 GameFont font = new GameFont(toLoad, contentManager.Load<SpriteFont>(toLoad), scale);
                 return font;
             }
             catch { return null; }
-        })
+        }, "Fonts")
         { }
     }
 }

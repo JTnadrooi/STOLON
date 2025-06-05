@@ -18,9 +18,9 @@ namespace STOLON
     public class MenuGameState : IGameState
     {
         private Texture2D _menuLogoLines;
-        private Texture2D _menuLogoDummyTiles;
-        private Texture2D _menuLogoFilledTiles;
-        private Texture2D _menuLogoLowResFonted;
+        private Texture2D _menuLogoMarks;
+        private Texture2D _menuLogoFilledMarks;
+        private Texture2D _menuLogoFonted;
         private Texture2D _dither32;
 
         private Rectangle _menuLogoTileHider;
@@ -70,12 +70,11 @@ namespace STOLON
 
         public MenuGameState()
         {
-            const string menuDataFolder = "menuLogoMid";
-            _menuLogoLines = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\lines");
-            _menuLogoDummyTiles = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\dummyTiles");
-            _menuLogoFilledTiles = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\filledTiles");
-            _menuLogoLowResFonted = STOLON.Textures.GetReference($@"textures\{menuDataFolder}\lowResFonted");
-            _dither32 = STOLON.Textures.GetReference("textures\\dither_32");
+            _menuLogoLines = STOLON.Textures.GetReference("Logo\\Menu\\lines");
+            _menuLogoMarks = STOLON.Textures.GetReference("Logo\\Menu\\marks");
+            _menuLogoFilledMarks = STOLON.Textures.GetReference("Logo\\Menu\\filled_marks");
+            _menuLogoFonted = STOLON.Textures.GetReference("Logo\\Menu\\fonted");
+            _dither32 = STOLON.Textures.GetReference("dither-32");
             _drawMenuLogoLines = true;
             _drawMenuLogoDummyTiles = true;
             _drawMenuLogoFilledTiles = false;
@@ -386,9 +385,9 @@ namespace STOLON
                 spriteBatch.Draw(STOLON.Textures.Pixel, _menuLogoBoundingBox, Color.Black);
                 spriteBatch.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
             }
-            if (_drawMenuLogoDummyTiles) spriteBatch.Draw(_menuLogoDummyTiles, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoFilledTiles) spriteBatch.Draw(_menuLogoFilledTiles, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoLowResFonted) spriteBatch.Draw(_menuLogoLowResFonted, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoDummyTiles) spriteBatch.Draw(_menuLogoMarks, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoFilledTiles) spriteBatch.Draw(_menuLogoFilledMarks, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoLowResFonted) spriteBatch.Draw(_menuLogoFonted, _menuLogoDrawPos, Color.White);
 
             spriteBatch.Draw(STOLON.Textures.Pixel, _menuLogoTileHider, Color.Black);
             if (_drawMenuLogoLines) spriteBatch.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);

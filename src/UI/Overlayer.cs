@@ -136,7 +136,7 @@ namespace STOLON
 
         public LoadOverlay()
         {
-            lineTexture = STOLON.Textures.GetReference("textures\\loading1");
+            lineTexture = STOLON.Textures.GetReference("loading1");
             _rotation = 0f;
             _scale = 0.20f;
             _rotationSpeed = 40f;

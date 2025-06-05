@@ -27,32 +27,32 @@ namespace STOLON
     }
     public static class Utils
     {
-        public static GameTexture Copy(this GameTexture texture, GraphicsDevice graphicsDevice, GameTextureCollection collection,
-            string? newName = null, bool onlyPostFix = true,
-            bool lazyCopy = true, Action<GameTexture>? action = null)
-        {
-            action ??= new Action<GameTexture>(t => { });
-            newName ??= texture.Name;
-            newName = onlyPostFix ? (texture.Name.Split("\\")[..^1].ToJoinedString("\\") + "\\" + newName) : newName;
+        //public static GameTexture Copy(this GameTexture texture, GraphicsDevice graphicsDevice, GameTextureCollection collection,
+        //    string? newName = null, bool onlyPostFix = true,
+        //    bool lazyCopy = true, Action<GameTexture>? action = null)
+        //{
+        //    action ??= new Action<GameTexture>(t => { });
+        //    newName ??= texture.Name;
+        //    newName = onlyPostFix ? (texture.Name.Split("\\")[..^1].ToJoinedString("\\") + "\\" + newName) : newName;
 
-            if (collection.ContainsKey(newName) && lazyCopy)
-            {
-                return collection.GetReference(newName);
-            }
-            GameTexture texture2 = new GameTexture(graphicsDevice, texture.Width, texture.Height);
-            Color[] data = new Color[texture.Width * texture.Height];
-            texture.GetColorData(data);
-            texture2.SetColorData(data);
-            texture2.Name = newName;
+        //    if (collection.ContainsKey(newName) && lazyCopy)
+        //    {
+        //        return collection.GetReference(newName);
+        //    }
+        //    GameTexture texture2 = new GameTexture(graphicsDevice, texture.Width, texture.Height);
+        //    Color[] data = new Color[texture.Width * texture.Height];
+        //    texture.GetColorData(data);
+        //    texture2.SetColorData(data);
+        //    texture2.Name = newName;
 
-            if (lazyCopy)
-            {
-                action.Invoke(texture2);
-                collection.Add(texture2, newName);
-            }
+        //    if (lazyCopy)
+        //    {
+        //        action.Invoke(texture2);
+        //        collection.Add(texture2, newName);
+        //    }
 
-            return texture2;
-        }
+        //    return texture2;
+        //}
         public static string WrapText(string text, SpriteFont font, float maxLineWidth, float fontScale)
         {
             string[] words = text.Split(' ');

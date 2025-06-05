@@ -57,7 +57,7 @@ namespace STOLON
         {
             Instance = this;
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "content";
+            Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
             Debug = new DebugStream(header: "STOLON");
@@ -215,8 +215,8 @@ namespace STOLON
         public static GameInputHelper Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
         public static UserInterface UI { get; internal set; }
-        public const string MEDIUM_FONT_ID = "fonts\\pixeloidMono";
-        public const string SMALL_FONT_ID = "fonts\\smollerMono";
+        public const string MEDIUM_FONT_ID = "pixeloid";
+        public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";
         public const int VIRTUAL_MODIFIER = 57;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

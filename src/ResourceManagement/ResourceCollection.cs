@@ -35,53 +35,48 @@ namespace STOLON
         public ContentManager ContentManager { get; }
         public TContent GetReference(string path);
         public void UnloadContent();
-        public void Add(TContent resource, string? newName = null);
     }
     public abstract class ResourceCollection<TContent> : IResourceCollection<TContent>
     {
         protected readonly Dictionary<string, TContent> dictionary = new Dictionary<string, TContent>();
         private bool _disposedValue;
+        private string _basePath;
 
         public ContentManager ContentManager { get; }
 
         public IEnumerable<string> Keys => dictionary.Keys;
         public IEnumerable<TContent> Values => dictionary.Values;
         public int Count => dictionary.Count;
-        public TContent this[string key] => GetReference(key);
+        public TContent this[string key] => dictionary[key];
 
-        public ResourceCollection(ContentManager contentManager, Func<string, TContent?> loader)
+        public ResourceCollection(ContentManager contentManager, Func<string, TContent?> loader, string basePath)
         {
+            _basePath = basePath;
             string[] files = Directory.GetFiles(contentManager.RootDirectory, "*", SearchOption.AllDirectories);
             if (files.Length == 0) throw new Exception("No initial content found.");
 
             foreach (string file in files)
             {
-                STOLON.Debug.Log("found file: " + file);
                 string toLoad = file[(contentManager.RootDirectory.Length + 1)..].Split('.')[..^1].ToJoinedString();
+                if (!toLoad.StartsWith(basePath)) continue;
+                STOLON.Debug.Log("found file: " + file);
+                string toLoadId = toLoad[(basePath.Length + 1)..];
                 STOLON.Debug.Log(">loading resource with id/key: " + toLoad);
                 TContent? loaderResult = loader(toLoad);
-                if (loaderResult != null) dictionary[toLoad] = loaderResult;
+                if (loaderResult != null) dictionary[toLoadId] = loaderResult;
+                STOLON.Debug.Log("added with id: " + toLoadId);
                 STOLON.Debug.Success();
             }
             ContentManager = contentManager;
-
         }
 
-        public virtual void Add(TContent resource, string? newName = null)
-        {
-            if (newName == null) throw new ArgumentNullException(nameof(newName));
-            dictionary.Add(newName, resource);
-        }
+        //public virtual void Add(TContent resource, string? newName = null) => dictionary.Add(newName, resource);
 
-        public virtual TContent GetReference(string path)
-        {
-            if (!dictionary.TryGetValue(path, out var item))
-                throw new KeyNotFoundException($"Resource '{path}' not found.");
-            return item;
-        }
+        public virtual TContent GetReference(string path) => this[path];
+
         public virtual void UnloadContent()
         {
-            foreach (var item in dictionary.Values)
+            foreach (TContent item in dictionary.Values)
                 if (item is IDisposable disposable)
                     disposable.Dispose();
             dictionary.Clear();
@@ -109,5 +104,4 @@ namespace STOLON
             GC.SuppressFinalize(this);
         }
     }
-
 }

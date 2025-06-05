@@ -253,7 +253,7 @@ namespace STOLON
                     int playerid = tile.GetOccupiedByPlayerId();
                     if (playerid != -1)
                     {
-                        _boardSpriteBatch.Draw(STOLON.Textures.GetReference("textures\\player" + playerid + "item_96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                        _boardSpriteBatch.Draw(STOLON.Textures.GetReference("player" + playerid + "_item-96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                     }
                     else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
                     else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
@@ -483,7 +483,7 @@ namespace STOLON
             Texture = texture;
         }
 
-        public static TileType Void => new TileType("void", STOLON.Textures.GetReference("textures\\box_96"));
+        public static TileType Void => new TileType("void", STOLON.Textures.GetReference("box-96"));
     }
 
 }
