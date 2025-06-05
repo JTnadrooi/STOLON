@@ -216,20 +216,20 @@ namespace STOLON
             int logoYoffset = 30;
             int menuLogoBoundingBoxClearing = 8;
 
-            if (_milisecondsSinceStartup < 10000) // to skip start button click and animation
-            {
-                _milisecondsSinceStartup = 10001;
-                _menuDone = true;
-                _menuRemoveTweener.Update(10);
+            //if (_milisecondsSinceStartup < 10000) // to skip start button click and animation
+            //{
+            //    _milisecondsSinceStartup = 10001;
+            //    _menuDone = true;
+            //    _menuRemoveTweener.Update(10);
 
-                _boardPlayers = new Player[]
-                        {
-                                new Player("player0"),
-                                new Player("player1"),
-                        };
-                Leave();
-                //startFrame = true;
-            }
+            //    _boardPlayers = new Player[]
+            //            {
+            //                    new Player("player0"),
+            //                    new Player("player1"),
+            //            };
+            //    Leave();
+            //    //startFrame = true;
+            //}
 
             #region inFlash
             _menuLogoTileHider = new Rectangle(_menuLogoDrawPos.ToPoint(), new Point((int)(_menuLogoLines.Width * _menuLogoScaling), (int)(rowHeight * _menuLogoRowsHidden)));

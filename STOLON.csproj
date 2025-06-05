@@ -14,10 +14,13 @@
 	<ItemGroup>
 		<Compile Remove="content\bin\**" />
 		<Compile Remove="content\obj\**" />
+		<Compile Remove="content\textures\characters\**" />
 		<EmbeddedResource Remove="content\bin\**" />
 		<EmbeddedResource Remove="content\obj\**" />
+		<EmbeddedResource Remove="content\textures\characters\**" />
 		<None Remove="content\bin\**" />
 		<None Remove="content\obj\**" />
+		<None Remove="content\textures\characters\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="AsitLib">
@@ -57,6 +60,9 @@
 		<MGCBContentReferences Remove="content\obj\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="content\textures\characters\goldsilk\" />
+	  <NPLContentReferences Remove="content\textures\characters\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <MGCBContentReferences Remove="content\textures\characters\**" />
 	</ItemGroup>
 </Project>
