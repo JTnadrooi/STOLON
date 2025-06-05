@@ -23,7 +23,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>./../libs/AsitLib.dll</HintPath>
+			<HintPath>./Assets/AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
