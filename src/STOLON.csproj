@@ -58,4 +58,11 @@
 	<ItemGroup>
 		<MGCBContentReferences Remove="..\Content\obj\**" />
 	</ItemGroup>
+	<ItemGroup>
+		<Assets Include="Assets\**\*.*" />
+	</ItemGroup>
+
+	<Target Name="DepositAssets" AfterTargets="Build">
+		<Copy SourceFiles="@(Assets)" DestinationFiles="@(Assets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
 </Project>
