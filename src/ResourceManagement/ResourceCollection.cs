@@ -58,8 +58,8 @@ namespace STOLON
             foreach (string file in files)
             {
                 string toLoad = file[(contentManager.RootDirectory.Length + 1)..].Split('.')[..^1].ToJoinedString();
+                STOLON.Debug.Log("found file: " + toLoad);
                 if (!toLoad.StartsWith(basePath)) continue;
-                STOLON.Debug.Log("found file: " + file);
                 string toLoadId = toLoad[(basePath.Length + 1)..];
                 STOLON.Debug.Log(">loading resource with id/key: " + toLoad);
                 TContent? loaderResult = loader(toLoad);

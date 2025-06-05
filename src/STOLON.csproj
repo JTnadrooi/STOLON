@@ -14,7 +14,6 @@
 	<ItemGroup>
 		<Compile Remove="Content\bin\**" />
 		<Compile Remove="Content\obj\**" />
-		<Compile Remove="Content\Textures\Entities\**" />
 		<EmbeddedResource Remove="Content\bin\**" />
 		<EmbeddedResource Remove="Content\obj\**" />
 		<EmbeddedResource Remove="Content\Textures\Entities\**" />
@@ -24,7 +23,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>./libs/AsitLib.dll</HintPath>
+			<HintPath>./../libs/AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -48,21 +47,15 @@
 		<PackageReference Include="Salaros.ConfigParser" Version="0.3.8" />
 	</ItemGroup>
 	<ItemGroup>
-		<NPLContentReferences Remove="Content\bin\**" />
+		<NPLContentReferences Remove="..\Content\bin\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<MGCBContentReferences Remove="Content\bin\**" />
+		<MGCBContentReferences Remove="..\Content\bin\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<NPLContentReferences Remove="Content\obj\**" />
+		<NPLContentReferences Remove="..\Content\obj\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<MGCBContentReferences Remove="Content\obj\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <NPLContentReferences Remove="Content\Textures\Entities\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <MGCBContentReferences Remove="Content\Textures\Entities\**" />
+		<MGCBContentReferences Remove="..\Content\obj\**" />
 	</ItemGroup>
 </Project>
