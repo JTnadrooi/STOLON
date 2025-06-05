@@ -12,15 +12,15 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Remove="content\bin\**" />
-		<Compile Remove="content\obj\**" />
-		<Compile Remove="content\textures\characters\**" />
-		<EmbeddedResource Remove="content\bin\**" />
-		<EmbeddedResource Remove="content\obj\**" />
-		<EmbeddedResource Remove="content\textures\characters\**" />
-		<None Remove="content\bin\**" />
-		<None Remove="content\obj\**" />
-		<None Remove="content\textures\characters\**" />
+		<Compile Remove="Content\bin\**" />
+		<Compile Remove="Content\obj\**" />
+		<Compile Remove="Content\Textures\Entities\**" />
+		<EmbeddedResource Remove="Content\bin\**" />
+		<EmbeddedResource Remove="Content\obj\**" />
+		<EmbeddedResource Remove="Content\Textures\Entities\**" />
+		<None Remove="Content\bin\**" />
+		<None Remove="Content\obj\**" />
+		<None Remove="Content\Textures\Entities\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="AsitLib">
@@ -48,21 +48,21 @@
 		<PackageReference Include="Salaros.ConfigParser" Version="0.3.8" />
 	</ItemGroup>
 	<ItemGroup>
-		<NPLContentReferences Remove="content\bin\**" />
+		<NPLContentReferences Remove="Content\bin\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<MGCBContentReferences Remove="content\bin\**" />
+		<MGCBContentReferences Remove="Content\bin\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<NPLContentReferences Remove="content\obj\**" />
+		<NPLContentReferences Remove="Content\obj\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<MGCBContentReferences Remove="content\obj\**" />
+		<MGCBContentReferences Remove="Content\obj\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <NPLContentReferences Remove="content\textures\characters\**" />
+	  <NPLContentReferences Remove="Content\Textures\Entities\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <MGCBContentReferences Remove="content\textures\characters\**" />
+	  <MGCBContentReferences Remove="Content\Textures\Entities\**" />
 	</ItemGroup>
 </Project>
