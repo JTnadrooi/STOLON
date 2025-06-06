@@ -28,21 +28,21 @@ namespace STOLON
 
         public override IReadOnlyDictionary<int, GameTexture?> Mipmaps => throw new NotImplementedException();
 
-        private GoldsilkCom _computer;
+        private GoldsilkComputer _computer;
 
         public GoldsilkEntity() : base("goldsilk", "Opponent", "O")
         {
-            _computer = new GoldsilkCom(this);
+            _computer = new GoldsilkComputer(this);
         }
     }
     /// <summary>
     /// The computer <see cref="GoldsilkEntity"/> uses to play.
     /// </summary>
-    public class GoldsilkCom : Computer
+    public class GoldsilkComputer : Computer
     {
-        private static int negaCount = 0;
+        private int negaCount = 0;
         private const int EVAL_SCORE = 10000;
-        public GoldsilkCom(GoldsilkEntity source) : base(source) { }
+        public GoldsilkComputer(GoldsilkEntity source) : base(source) { }
         public override void DoMove(Board board)
         {
             int current = board.State.CurrentPlayerId;
@@ -55,7 +55,7 @@ namespace STOLON
                     board.Reset();
                 }, "4 Connected found for player " + board.GetPlayerTile(ret) + "!");
         }
-        public static NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
+        public NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
         {
             STOLON.Debug.Log(">[s]initializing parallel alpha-beta algorithm..");
 
@@ -106,7 +106,7 @@ namespace STOLON
             STOLON.Debug.Success();
             return new NegamaxEndResult(bestItem.move, negaCount, (int)stopwatch.ElapsedMilliseconds);
         }
-        public static int MoveEvaluate(BoardState state, Move move, int score)
+        public int MoveEvaluate(BoardState state, Move move, int score)
         {
             STOLON.Debug.Log(">starting eval of move " + move + "..");
 
@@ -153,7 +153,7 @@ namespace STOLON
             public static MinMaxResult operator -(MinMaxResult result) => result.InvertScore();
         }
 
-        public static int Negamax(BoardState node, Point sim, UniqueMoveBoardMap map, IDictionary<int, TTEntry> tt, int depth, int alpha, int beta, int color)
+        public int Negamax(BoardState node, Point sim, UniqueMoveBoardMap map, IDictionary<int, TTEntry> tt, int depth, int alpha, int beta, int color)
         {
 
             //int alphaOrig = alpha;
