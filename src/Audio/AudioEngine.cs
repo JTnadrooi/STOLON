@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 using AsitLib;
 
 using NAudio.Mixer;
-using Salaros.Configuration;
+using System.IO;
 
 
 
@@ -84,9 +84,9 @@ namespace STOLON
         /// </summary>
         public AudioEngine()
         {
+            STOLON.Debug.Log(">initating audioengine");
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-            ConfigParser parser = new ConfigParser(@"user.cfg");
             Library = new Dictionary<string, CachedAudio>();
 
             _masterMixer = new MixingSampleProvider(waveFormat);
@@ -111,10 +111,13 @@ namespace STOLON
 
             _outputDevice.Init(_masterVolumeSampleProvider);
             _outputDevice.Play();
-
-            FxVolume = (float)parser.GetValue("Audio", "fx_vol", 0.5f);
-            OstVolume = (float)parser.GetValue("Audio", "ost_vol", 1f);
-            MasterVolume = (float)parser.GetValue("Audio", "master_vol", 1f);
+            STOLON.Debug.Log(">getting config values");
+            FxVolume = STOLON.Config.GetFloat("Audio.fx_vol", 0.5f);
+            OstVolume = STOLON.Config.GetFloat("Audio.ost_vol", 1f);
+            MasterVolume = STOLON.Config.GetFloat("Audio.master_vol", 1f);
+            STOLON.Debug.Log($"found as: Fx={FxVolume}, OST={OstVolume}, Master={MasterVolume}");
+            STOLON.Debug.Success();
+            STOLON.Debug.Success();
         }
         ///// <summary>
         ///// Play an filename. <br/> <br/><i>Very slow.</i>

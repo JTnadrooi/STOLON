@@ -62,7 +62,6 @@ namespace STOLON
 
             Debug = new DebugStream(header: "STOLON");
             Debug.Silent = false;
-            Audio = new AudioEngine();
         }
 
         protected override void Initialize()
@@ -136,6 +135,8 @@ namespace STOLON
             Debug.Log(">[s]loading stolon content");
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            STOLON.Config = new GameConfig(@"user.cfg");
+            STOLON.Audio = new AudioEngine();
             STOLON.Textures = _textures = new GameTextureCollection(Content);
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
             STOLON.Input = _input = new GameInputHelper();
@@ -215,6 +216,7 @@ namespace STOLON
         public static GameInputHelper Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
         public static UserInterface UI { get; internal set; }
+        public static GameConfig Config { get; internal set; }
         public const string MEDIUM_FONT_ID = "pixeloid";
         public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";
