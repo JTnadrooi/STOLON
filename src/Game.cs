@@ -152,10 +152,7 @@ namespace STOLON
 
             _post = new EffectPipeline();
 
-            if (!STOLON.Config.GetBool("Graphics.crt_enable"))
-            {
-                _post.DisableEffect("Effects\\crt");
-            }
+            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _post.DisableEffect("crt");
 
             Debug.Success();
 

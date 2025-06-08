@@ -51,7 +51,7 @@ namespace STOLON
             foreach (GameEffect effect in tempEffects)
             {
                 STOLON.Debug.Log($"found effect with name \"{effect.Effect.Name}\".");
-                _effects.Add(effect.Effect.Name, effect);
+                _effects.Add(effect.Effect.Name["Effects\\".Length..], effect);
             }
             STOLON.Debug.Success();
             STOLON.Debug.Success();
