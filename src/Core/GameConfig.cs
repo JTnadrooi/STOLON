@@ -29,12 +29,17 @@ namespace STOLON
     {
         private IniDataParser _parser;
         private IniData _data;
-        public GameConfig(string path)
+        public GameConfig()
         {
+            string path = @"user.cfg";
             STOLON.Debug.Log(">registering config from path: " + path);
             _parser = new IniDataParser();
             STOLON.Debug.Log(">parsing config");
             _data = _parser.Parse(File.ReadAllText(path));
+            STOLON.Debug.Success();
+            STOLON.Debug.Log(">managing overrides");
+
+
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }

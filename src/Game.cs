@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
 using System.Reflection;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 
 
@@ -135,7 +136,7 @@ namespace STOLON
             Debug.Log(">[s]loading stolon content");
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            STOLON.Config = new GameConfig(@"user.cfg");
+            STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
             STOLON.Textures = _textures = new GameTextureCollection(Content);
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
@@ -151,7 +152,17 @@ namespace STOLON
 
             _post = new EffectPipeline();
 
+            if (!STOLON.Config.GetBool("Graphics.crt_enable"))
+            {
+                _post.DisableEffect("Effects\\CRT-Lottes");
+            }
+
             Debug.Success();
+
+            bool silenceConsole = !STOLON.Config.GetBool("Debug.log_enable");
+            if (silenceConsole) STOLON.Debug.Log("console will be silenced.");
+            STOLON.Debug.Silent = silenceConsole;
+
             base.LoadContent();
         }
         protected override void UnloadContent()
@@ -164,6 +175,13 @@ namespace STOLON
         }
         protected override void Update(GameTime gameTime)
         {
+            //[DllImport("kernel32.dll")]
+            //static extern IntPtr GetConsoleWindow();
+            //[DllImport("user32.dll")]
+            //static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+            //const int SW_HIDE = 0;
+            ////const int SW_SHOW = 5;
+            //if (!Config.GetBool("Debug.console_enable") && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ShowWindow(GetConsoleWindow(), SW_HIDE);
             if (IsActive)
             {
                 STOLON.Input.PreviousMouse = STOLON.Input.CurrentMouse;
@@ -179,7 +197,6 @@ namespace STOLON
 
                 ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
-
 
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
 

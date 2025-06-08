@@ -12,26 +12,27 @@ using System.Xml.Linq;
 
 namespace STOLON
 {
-    public interface IEffect
+    public abstract class GameEffect
     {
-        public Effect Effect { get; }
-        public bool Virtual => true;
-        public bool Enabled { get => true; set { } }
-        public void UpdateResolution(Point newDesiredRes) { }
+        private bool _enabled = true;
+        public virtual bool Enabled { get => _enabled; set => _enabled = value; }
+        public abstract bool Virtual { get; }
+        public abstract Effect Effect { get; }
+        public virtual void UpdateResolution(Point newDesiredRes) { }
     }
 
     public class EffectPipeline : IDisposable
     {
         private readonly GraphicsDevice _graphics;
         private readonly SpriteBatch _spriteBatch;
-        private readonly Dictionary<string, IEffect> _effects;
+        private readonly Dictionary<string, GameEffect> _effects;
 
         private RenderTarget2D _vrt1;
         private RenderTarget2D _vrt2;
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
 
-        public ReadOnlyDictionary<string, IEffect> Effects => _effects.AsReadOnly();
+        public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
 
         public EffectPipeline()
         {
@@ -44,10 +45,10 @@ namespace STOLON
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
 
-            _effects = new Dictionary<string, IEffect>();
-            IEffect[] tempEffects = STOLON.Scan<IEffect>();
+            _effects = new Dictionary<string, GameEffect>();
+            GameEffect[] tempEffects = STOLON.Scan<GameEffect>();
             STOLON.Debug.Log(">searching for effects");
-            foreach (IEffect effect in tempEffects)
+            foreach (GameEffect effect in tempEffects)
             {
                 STOLON.Debug.Log($"found effect with name \"{effect.Effect.Name}\".");
                 _effects.Add(effect.Effect.Name, effect);
@@ -70,26 +71,36 @@ namespace STOLON
             Point newRes = STOLON.Instance.DesiredDimensions;
             _rt1 = GetDesired(newRes);
             _rt2 = GetDesired(newRes);
-            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
+            foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
             STOLON.Debug.Log($"updated fx pipeline res.");
         }
-
         public void DisableEffect(string name)
         {
+            if (!_effects[name].Enabled)
+            {
+                STOLON.Debug.Log($"effect \"{name}\" already disabled.");
+                return;
+            }
             _effects[name].Enabled = false;
             STOLON.Debug.Log($"disabled effect with name \"{name}\".");
         }
         public bool IsEnabled(string name) => _effects[name].Enabled;
         public void EnableEffect(string name)
         {
+            if (_effects[name].Enabled)
+            {
+                STOLON.Debug.Log($"effect \"{name}\" already enabled.");
+                return;
+            }
             _effects[name].Enabled = true;
             STOLON.Debug.Log($"enabled effect with name \"{name}\".");
         }
 
+
         public void EndScene()
         {
             RenderTarget2D finalVTarget = _vrt1;
-            foreach (IEffect effect in _effects.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
+            foreach (GameEffect effect in _effects.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
             {
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -109,7 +120,7 @@ namespace STOLON
 
             RenderTarget2D finalTarget = _rt1;
 
-            foreach (IEffect effect in _effects.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
+            foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
             {
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -134,14 +145,14 @@ namespace STOLON
             _vrt2.Dispose();
             _rt1.Dispose();
             _rt2.Dispose();
-            foreach (IEffect effect in _effects.Values) (effect as IDisposable)?.Dispose();
+            foreach (GameEffect effect in _effects.Values) (effect as IDisposable)?.Dispose();
         }
     }
 
-    public class StolonReplaceColorEffect : IEffect
+    public class StolonReplaceColorEffect : GameEffect
     {
-        public Effect Effect { get; }
-        public bool Virtual => true;
+        public override Effect Effect { get; }
+        public override bool Virtual => true;
         public StolonReplaceColorEffect()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("Effects\\ReplaceColor");
@@ -150,13 +161,12 @@ namespace STOLON
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
             Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
         }
-        public void UpdateResolution(Point newDesiredRes) { }
+        public override void UpdateResolution(Point newDesiredRes) { }
     }
-    public class CRTEffect : IEffect
+    public class CRTEffect : GameEffect
     {
-        public Effect Effect { get; }
-        public bool Virtual => false;
-
+        public override Effect Effect { get; }
+        public override bool Virtual => false;
         public CRTEffect()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("Effects\\CRT-Lottes");
@@ -164,7 +174,7 @@ namespace STOLON
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
         }
-        public void UpdateResolution(Point newDesiredRes)
+        public override void UpdateResolution(Point newDesiredRes)
         {
             Effect.Parameters["textureSize"].SetValue(newDesiredRes.ToVector2());
             Effect.Parameters["outputSize"].SetValue(newDesiredRes.ToVector2());
