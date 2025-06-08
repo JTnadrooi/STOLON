@@ -51,6 +51,8 @@ namespace STOLON
         internal int MenuRemoveLine1x;
         internal int MenuRemoveLine2x;
 
+        private string? _skipTo;
+
         private float _menuLogoScaling;
 
         private List<UIElement> _depthPath;
@@ -85,6 +87,17 @@ namespace STOLON
             _menuDitherTexturePositions = Array.Empty<Point>();
 
             _depthPath = new List<UIElement>();
+
+            _skipTo = STOLON.Config.GetString("Debug.skip_to");
+            //switch (_skipTo)
+            //{
+            //    case "main_menu":
+            //        _skipLogoAnimation = true;
+            //        break;
+            //    case "entity_select":
+            //        _skipLogoAnimation = true;
+            //        break;
+            //}
 
             _menuLogoScaling = 1f;
 
@@ -215,20 +228,26 @@ namespace STOLON
             int logoYoffset = 30;
             int menuLogoBoundingBoxClearing = 8;
 
-            //if (_milisecondsSinceStartup < 10000) // to skip start button click and animation
-            //{
-            //    _milisecondsSinceStartup = 10001;
-            //    _menuDone = true;
-            //    _menuRemoveTweener.Update(10);
-
-            //    _boardPlayers = new Player[]
-            //            {
-            //                    new Player("player0"),
-            //                    new Player("player1"),
-            //            };
-            //    Leave();
-            //    //startFrame = true;
-            //}
+            switch (_skipTo)
+            {
+                case "entity_select":
+                    if (_milisecondsSinceStartup < 10000) // to skip start button click and animation
+                    {
+                        _milisecondsSinceStartup = 10001;
+                        _menuDone = true;
+                        _menuRemoveTweener.Update(10);
+                        _boardPlayers = new Player[]
+                                {
+                                new Player("player0"),
+                                new Player("player1"),
+                                };
+                        Leave();
+                    }
+                    break;
+                case "main_menu":
+                    if (_milisecondsSinceStartup < 10000) _milisecondsSinceStartup = 10001;
+                    break;
+            }
 
             #region inFlash
             _menuLogoTileHider = new Rectangle(_menuLogoDrawPos.ToPoint(), new Point((int)(_menuLogoLines.Width * _menuLogoScaling), (int)(rowHeight * _menuLogoRowsHidden)));
