@@ -41,10 +41,11 @@ namespace STOLON
         public float GetFloat(string key, float? defaultValue = null) => TryGetParsedValue(key, float.TryParse, defaultValue);
         public int GetInt(string key, int? defaultValue = null) => TryGetParsedValue(key, int.TryParse, defaultValue);
         public double GetDouble(string key, double? defaultValue = null) => TryGetParsedValue(key, double.TryParse, defaultValue);
+        public bool GetBool(string key, bool? defaultValue = null) => TryGetParsedValue(key, TryParseBool, defaultValue);
         public string GetString(string key, string? defaultValue = null)
         {
             if (_data.TryGetKey(key, out var value)) return value;
-            if (defaultValue is not null) return defaultValue;
+            if (defaultValue != null) return defaultValue;
             throw new FormatException($"Key '{key}' not found.");
         }
         private T TryGetParsedValue<T>(string key, TryParseHandler<T> parser, T? defaultValue) where T : struct
@@ -54,5 +55,26 @@ namespace STOLON
             throw new FormatException($"Failed to parse '{key}' as {typeof(T).Name} or find it without defautValue set");
         }
         private delegate bool TryParseHandler<T>(string input, out T result);
+        private bool TryParseBool(string input, out bool result)
+        {
+            switch (input.ToLowerInvariant())
+            {
+                case "true":
+                case "1":
+                case "yes":
+                case "on":
+                    result = true;
+                    return true;
+                case "false":
+                case "0":
+                case "no":
+                case "off":
+                    result = false;
+                    return true;
+                default:
+                    result = default;
+                    return false;
+            }
+        }
     }
 }
