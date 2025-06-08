@@ -82,7 +82,7 @@ namespace STOLON
         public bool IsEnabled(string name) => _effects[name].Enabled;
         public void EnableEffect(string name)
         {
-            _effects[name].Enabled = false;
+            _effects[name].Enabled = true;
             STOLON.Debug.Log($"enabled effect with name \"{name}\".");
         }
 
@@ -144,7 +144,7 @@ namespace STOLON
         public bool Virtual => true;
         public StolonReplaceColorEffect()
         {
-            Effect = STOLON.Instance.Content.Load<Effect>("effects\\ReplaceColor");
+            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\ReplaceColor");
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
             Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
@@ -159,7 +159,7 @@ namespace STOLON
 
         public CRTEffect()
         {
-            Effect = STOLON.Instance.Content.Load<Effect>("effects\\CRT-Lottes");
+            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\CRT-Lottes");
             Effect.Parameters["brightboost"].SetValue(0.92f);
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
