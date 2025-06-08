@@ -154,7 +154,7 @@ namespace STOLON
 
             if (!STOLON.Config.GetBool("Graphics.crt_enable"))
             {
-                _post.DisableEffect("Effects\\CRT-Lottes");
+                _post.DisableEffect("Effects\\crt");
             }
 
             Debug.Success();

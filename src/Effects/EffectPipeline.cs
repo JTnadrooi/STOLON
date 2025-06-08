@@ -155,7 +155,7 @@ namespace STOLON
         public override bool Virtual => true;
         public StolonReplaceColorEffect()
         {
-            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\ReplaceColor");
+            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\apply_palette");
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
             Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
@@ -169,7 +169,7 @@ namespace STOLON
         public override bool Virtual => false;
         public CRTEffect()
         {
-            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\CRT-Lottes");
+            Effect = STOLON.Instance.Content.Load<Effect>("Effects\\crt");
             Effect.Parameters["brightboost"].SetValue(0.92f);
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
             Effect.Parameters["outputSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());

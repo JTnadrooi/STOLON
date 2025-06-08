@@ -13,24 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ../Content/Effects/Bloom.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:../Content/Effects/Bloom.fx;Effects/Bloom.fx
-
-#begin ../Content/Effects/CRT-Lottes.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:../Content/Effects/CRT-Lottes.fx;Effects/CRT-Lottes.fx
-
-#begin ../Content/Effects/ReplaceColor.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:../Content/Effects/ReplaceColor.fx;Effects/ReplaceColor.fx
-
 #begin ../Content/Fonts/fixedsys.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -274,3 +256,21 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../Content/Textures/player1_item-96.png;Textures/player1_item-96.png
+
+#begin Effects/apply_palette.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/apply_palette.fx
+
+#begin Effects/bloom.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/bloom.fx
+
+#begin Effects/crt.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/crt.fx
