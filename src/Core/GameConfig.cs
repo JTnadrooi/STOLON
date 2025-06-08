@@ -57,12 +57,12 @@ namespace STOLON
         {
             if (_data.TryGetKey(key, out string toparse) && parser(toparse, out T toret)) return toret;
             if (defaultValue.HasValue) return defaultValue.Value;
-            throw new FormatException($"Failed to parse '{key}' as {typeof(T).Name} or find it without defautValue set");
+            throw new FormatException($"Failed to parse '{toparse}' as {typeof(T).Name} or find it without defautValue set");
         }
         private delegate bool TryParseHandler<T>(string input, out T result);
         private bool TryParseBool(string input, out bool result)
         {
-            switch (input.ToLowerInvariant())
+            switch (input.ToLowerInvariant().Trim())
             {
                 case "true":
                 case "1":

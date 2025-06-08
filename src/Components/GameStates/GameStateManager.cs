@@ -8,12 +8,8 @@ using AsitLib;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-
-
 using Point = Microsoft.Xna.Framework.Point;
 using Microsoft.Xna.Framework.Content;
-
-
 
 namespace STOLON
 {

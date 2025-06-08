@@ -12,6 +12,7 @@ using Point = Microsoft.Xna.Framework.Point;
 using Microsoft.Xna.Framework.Content;
 using Betwixt;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace STOLON
 {
@@ -52,6 +53,7 @@ namespace STOLON
         internal int MenuRemoveLine2x;
 
         private string? _skipTo;
+        private bool _showSplashtexts;
 
         private float _menuLogoScaling;
 
@@ -89,6 +91,7 @@ namespace STOLON
             _depthPath = new List<UIElement>();
 
             _skipTo = STOLON.Config.GetString("Debug.skip_to");
+            _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
             //switch (_skipTo)
             //{
             //    case "main_menu":
@@ -192,6 +195,7 @@ namespace STOLON
             };
 
             _tipId = new Random().Next(0, _tips.Length);
+
         }
 
         /// <summary>
@@ -393,7 +397,7 @@ namespace STOLON
         {
             spriteBatch.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             spriteBatch.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone) spriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
+            if (_menuDone && _showSplashtexts) spriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
 
             if (_drawMenuLogoLowResFonted)
             {
