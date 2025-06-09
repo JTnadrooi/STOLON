@@ -307,7 +307,7 @@ namespace STOLON
         {
             drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);
-            drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale * TextSizeMod, SpriteEffects.None, 0f);
+            drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, TextSizeMod);
         }
 
         public void Initialize(OverlayEngine overlayer, params object?[] args)

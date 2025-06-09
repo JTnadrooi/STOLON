@@ -69,7 +69,7 @@ namespace STOLON
                 foreach (Vector2 tilePos in _tilePositions)
                 {
                     drawingContext.Draw(_tileTexture, tilePos);
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.Instance.VirtualDimensions.X - 4f, 10f), Color.White, 1.57079633f, Vector2.Zero, STOLON.Fonts[STOLON.MEDIUM_FONT_ID].Scale, SpriteEffects.None, 1f);
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.Instance.VirtualDimensions.X - 4f, 10f), rotation: 1.57079633f);
                 }
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);

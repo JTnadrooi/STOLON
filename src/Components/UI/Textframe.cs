@@ -199,8 +199,8 @@ namespace STOLON
             drawingContext.DrawArea(_dialoguebounds, Color.Black);
             if (_currentDialogue.HasValue)
             {
-                drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _font.Scale, SpriteEffects.None, 0f);
-                drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _providerTextScaleCoefficient * _font.Scale, SpriteEffects.None, 0f);
+                drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2());
+                drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), _providerTextScaleCoefficient);
             }
             drawingContext.DrawRectangle(_dialoguebounds, Color.White, _userInterface.LineWidth);
 

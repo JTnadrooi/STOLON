@@ -176,7 +176,7 @@ namespace STOLON
             string id = STOLON.StateManager.Current.GetId();
             foreach (UIElementDrawData elementDrawData in _drawData)
             {
-                drawingContext.DrawString(STOLON.Fonts[elementDrawData.FontName], elementDrawData.Text, elementDrawData.Position, Color.White, 0f, Vector2.Zero, STOLON.Fonts[elementDrawData.FontName].Scale, SpriteEffects.None, 1f);
+                drawingContext.DrawString(STOLON.Fonts[elementDrawData.FontName], elementDrawData.Text, elementDrawData.Position);
                 if (elementDrawData.DrawRectangle)
                 {
                     drawingContext.DrawRectangle(elementDrawData.Rectangle, Color.White, 1f);

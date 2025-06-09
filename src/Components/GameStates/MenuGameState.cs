@@ -397,7 +397,7 @@ namespace STOLON
         {
             drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
+            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos);
 
             if (_drawMenuLogoLowResFonted)
             {

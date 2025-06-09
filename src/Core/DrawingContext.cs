@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -150,8 +151,6 @@ namespace STOLON
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
-        //public void Draw(GameTexture texture, Vector2 position, Color? color = null)
-        //    => InternalDraw(texture, GetDestinationRectangle(texture, position), color: color);
 
         public void Draw(GameTexture texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
@@ -167,19 +166,10 @@ namespace STOLON
         private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, Vector2? scale = null)
             => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
 
-        //public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null)
-        //=> _batch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White);
-        //public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color) => _batch.Draw(texture, position, sourceRectangle, color);
-        //public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None, float layerDepth = 1f)
-        //    => _batch.Draw(texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, layerDepth);
-
-        public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
-            => _spriteBatch.DrawString(spriteFont, text, position, color);
-        public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
-            => _spriteBatch.DrawString(spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
-        public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
-            => _spriteBatch.DrawString(spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
-
+        public void DrawString(GameFont font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
+        public void DrawString(GameFont font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => _spriteBatch.DrawString(font, text, position, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale * font.Scale, effects, layerDepth);
 
         public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
