@@ -14,8 +14,6 @@ namespace STOLON
     {
         private bool _disposedValue;
 
-        public SpriteBatch SpriteBatch => _spriteBatch;
-
         private readonly GraphicsDevice _graphics;
         private readonly SpriteBatch _spriteBatch;
         private readonly Dictionary<string, GameEffect> _effects;
@@ -25,9 +23,11 @@ namespace STOLON
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
 
-        private Matrix _invertYMatrix;
+        private readonly Matrix _invertYMatrix;
 
         public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
+        public Matrix InvertYMatrix => _invertYMatrix;
+        //public SpriteBatch SpriteBatch => _spriteBatch;
 
         public DrawingContext()
         {
@@ -40,7 +40,7 @@ namespace STOLON
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
 
-            _invertYMatrix = Matrix.CreateScale(1, -1, 1);
+            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0);
 
             _effects = new Dictionary<string, GameEffect>();
             GameEffect[] tempEffects = STOLON.Scan<GameEffect>();
@@ -94,7 +94,6 @@ namespace STOLON
             STOLON.Debug.Log($"enabled effect with name \"{name}\".");
         }
 
-
         public void EndScene()
         {
             _spriteBatch.End();
@@ -134,10 +133,10 @@ namespace STOLON
                 (_rt1, _rt2) = (_rt2, _rt1);
             }
 
-            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0);
+
             //var viewport = STOLON.Instance.GraphicsDevice.Viewport;
             //_invertYMatrix = Matrix.CreateTranslation(-0.5f, -0.5f, 0) * Matrix.CreateOrthographicOffCenter(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferWidth, 0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0, 1);
-            _invertYMatrix = Matrix.CreateScale(1, 1, 1);
+            //_invertYMatrix = Matrix.CreateScale(1, 1, 1);
             _graphics.SetRenderTarget(null);
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
@@ -157,9 +156,6 @@ namespace STOLON
             => _spriteBatch.Draw(texture, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
             => _spriteBatch.Draw(texture, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
-
-
-
 
         //public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null)
         //=> _batch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White);

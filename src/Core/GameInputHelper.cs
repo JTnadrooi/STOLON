@@ -41,7 +41,7 @@ namespace STOLON
         public MouseState CurrentMouse { get; internal set; }
         public KeyboardState CurrentKeyboard { get; internal set; }
         public KeyboardState PreviousKeyboard { get; internal set; }
-        public Vector2 VirtualMousePos => CurrentMouse.Position.ToVector2() / STOLON.Instance.ScreenScale;
+        public Vector2 VirtualMousePos => Vector2.Transform(CurrentMouse.Position.ToVector2(), STOLON.DrawingContext.InvertYMatrix) / STOLON.Instance.ScreenScale;
         public bool IsPressed(MouseButton button) => IsPressed(CurrentMouse, button);
         private bool IsPressed(MouseState state, MouseButton button) => button switch
         {

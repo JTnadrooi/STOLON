@@ -45,7 +45,6 @@ namespace STOLON
         public Point ScreenCenter => new Point(VirtualDimensions.X / 2, VirtualDimensions.Y / 2);
         public float ScreenScale { get; private set; }
 
-        public DrawingContext DrawingContext => _drawingContext;
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
         public Color Color1 => _palette[0];
         public Color Color2 => _palette[1];
@@ -141,9 +140,9 @@ namespace STOLON
             };
             STOLON.Debug.Log("palette set.");
 
-            _drawingContext = new DrawingContext();
             STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
+            STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Textures = _textures = new GameTextureCollection(Content);
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
             STOLON.Input = _input = new GameInputHelper();
@@ -228,6 +227,7 @@ namespace STOLON
         public static GameStateManager StateManager { get; internal set; }
         public static UserInterface UI { get; internal set; }
         public static GameConfig Config { get; internal set; }
+        public static DrawingContext DrawingContext { get; internal set; }
         public const string MEDIUM_FONT_ID = "pixeloid";
         public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";
