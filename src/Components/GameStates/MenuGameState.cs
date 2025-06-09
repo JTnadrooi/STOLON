@@ -402,18 +402,17 @@ namespace STOLON
             if (_drawMenuLogoLowResFonted)
             {
                 for (int i = 0; i < _menuDitherTexturePositions.Length; i++)
-                    drawingContext.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f,
-                        (i >= _menuDitherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                    drawingContext.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), effects: (i >= _menuDitherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
                 drawingContext.DrawArea(_menuLogoBoundingBox, Color.Black);
                 drawingContext.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
             }
-            if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoLowResFonted) drawingContext.Draw(_menuLogoFonted, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos);
+            if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos);
+            if (_drawMenuLogoLowResFonted) drawingContext.Draw(_menuLogoFonted, _menuLogoDrawPos);
 
             drawingContext.DrawArea(_menuLogoTileHider, Color.Black);
-            if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos);
 
             drawingContext.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(MenuRemoveLine2x, -10f, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);

@@ -68,7 +68,7 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 foreach (Vector2 tilePos in _tilePositions)
                 {
-                    drawingContext.Draw(_tileTexture, tilePos, Color.White);
+                    drawingContext.Draw(_tileTexture, tilePos);
                     drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.Instance.VirtualDimensions.X - 4f, 10f), Color.White, 1.57079633f, Vector2.Zero, STOLON.Fonts[STOLON.MEDIUM_FONT_ID].Scale, SpriteEffects.None, 1f);
                 }
             }

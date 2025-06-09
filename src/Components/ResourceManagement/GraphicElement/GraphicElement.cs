@@ -61,7 +61,7 @@ namespace STOLON
 
         public virtual void Draw(DrawingContext drawingContext, int elapsedMiliseconds, SpriteEffects effects = SpriteEffects.None)
         {
-            drawingContext.Draw(Texture, Position + Source.Position, null, Color.White, 0, new Vector2(0), Scale, SpriteEffects.None, 1f);
+            drawingContext.Draw(Texture, Position + Source.Position, Scale);
         }
 
         public virtual bool IsHovered(MouseState mouseState) => IsHovered(mouseState.Position);

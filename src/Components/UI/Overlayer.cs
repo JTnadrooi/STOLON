@@ -162,7 +162,7 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            drawingContext.Draw(lineTexture, _pos, null, Color.White, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f), _scale, SpriteEffects.None, 0);
+            drawingContext.Draw(lineTexture, _pos, _scale, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f));
             //drawingContext.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
         }
     }
@@ -247,7 +247,7 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            drawingContext.Draw(_ditherTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, (float)_resolution, SpriteEffects.None, 1f);
+            drawingContext.Draw(_ditherTexture, Vector2.Zero, (float)_resolution);
         }
     }
     public class TransitionOverlay : IOverlay
