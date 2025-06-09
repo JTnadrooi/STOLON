@@ -136,18 +136,11 @@ namespace STOLON
                 (_rt1, _rt2) = (_rt2, _rt1);
             }
 
-            //var viewport = STOLON.Instance.GraphicsDevice.Viewport;
-            //_invertYMatrix = Matrix.CreateTranslation(-0.5f, -0.5f, 0) * Matrix.CreateOrthographicOffCenter(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferWidth, 0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0, 1);
-            //_invertYMatrix = Matrix.CreateScale(1, 1, 1);
             _graphics.SetRenderTarget(null);
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
         }
-
-        //public void Begin(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
-        //    => _batch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
-        //public void End() => _batch.End();
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
@@ -158,18 +151,27 @@ namespace STOLON
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
         public void Draw(GameTexture texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
-            _spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, effects, layerDepth);
+            _spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, InvertY(effects), layerDepth);
         }
 
         private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, float scale)
             => GetDestinationRectangle(texture, position, new Vector2(scale));
         private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, Vector2? scale = null)
             => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
+        //private SpriteEffects InvertY(SpriteEffects effect) => effect switch
+        //{
+        //    SpriteEffects.FlipHorizontally => SpriteEffects.FlipHorizontally & SpriteEffects.FlipVertically,
+        //    SpriteEffects.FlipVertically => SpriteEffects.None,
+        //    SpriteEffects.None => SpriteEffects.FlipVertically,
+        //    _ => effect,
+        //};
+        private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
+
 
         public void DrawString(GameFont font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
         public void DrawString(GameFont font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-            => _spriteBatch.DrawString(font, text, position, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale * font.Scale, effects, layerDepth);
+            => _spriteBatch.DrawString(font, text, position, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale * font.Scale, InvertY(effects), layerDepth);
 
         public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
