@@ -72,9 +72,9 @@ namespace STOLON
         {
             _board?.Draw(drawingContext, elapsedMiliseconds);
 
-            drawingContext.Draw(STOLON.Textures.Pixel, new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
+            drawingContext.DrawArea(new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
             drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
-            drawingContext.Draw(STOLON.Textures.Pixel, new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
+            drawingContext.DrawArea(new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
             drawingContext.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
         }
     }

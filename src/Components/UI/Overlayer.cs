@@ -127,7 +127,7 @@ namespace STOLON
         public string Id => "loading";
         public bool Ended { get; private set; }
 
-        private Texture2D lineTexture;
+        private GameTexture lineTexture;
 
         private float _rotation;
         private float _rotationSpeed;
@@ -172,7 +172,7 @@ namespace STOLON
 
         public bool Ended => _ended;
 
-        private Texture2D _ditherTexture;
+        private GameTexture _ditherTexture;
         private const int FRAME_PIXELS_TO_REMOVE = 11150 / RESOLUTION; // Number of pixels to turn transparent each frame
         private const int RESOLUTION = 2;
         private Color[] _pixelData; // Holds the pixel data for the dither texture
@@ -208,10 +208,10 @@ namespace STOLON
 
         public void ResetTexture()
         {
-            _ditherTexture = new Texture2D(_graphicsDevice, _width, _height);
+            _ditherTexture = new GameTexture(_graphicsDevice, _width, _height);
             _pixelData = new Color[_width * _height];
             for (int i = 0; i < _pixelData.Length; i++) _pixelData[i] = Color.White;
-            _ditherTexture.SetData(_pixelData);
+            _ditherTexture.SetColorData(_pixelData);
         }
 
         public void Reset()
@@ -242,12 +242,12 @@ namespace STOLON
                     return;
                 }
             }
-            _ditherTexture.SetData(_pixelData);
+            _ditherTexture.SetColorData(_pixelData);
         }
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            drawingContext.Draw(_ditherTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, _resolution, SpriteEffects.None, 1f);
+            drawingContext.Draw(_ditherTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, (float)_resolution, SpriteEffects.None, 1f);
         }
     }
     public class TransitionOverlay : IOverlay
@@ -305,7 +305,7 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            drawingContext.Draw(STOLON.Textures.Pixel, _drawArea, Color.Black);
+            drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);
             drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale * TextSizeMod, SpriteEffects.None, 0f);
         }

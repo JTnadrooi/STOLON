@@ -65,7 +65,7 @@ namespace STOLON
             if (_initDone)
             {
                 //drawingContext.Draw(STOLON.Textures.GetReference("characters\\silo"), new Vector2(448, 0), Color.White);
-                drawingContext.Draw(STOLON.Textures.Pixel, new Rectangle(0, 0, _line1x, 1000), Color.Black);
+                drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 foreach (Vector2 tilePos in _tilePositions)
                 {
                     drawingContext.Draw(_tileTexture, tilePos, Color.White);

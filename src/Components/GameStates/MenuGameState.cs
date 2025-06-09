@@ -18,11 +18,11 @@ namespace STOLON
 {
     public class MenuGameState : IGameState
     {
-        private Texture2D _menuLogoLines;
-        private Texture2D _menuLogoMarks;
-        private Texture2D _menuLogoFilledMarks;
-        private Texture2D _menuLogoFonted;
-        private Texture2D _dither32;
+        private GameTexture _menuLogoLines;
+        private GameTexture _menuLogoMarks;
+        private GameTexture _menuLogoFilledMarks;
+        private GameTexture _menuLogoFonted;
+        private GameTexture _dither32;
 
         private Rectangle _menuLogoTileHider;
 
@@ -405,14 +405,14 @@ namespace STOLON
                     drawingContext.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f,
                         (i >= _menuDitherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
 
-                drawingContext.Draw(STOLON.Textures.Pixel, _menuLogoBoundingBox, Color.Black);
+                drawingContext.DrawArea(_menuLogoBoundingBox, Color.Black);
                 drawingContext.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
             }
             if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos, Color.White);
             if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos, Color.White);
             if (_drawMenuLogoLowResFonted) drawingContext.Draw(_menuLogoFonted, _menuLogoDrawPos, Color.White);
 
-            drawingContext.Draw(STOLON.Textures.Pixel, _menuLogoTileHider, Color.Black);
+            drawingContext.DrawArea(_menuLogoTileHider, Color.Black);
             if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);
 
             drawingContext.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);

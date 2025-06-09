@@ -196,7 +196,7 @@ namespace STOLON
         }
         public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            drawingContext.Draw(STOLON.Textures.Pixel, _dialoguebounds, Color.Black);
+            drawingContext.DrawArea(_dialoguebounds, Color.Black);
             if (_currentDialogue.HasValue)
             {
                 drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _font.Scale, SpriteEffects.None, 0f);

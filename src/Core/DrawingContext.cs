@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace STOLON
 {
@@ -148,15 +149,24 @@ namespace STOLON
         //    => _batch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
         //public void End() => _batch.End();
 
-        public void Draw(Texture2D texture, Rectangle destinationRectangle, Color? color = null)
-            => _spriteBatch.Draw(texture, destinationRectangle, color ?? Color.White);
-        public void Draw(Texture2D texture, Vector2 position, Color? color = null)
-            => _spriteBatch.Draw(texture, position, color ?? Color.White);
+        public void DrawArea(Rectangle destinationRectangle, Color color)
+            => InternalDraw(STOLON.Textures.Pixel, destinationRectangle, color: color);
+        public void Draw(GameTexture texture, Vector2 position, Color? color = null)
+            => InternalDraw(texture, GetDestinationRectangle(texture, position), color: color);
 
-        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
-            => _spriteBatch.Draw(texture, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
-        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
-            => _spriteBatch.Draw(texture, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
+        public void Draw(GameTexture texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+            => InternalDraw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
+        public void Draw(GameTexture texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
+            => InternalDraw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
+
+        private void InternalDraw(GameTexture texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.FlipVertically, float layerDepth = 0f)
+        {
+            _spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, effects, layerDepth);
+        }
+
+        private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, float scale) => GetDestinationRectangle(texture, position, new Vector2(scale));
+        private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, Vector2? scale = null)
+            => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
 
         //public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null)
         //=> _batch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White);
