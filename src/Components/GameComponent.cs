@@ -40,7 +40,7 @@ namespace STOLON
         /// Update this component so it draws all sub-drawables.
         /// </summary>
         /// <param name="elapsedMiliseconds">The miliseconds since last frame.</param>
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds);
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
         /// <summary>
         /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> featuring all the <see cref="GraphicElement"/> objects managed by this <see cref="IGameComponent"/>.
         /// </summary>
@@ -60,7 +60,7 @@ namespace STOLON
             Source = source;
             _graphicElements = new GraphicElementCollection(this);
         }
-        public virtual void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public virtual void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
 
         }

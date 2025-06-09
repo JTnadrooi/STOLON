@@ -16,7 +16,7 @@ namespace STOLON
     public interface IGameState
     {
         public void Update(int elapsedMilliseconds);
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds);
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
         public string DRPStatus => this.GetType().Name;
     }
 
@@ -52,9 +52,9 @@ namespace STOLON
             _currentState.Update(elapsedMilliseconds);
         }
 
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            _currentState.Draw(spriteBatch, elapsedMiliseconds);
+            _currentState.Draw(drawingContext, elapsedMiliseconds);
         }
 
         public TGameState GetCurrent<TGameState>() where TGameState : IGameState => (TGameState)Current;

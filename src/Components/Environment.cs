@@ -94,13 +94,13 @@ namespace STOLON
             _overlayer.Update(elapsedMiliseconds);
             base.Update(elapsedMiliseconds);
         }
-        public override void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            STOLON.StateManager.Draw(spriteBatch, elapsedMiliseconds);
-            _userInterface.Draw(spriteBatch, elapsedMiliseconds);
+            STOLON.StateManager.Draw(drawingContext, elapsedMiliseconds);
+            _userInterface.Draw(drawingContext, elapsedMiliseconds);
 
-            _overlayer.Draw(spriteBatch, elapsedMiliseconds);
-            base.Draw(spriteBatch, elapsedMiliseconds);
+            _overlayer.Draw(drawingContext, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMiliseconds);
         }
 
         /// <summary>

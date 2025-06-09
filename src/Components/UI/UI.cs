@@ -171,19 +171,19 @@ namespace STOLON
                 }
         }
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
-        public override void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             string id = STOLON.StateManager.Current.GetId();
             foreach (UIElementDrawData elementDrawData in _drawData)
             {
-                spriteBatch.DrawString(STOLON.Fonts[elementDrawData.FontName], elementDrawData.Text, elementDrawData.Position, Color.White, 0f, Vector2.Zero, STOLON.Fonts[elementDrawData.FontName].Scale, SpriteEffects.None, 1f);
+                drawingContext.DrawString(STOLON.Fonts[elementDrawData.FontName], elementDrawData.Text, elementDrawData.Position, Color.White, 0f, Vector2.Zero, STOLON.Fonts[elementDrawData.FontName].Scale, SpriteEffects.None, 1f);
                 if (elementDrawData.DrawRectangle)
                 {
-                    spriteBatch.DrawRectangle(elementDrawData.Rectangle, Color.White, 1f);
+                    drawingContext.DrawRectangle(elementDrawData.Rectangle, Color.White, 1f);
                 }
             }
-            _textframe.Draw(spriteBatch, elapsedMiliseconds);
-            base.Draw(spriteBatch, elapsedMiliseconds);
+            _textframe.Draw(drawingContext, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMiliseconds);
         }
         /// <summary>
         /// Add an element to the <see cref="UserInterface"/>.

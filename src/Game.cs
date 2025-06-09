@@ -27,7 +27,7 @@ namespace STOLON
     {
         private GraphicsDeviceManager _graphics;
         private GameInputHelper _input;
-        private SpriteBatch _spriteBatch;
+        private DrawingContext _drawingContext;
 
         private GameEnvironment _environment;
         private Point _aspectRatio = new Point(16, 9);
@@ -46,7 +46,7 @@ namespace STOLON
         public Point ScreenCenter => new Point(VirtualDimensions.X / 2, VirtualDimensions.Y / 2);
         public float ScreenScale { get; private set; }
 
-        public SpriteBatch SpriteBatch => _spriteBatch;
+        public DrawingContext DrawingContext => _drawingContext;
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
         public Color Color1 => _palette[0];
         public Color Color2 => _palette[1];
@@ -135,7 +135,7 @@ namespace STOLON
         {
             Debug.Log(">[s]loading stolon content");
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _drawingContext = new DrawingContext();
             STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
             STOLON.Textures = _textures = new GameTextureCollection(Content);
@@ -206,13 +206,13 @@ namespace STOLON
             int elapsedMiliseconds = gameTime.ElapsedGameTime.Milliseconds;
             _post.BeginScene();
             GraphicsDevice.Clear(STOLON.Instance.Color2);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _drawingContext.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 
-            _environment.Draw(_spriteBatch, gameTime.ElapsedGameTime.Milliseconds);
-            _spriteBatch.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(VirtualDimensions.X / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 1f), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
-            _spriteBatch.DrawRectangle(new Rectangle(Point.Zero, VirtualDimensions), Color.White, 1);
+            _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);
+            _drawingContext.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(VirtualDimensions.X / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 1f), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
+            _drawingContext.DrawRectangle(new Rectangle(Point.Zero, VirtualDimensions), Color.White, 1);
 
-            _spriteBatch.End();
+            _drawingContext.End();
             _post.EndScene();
 
             base.Draw(gameTime);

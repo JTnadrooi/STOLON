@@ -194,17 +194,17 @@ namespace STOLON
         {
             return text.Length * CHAR_READ_MILISECONDS;
         }
-        public override void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            spriteBatch.Draw(STOLON.Textures.Pixel, _dialoguebounds, Color.Black);
+            drawingContext.Draw(STOLON.Textures.Pixel, _dialoguebounds, Color.Black);
             if (_currentDialogue.HasValue)
             {
-                spriteBatch.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _font.Scale, SpriteEffects.None, 0f);
-                spriteBatch.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _providerTextScaleCoefficient * _font.Scale, SpriteEffects.None, 0f);
+                drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _font.Scale, SpriteEffects.None, 0f);
+                drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), Color.White, 0f, Vector2.Zero, _providerTextScaleCoefficient * _font.Scale, SpriteEffects.None, 0f);
             }
-            spriteBatch.DrawRectangle(_dialoguebounds, Color.White, _userInterface.LineWidth);
+            drawingContext.DrawRectangle(_dialoguebounds, Color.White, _userInterface.LineWidth);
 
-            base.Draw(spriteBatch, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMiliseconds);
         }
     }
 }

@@ -32,18 +32,22 @@ namespace STOLON
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
 
+        private Matrix _invertYMatrix;
+
         public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
 
         public EffectPipeline()
         {
             STOLON.Debug.Log(">[s]initialising effect pipeline");
-            _spriteBatch = STOLON.Instance.SpriteBatch;
+            _spriteBatch = STOLON.Instance.DrawingContext.SpriteBatch;
             _graphics = STOLON.Instance.GraphicsDevice;
 
             _vrt1 = GetVirtual();
             _vrt2 = GetVirtual();
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
+
+            _invertYMatrix = Matrix.CreateScale(1, -1, 1);
 
             _effects = new Dictionary<string, GameEffect>();
             GameEffect[] tempEffects = STOLON.Scan<GameEffect>();
@@ -133,8 +137,12 @@ namespace STOLON
                 (_rt1, _rt2) = (_rt2, _rt1);
             }
 
-            _graphics.SetRenderTarget(null); // and draw to screen.
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0);
+            //var viewport = STOLON.Instance.GraphicsDevice.Viewport;
+            //_invertYMatrix = Matrix.CreateTranslation(-0.5f, -0.5f, 0) * Matrix.CreateOrthographicOffCenter(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferWidth, 0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0, 1);
+            _invertYMatrix = Matrix.CreateScale(1, 1, 1);
+            _graphics.SetRenderTarget(null);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
         }

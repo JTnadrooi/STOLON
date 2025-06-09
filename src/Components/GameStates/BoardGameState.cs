@@ -68,14 +68,14 @@ namespace STOLON
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
             _lineX2 = (int)(STOLON.Instance.VirtualDimensions.X - _lineOffset + _uiRightOffset);
         }
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            _board?.Draw(spriteBatch, elapsedMiliseconds);
+            _board?.Draw(drawingContext, elapsedMiliseconds);
 
-            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
-            spriteBatch.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
-            spriteBatch.Draw(STOLON.Textures.Pixel, new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
-            spriteBatch.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.Draw(STOLON.Textures.Pixel, new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
+            drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.Draw(STOLON.Textures.Pixel, new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
+            drawingContext.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
         }
     }
 }

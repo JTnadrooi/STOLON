@@ -100,13 +100,13 @@ namespace STOLON
             }
             base.Update(elapsedMiliseconds);
         }
-        public override void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             for (int i = 0; i < _initialized.Count; i++)
             {
-                _overlays[_initialized[i]].Draw(spriteBatch, elapsedMiliseconds);
+                _overlays[_initialized[i]].Draw(drawingContext, elapsedMiliseconds);
             }
-            base.Draw(spriteBatch, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMiliseconds);
         }
 
         public static OverlayEngine Engine => STOLON.Environment.Overlayer;
@@ -116,7 +116,7 @@ namespace STOLON
     {
         public void Initialize(OverlayEngine overlayer, params object?[] args);
         public void Update(int elapsedMiliseconds);
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds);
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
         public void Reset();
 
         public string Id { get; }
@@ -160,10 +160,10 @@ namespace STOLON
             _rotation += _rotationSpeed;
         }
 
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            spriteBatch.Draw(lineTexture, _pos, null, Color.White, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f), _scale, SpriteEffects.None, 0);
-            //spriteBatch.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
+            drawingContext.Draw(lineTexture, _pos, null, Color.White, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f), _scale, SpriteEffects.None, 0);
+            //drawingContext.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
         }
     }
     public class TransitionDitherOverlay : IOverlay
@@ -245,9 +245,9 @@ namespace STOLON
             _ditherTexture.SetData(_pixelData);
         }
 
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            spriteBatch.Draw(_ditherTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, _resolution, SpriteEffects.None, 1f);
+            drawingContext.Draw(_ditherTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, _resolution, SpriteEffects.None, 1f);
         }
     }
     public class TransitionOverlay : IOverlay
@@ -303,11 +303,11 @@ namespace STOLON
             Centering.OnPixel(ref _textPos);
         }
 
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            spriteBatch.Draw(STOLON.Textures.Pixel, _drawArea, Color.Black);
-            spriteBatch.DrawRectangle(_drawArea, Color.White);
-            spriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale * TextSizeMod, SpriteEffects.None, 0f);
+            drawingContext.Draw(STOLON.Textures.Pixel, _drawArea, Color.Black);
+            drawingContext.DrawRectangle(_drawArea, Color.White);
+            drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale * TextSizeMod, SpriteEffects.None, 0f);
         }
 
         public void Initialize(OverlayEngine overlayer, params object?[] args)

@@ -393,30 +393,30 @@ namespace STOLON
 
             Centering.OnPixel(ref _menuLogoDrawPos);
         }
-        public void Draw(SpriteBatch spriteBatch, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
-            spriteBatch.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
-            spriteBatch.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone && _showSplashtexts) spriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
+            drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
+            drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
+            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos, Color.White, 0f, Vector2.Zero, STOLON.Fonts[STOLON.SMALL_FONT_ID].Scale, SpriteEffects.None, 1f);
 
             if (_drawMenuLogoLowResFonted)
             {
                 for (int i = 0; i < _menuDitherTexturePositions.Length; i++)
-                    spriteBatch.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f,
+                    drawingContext.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f,
                         (i >= _menuDitherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
 
-                spriteBatch.Draw(STOLON.Textures.Pixel, _menuLogoBoundingBox, Color.Black);
-                spriteBatch.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
+                drawingContext.Draw(STOLON.Textures.Pixel, _menuLogoBoundingBox, Color.Black);
+                drawingContext.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
             }
-            if (_drawMenuLogoDummyTiles) spriteBatch.Draw(_menuLogoMarks, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoFilledTiles) spriteBatch.Draw(_menuLogoFilledMarks, _menuLogoDrawPos, Color.White);
-            if (_drawMenuLogoLowResFonted) spriteBatch.Draw(_menuLogoFonted, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos, Color.White);
+            if (_drawMenuLogoLowResFonted) drawingContext.Draw(_menuLogoFonted, _menuLogoDrawPos, Color.White);
 
-            spriteBatch.Draw(STOLON.Textures.Pixel, _menuLogoTileHider, Color.Black);
-            if (_drawMenuLogoLines) spriteBatch.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);
+            drawingContext.Draw(STOLON.Textures.Pixel, _menuLogoTileHider, Color.Black);
+            if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos, Color.White);
 
-            spriteBatch.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
-            spriteBatch.DrawLine(MenuRemoveLine2x, -10f, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(MenuRemoveLine2x, -10f, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
         }
     }
 }
