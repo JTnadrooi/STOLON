@@ -60,13 +60,13 @@ namespace STOLON
         public (UIElementDrawData drawData, bool isHovered) GetElementDrawData(UIElement element, Vector2 UIOrgin, int index)
         {
             Vector2 elementPos = Centering.MiddleX((int)_font.FastMeasure(element.Text).X,
-                                index * (_font.Dimensions.Y * 2 + 2) + UIOrgin.Y,
+                                index * (-_font.Dimensions.Y * 2 - 2) + UIOrgin.Y,
                                 STOLON.Instance.VirtualDimensions.X, Vector2.One);
             Centering.OnPixel(ref elementPos);
 
             Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
             string elementText = element.Text;
-            if (_capitalise) element.Text = element.Text.ToUpper();
+            if (_capitalise) elementText = elementText.ToUpper();
 
             string postPre = element.Id switch
             {

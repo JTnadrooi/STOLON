@@ -125,6 +125,8 @@ namespace STOLON
             _menuLogoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
             _menuRemoveTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
 
+            //Console.WriteLine(STOLON.UI.UIElements.ToJoinedString(", "));
+
             _tips = new string[]
             {
                 //"A Stolon is a line where both players cannot drop their tiles.", // to long
@@ -243,10 +245,10 @@ namespace STOLON
         private void UpdateUI(int elapsedMiliseconds)
         {
             int rowHeight = (int)(_menuLogoLines.Height / (float)MENU_LOGO_ROW_COUNT);
-            float menuRemoveTweenerOffset = 300f * _menuRemoveTweener.Value;
-            int lineFromMid = (int)(170f + menuRemoveTweenerOffset);
+            float menuRemoveTweenerOffset = -300f * _menuRemoveTweener.Value;
+            int lineFromMid = (int)(170f - menuRemoveTweenerOffset);
             bool menuFlashEnded = _milisecondsSinceStartup > _menuFlashEnd;
-            int uiElementOffsetY = (int)(230f + menuRemoveTweenerOffset);
+            int uiElementOffsetY = (int)(280f + menuRemoveTweenerOffset);
             int logoYoffset = 30;
             int menuLogoBoundingBoxClearing = 8;
 
