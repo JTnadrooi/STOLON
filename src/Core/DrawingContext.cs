@@ -165,7 +165,7 @@ namespace STOLON
         //    SpriteEffects.None => SpriteEffects.FlipVertically,
         //    _ => effect,
         //};
-        private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
+        private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // I don't think this completelly works.
 
 
         public void DrawString(GameFont font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
