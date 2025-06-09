@@ -23,7 +23,7 @@ namespace STOLON
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
 
-        private readonly Matrix _invertYMatrix;
+        private Matrix _invertYMatrix;
 
         public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
         public Matrix InvertYMatrix => _invertYMatrix;
@@ -67,6 +67,7 @@ namespace STOLON
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
+            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, newRes.Y, 0);
             _rt1 = GetDesired(newRes);
             _rt2 = GetDesired(newRes);
             foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
