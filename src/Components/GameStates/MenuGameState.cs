@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Content;
 using Betwixt;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
+using static STOLON.UIElement;
 
 namespace STOLON
 {
@@ -102,6 +103,23 @@ namespace STOLON
             //        break;
             //}
 
+            STOLON.UI.AddElement(new UIElement(UserInterface.TITLE_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
+
+            STOLON.UI.AddElement(new UIElement("startStory", UserInterface.TITLE_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
+            STOLON.UI.AddElement(new UIElement("startCom", UserInterface.TITLE_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("startXp", UserInterface.TITLE_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("options", UserInterface.TITLE_PARENT_ID, "Options", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("specialThanks", UserInterface.TITLE_PARENT_ID, "Special Thanks", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("quit", UserInterface.TITLE_PARENT_ID, "Quit", UIElementType.Listen));
+
+            // options
+            STOLON.UI.AddElement(new UIElement("sound", "options", "Sound", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"));
+
+            STOLON.UI.AddElement(new UIElement("volUp", "sound", "Volume UP", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("volDown", "sound", "Volume DOWN", UIElementType.Listen));
+
+            STOLON.UI.MenuPath = GetSelfPath(UserInterface.TITLE_PARENT_ID);
             _menuLogoScaling = 1f;
 
             _menuLogoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);

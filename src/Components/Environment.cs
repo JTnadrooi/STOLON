@@ -50,10 +50,9 @@ namespace STOLON
         {
             _entities = new Dictionary<string, Entity>();
             _userInterface = null!;
+            _gameStateManager = null!;
             _overlayer = null!;
-            _gameStateManager = new GameStateManager();
-            STOLON.StateManager = _gameStateManager;
-            STOLON.StateManager.ChangeState<MenuGameState>();
+
             TaskHeap = new TaskHeap();
         }
         internal void Initialize()
@@ -68,9 +67,10 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            _userInterface = new UserInterface();
-            STOLON.UI = _userInterface;
+            STOLON.UI = _userInterface = new UserInterface();
             _userInterface.Initialize();
+            STOLON.StateManager = _gameStateManager = new GameStateManager();
+            STOLON.StateManager.ChangeState<MenuGameState>();
 
 
             _overlayer = new OverlayEngine();

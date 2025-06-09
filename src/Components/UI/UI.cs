@@ -93,7 +93,6 @@ namespace STOLON
         {
             STOLON.Debug.Log(">[s]initializing ui..");
             // top
-            AddElement(new UIElement(TITLE_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
 
             // board l
             //AddElement(new UIElement("exitGame", boardLeftParentId, "Exit Game", UIElementType.Listen));
@@ -113,22 +112,7 @@ namespace STOLON
             // board
             //AddElement(new UIElement("currentPlayer", boardRightParentId, null, UIElementType.Ignore));
 
-            // main menu
-            AddElement(new UIElement("startStory", TITLE_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
-            AddElement(new UIElement("startCom", TITLE_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
-            AddElement(new UIElement("startXp", TITLE_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
-            AddElement(new UIElement("options", TITLE_PARENT_ID, "Options", UIElementType.Listen));
-            AddElement(new UIElement("specialThanks", TITLE_PARENT_ID, "Special Thanks", UIElementType.Listen));
-            AddElement(new UIElement("quit", TITLE_PARENT_ID, "Quit", UIElementType.Listen));
 
-            // options
-            AddElement(new UIElement("sound", "options", "Sound", UIElementType.Listen));
-            AddElement(new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"));
-
-            AddElement(new UIElement("volUp", "sound", "Volume UP", UIElementType.Listen));
-            AddElement(new UIElement("volDown", "sound", "Volume DOWN", UIElementType.Listen));
-
-            MenuPath = GetSelfPath(TITLE_PARENT_ID);
 
             STOLON.Debug.Log(">autogenerating _back_ buttons");
             HashSet<string> parentIds = GetParentIds();
