@@ -60,7 +60,7 @@ namespace STOLON
 
             lineZoomOffset = Math.Max(0, lineZoomOffset);
 
-            bool mouseIsOnUI = STOLON.Input.Domain == GameInputHelper.MouseDomain.UserInterfaceLow;
+            bool mouseIsOnUI = STOLON.Input.Domain == GameInput.MouseDomain.UserInterfaceLow;
 
             _uiLeftOffset = -lineZoomOffset;
             _uiRightOffset = lineZoomOffset;
