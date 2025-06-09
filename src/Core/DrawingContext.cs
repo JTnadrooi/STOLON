@@ -40,7 +40,7 @@ namespace STOLON
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
 
-            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight, 0);
+            _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
 
             _effects = new Dictionary<string, GameEffect>();
             GameEffect[] tempEffects = STOLON.Scan<GameEffect>();
