@@ -37,7 +37,6 @@ namespace STOLON
         private GameTextureCollection _textures;
         private GameFontCollection _fonts;
         private Point _oldWindowSize;
-        private EffectPipeline _post;
 
         public DiscordRichPresence DRP { get; private set; }
         public Rectangle VirtualBounds => new Rectangle(Point.Zero, VirtualDimensions);
@@ -111,7 +110,7 @@ namespace STOLON
             ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
             _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
-            _post.UpdateResolution();
+            _drawingContext.UpdateResolution();
             Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
         public void GoFullscreen()
@@ -135,6 +134,13 @@ namespace STOLON
         {
             Debug.Log(">[s]loading stolon content");
 
+            _palette = new Color[]
+            {
+                new Color(242, 251, 235), // #f2fbeb
+                new Color(23, 18, 25), // #171219
+            };
+            STOLON.Debug.Log("palette set.");
+
             _drawingContext = new DrawingContext();
             STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
@@ -144,15 +150,9 @@ namespace STOLON
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
-            _palette = new Color[]
-            {
-                new Color(242, 251, 235), // #f2fbeb
-                new Color(23, 18, 25), // #171219
-            };
 
-            _post = new EffectPipeline();
 
-            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _post.DisableEffect("crt");
+            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableEffect("crt");
 
             Debug.Success();
 
@@ -204,16 +204,13 @@ namespace STOLON
         protected override void Draw(GameTime gameTime)
         {
             int elapsedMiliseconds = gameTime.ElapsedGameTime.Milliseconds;
-            _post.BeginScene();
-            GraphicsDevice.Clear(STOLON.Instance.Color2);
-            _drawingContext.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);
             _drawingContext.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(VirtualDimensions.X / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 1f), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
             _drawingContext.DrawRectangle(new Rectangle(Point.Zero, VirtualDimensions), Color.White, 1);
 
-            _drawingContext.End();
-            _post.EndScene();
+            _drawingContext.EndScene();
 
             base.Draw(gameTime);
         }
