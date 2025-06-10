@@ -26,7 +26,7 @@ namespace STOLON
         public override Computer Computer => _computer;
         public override string? Description => "This shoulden't be readable in the current verion.";
 
-        public override IReadOnlyDictionary<int, GameTexture?> Mipmaps => throw new NotImplementedException();
+        public override EntityProfile Profile => EntityProfile.Debug;
 
         private GoldsilkComputer _computer;
 

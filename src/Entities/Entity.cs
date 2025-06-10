@@ -16,12 +16,18 @@ namespace STOLON
         private Point _focus;
 
         public GameTexture Texture512 => Mipmaps[512];
-        public GameTexture? Texture256 => this.TryGetMipmap(256, out GameTexture? t) ? t : throw new Exception();
-        public GameTexture? Texture128 => this.TryGetMipmap(128, out GameTexture? t) ? t : throw new Exception();
+        public GameTexture Texture256 => this.TryGetMipmap(256, out GameTexture? t) ? t! : throw new Exception();
+        public GameTexture Texture128 => this.TryGetMipmap(128, out GameTexture? t) ? t! : throw new Exception();
 
         public IReadOnlyDictionary<int, GameTexture> Mipmaps => mipmaps;
         public Point Focus { get => _focus; set => _focus = value; }
 
+        public EntityProfile(string entityName, Point? focus = null) : this(
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out GameTexture? val512) ? val512 : throw new Exception(),
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out GameTexture? val256) ? val256 : null,
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out GameTexture? val128) ? val128 : null,
+            focus)
+        { }
         public EntityProfile(GameTexture t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null)
         {
             mipmaps = new Dictionary<int, GameTexture>();
@@ -30,13 +36,20 @@ namespace STOLON
             if (t128 != null) mipmaps[128] = t128;
             _focus = focus ?? Centering.Get(t512).ToPoint();
         }
+
+        public static EntityProfile Debug => new EntityProfile(
+            STOLON.Textures[$"Entities\\Debug\\temp-512"],
+            null,
+            STOLON.Textures[$"Entities\\Debug\\temp-128"]);
     }
     /// <summary>
     /// Represent the main component of a <see cref="Entity"/>.
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
-        public abstract IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
+        public abstract EntityProfile Profile { get; }
+        public IReadOnlyDictionary<int, GameTexture> Mipmaps => Profile.Mipmaps;
+
         /// <summary>
         /// Create a new <see cref="Entity"/> with set values.
         /// </summary>
@@ -72,6 +85,7 @@ namespace STOLON
         public string Id { get; private set; }
         public string Name { get; private set; }
         public string SymbolNotation { get; protected set; }
+
     }
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
