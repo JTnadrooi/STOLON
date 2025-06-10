@@ -408,7 +408,7 @@ namespace STOLON
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
 
             _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
-                _menuLogoDrawPos.Y + _menuLogoLines.Height + (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
+                _menuLogoDrawPos.Y - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
 
             _menuRemoveLineY = STOLON.V_HEIGHT - (int)(_menuRemoveTweener.Value * STOLON.V_HEIGHT);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
