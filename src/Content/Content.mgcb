@@ -125,18 +125,6 @@
 /processorParam:TextureFormat=Color
 /build:../Content/Textures/dither-32.png;Textures/dither-32.png
 
-#begin ../Content/Textures/Enities/silo/silo-512.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../Content/Textures/Enities/silo/silo-512.png;Textures/Enities/silo/silo-512.png
-
 #begin ../Content/Textures/landscape.png
 /importer:TextureImporter
 /processor:TextureProcessor

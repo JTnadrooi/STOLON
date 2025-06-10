@@ -16,10 +16,8 @@
 		<Compile Remove="Content\obj\**" />
 		<EmbeddedResource Remove="Content\bin\**" />
 		<EmbeddedResource Remove="Content\obj\**" />
-		<EmbeddedResource Remove="Content\Textures\Entities\**" />
 		<None Remove="Content\bin\**" />
 		<None Remove="Content\obj\**" />
-		<None Remove="Content\Textures\Entities\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="AsitLib">
