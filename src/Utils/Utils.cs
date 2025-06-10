@@ -290,11 +290,15 @@ namespace STOLON
         public static Vector2 BottomLeft(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(0, -(texture.Height * scaling.Y));
         public static Vector2 BottomRight(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(-(texture.Width * scaling.X), -(texture.Height * scaling.Y));
 
-        public static Vector2 MiddleX(Texture2D texture, float y, float inX, Vector2 scaling) => MiddleX(texture.Width, y, inX, scaling);
-        public static Vector2 MiddleX(int boxX, float y, float inX, Vector2 scaling) => new Vector2(inX * 0.5f - boxX * scaling.X * 0.5f, y);
+        public static Vector2 MiddleX(Texture2D texture, float y, float inX, Vector2 scaling) => MiddleX(texture, y, inX, scaling.X);
+        public static Vector2 MiddleX(int boxX, float y, float inX, Vector2 scaling) => MiddleX(boxX, y, inX, scaling.X);
+        public static Vector2 MiddleX(Texture2D texture, float y, float inX, float scaling = 1f) => MiddleX(texture.Width, y, inX, scaling);
+        public static Vector2 MiddleX(int boxX, float y, float inX, float scaling = 1f) => new Vector2(inX * 0.5f - boxX * scaling * 0.5f, y);
 
-        public static Vector2 MiddleY(Texture2D texture, float x, float inY, Vector2 scaling) => new Vector2(x, inY * 0.5f - texture.Height * scaling.Y * 0.5f);
-        public static Vector2 MiddleY(int boxY, float x, float inY, Vector2 scaling) => new Vector2(x, inY * 0.5f - boxY * scaling.Y * 0.5f);
+        public static Vector2 MiddleY(Texture2D texture, float x, float inY, Vector2 scaling) => MiddleY(texture.Height, x, inY, scaling.Y);
+        public static Vector2 MiddleY(int boxY, float x, float inY, Vector2 scaling) => MiddleY(boxY, x, inY, scaling.Y);
+        public static Vector2 MiddleY(Texture2D texture, float x, float inY, float scaling = 1f) => MiddleY(texture.Height, x, inY, scaling);
+        public static Vector2 MiddleY(int boxY, float x, float inY, float scaling = 1f) => new Vector2(x, inY * 0.5f - boxY * scaling * 0.5f);
 
         public static Vector2 MiddleXY(Rectangle tocenter, Rectangle inXY, Vector2 scaling)
         {
