@@ -410,7 +410,7 @@ namespace STOLON
             _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
                 _menuLogoDrawPos.Y + _menuLogoLines.Height + (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
 
-            _menuRemoveLineY = (int)(_menuRemoveTweener.Value * STOLON.Instance.VirtualDimensions.Y);
+            _menuRemoveLineY = STOLON.V_HEIGHT - (int)(_menuRemoveTweener.Value * STOLON.V_HEIGHT);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
             MenuRemoveLine1x = lDelta;
             MenuRemoveLine2x = STOLON.Instance.VirtualDimensions.X - lDelta;
@@ -438,8 +438,8 @@ namespace STOLON
             drawingContext.DrawArea(_menuLogoTileHider, Color.Black);
             if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos);
 
-            drawingContext.DrawLine(MenuRemoveLine1x, -10f, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
-            drawingContext.DrawLine(MenuRemoveLine2x, -10f, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(MenuRemoveLine1x, STOLON.V_HEIGHT, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(MenuRemoveLine2x, STOLON.V_HEIGHT, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
         }
     }
 }
