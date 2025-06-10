@@ -114,7 +114,6 @@ namespace STOLON
 
 
 
-            STOLON.Debug.Log(">autogenerating _back_ buttons");
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }

@@ -30,8 +30,6 @@ namespace STOLON
         private DrawingContext _drawingContext;
 
         private GameEnvironment _environment;
-        private Point _aspectRatio = new Point(16, 9);
-        private float AspectRatioFloat => _aspectRatio.X / _aspectRatio.Y * 1.7776f;
         private int _desiredModifier;
         private Color[] _palette;
         private GameTextureCollection _textures;
@@ -40,8 +38,8 @@ namespace STOLON
 
         public DiscordRichPresence DRP { get; private set; }
         public Rectangle VirtualBounds => new Rectangle(Point.Zero, VirtualDimensions);
-        public Point VirtualDimensions => new Point(_aspectRatio.X * VIRTUAL_MODIFIER, _aspectRatio.Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
-        public Point DesiredDimensions => new Point(_aspectRatio.X * _desiredModifier, _aspectRatio.Y * _desiredModifier);
+        public Point VirtualDimensions => new Point(ASPECT_RATIO_X * VIRTUAL_MODIFIER, ASPECT_RATIO_Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
+        public Point DesiredDimensions => new Point(ASPECT_RATIO_X * _desiredModifier, ASPECT_RATIO_Y * _desiredModifier);
         public Point ScreenCenter => new Point(VirtualDimensions.X / 2, VirtualDimensions.Y / 2);
         public float ScreenScale { get; private set; }
 
@@ -95,11 +93,11 @@ namespace STOLON
             if (newWidth != _oldWindowSize.X)
             {
                 _graphics.PreferredBackBufferWidth = newWidth;
-                _graphics.PreferredBackBufferHeight = (int)(newWidth / AspectRatioFloat);
+                _graphics.PreferredBackBufferHeight = (int)(newWidth / ASPECT_RATIO_FLOAT);
             }
             else if (newHeight != _oldWindowSize.Y)
             {
-                _graphics.PreferredBackBufferWidth = (int)(newHeight * AspectRatioFloat);
+                _graphics.PreferredBackBufferWidth = (int)(newHeight * ASPECT_RATIO_FLOAT);
                 _graphics.PreferredBackBufferHeight = newHeight;
             }
 
@@ -231,7 +229,12 @@ namespace STOLON
         public const string MEDIUM_FONT_ID = "pixeloid";
         public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";
+        public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
+        public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;
+        public const int ASPECT_RATIO_X = 16;
+        public const int ASPECT_RATIO_Y = 9;
         public const int VIRTUAL_MODIFIER = 57;
+        public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / ASPECT_RATIO_Y * 1.7776f;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static T[] Scan<T>() where T : class
