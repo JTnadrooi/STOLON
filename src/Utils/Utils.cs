@@ -1,15 +1,11 @@
 ﻿
 using AsitLib;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
@@ -285,10 +281,16 @@ namespace STOLON
     }
     public static class Centering
     {
-        public static Vector2 TopLeft(Texture2D texture, Vector2 location, Vector2 scaling) => location;
-        public static Vector2 TopRight(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(-(texture.Width * scaling.X), 0);
-        public static Vector2 BottomLeft(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(0, -(texture.Height * scaling.Y));
-        public static Vector2 BottomRight(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(-(texture.Width * scaling.X), -(texture.Height * scaling.Y));
+        //public static Vector2 TopLeft(Texture2D texture, Vector2 location, Vector2 scaling) => location;
+        //public static Vector2 TopRight(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(-(texture.Width * scaling.X), 0);
+        //public static Vector2 BottomLeft(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(0, -(texture.Height * scaling.Y));
+        //public static Vector2 BottomRight(Texture2D texture, Vector2 location, Vector2 scaling) => location + new Vector2(-(texture.Width * scaling.X), -(texture.Height * scaling.Y));
+
+        public static Vector2 TopLeft(Texture2D texture, Vector2 pos, Vector2 scaling) => pos + new Vector2(0, texture.Height * scaling.Y);
+        public static Vector2 TopRight(Texture2D texture, Vector2 pos, Vector2 scaling) => pos + new Vector2(texture.Width * scaling.X, texture.Height * scaling.Y);
+
+        public static Vector2 BottomLeft(Texture2D texture, Vector2 pos, Vector2 scaling) => pos;
+        public static Vector2 BottomRight(Texture2D texture, Vector2 pos, Vector2 scaling) => pos + new Vector2(texture.Width * scaling.X, 0);
 
         public static Vector2 MiddleX(Texture2D texture, float y, float inX, Vector2 scaling) => MiddleX(texture, y, inX, scaling.X);
         public static Vector2 MiddleX(int boxX, float y, float inX, Vector2 scaling) => MiddleX(boxX, y, inX, scaling.X);
