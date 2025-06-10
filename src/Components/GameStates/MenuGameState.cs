@@ -59,6 +59,7 @@ namespace STOLON
         private List<UIElement> _depthPath;
 
         private Point[] _menuDitherTexturePositions;
+        private IReadOnlyDictionary<string, EntityProfile> _entityProfiles;
 
         private Tweener<float> _menuLogoEaseTweener;
         private Tweener<float> _menuRemoveTweener;
@@ -81,6 +82,8 @@ namespace STOLON
             _drawMenuLogoLines = true;
             _drawMenuLogoDummyTiles = true;
             _drawMenuLogoFilledTiles = false;
+
+            _entityProfiles = STOLON.Environment.GetEntityProfiles();
 
             _menuLogoFlashTime = 0;
             _menuFlashStart = null;
@@ -430,6 +433,7 @@ namespace STOLON
 
                 drawingContext.DrawArea(_menuLogoBoundingBox, Color.Black);
                 drawingContext.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
+
             }
             if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos);
             if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos);
@@ -440,6 +444,10 @@ namespace STOLON
 
             drawingContext.DrawLine(MenuRemoveLine1x, STOLON.V_HEIGHT, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(MenuRemoveLine2x, STOLON.V_HEIGHT, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+
+
+            drawingContext.Draw(_entityProfiles["silo"], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), Vector2.One);
+            drawingContext.Draw(_entityProfiles["deceit"], 512, new Vector2(STOLON.V_WIDTH / 2 - 130 - 512, -40), Vector2.One);
         }
     }
 }

@@ -181,7 +181,7 @@ namespace STOLON
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
-        public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None)
+        public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
         {
             Rectangle sourceRec;
             GameTexture texture;
@@ -193,7 +193,7 @@ namespace STOLON
                 scale *= res == 128 ? 0.5f : 1f;
                 texture = entityProfile.Mipmaps[512];
             }
-            Draw(texture, position, scale, rotation, origin, sourceRec, null, effects);
+            Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Vector2.Zero), scale, rotation, origin, sourceRec, null, effects);
         }
 
         protected virtual void Dispose(bool disposing)

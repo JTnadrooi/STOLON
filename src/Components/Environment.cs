@@ -18,6 +18,7 @@ using DiscordRPC;
 using DiscordRPC.Events;
 using System.Reflection;
 using System.Linq;
+using System.Diagnostics;
 
 
 
@@ -44,18 +45,21 @@ namespace STOLON
         private UserInterface _userInterface;
         private OverlayEngine _overlayer;
         private Dictionary<string, Entity> _entities;
-        private GameStateManager _gameStateManager;
+        private GameStateManager _stateManager;
+        private Dictionary<string, EntityProfile> _entityProfiles; // temp
 
-        internal GameEnvironment() : base(null)
+        public GameEnvironment() : base(null)
         {
             _entities = new Dictionary<string, Entity>();
             _userInterface = null!;
-            _gameStateManager = null!;
+            _stateManager = null!;
             _overlayer = null!;
+
+            _entityProfiles = new Dictionary<string, EntityProfile>();
 
             TaskHeap = new TaskHeap();
         }
-        internal void Initialize()
+        public void Initialize()
         {
             STOLON.Debug.Log(">[s]initialising environment");
             STOLON.Debug.Log(">searching for entities");
@@ -69,11 +73,13 @@ namespace STOLON
 
             STOLON.UI = _userInterface = new UserInterface();
             _userInterface.Initialize();
-            STOLON.StateManager = _gameStateManager = new GameStateManager();
+            STOLON.StateManager = _stateManager = new GameStateManager();
             STOLON.StateManager.ChangeState<MenuGameState>();
 
 
             _overlayer = new OverlayEngine();
+            _entityProfiles.Add("silo", new EntityProfile("silo", focus: Point.Zero));
+            _entityProfiles.Add("deceit", new EntityProfile("deceit", focus: Point.Zero));
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"
@@ -102,6 +108,8 @@ namespace STOLON
             _overlayer.Draw(drawingContext, elapsedMiliseconds);
             base.Draw(drawingContext, elapsedMiliseconds);
         }
+
+        public IReadOnlyDictionary<string, EntityProfile> GetEntityProfiles() => _entityProfiles;
 
         /// <summary>
         /// Register a new <see cref="Entity"/>.
