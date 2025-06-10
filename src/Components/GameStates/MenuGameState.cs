@@ -120,6 +120,8 @@ namespace STOLON
             STOLON.UI.AddElement(new UIElement("volDown", "sound", "Volume DOWN", UIElementType.Listen));
 
             STOLON.UI.MenuPath = GetSelfPath(UserInterface.TITLE_PARENT_ID);
+            HashSet<string> parentIds = STOLON.UI.GetParentIds();
+            foreach (string id in parentIds) STOLON.UI.AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
             _menuLogoScaling = 1f;
 
             _menuLogoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);

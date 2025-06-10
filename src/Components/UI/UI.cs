@@ -115,8 +115,6 @@ namespace STOLON
 
 
             STOLON.Debug.Log(">autogenerating _back_ buttons");
-            HashSet<string> parentIds = GetParentIds();
-            foreach (string id in parentIds) AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
