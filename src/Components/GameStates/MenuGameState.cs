@@ -250,8 +250,9 @@ namespace STOLON
             bool menuFlashEnded = _milisecondsSinceStartup > _menuFlashEnd;
             int uiElementOffsetY = (int)(280f + menuRemoveTweenerOffset);
             int logoYoffset = (int)(512 - 30 - _menuLogoLines.Height + 8f * _menuLogoEaseTweener.Value * (1 - _menuRemoveTweener.Value));
-            logoYoffset += (int)(Centering.MiddleY(_menuLogoLines, 1, STOLON.Instance.VirtualDimensions.Y, Vector2.One).Y - logoYoffset * 1.5f * _menuRemoveTweener.Value);
-            int menuLogoBoundingBoxClearing = 8;
+            int logoYScreenCenter = (int)Centering.MiddleY(_menuLogoLines, 0, STOLON.Instance.VirtualDimensions.Y).Y;
+            logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _menuRemoveTweener.Value);
+            const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
             switch (_skipTo)
             {
@@ -331,7 +332,7 @@ namespace STOLON
                 STOLON.Debug.Log("reversed icon tweener.");
             }
             _menuLogoBoundingBox =
-                new Rectangle(_menuLogoDrawPos.ToPoint() + new Point(-menuLogoBoundingBoxClearing), _menuLogoLines.Bounds.Size + new Point(menuLogoBoundingBoxClearing * 2));
+                new Rectangle(_menuLogoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _menuLogoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
 
             _menuDitherTexturePositions = new Point[(int)Math.Ceiling(STOLON.Instance.VirtualDimensions.Y / (float)_dither32.Height) * 2];
             for (int i = 0; i < _menuDitherTexturePositions.Length; i++) // dithering positions.
@@ -407,7 +408,7 @@ namespace STOLON
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
 
             _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
-                _menuLogoDrawPos.Y + _menuLogoLines.Height + (menuLogoBoundingBoxClearing * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
+                _menuLogoDrawPos.Y + _menuLogoLines.Height + (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
 
             _menuRemoveLineY = (int)(_menuRemoveTweener.Value * STOLON.Instance.VirtualDimensions.Y);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
