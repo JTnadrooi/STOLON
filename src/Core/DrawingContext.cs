@@ -166,7 +166,8 @@ namespace STOLON
         //    _ => effect,
         //};
         private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // I don't think this completelly works.
-
+        private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
+            => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
         public void DrawString(GameFont font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
@@ -179,6 +180,21 @@ namespace STOLON
             => _spriteBatch.DrawLine(point1, point2, color, thickness, layerDepth);
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
+
+        public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None)
+        {
+            Rectangle sourceRec;
+            GameTexture texture;
+            if (entityProfile.TryGetMipmap(res, out texture!))
+                sourceRec = entityProfile.Mipmaps[res].Bounds;
+            else
+            {
+                sourceRec = new Rectangle(entityProfile.Focus + new Point(res / 2), new Size(res, res));
+                scale *= res == 128 ? 0.5f : 1f;
+                texture = entityProfile.Mipmaps[512];
+            }
+            Draw(texture, position, scale, rotation, origin, sourceRec, null, effects);
+        }
 
         protected virtual void Dispose(bool disposing)
         {

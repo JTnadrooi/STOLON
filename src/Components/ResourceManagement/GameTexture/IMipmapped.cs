@@ -51,5 +51,7 @@ namespace STOLON
         /// </summary>
         public static bool TryGetMipmap(this IMipmapped mipmappedObj, int res, out GameTexture? texture)
             => mipmappedObj.Mipmaps.TryGetValue(res, out texture);
+        public static bool HasMipmap(this IMipmapped mipmappedObj, int res)
+            => mipmappedObj.Mipmaps.ContainsKey(res);
     }
 }
