@@ -141,7 +141,7 @@ namespace STOLON
             _scale = 0.20f;
             _rotationSpeed = 40f;
 
-            _pos = STOLON.Instance.VirtualBounds.Size.ToVector2() + new Vector2(-lineTexture.Width, -lineTexture.Height) * _scale;
+            _pos = new Vector2(STOLON.V_WIDTH, STOLON.V_HEIGHT) + new Vector2(-lineTexture.Width, -lineTexture.Height) * _scale;
 
         }
 
@@ -192,8 +192,8 @@ namespace STOLON
 
 
             _tweener = new Tweener<float>(1, FRAME_PIXELS_TO_REMOVE, 5f, Ease.Expo.In);
-            _height = STOLON.Instance.VirtualDimensions.Y / RESOLUTION;
-            _width = STOLON.Instance.VirtualDimensions.X / RESOLUTION;
+            _height = STOLON.V_HEIGHT / RESOLUTION;
+            _width = STOLON.V_WIDTH / RESOLUTION;
 
             _ditherTexture = null!;
             _pixelData = null!;
@@ -314,7 +314,7 @@ namespace STOLON
         {
             Ended = false;
             _tweener = new Tweener<float>(0f, 1f, Duration / 1000f / 2, Ease.Sine.Out);
-            _area = (Rectangle)((args.Length > 0 ? args[0] : null) ?? STOLON.Instance.VirtualBounds);
+            _area = (Rectangle)((args.Length > 0 ? args[0] : null) ?? STOLON.Instance.GetVirtualBounds());
             _text = (string)(args[2] ?? string.Empty);
             _action = (Action)(args[1]! ?? _action);
 

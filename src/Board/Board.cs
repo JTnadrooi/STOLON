@@ -277,7 +277,7 @@ namespace STOLON
             bool draw = winner < 0;
             STOLON.Debug.Log(">ending game with " + (draw ? "a draw" : "winner: " + _state.Players[winner]));
 
-            STOLON.Environment.Overlayer.Activate("transition", STOLON.Instance.VirtualBounds);
+            STOLON.Environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
             STOLON.Debug.Success();
         }
     }

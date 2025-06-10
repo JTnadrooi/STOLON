@@ -52,9 +52,9 @@ namespace STOLON
             int To(int orgin, int target, float amount) => (int)(orgin + (target - orgin) * amount);
             _lineTweener.Update(elapsedMilliseconds / 1000f);
             _initDone = !_lineTweener.Running;
-            //int line1Target = STOLON.Instance.VirtualDimensions.X - (_menuGameState.MenuRemoveLine2x - _menuGameState.MenuRemoveLine1x) + 144;
+            //int line1Target = STOLON.V_WIDTH - (_menuGameState.MenuRemoveLine2x - _menuGameState.MenuRemoveLine1x) + 144;
             int line1Target = TILE_SIZE * TILE_ROW_AMOUNT;
-            int line2Target = STOLON.Instance.VirtualDimensions.X - 16;
+            int line2Target = STOLON.V_WIDTH - 16;
 
             _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
@@ -69,7 +69,7 @@ namespace STOLON
                 foreach (Vector2 tilePos in _tilePositions)
                 {
                     drawingContext.Draw(_tileTexture, tilePos);
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.Instance.VirtualDimensions.X - 4f, 10f), rotation: 1.57079633f);
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
                 }
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);

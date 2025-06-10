@@ -250,7 +250,7 @@ namespace STOLON
             bool menuFlashEnded = _milisecondsSinceStartup > _menuFlashEnd;
             int uiElementOffsetY = (int)(280f + menuRemoveTweenerOffset);
             int logoYoffset = (int)(512 - 30 - _menuLogoLines.Height + 8f * _menuLogoEaseTweener.Value * (1 - _menuRemoveTweener.Value));
-            int logoYScreenCenter = (int)Centering.MiddleY(_menuLogoLines, 0, STOLON.Instance.VirtualDimensions.Y).Y;
+            int logoYScreenCenter = (int)Centering.MiddleY(_menuLogoLines, 0, STOLON.V_HEIGHT).Y;
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _menuRemoveTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
@@ -277,7 +277,7 @@ namespace STOLON
 
             #region inFlash
             _milisecondsSinceStartup += elapsedMiliseconds;
-            _menuLogoDrawPos = Vector2.Round(Centering.MiddleX(_menuLogoLines, logoYoffset, STOLON.Instance.VirtualDimensions.X));
+            _menuLogoDrawPos = Vector2.Round(Centering.MiddleX(_menuLogoLines, logoYoffset, STOLON.V_WIDTH));
             _menuLogoTileHider = new Rectangle(
                 _menuLogoDrawPos.ToPoint() + new Point(0, (int)(rowHeight * (MENU_LOGO_ROW_COUNT - _menuLogoRowsHidden))),
                 new Point((int)(_menuLogoLines.Width), (int)(rowHeight * _menuLogoRowsHidden))
@@ -286,10 +286,10 @@ namespace STOLON
             _menuFlashStart = 1200;
             _menuFlashEnd = _menuFlashStart + 400;
 
-            _menuLine1X = (int)(STOLON.Instance.VirtualDimensions.X / 2f) - lineFromMid;
-            _menuLine2X = (int)(STOLON.Instance.VirtualDimensions.X / 2f) + lineFromMid;
+            _menuLine1X = (int)(STOLON.V_WIDTH / 2f) - lineFromMid;
+            _menuLine2X = (int)(STOLON.V_WIDTH / 2f) + lineFromMid;
 
-            _menuLineLenght = _drawMenuLogoFilledTiles ? STOLON.Instance.VirtualDimensions.Y : 0;
+            _menuLineLenght = _drawMenuLogoFilledTiles ? STOLON.V_HEIGHT : 0;
             _menuLineWidth = 2 + (menuFlashEnded ? 2 : 0);
 
             if (_milisecondsSinceStartup > 300) _menuLogoRowsHidden = 4;
@@ -334,7 +334,7 @@ namespace STOLON
             _menuLogoBoundingBox =
                 new Rectangle(_menuLogoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _menuLogoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
 
-            _menuDitherTexturePositions = new Point[(int)Math.Ceiling(STOLON.Instance.VirtualDimensions.Y / (float)_dither32.Height) * 2];
+            _menuDitherTexturePositions = new Point[(int)Math.Ceiling(STOLON.V_HEIGHT / (float)_dither32.Height) * 2];
             for (int i = 0; i < _menuDitherTexturePositions.Length; i++) // dithering positions.
                 _menuDitherTexturePositions[i] = new Point(
                         (i >= _menuDitherTexturePositions.Length / 2f) ? _menuLine2X : _menuLine1X - _dither32.Width,
@@ -408,12 +408,12 @@ namespace STOLON
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
 
             _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
-                _menuLogoDrawPos.Y - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.Instance.VirtualDimensions.X, Vector2.One);
+                _menuLogoDrawPos.Y - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
 
             _menuRemoveLineY = STOLON.V_HEIGHT - (int)(_menuRemoveTweener.Value * STOLON.V_HEIGHT);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
             MenuRemoveLine1x = lDelta;
-            MenuRemoveLine2x = STOLON.Instance.VirtualDimensions.X - lDelta;
+            MenuRemoveLine2x = STOLON.V_WIDTH - lDelta;
 
             Centering.OnPixel(ref _menuLogoDrawPos);
         }

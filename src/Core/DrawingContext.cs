@@ -56,7 +56,7 @@ namespace STOLON
             STOLON.Debug.Success();
         }
 
-        private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.Instance.VirtualDimensions.X, STOLON.Instance.VirtualDimensions.Y);
+        private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
 
         public void BeginScene()

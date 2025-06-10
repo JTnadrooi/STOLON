@@ -61,7 +61,7 @@ namespace STOLON
         {
             Vector2 elementPos = Centering.MiddleX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + UIOrgin.Y,
-                                STOLON.Instance.VirtualDimensions.X, Vector2.One);
+                                STOLON.V_WIDTH, Vector2.One);
             Centering.OnPixel(ref elementPos);
 
             Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));

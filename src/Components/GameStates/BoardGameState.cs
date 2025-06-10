@@ -66,7 +66,7 @@ namespace STOLON
             _uiRightOffset = lineZoomOffset;
 
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
-            _lineX2 = (int)(STOLON.Instance.VirtualDimensions.X - _lineOffset + _uiRightOffset);
+            _lineX2 = (int)(STOLON.V_WIDTH - _lineOffset + _uiRightOffset);
         }
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
@@ -74,7 +74,7 @@ namespace STOLON
 
             drawingContext.DrawArea(new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
             drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
-            drawingContext.DrawArea(new Rectangle((int)_lineX2, 0, STOLON.Instance.VirtualDimensions.X - (int)_lineX2, UI_HEIGHT), Color.Black);
+            drawingContext.DrawArea(new Rectangle((int)_lineX2, 0, STOLON.V_WIDTH - (int)_lineX2, UI_HEIGHT), Color.Black);
             drawingContext.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);
         }
     }

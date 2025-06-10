@@ -18,7 +18,7 @@ namespace STOLON
 
         public Camera2D()
         {
-            _dimensions = STOLON.Instance.VirtualDimensions;
+            _dimensions = STOLON.Instance.GetVirtualDimensions();
 
             MinZoom = 0.1f;
             MaxZoom = 100f;

@@ -141,7 +141,7 @@ namespace STOLON
             int dialogueYoffset = (int)(10f * (_dialogueIsHidden ? _dialogueShowCoefficient : 1f));
             bool textFrameGoUp = false;
             _dialoguebounds = new Rectangle(
-                (int)(STOLON.Instance.VirtualBounds.Width * 0.5f - dialogueBoxDimensions.X * 0.5f),
+                (int)(STOLON.V_WIDTH * 0.5f - dialogueBoxDimensions.X * 0.5f),
                 (int)((dialogueBoxDimensions.Y * _dialogueShowCoefficient - dialogueBoxDimensions.Y) + dialogueYoffset),
                 dialogueBoxDimensions.X,
                 dialogueBoxDimensions.Y

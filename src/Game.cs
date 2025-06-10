@@ -37,10 +37,9 @@ namespace STOLON
         private Point _oldWindowSize;
 
         public DiscordRichPresence DRP { get; private set; }
-        public Rectangle VirtualBounds => new Rectangle(Point.Zero, VirtualDimensions);
-        public Point VirtualDimensions => new Point(ASPECT_RATIO_X * VIRTUAL_MODIFIER, ASPECT_RATIO_Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
+        //public Point VirtualDimensions => new Point(ASPECT_RATIO_X * VIRTUAL_MODIFIER, ASPECT_RATIO_Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
         public Point DesiredDimensions => new Point(ASPECT_RATIO_X * _desiredModifier, ASPECT_RATIO_Y * _desiredModifier);
-        public Point ScreenCenter => new Point(VirtualDimensions.X / 2, VirtualDimensions.Y / 2);
+        public Point ScreenCenter => new Point(V_WIDTH / 2, V_HEIGHT / 2);
         public float ScreenScale { get; private set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
@@ -104,7 +103,7 @@ namespace STOLON
             _graphics.ApplyChanges();
 
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
-            ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
+            ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT);
             _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
             _drawingContext.UpdateResolution();
@@ -112,7 +111,7 @@ namespace STOLON
         }
         public void GoFullscreen()
         {
-            if (_graphics.IsFullScreen) SetBackBufferSize(VirtualDimensions);
+            if (_graphics.IsFullScreen) SetBackBufferSize(new Point(V_WIDTH, V_HEIGHT));
             else
             {
                 SetBackBufferSize(new Point(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
@@ -121,6 +120,9 @@ namespace STOLON
             _graphics.ToggleFullScreen();
             _graphics.ApplyChanges();
         }
+
+        public Rectangle GetVirtualBounds() => new Rectangle(Point.Zero, GetVirtualDimensions());
+        public Point GetVirtualDimensions() => new Point(V_WIDTH, V_HEIGHT);
 
         private void SetBackBufferSize(Point size)
         {
@@ -189,7 +191,8 @@ namespace STOLON
                 else if (STOLON.StateManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.StateManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInput.MouseDomain.Board;
                 else STOLON.Input.Domain = GameInput.MouseDomain.UserInterfaceLow;
 
-                ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / VirtualDimensions.ToVector2()).Y;
+                ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT);
+                //ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / new Vector2(V_WIDTH, V_HEIGHT)).Y;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
@@ -204,8 +207,8 @@ namespace STOLON
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);
-            _drawingContext.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(VirtualDimensions.X / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
-            _drawingContext.DrawRectangle(new Rectangle(Point.Zero, VirtualDimensions), Color.White, 1);
+            _drawingContext.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(V_WIDTH / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
+            _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
             _drawingContext.EndScene();
 
@@ -234,7 +237,7 @@ namespace STOLON
         public const int ASPECT_RATIO_X = 16;
         public const int ASPECT_RATIO_Y = 9;
         public const int VIRTUAL_MODIFIER = 57;
-        public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / ASPECT_RATIO_Y * 1.7776f;
+        public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / (float)ASPECT_RATIO_Y;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static T[] Scan<T>() where T : class
