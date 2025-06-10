@@ -30,7 +30,7 @@ namespace STOLON
 {
     public interface IMipmapped
     {
-        public IReadOnlyDictionary<int, GameTexture?> Mipmaps { get; }
+        public IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
     }
 
     public static class MipmappedExtensions
@@ -50,6 +50,6 @@ namespace STOLON
         /// Tries to get a mipmap of a given resolution. Returns <see langword="true"/> if found.
         /// </summary>
         public static bool TryGetMipmap(this IMipmapped mipmappedObj, int res, out GameTexture? texture)
-            => mipmappedObj.Mipmaps.TryGetValue(res, out texture) && texture != null;
+            => mipmappedObj.Mipmaps.TryGetValue(res, out texture);
     }
 }

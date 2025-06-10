@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,33 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
+    public class EntityProfile : IMipmapped
+    {
+        private Dictionary<int, GameTexture> mipmaps;
+        private Point _focus;
+
+        public GameTexture Texture512 => Mipmaps[512];
+        public GameTexture? Texture256 => this.TryGetMipmap(256, out GameTexture? t) ? t : throw new Exception();
+        public GameTexture? Texture128 => this.TryGetMipmap(128, out GameTexture? t) ? t : throw new Exception();
+
+        public IReadOnlyDictionary<int, GameTexture> Mipmaps => mipmaps;
+        public Point Focus { get => _focus; set => _focus = value; }
+
+        public EntityProfile(GameTexture t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null)
+        {
+            mipmaps = new Dictionary<int, GameTexture>();
+            mipmaps[512] = t512;
+            if (t256 != null) mipmaps[256] = t256;
+            if (t128 != null) mipmaps[128] = t128;
+            _focus = focus ?? Centering.Get(t512).ToPoint();
+        }
+    }
     /// <summary>
     /// Represent the main component of a <see cref="Entity"/>.
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
-        public abstract IReadOnlyDictionary<int, GameTexture?> Mipmaps { get; }
+        public abstract IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
         /// <summary>
         /// Create a new <see cref="Entity"/> with set values.
         /// </summary>
