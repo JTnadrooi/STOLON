@@ -61,10 +61,6 @@
 	<ItemGroup>
 		<Assets Include="Assets\**\*.*" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Assets Remove="Assets\user.ini" />
-	</ItemGroup>
-
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(Assets)" DestinationFiles="@(Assets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>

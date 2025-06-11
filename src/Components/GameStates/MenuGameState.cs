@@ -55,6 +55,7 @@ namespace STOLON
 
         private string? _skipTo;
         private bool _showSplashtexts;
+        private bool _showEntityProfiles;
 
         private List<UIElement> _depthPath;
 
@@ -94,6 +95,8 @@ namespace STOLON
 
             _skipTo = STOLON.Config.GetString("Debug.skip_to");
             _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
+            _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
+
             //switch (_skipTo)
             //{
             //    case "main_menu":
@@ -444,9 +447,11 @@ namespace STOLON
             drawingContext.DrawLine(MenuRemoveLine1x, STOLON.V_HEIGHT, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(MenuRemoveLine2x, STOLON.V_HEIGHT, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
 
-
-            drawingContext.Draw(_entityProfiles["silo"], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), Vector2.One);
-            drawingContext.Draw(_entityProfiles["deceit"], 512, new Vector2(STOLON.V_WIDTH / 2 - 130 - 512, -40), Vector2.One);
+            if (_showEntityProfiles)
+            {
+                drawingContext.Draw(_entityProfiles["silo"], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), Vector2.One);
+                drawingContext.Draw(_entityProfiles["deceit"], 512, new Vector2(STOLON.V_WIDTH / 2 - 130 - 512, -40), Vector2.One);
+            }
         }
     }
 }
