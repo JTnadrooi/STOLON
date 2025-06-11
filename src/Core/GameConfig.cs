@@ -31,7 +31,7 @@ namespace STOLON
         private IniData _data;
         public GameConfig()
         {
-            string path = @"user.cfg";
+            string path = @"user.ini";
             STOLON.Debug.Log(">registering config from path: " + path);
             _parser = new IniDataParser();
             STOLON.Debug.Log(">parsing config");
