@@ -106,19 +106,19 @@ namespace STOLON
 
             STOLON.UI.AddElement(new UIElement(UserInterface.TITLE_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
 
-            STOLON.UI.AddElement(new UIElement("startStory", UserInterface.TITLE_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
-            STOLON.UI.AddElement(new UIElement("startCom", UserInterface.TITLE_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
-            STOLON.UI.AddElement(new UIElement("startXp", UserInterface.TITLE_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("story_start", UserInterface.TITLE_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
+            STOLON.UI.AddElement(new UIElement("com_start", UserInterface.TITLE_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("xp_start", UserInterface.TITLE_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
             STOLON.UI.AddElement(new UIElement("options", UserInterface.TITLE_PARENT_ID, "Options", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("specialThanks", UserInterface.TITLE_PARENT_ID, "Special Thanks", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("special_thanks", UserInterface.TITLE_PARENT_ID, "Special Thanks", UIElementType.Listen));
             STOLON.UI.AddElement(new UIElement("quit", UserInterface.TITLE_PARENT_ID, "Quit", UIElementType.Listen));
 
             // options
             STOLON.UI.AddElement(new UIElement("sound", "options", "Sound", UIElementType.Listen));
             STOLON.UI.AddElement(new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"));
 
-            STOLON.UI.AddElement(new UIElement("volUp", "sound", "Volume UP", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("volDown", "sound", "Volume DOWN", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen));
 
             STOLON.UI.MenuPath = GetSelfPath(UserInterface.TITLE_PARENT_ID);
             STOLON.Debug.Log(">autogenerating _back_ buttons");
@@ -345,14 +345,13 @@ namespace STOLON
 
             UIOrdering.Order(STOLON.UI.UIElements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UIElementUpdateData, new Vector2(0, uiElementOffsetY), OrderProviders.Menu);
 
-            if (STOLON.UI.UIElementUpdateData["startXp"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["xp_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
                             new Player("player0"),
                             new Player("player1"),
                         };
-
                 Leave();
             }
             if (STOLON.UI.UIElementUpdateData["options"].IsClicked)
@@ -363,21 +362,21 @@ namespace STOLON
             {
                 STOLON.UI.MenuPath = UIElement.GetSelfPath("sound");
             }
-            if (STOLON.UI.UIElementUpdateData["volUp"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["vol_up"].IsClicked)
             {
                 STOLON.Audio.MasterVolume += 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UIElementUpdateData["volDown"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["vol_down"].IsClicked)
             {
                 STOLON.Audio.MasterVolume -= 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UIElementUpdateData["startStory"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["story_start"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Not yet implemented."));
             }
-            if (STOLON.UI.UIElementUpdateData["startCom"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["com_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
@@ -386,7 +385,7 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UIElementUpdateData["specialThanks"].IsClicked)
+            if (STOLON.UI.UIElementUpdateData["special_thanks"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Please read the github README."));
             }
