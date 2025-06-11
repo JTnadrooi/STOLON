@@ -168,7 +168,7 @@ namespace STOLON
     }
     public class TransitionDitherOverlay : IOverlay
     {
-        public string Id => "transitionDither";
+        public string Id => "transition_dither";
 
         public bool Ended => _ended;
 

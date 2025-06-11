@@ -188,8 +188,8 @@ namespace STOLON
         {
             STOLON.Debug.Log(">track changing to " + id);
 
-            string ostProviderId = "__ostProvider";
-            string ostTaskId = "ostChange";
+            string ostProviderId = "__ost_provider";
+            string ostTaskId = "ost_change";
             bool alreadyPlaying = _fadeInOutSampleProvider != null;
 
             if (alreadyPlaying && fade) _fadeInOutSampleProvider.BeginFadeOut(FadeTimeMiliseconds);
