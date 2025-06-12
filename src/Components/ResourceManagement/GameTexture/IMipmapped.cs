@@ -56,7 +56,7 @@ namespace STOLON
         public static bool Validate(this IMipmapped mipmappedObj, bool throwException = false)
         {
             if (mipmappedObj.Mipmaps.Any(kvp => kvp.Value.Width == kvp.Value.Height && kvp.Value.Width == kvp.Key))
-                if (!throwException) throw new Exception();
+                if (throwException) throw new Exception();
                 else return true;
             return false;
         }
