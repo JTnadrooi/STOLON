@@ -181,19 +181,25 @@ namespace STOLON
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
-        public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+        public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
         {
             Rectangle sourceRec;
-            GameTexture texture;
-            if (entityProfile.TryGetMipmap(res, out texture!))
-                sourceRec = entityProfile.Mipmaps[res].Bounds;
+            GameTexture? texture;
+            if (entityProfile.TryGetMipmap(res, out texture))
+                Draw(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
             else
             {
-                sourceRec = new Rectangle(entityProfile.Focus + new Point(res / 2), new Size(res, res));
-                scale *= res == 128 ? 0.5f : 1f;
-                texture = entityProfile.Mipmaps[512];
+                switch (res)
+                {
+                    case 128:
+                        texture = entityProfile.Mipmaps[512];
+                        sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
+                        scale *= 0.25f;
+                        Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Vector2.Zero), scale, rotation, origin, sourceRec, null, effects, layerDepth);
+                        break;
+                    default: throw new Exception();
+                }
             }
-            Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Vector2.Zero), scale, rotation, origin, sourceRec, null, effects);
         }
 
         protected virtual void Dispose(bool disposing)
