@@ -29,6 +29,8 @@ namespace STOLON
 
         private List<Vector2> _tilePositions;
 
+        private Entity[] _entities;
+
         public const int TILE_SIZE = 128;
         public const int TILE_ROW_AMOUNT = 4;
         public const int TILE_COLUMN_AMOUNT = 2;
@@ -40,6 +42,7 @@ namespace STOLON
             _lineTweener = new Tweener<float>(0, 1, 2, Ease.Quad.InOut);
             _lineTweener.Start();
 
+            _entities = STOLON.Environment.Entities.Values.ToArray();
             _tilePositions = new List<Vector2>();
             for (int i = 0; i < TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT; i++)
             {
@@ -66,9 +69,13 @@ namespace STOLON
             {
                 //drawingContext.Draw(STOLON.Textures.GetReference("characters\\silo"), new Vector2(448, 0), Color.White);
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
-                foreach (Vector2 tilePos in _tilePositions)
+                for (int i = 0; i < _tilePositions.Count; i++)
                 {
-                    drawingContext.Draw(_tileTexture, tilePos);
+                    drawingContext.Draw(_tileTexture, _tilePositions[i]);
+                    if (_entities.Length > i)
+                    {
+                        drawingContext.Draw(_entities[i].Profile, 128, _tilePositions[i], Vector2.One);
+                    }
                 }
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
