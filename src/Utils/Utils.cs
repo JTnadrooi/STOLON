@@ -312,7 +312,7 @@ namespace STOLON
         public static Vector2 MiddleXY(Point dimensions, Rectangle inXY, Vector2 scaling) => MiddleXY(new Rectangle(Point.Zero, dimensions), inXY, scaling);
 
         public static Vector2 Get(Rectangle rectangle) => rectangle.Center.ToVector2();
-        public static Vector2 Get(Texture2D texture) => texture.Bounds.Center.ToVector2();
+        public static Vector2 Get(Texture2D texture) => Get(texture.Bounds);
 
         public static void OnPixel(ref Vector2 pos) => pos = pos.ToPoint().ToVector2();
     }
