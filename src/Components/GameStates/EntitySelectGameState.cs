@@ -41,9 +41,9 @@ namespace STOLON
             _lineTweener.Start();
 
             _tilePositions = new List<Vector2>();
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT; i++)
             {
-                _tilePositions.Add(new Vector2(i % TILE_ROW_AMOUNT * TILE_SIZE, i / TILE_ROW_AMOUNT * TILE_SIZE + 32));
+                _tilePositions.Add(new Vector2(i % TILE_ROW_AMOUNT * TILE_SIZE, i / TILE_ROW_AMOUNT * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)));
             }
         }
 
@@ -69,12 +69,11 @@ namespace STOLON
                 foreach (Vector2 tilePos in _tilePositions)
                 {
                     drawingContext.Draw(_tileTexture, tilePos);
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
                 }
+                //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, UserInterface.LINE_WIDTH);
-
         }
     }
 }
