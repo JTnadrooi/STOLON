@@ -27,7 +27,7 @@ namespace STOLON
 
         private bool _initDone;
 
-        private List<Vector2> _tilePositions;
+        private Vector2[] _tilePositions;
 
         //private Entity[] _entities;
         private EntityProfile[] _profiles;
@@ -46,12 +46,13 @@ namespace STOLON
 
             //_entities = STOLON.Environment.Entities.Values.ToArray();
             _profiles = STOLON.Environment.GetEntityProfiles().Values.ToArray();
-            _tilePositions = new List<Vector2>();
+            List<Vector2> tempPositions = new List<Vector2>();
             for (int i = 0; i < TILE_COUNT; i++)
             {
-                _tilePositions.Add(new Vector2(i % TILE_ROW_AMOUNT * TILE_SIZE, i / TILE_ROW_AMOUNT * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)));
+                tempPositions.Add(new Vector2(i % TILE_ROW_AMOUNT * TILE_SIZE, i / TILE_ROW_AMOUNT * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)));
             }
-            _tilePositions.Reverse();
+            tempPositions.Reverse();
+            _tilePositions = tempPositions.ToArray();
         }
 
         public void Update(int elapsedMilliseconds)
@@ -65,25 +66,27 @@ namespace STOLON
 
             _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
+
+
         }
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             if (_initDone)
             {
-                //drawingContext.Draw(STOLON.Textures.GetReference("characters\\silo"), new Vector2(448, 0), Color.White);
+                //drawingContext.Draw(STOLON.Textures.GetReference("Entities\\silo\\silo-512"), new Vector2(448, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
-                for (int i = 0; i < _tilePositions.Count; i++)
+                for (int i = 0; i < _tilePositions.Length; i++)
                 {
-                    drawingContext.Draw(_tileTexture, _tilePositions[i]);
-                    //if (_entities.Length > i)
-                    //{
-                    //    drawingContext.Draw(_entities[i].Profile, 128, _tilePositions[i], Vector2.One);
-                    //}
+                    ref Vector2 pos = ref _tilePositions[i];
                     if (_profiles.Length > i)
                     {
-                        drawingContext.Draw(_profiles[i], 128, _tilePositions[i], Vector2.One);
+                        drawingContext.Draw(_profiles[i], 128, pos, Vector2.One);
+                        drawingContext.DrawArea(new Rectangle(pos.ToPoint(), new Point(20)), Color.Black);
+                        drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
+                        drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
                     }
+                    drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(128)), Color.White, 1);
                 }
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
