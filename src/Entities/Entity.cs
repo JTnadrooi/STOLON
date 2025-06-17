@@ -20,7 +20,7 @@ namespace STOLON
 
         private Dictionary<int, GameTexture> mipmaps;
         private Point _focus;
-        private Vector2 _menuOffset;
+        private Point _menuOffset;
 
         public GameTexture Texture512 => Mipmaps[512];
         public GameTexture Texture256 => this.TryGetMipmap(256, out GameTexture? t) ? t! : throw new Exception();
@@ -28,22 +28,22 @@ namespace STOLON
 
         public IReadOnlyDictionary<int, GameTexture> Mipmaps => mipmaps;
         public Point Focus { get => _focus; set => _focus = value; }
-        public Vector2 MenuOffset { get => _menuOffset; set => _menuOffset = value; }
+        public Point MenuOffset { get => _menuOffset; set => _menuOffset = value; }
 
-        public EntityProfile(string entityName, Point? focus = null, Vector2? menuOffset = null) : this(
+        public EntityProfile(string entityName, Point? focus = null, Point? menuOffset = null) : this(
             STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out GameTexture? val512) ? val512 : throw new Exception(),
             STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out GameTexture? val256) ? val256 : null,
             STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out GameTexture? val128) ? val128 : null,
             focus)
         { }
-        public EntityProfile(GameTexture t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Vector2? menuOffset = null)
+        public EntityProfile(GameTexture t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Point? menuOffset = null)
         {
             mipmaps = new Dictionary<int, GameTexture>();
             mipmaps[512] = t512;
             if (t256 != null) mipmaps[256] = t256;
             if (t128 != null) mipmaps[128] = t128;
             _focus = focus ?? Centering.Get(t512).ToPoint();
-            _menuOffset = menuOffset ?? Vector2.Zero;
+            _menuOffset = menuOffset ?? Point.Zero;
         }
 
         public static EntityProfile Debug => new EntityProfile(

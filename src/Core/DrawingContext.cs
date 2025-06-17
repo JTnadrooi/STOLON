@@ -195,7 +195,7 @@ namespace STOLON
                         texture = entityProfile.Mipmaps[512];
                         sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
                         scale *= 0.25f;
-                        Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Vector2.Zero), scale, rotation, origin, sourceRec, null, effects, layerDepth);
+                        Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
                         break;
                     default: throw new Exception();
                 }
