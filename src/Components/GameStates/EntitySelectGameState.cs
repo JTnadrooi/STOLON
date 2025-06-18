@@ -49,9 +49,11 @@ namespace STOLON
             List<Vector2> tempPositions = new List<Vector2>();
             for (int i = 0; i < TILE_COUNT; i++)
             {
-                tempPositions.Add(new Vector2(i % TILE_ROW_AMOUNT * TILE_SIZE, i / TILE_ROW_AMOUNT * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)));
+                int x = (i % TILE_ROW_AMOUNT) * TILE_SIZE;
+                int y = (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE;
+                tempPositions.Add(new Vector2(x, y + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)));
             }
-            tempPositions.Reverse();
+
             _tilePositions = tempPositions.ToArray();
         }
 
@@ -82,9 +84,14 @@ namespace STOLON
                     if (_profiles.Length > i)
                     {
                         drawingContext.Draw(_profiles[i], 128, pos, Vector2.One);
+
                         drawingContext.DrawArea(new Rectangle(pos.ToPoint(), new Point(20)), Color.Black);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
                         drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
+
+                        //drawingContext.DrawArea(new Rectangle(pos.ToPoint() + new Point(0, 100), new Point(STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_profiles), )), Color.Black);
+                        //drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
+                        //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
                     }
                     drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(128)), Color.White, 1);
                 }
