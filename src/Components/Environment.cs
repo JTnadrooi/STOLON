@@ -80,6 +80,7 @@ namespace STOLON
             _overlayer = new OverlayEngine();
             _entityProfiles.Add("silo", new EntityProfile("silo", new Point(245, 180)));
             _entityProfiles.Add("deceit", new EntityProfile("deceit"));
+            _entityProfiles.Add("north", EntityProfile.GetDebug("north"));
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"

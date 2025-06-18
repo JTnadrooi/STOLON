@@ -47,21 +47,12 @@
 		<PackageReference Include="Nopipeline.Task" Version="2.3.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<NPLContentReferences Remove="..\Content\bin\**" />
+		<Folder Include="Content\" />
 	</ItemGroup>
 	<ItemGroup>
-		<MGCBContentReferences Remove="..\Content\bin\**" />
-	</ItemGroup>
-	<ItemGroup>
-		<NPLContentReferences Remove="..\Content\obj\**" />
-	</ItemGroup>
-	<ItemGroup>
-		<MGCBContentReferences Remove="..\Content\obj\**" />
-	</ItemGroup>
-	<ItemGroup>
-		<Assets Include="Assets\**\*.*" />
+		<SLBuildAssets Include="Assets\**\*.*" />
 	</ItemGroup>
 	<Target Name="DepositAssets" AfterTargets="Build">
-		<Copy SourceFiles="@(Assets)" DestinationFiles="@(Assets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
 </Project>

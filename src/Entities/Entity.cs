@@ -47,10 +47,17 @@ namespace STOLON
         }
 
         public static EntityProfile Debug => new EntityProfile(
-            STOLON.Textures[$"Entities\\Debug\\temp-512"],
+            STOLON.Textures[$"Debug\\temp-512"],
             null,
-            STOLON.Textures[$"Entities\\Debug\\temp-128"]);
-
+            STOLON.Textures[$"Debug\\temp-128"]);
+        public static EntityProfile GetDebug(GameTexture? t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Point? menuOffset = null)
+            => new EntityProfile(t512 ?? STOLON.Textures[$"Debug\\temp-512"], t256, t128, focus, menuOffset);
+        public static EntityProfile GetDebug(string entityName, Point? focus = null, Point? menuOffset = null)
+            => new EntityProfile(
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out GameTexture? val512) ? val512 : STOLON.Textures[$"Debug\\temp-512"],
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out GameTexture? val256) ? val256 : null,
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out GameTexture? val128) ? val128 : null,
+            focus);
     }
     /// <summary>
     /// Represent the main component of a <see cref="Entity"/>.

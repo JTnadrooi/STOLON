@@ -23,7 +23,7 @@ namespace STOLON
             public Vector2 Pos { get; }
             public Rectangle SymbolNotationBox { get; }
             public Rectangle NameBox { get; }
-            public EntityProfile? Profile { get; }
+            public EntityProfile? Profile { get; } // should become the actual entity.
             public EntityDrawData(Vector2 pos, EntityProfile? profile)
             {
                 Pos = pos;
