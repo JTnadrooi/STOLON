@@ -3,5 +3,4 @@
 .vscode/
 bin/
 obj/
-Content.mgcb
 /src/Content/Content.mgcb
