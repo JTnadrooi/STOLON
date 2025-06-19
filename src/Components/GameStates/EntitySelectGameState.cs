@@ -81,8 +81,6 @@ namespace STOLON
 
             _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
-
-
         }
 
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)

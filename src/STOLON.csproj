@@ -47,9 +47,6 @@
 		<PackageReference Include="Nopipeline.Task" Version="2.3.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Content\" />
-	</ItemGroup>
-	<ItemGroup>
 		<SLBuildAssets Include="Assets\**\*.*" />
 	</ItemGroup>
 	<Target Name="DepositAssets" AfterTargets="Build">
