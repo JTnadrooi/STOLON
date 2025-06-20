@@ -17,7 +17,7 @@ using static STOLON.UIElement;
 
 namespace STOLON
 {
-    public class MenuGameState : IGameState
+    public class MenuGameState : GameState
     {
         private GameTexture _menuLogoLines;
         private GameTexture _menuLogoMarks;
@@ -53,7 +53,8 @@ namespace STOLON
         internal int MenuRemoveLine1x;
         internal int MenuRemoveLine2x;
 
-        private string? _skipTo;
+        private string _skipTo;
+        private bool _skipAnimation;
         private bool _showSplashtexts;
         private bool _showEntityProfiles;
 
@@ -73,7 +74,7 @@ namespace STOLON
         private const int MENU_LOGO_ROW_COUNT = 5;
         private Player[]? _boardPlayers;
 
-        public MenuGameState()
+        public MenuGameState() : base("main_menu")
         {
             _menuLogoLines = STOLON.Textures.GetReference("Logo\\Menu\\lines");
             _menuLogoMarks = STOLON.Textures.GetReference("Logo\\Menu\\marks");
@@ -94,6 +95,7 @@ namespace STOLON
             _depthPath = new List<UIElement>();
 
             _skipTo = STOLON.Config.GetString("Debug.skip_to");
+            _skipAnimation = STOLON.Config.GetBool("Debug.skip_gamestage_animation");
             _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
             _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
 
@@ -243,12 +245,7 @@ namespace STOLON
             _menuDone = true;
             this._onLeave = onLeave;
         }
-
-        public void Update(int elapsedMiliseconds)
-        {
-            UpdateUI(elapsedMiliseconds);
-        }
-        private void UpdateUI(int elapsedMiliseconds)
+        protected override void UpdateUI(int elapsedMiliseconds)
         {
             int rowHeight = (int)(_menuLogoLines.Height / (float)MENU_LOGO_ROW_COUNT);
             float menuRemoveTweenerOffset = -300f * _menuRemoveTweener.Value;
@@ -263,7 +260,7 @@ namespace STOLON
             switch (_skipTo)
             {
                 case "entity_select":
-                    if (_milisecondsSinceStartup < 10000) // to skip start button click and animation
+                    if (_milisecondsSinceStartup < 10000)
                     {
                         _milisecondsSinceStartup = 10001;
                         _menuDone = true;
@@ -422,7 +419,7 @@ namespace STOLON
 
             Centering.OnPixel(ref _menuLogoDrawPos);
         }
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);

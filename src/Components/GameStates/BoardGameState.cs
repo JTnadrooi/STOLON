@@ -15,7 +15,7 @@ using MonoGame.Extended;
 
 namespace STOLON
 {
-    public class BoardGameState : IGameState
+    public class BoardGameState : GameState
     {
         private int _lineX1;
         private int _lineX2;
@@ -36,7 +36,7 @@ namespace STOLON
         /// </summary>
         public float Line2X => _lineX2;
 
-        public BoardGameState()
+        public BoardGameState() : base("board")
         {
             _lineOffset = 192f;
         }
@@ -48,12 +48,12 @@ namespace STOLON
             else throw new Exception();
         }
 
-        public void Update(int elapsedMiliseconds)
+        protected override void UpdateEnvironment(int elapsedMiliseconds)
         {
             UpdateUI(elapsedMiliseconds);
             _board?.Update(elapsedMiliseconds);
         }
-        private void UpdateUI(int elapsedMiliseconds)
+        protected override void UpdateUI(int elapsedMiliseconds)
         {
             float zoomIntensity = ((BoardGameState)STOLON.StateManager.Current).Board.ZoomIntensity;
             float lineZoomOffset = zoomIntensity * 30f * (zoomIntensity < 0 ? 0.5f : 1f); // 30 being the max zoom in pixels, the last bit is smoothening the inverted zoom.
@@ -68,7 +68,7 @@ namespace STOLON
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
             _lineX2 = (int)(STOLON.V_WIDTH - _lineOffset + _uiRightOffset);
         }
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             _board?.Draw(drawingContext, elapsedMiliseconds);
 

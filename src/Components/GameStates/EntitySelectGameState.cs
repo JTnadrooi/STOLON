@@ -16,7 +16,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace STOLON
 {
-    public class EntitySelectGameState : IGameState
+    public class EntitySelectGameState : GameState
     {
         private struct EntityDrawData
         {
@@ -50,7 +50,7 @@ namespace STOLON
         public const int TILE_COLUMN_AMOUNT = 2;
         public const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
 
-        public EntitySelectGameState()
+        public EntitySelectGameState() : base("entity_select")
         {
             _tileTexture = STOLON.Textures.GetReference("Debug\\temp-" + TILE_SIZE);
             if (!STOLON.StateManager.TryGetState(out _menuGameState!)) throw new Exception();
@@ -70,7 +70,7 @@ namespace STOLON
             _drawData = tempDrawData.ToArray();
         }
 
-        public void Update(int elapsedMilliseconds)
+        protected override void UpdateUI(int elapsedMilliseconds)
         {
             int To(int orgin, int target, float amount) => (int)(orgin + (target - orgin) * amount);
             _lineTweener.Update(elapsedMilliseconds / 1000f);
@@ -83,7 +83,7 @@ namespace STOLON
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
         {
             if (_initDone)
             {

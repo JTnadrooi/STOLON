@@ -17,7 +17,32 @@ namespace STOLON
     {
         public void Update(int elapsedMilliseconds);
         public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
-        public string DRPStatus => this.GetType().Name;
+        public string Id { get; }
+        public string DRPStatus => GetType().Name;
+    }
+
+    public abstract class GameState : IGameState
+    {
+        public abstract void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
+
+        public string Id { get; }
+        public bool IsSkipTarget { get; }
+        protected bool SkipAnimation { get; }
+
+        protected GameState(string id)
+        {
+            IsSkipTarget = GameStateHelpers.SkipData.SkipTo == id;
+            SkipAnimation = IsSkipTarget && GameStateHelpers.SkipData.SkipAnimation;
+
+            Id = id;
+        }
+        public void Update(int elapsedMilliseconds)
+        {
+            UpdateUI(elapsedMilliseconds);
+            UpdateEnvironment(elapsedMilliseconds);
+        }
+        protected virtual void UpdateUI(int elapsedMiliseconds) { }
+        protected virtual void UpdateEnvironment(int elapsedMiliseconds) { }
     }
 
     public static class GameStateExtensions
