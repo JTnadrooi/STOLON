@@ -66,13 +66,6 @@ namespace STOLON
     {
         public abstract EntityProfile Profile { get; }
         public IReadOnlyDictionary<int, GameTexture> Mipmaps => Profile.Mipmaps;
-
-        /// <summary>
-        /// Create a new <see cref="Entity"/> with set values.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <param name="symbolNotation"></param>
         public Entity(string id, string name, string symbolNotation)
         {
             Id = id;
@@ -83,18 +76,8 @@ namespace STOLON
         /// Get the <see cref="Player"/> of this <see cref="Entity"/>.
         /// </summary>
         /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
-        public Player GetPlayer()
-        {
-            return new Player(Name, Computer);
-        }
-
-        /// <summary>
-        /// Get the <see cref="Computer"/> of this <see cref="Entity"/>.
-        /// </summary>
-        public abstract Computer Computer { get; }
-        /// <summary>
-        /// A short description of this <see cref="Entity"/>.
-        /// </summary>
+        public Player GetPlayer() => new Player(Name, Computer ?? throw new Exception());
+        public abstract Computer? Computer { get; }
         public virtual string? Description { get; }
         /// <summary>
         /// The unique ID of this <see cref="Entity"/>, no capital letters.
@@ -113,10 +96,6 @@ namespace STOLON
         /// The source <see cref="Entity"/>.
         /// </summary>
         public Entity? Source { get; }
-        /// <summary>
-        /// Create a new <see cref="Computer"/> with a set <see cref="Source"/> <see cref="Entity"/>.
-        /// </summary>
-        /// <param name="source">The source <see cref="Entity"/>.</param>
         public Computer(Entity? source)
         {
             Source = source;
