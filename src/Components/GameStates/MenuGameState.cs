@@ -25,6 +25,8 @@ namespace STOLON
         private GameTexture _menuLogoFonted;
         private GameTexture _dither32;
 
+        private EntityProfile[] _entityProfiles;
+
         private Rectangle _menuLogoTileHider;
 
         private bool _drawMenuLogoLines;
@@ -93,6 +95,12 @@ namespace STOLON
 
             _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
             _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
+
+            _entityProfiles = new EntityProfile[]
+            {
+                STOLON.Environment.Entities.Values.First().Profile,
+                STOLON.Environment.Entities.Values.Last().Profile,
+            };
 
             //switch (_skipTo)
             //{
@@ -439,11 +447,11 @@ namespace STOLON
             drawingContext.DrawLine(MenuRemoveLine1x, STOLON.V_HEIGHT, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(MenuRemoveLine2x, STOLON.V_HEIGHT, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
 
-            //if (_showEntityProfiles)
-            //{
-            //    drawingContext.Draw(_entityProfiles["silo"], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), Vector2.One);
-            //    drawingContext.Draw(_entityProfiles["deceit"], 512, new Vector2(STOLON.V_WIDTH / 2 - 130 - 512, -40), Vector2.One);
-            //}
+            if (_showEntityProfiles)
+            {
+                drawingContext.Draw(_entityProfiles[0], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), drawMode: EntityProfile.DrawMode.Menu);
+                drawingContext.Draw(_entityProfiles[1], 512, new Vector2(STOLON.V_WIDTH / 2 - 512, 0), drawMode: EntityProfile.DrawMode.Menu);
+            }
         }
     }
 }
