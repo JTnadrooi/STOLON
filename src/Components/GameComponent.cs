@@ -34,13 +34,13 @@ namespace STOLON
         /// <summary>
         /// Update this component so it computes all the calculations.
         /// </summary>
-        /// <param name="elapsedMiliseconds">The miliseconds since last frame.</param>
-        public void Update(int elapsedMiliseconds);
+        /// <param name="elapsedMilliseconds">The milliseconds since last frame.</param>
+        public void Update(int elapsedMilliseconds);
         /// <summary>
         /// Update this component so it draws all sub-drawables.
         /// </summary>
-        /// <param name="elapsedMiliseconds">The miliseconds since last frame.</param>
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
+        /// <param name="elapsedMilliseconds">The milliseconds since last frame.</param>
+        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
         /// <summary>
         /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> featuring all the <see cref="GraphicElement"/> objects managed by this <see cref="IGameComponent"/>.
         /// </summary>
@@ -60,11 +60,11 @@ namespace STOLON
             Source = source;
             _graphicElements = new GraphicElementCollection(this);
         }
-        public virtual void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public virtual void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
 
         }
-        public virtual void Update(int elapsedMiliseconds)
+        public virtual void Update(int elapsedMilliseconds)
         {
 
         }

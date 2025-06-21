@@ -100,8 +100,8 @@ namespace STOLON
         /// <summary>
         /// Update method. 
         /// </summary>
-        /// <param name="elapsedMiliseconds"></param>
-        public override void Update(int elapsedMiliseconds)
+        /// <param name="elapsedMilliseconds"></param>
+        public override void Update(int elapsedMilliseconds)
         {
             if (!_firstFrame) _firstFrame = true;
 
@@ -165,7 +165,7 @@ namespace STOLON
 
             //Instance.UserInterface.UIElements["currentPlayer"].Text = "Current: " + state.CurrentPlayer.Name + " " + GetPlayerTile(state.CurrentPlayerID);
 
-            base.Update(elapsedMiliseconds);
+            base.Update(elapsedMilliseconds);
         }
         public void Undo()
         {
@@ -242,7 +242,7 @@ namespace STOLON
         {
             State.GoNextPlayer();
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
             for (int x = 0; x < _state.Dimensions.X; x++)
@@ -260,7 +260,7 @@ namespace STOLON
                     else _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], "Z", tile.BoardPosition + new Vector2(10), Color.White);
                 }
             _boardSpriteBatch.End();
-            base.Draw(drawingContext, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMilliseconds);
         }
         public string GetPlayerTile(int playerIndex) => playerIndex switch
         {

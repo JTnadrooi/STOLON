@@ -77,7 +77,7 @@ namespace STOLON
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
         }
 
-        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             if (_initDone)
             {

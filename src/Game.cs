@@ -203,7 +203,7 @@ namespace STOLON
         }
         protected override void Draw(GameTime gameTime)
         {
-            int elapsedMiliseconds = gameTime.ElapsedGameTime.Milliseconds;
+            int elapsedMilliseconds = gameTime.ElapsedGameTime.Milliseconds;
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);

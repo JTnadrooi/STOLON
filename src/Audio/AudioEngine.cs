@@ -192,7 +192,7 @@ namespace STOLON
             string ostTaskId = "ost_change";
             bool alreadyPlaying = _fadeInOutSampleProvider != null;
 
-            if (alreadyPlaying && fade) _fadeInOutSampleProvider.BeginFadeOut(FadeTimeMiliseconds);
+            if (alreadyPlaying && fade) _fadeInOutSampleProvider.BeginFadeOut(FadeTimeMilliseconds);
             TaskHeap.Instance.SafePush(ostTaskId, new DynamicTask(() => // fire and forget game logic ftw
             {
                 TryRemoveMixerInput(ostProviderId, AudioDomain.OST);
@@ -203,7 +203,7 @@ namespace STOLON
                 AddMixerInput(_fadeInOutSampleProvider, ostProviderId, AudioDomain.OST);
                 _fadeInOutSampleProvider.BeginFadeIn(1);
                 _trackHistory.Add(id);
-            }), alreadyPlaying ? FadeTimeMiliseconds : -1);
+            }), alreadyPlaying ? FadeTimeMilliseconds : -1);
         }
         public void SetPlayList(Playlist newPlaylist, bool fade = true)
         {
@@ -225,15 +225,15 @@ namespace STOLON
         //        TaskHeap.Heap.SafePush("playlistClear", new DynamicTask(() => // fire and forget game logic ftw
         //        {
 
-        //        }), FadeTimeMiliseconds);
+        //        }), FadeTimeMilliseconds);
         //    }
 
         //}
         /// <summary>
         /// Update the <see cref="AudioEngine"/>.
         /// </summary>
-        /// <param name="elapsedMiliseconds">yes.</param>
-        public void Update(int elapsedMiliseconds)
+        /// <param name="elapsedMilliseconds">yes.</param>
+        public void Update(int elapsedMilliseconds)
         {
             if (_fadeInOutSampleProvider != null && _fadeInOutSampleProviderSource.Finished)
             {
@@ -266,7 +266,7 @@ namespace STOLON
         /// All loaded sounds relevant for the stolon <see cref="GameEnvironment"/>
         /// </summary>
         public Dictionary<string, CachedAudio> Library { get; }
-        public const int FadeTimeMiliseconds = 2000;
+        public const int FadeTimeMilliseconds = 2000;
     }
     public class Playlist
     {

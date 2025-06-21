@@ -48,12 +48,12 @@ namespace STOLON
             else throw new Exception();
         }
 
-        protected override void UpdateEnvironment(int elapsedMiliseconds)
+        protected override void UpdateEnvironment(int elapsedMilliseconds)
         {
-            UpdateUI(elapsedMiliseconds);
-            _board?.Update(elapsedMiliseconds);
+            UpdateUI(elapsedMilliseconds);
+            _board?.Update(elapsedMilliseconds);
         }
-        protected override void UpdateUI(int elapsedMiliseconds)
+        protected override void UpdateUI(int elapsedMilliseconds)
         {
             float zoomIntensity = ((BoardGameState)STOLON.StateManager.Current).Board.ZoomIntensity;
             float lineZoomOffset = zoomIntensity * 30f * (zoomIntensity < 0 ? 0.5f : 1f); // 30 being the max zoom in pixels, the last bit is smoothening the inverted zoom.
@@ -68,9 +68,9 @@ namespace STOLON
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
             _lineX2 = (int)(STOLON.V_WIDTH - _lineOffset + _uiRightOffset);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
-            _board?.Draw(drawingContext, elapsedMiliseconds);
+            _board?.Draw(drawingContext, elapsedMilliseconds);
 
             drawingContext.DrawArea(new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
             drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);

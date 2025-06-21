@@ -84,13 +84,13 @@ namespace STOLON
             _initialized.Remove(overlayId);
         }
 
-        public override void Update(int elapsedMiliseconds)
+        public override void Update(int elapsedMilliseconds)
         {
             IOverlay overlay;
             for (int i = 0; i < _initialized.Count; i++) // for all initialized overlays
             {
                 overlay = _overlays[_initialized[i]];
-                overlay.Update(elapsedMiliseconds);
+                overlay.Update(elapsedMilliseconds);
                 if (overlay.Ended)
                 {
                     STOLON.Debug.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
@@ -98,15 +98,15 @@ namespace STOLON
                     STOLON.Debug.Success();
                 }
             }
-            base.Update(elapsedMiliseconds);
+            base.Update(elapsedMilliseconds);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             for (int i = 0; i < _initialized.Count; i++)
             {
-                _overlays[_initialized[i]].Draw(drawingContext, elapsedMiliseconds);
+                _overlays[_initialized[i]].Draw(drawingContext, elapsedMilliseconds);
             }
-            base.Draw(drawingContext, elapsedMiliseconds);
+            base.Draw(drawingContext, elapsedMilliseconds);
         }
 
         public static OverlayEngine Engine => STOLON.Environment.Overlayer;
@@ -115,8 +115,8 @@ namespace STOLON
     public interface IOverlay
     {
         public void Initialize(OverlayEngine overlayer, params object?[] args);
-        public void Update(int elapsedMiliseconds);
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds);
+        public void Update(int elapsedMilliseconds);
+        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
         public void Reset();
 
         public string Id { get; }
@@ -155,12 +155,12 @@ namespace STOLON
 
         }
 
-        public void Update(int elapsedMiliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             _rotation += _rotationSpeed;
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             drawingContext.Draw(lineTexture, _pos, _scale, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f));
             //drawingContext.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
@@ -220,12 +220,12 @@ namespace STOLON
             ResetTexture();
         }
 
-        public void Update(int elapsedMiliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             int removedPixels = 0;
             int dullPixels = 0;
 
-            _tweener.Update(elapsedMiliseconds / 1000f);
+            _tweener.Update(elapsedMilliseconds / 1000f);
 
             while (removedPixels < _tweener.Value)
             {
@@ -245,7 +245,7 @@ namespace STOLON
             _ditherTexture.SetColorData(_pixelData);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             drawingContext.Draw(_ditherTexture, Vector2.Zero, (float)_resolution);
         }
@@ -280,7 +280,7 @@ namespace STOLON
             _action = () => { };
         }
 
-        public void Update(int elapsedMiliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             int desiredHeight = _area.Height;
             if (!_hasHitMax && _heightCoefficient > 0.999f)
@@ -292,7 +292,7 @@ namespace STOLON
             }
             Ended = _hasHitMax && _heightCoefficient < 0.001f;
 
-            _tweener.Update(elapsedMiliseconds / 1000f);
+            _tweener.Update(elapsedMilliseconds / 1000f);
 
             _heightCoefficient = _tweener.Value;
 
@@ -303,7 +303,7 @@ namespace STOLON
             Centering.OnPixel(ref _textPos);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
             drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);

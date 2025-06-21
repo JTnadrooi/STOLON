@@ -16,7 +16,7 @@ namespace STOLON
         /// </summary>
         /// <param name="value">The intial value.</param>
         /// <param name="target">The target value.</param>
-        /// <param name="elapsedMilliseconds">Elapsed miliseconds since last frame.</param>
+        /// <param name="elapsedMilliseconds">Elapsed milliseconds since last frame.</param>
         /// <param name="strength">The strenghts of the function</param>
         /// <param name="smoothness">The smoothness of the function. Higher values may cause performance issues.</param>
         public static void PushDesired(ref int value, int target, int elapsedMilliseconds, float strength = 0.1f, int smoothness = 1)
@@ -30,7 +30,7 @@ namespace STOLON
         /// </summary>
         /// <param name="value">The intial value.</param>
         /// <param name="target">The target value.</param>
-        /// <param name="elapsedMilliseconds">Elapsed miliseconds since last frame.</param>
+        /// <param name="elapsedMilliseconds">Elapsed milliseconds since last frame.</param>
         /// <param name="strength">The strenghts of the function</param>
         /// <param name="smoothness">The smoothness of the function. Higher values may cause performance issues.</param>
         public static void PushDesired(ref float value, float target, int elapsedMilliseconds, float strength = 0.001f, int smoothness = 1)
@@ -47,7 +47,7 @@ namespace STOLON
         /// </summary>
         /// <param name="value">The initial value.</param>
         /// <param name="push"></param>
-        /// <param name="elapsedMilliseconds">Elapsed miliseconds since last frame.</param>
+        /// <param name="elapsedMilliseconds">Elapsed milliseconds since last frame.</param>
         /// <param name="strength">The strenght of the function.</param>
         /// <param name="smoothness">The smoothness of the function, higher values can cause performace issues.</param>
         /// <param name="invert">If the method function inverted.</param>

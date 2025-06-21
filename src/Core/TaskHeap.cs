@@ -47,7 +47,7 @@ namespace STOLON
             FrameCompletedTasks = _frameCompletedTasks.AsReadOnly();
         }
 
-        public void Update(int elapsedMiliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             _frameCompletedTasks.Clear();
 
@@ -58,7 +58,7 @@ namespace STOLON
                     STOLON.Debug.Log("(interupt:taskheap) runningtask with id; " + taskKvp.Key);
                     ForceRun(taskKvp.Key);
                 }
-                else _taskWaitDataCollection[taskKvp.Key] -= elapsedMiliseconds;
+                else _taskWaitDataCollection[taskKvp.Key] -= elapsedMilliseconds;
             }
         }
 

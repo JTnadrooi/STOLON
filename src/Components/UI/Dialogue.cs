@@ -31,9 +31,9 @@ namespace STOLON
         /// </summary>
         public string Text { get; }
         /// <summary>
-        /// The miliseconds the <see cref="DialogueInfo"/> stagnates after all the <see cref="Text"/> is displayed.
+        /// The milliseconds the <see cref="DialogueInfo"/> stagnates after all the <see cref="Text"/> is displayed.
         /// </summary>
-        public int PostMiliseconds { get; }
+        public int PostMilliseconds { get; }
         /// <summary>
         /// The initial <see cref="IDialogueProvider"/>.
         /// </summary>
@@ -43,11 +43,11 @@ namespace STOLON
         /// </summary>
         /// <param name="provider">The initial <see cref="IDialogueProvider"/>.</param>
         /// <param name="text">The text this <see cref="DialogueInfo"/> holds.</param>
-        public DialogueInfo(IDialogueProvider provider, string text, int postMs = Textframe.POST_READ_MILISECONDS)
+        public DialogueInfo(IDialogueProvider provider, string text, int postMs = Textframe.POST_READ_MILLISECONDS)
         {
             Provider = provider;
             Text = text;
-            PostMiliseconds = postMs;
+            PostMilliseconds = postMs;
         }
         public override bool Equals([NotNullWhen(true)] object? obj) => ToString() == (obj == null ? string.Empty : obj).ToString();
         public static bool operator ==(DialogueInfo left, DialogueInfo right) => left.Equals(right);

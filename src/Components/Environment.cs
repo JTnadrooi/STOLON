@@ -82,27 +82,27 @@ namespace STOLON
             //));
             STOLON.Debug.Success();
         }
-        public override void Update(int elapsedMiliseconds)
+        public override void Update(int elapsedMilliseconds)
         {
-            TaskHeap.Update(elapsedMiliseconds);
-            _userInterface.Update(elapsedMiliseconds);
+            TaskHeap.Update(elapsedMilliseconds);
+            _userInterface.Update(elapsedMilliseconds);
 
-            STOLON.StateManager.Update(elapsedMiliseconds);
+            STOLON.StateManager.Update(elapsedMilliseconds);
 
-            _userInterface.PostUpdate(elapsedMiliseconds);
-            STOLON.Audio.Update(elapsedMiliseconds);
+            _userInterface.PostUpdate(elapsedMilliseconds);
+            STOLON.Audio.Update(elapsedMilliseconds);
             STOLON.Instance.DRP.UpdateDetails(STOLON.StateManager.Current.DRPStatus);
 
-            _overlayer.Update(elapsedMiliseconds);
-            base.Update(elapsedMiliseconds);
+            _overlayer.Update(elapsedMilliseconds);
+            base.Update(elapsedMilliseconds);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMiliseconds)
+        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
-            STOLON.StateManager.Draw(drawingContext, elapsedMiliseconds);
-            _userInterface.Draw(drawingContext, elapsedMiliseconds);
+            STOLON.StateManager.Draw(drawingContext, elapsedMilliseconds);
+            _userInterface.Draw(drawingContext, elapsedMilliseconds);
 
-            _overlayer.Draw(drawingContext, elapsedMiliseconds);
-            base.Draw(drawingContext, elapsedMiliseconds);
+            _overlayer.Draw(drawingContext, elapsedMilliseconds);
+            base.Draw(drawingContext, elapsedMilliseconds);
         }
 
         /// <summary>

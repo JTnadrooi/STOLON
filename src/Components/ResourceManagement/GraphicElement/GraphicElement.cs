@@ -59,7 +59,7 @@ namespace STOLON
             this._scale = scale;
         }
 
-        public virtual void Draw(DrawingContext drawingContext, int elapsedMiliseconds, SpriteEffects effects = SpriteEffects.None)
+        public virtual void Draw(DrawingContext drawingContext, int elapsedMilliseconds, SpriteEffects effects = SpriteEffects.None)
         {
             drawingContext.Draw(Texture, Position + Source.Position, Scale);
         }
