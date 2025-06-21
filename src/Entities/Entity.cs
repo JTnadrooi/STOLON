@@ -60,7 +60,7 @@ namespace STOLON
             focus);
     }
     /// <summary>
-    /// Represent the main component of a <see cref="Entity"/>.
+    /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
