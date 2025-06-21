@@ -181,6 +181,10 @@ namespace STOLON
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
+        public void Draw(Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+            => Draw(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
+        public void Draw(Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+            => Draw(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
         public void Draw(EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
             => Draw(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);
         public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
