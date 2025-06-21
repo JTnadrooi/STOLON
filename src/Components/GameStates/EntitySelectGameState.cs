@@ -79,6 +79,8 @@ namespace STOLON
             int line1Target = TILE_SIZE * TILE_ROW_AMOUNT;
             int line2Target = STOLON.V_WIDTH - 16;
 
+            if (SkipAnimation && _lineTweener.Running) _lineTweener.Update(12f);
+
             _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
             _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
         }

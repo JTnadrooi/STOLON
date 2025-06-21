@@ -53,8 +53,6 @@ namespace STOLON
         internal int MenuRemoveLine1x;
         internal int MenuRemoveLine2x;
 
-        private string _skipTo;
-        private bool _skipAnimation;
         private bool _showSplashtexts;
         private bool _showEntityProfiles;
 
@@ -70,6 +68,7 @@ namespace STOLON
         private Vector2 _tipPos;
         private int _tipId;
         private Action? _onLeave;
+        private bool _fastLeave;
 
         private const int MENU_LOGO_ROW_COUNT = 5;
         private Player[]? _boardPlayers;
@@ -84,6 +83,7 @@ namespace STOLON
             _drawMenuLogoLines = true;
             _drawMenuLogoDummyTiles = true;
             _drawMenuLogoFilledTiles = false;
+            _fastLeave = false;
 
             _entityProfiles = STOLON.Environment.GetEntityProfiles();
 
@@ -94,8 +94,6 @@ namespace STOLON
 
             _depthPath = new List<UIElement>();
 
-            _skipTo = STOLON.Config.GetString("Debug.skip_to");
-            _skipAnimation = STOLON.Config.GetBool("Debug.skip_gamestage_animation");
             _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
             _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
 
@@ -220,6 +218,7 @@ namespace STOLON
                 "the chairs have eyes",
                 "\"Its funny. You.\"",
                 "\"Human might be a over-/under- statement, whatever, its never quite right.\"",
+                "The BOULDER.",
             };
 
             _tipId = new Random().Next(0, _tips.Length);
@@ -257,7 +256,7 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _menuRemoveTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (_skipTo)
+            switch (GameStateHelpers.SkipData.SkipTo)
             {
                 case "entity_select":
                     if (_milisecondsSinceStartup < 10000)
@@ -270,13 +269,12 @@ namespace STOLON
                                 new Player("player0"),
                                 new Player("player1"),
                                 };
+                        _fastLeave = true;
                         Leave();
                     }
                     break;
-                case "main_menu":
-                    if (_milisecondsSinceStartup < 10000) _milisecondsSinceStartup = 10001;
-                    break;
             }
+            if (SkipAnimation && _milisecondsSinceStartup < 10000) _milisecondsSinceStartup = 10001;
 
             #region inFlash
             _milisecondsSinceStartup += elapsedMiliseconds;
@@ -406,7 +404,7 @@ namespace STOLON
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
                 STOLON.StateManager.ChangeState<EntitySelectGameState>(true);
                 _boardPlayers = null;
-            }), 2000, false);
+            }), _fastLeave ? 10 : 2000, false);
             _milisecondsSinceMenuRemoveStart += elapsedMiliseconds;
 
             _tipPos = Centering.MiddleX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
