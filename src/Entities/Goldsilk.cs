@@ -26,11 +26,9 @@ namespace STOLON
         public override Computer Computer => _computer;
         public override string? Description => "This shoulden't be readable in the current verion.";
 
-        public override EntityProfile Profile => EntityProfile.Debug;
-
         private GoldsilkComputer _computer;
 
-        public GoldsilkEntity() : base("goldsilk", "Opponent", "O")
+        public GoldsilkEntity() : base("goldsilk", "Opponent", "O", EntityProfile.Debug)
         {
             _computer = new GoldsilkComputer(this);
         }

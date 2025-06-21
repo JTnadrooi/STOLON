@@ -64,27 +64,28 @@ namespace STOLON
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
-        public abstract EntityProfile Profile { get; }
+        public EntityProfile Profile { get; }
         public IReadOnlyDictionary<int, GameTexture> Mipmaps => Profile.Mipmaps;
-        public Entity(string id, string name, string symbolNotation)
+        public Entity(string id, string name, string symbolNotation, EntityProfile? profile = null)
         {
             Id = id;
             Name = name;
             SymbolNotation = symbolNotation;
+            Profile = profile ?? new EntityProfile(id);
         }
         /// <summary>
         /// Get the <see cref="Player"/> of this <see cref="Entity"/>.
         /// </summary>
         /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
-        public Player GetPlayer() => new Player(Name, Computer ?? throw new Exception());
+        public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
         public abstract Computer? Computer { get; }
         public virtual string? Description { get; }
         /// <summary>
         /// The unique ID of this <see cref="Entity"/>, no capital letters.
         /// </summary>
-        public string Id { get; private set; }
-        public string Name { get; private set; }
-        public string SymbolNotation { get; protected set; }
+        public string Id { get; }
+        public string Name { get; }
+        public string SymbolNotation { get; }
 
     }
     /// <summary>

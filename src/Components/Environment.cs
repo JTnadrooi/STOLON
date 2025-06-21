@@ -46,7 +46,6 @@ namespace STOLON
         private OverlayEngine _overlayer;
         private Dictionary<string, Entity> _entities;
         private GameStateManager _stateManager;
-        private Dictionary<string, EntityProfile> _entityProfiles; // temp
 
         public GameEnvironment() : base(null)
         {
@@ -55,7 +54,6 @@ namespace STOLON
             _stateManager = null!;
             _overlayer = null!;
 
-            _entityProfiles = new Dictionary<string, EntityProfile>();
 
             TaskHeap = new TaskHeap();
         }
@@ -78,9 +76,6 @@ namespace STOLON
 
 
             _overlayer = new OverlayEngine();
-            _entityProfiles.Add("silo", new EntityProfile("silo", new Point(245, 180)));
-            _entityProfiles.Add("deceit", new EntityProfile("deceit"));
-            _entityProfiles.Add("north", EntityProfile.GetDebug("north"));
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"
@@ -109,8 +104,6 @@ namespace STOLON
             _overlayer.Draw(drawingContext, elapsedMiliseconds);
             base.Draw(drawingContext, elapsedMiliseconds);
         }
-
-        public IReadOnlyDictionary<string, EntityProfile> GetEntityProfiles() => _entityProfiles;
 
         /// <summary>
         /// Register a new <see cref="Entity"/>.

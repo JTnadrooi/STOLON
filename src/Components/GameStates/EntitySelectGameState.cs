@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using AsitLib;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Betwixt;
 using Microsoft.Xna.Framework;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Point = Microsoft.Xna.Framework.Point;
-using Microsoft.Xna.Framework.Content;
-using Betwixt;
-using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
 
 namespace STOLON
 {
@@ -23,11 +14,12 @@ namespace STOLON
             public Vector2 Pos { get; }
             public Rectangle SymbolNotationBox { get; }
             public Rectangle NameBox { get; }
-            public EntityProfile? Profile { get; } // should become the actual entity.
-            public EntityDrawData(Vector2 pos, EntityProfile? profile)
+            public EntityProfile Profile => Entity.Profile;
+            public Entity? Entity { get; }
+            public EntityDrawData(Vector2 pos, Entity? entity)
             {
                 Pos = pos;
-                Profile = profile;
+                Entity = entity;
                 SymbolNotationBox = new Rectangle(pos.ToPoint(), new Point(20));
             }
         }
@@ -58,13 +50,13 @@ namespace STOLON
             _lineTweener.Start();
 
             //_entities = STOLON.Environment.Entities.Values.ToArray();
-            EntityProfile[] profiles = STOLON.Environment.GetEntityProfiles().Values.ToArray();
+            Entity[] entities = STOLON.Environment.Entities.Values.ToArray();
             List<EntityDrawData> tempDrawData = new List<EntityDrawData>();
             for (int i = 0; i < TILE_COUNT; i++)
             {
                 int x = (i % TILE_ROW_AMOUNT) * TILE_SIZE;
                 int y = (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE;
-                tempDrawData.Add(new EntityDrawData(new Vector2(x, y + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)), profiles.Length > i ? profiles[i] : null));
+                tempDrawData.Add(new EntityDrawData(new Vector2(x, y + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT)), entities.Length > i ? entities[i] : null));
             }
 
             _drawData = tempDrawData.ToArray();
@@ -94,13 +86,13 @@ namespace STOLON
                 for (int i = 0; i < _drawData.Length; i++)
                 {
                     ref EntityDrawData ddc = ref _drawData[i];
-                    if (ddc.Profile != null)
+                    if (ddc.Entity != null)
                     {
                         drawingContext.Draw(ddc.Profile, 128, ddc.Pos, Vector2.One);
 
                         drawingContext.DrawArea(ddc.SymbolNotationBox, Color.Black);
                         drawingContext.DrawRectangle(ddc.SymbolNotationBox, Color.White, UserInterface.LINE_WIDTH);
-                        drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", ddc.Pos + new Vector2(3));
+                        drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], ddc.Entity.SymbolNotation, ddc.Pos + new Vector2(3));
 
                         //drawingContext.DrawArea(new Rectangle(pos.ToPoint() + new Point(0, 100), new Point(STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_profiles), )), Color.Black);
                         //drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
