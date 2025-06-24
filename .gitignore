@@ -1,6 +1,7 @@
-.ignore/
-.vs/
-.vscode/
+.*
+!.gitignore
+!.gitattributes
+
 bin/
 obj/
-/src/Content/Content.mgcb
+**/Content.mgcb
