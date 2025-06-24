@@ -49,7 +49,7 @@ namespace STOLON
         public static EntityProfile Debug => new EntityProfile(
             STOLON.Textures[$"Debug\\temp-512"],
             null,
-            STOLON.Textures[$"Debug\\temp-128"]);
+            STOLON.Textures[$"Debug\\profile-128"]);
         public static EntityProfile GetDebug(GameTexture? t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Point? menuOffset = null)
             => new EntityProfile(t512 ?? STOLON.Textures[$"Debug\\temp-512"], t256, t128, focus, menuOffset);
         public static EntityProfile GetDebug(string entityName, Point? focus = null, Point? menuOffset = null)
