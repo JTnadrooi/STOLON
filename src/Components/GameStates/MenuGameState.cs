@@ -76,10 +76,10 @@ namespace STOLON
 
         public MenuGameState() : base("main_menu")
         {
-            _menuLogoLines = STOLON.Textures.GetReference("Logo\\Menu\\lines");
-            _menuLogoMarks = STOLON.Textures.GetReference("Logo\\Menu\\marks");
-            _menuLogoFilledMarks = STOLON.Textures.GetReference("Logo\\Menu\\filled_marks");
-            _menuLogoFonted = STOLON.Textures.GetReference("Logo\\Menu\\fonted");
+            _menuLogoLines = STOLON.Textures.GetReference("UI\\Logo\\Menu\\lines");
+            _menuLogoMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\marks");
+            _menuLogoFilledMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\filled_marks");
+            _menuLogoFonted = STOLON.Textures.GetReference("UI\\Logo\\Menu\\fonted");
             _dither32 = STOLON.Textures.GetReference("dither-32");
             _drawMenuLogoLines = true;
             _drawMenuLogoDummyTiles = true;
