@@ -34,6 +34,7 @@ namespace STOLON
         private Texture2DAtlas _ditherAtlas;
 
         public const int DITHER_FRAME_COUNT = 5;
+        public const int DITHER_TEXTURE_HEIGHT = 32;
 
         public DrawingContext()
         {
@@ -58,7 +59,7 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], 32, 32);
+            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_HEIGHT, DITHER_TEXTURE_HEIGHT);
             Console.WriteLine(_ditherAtlas[4].Bounds);
 
             STOLON.Debug.Success();
@@ -218,6 +219,7 @@ namespace STOLON
 
         public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
         {
+            if (dimensions.X % DITHER_TEXTURE_HEIGHT != 0 || dimensions.Y % DITHER_TEXTURE_HEIGHT != 0) throw new ArgumentOutOfRangeException(nameof(dimensions));
             if (state < 0 || state >= DITHER_FRAME_COUNT) throw new ArgumentOutOfRangeException(nameof(state));
             for (int ox = 0; ox < dimensions.X; ox += _ditherAtlas[state].Width)
                 for (int oy = 0; oy < dimensions.Y; oy += _ditherAtlas[state].Height)
