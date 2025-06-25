@@ -217,15 +217,17 @@ namespace STOLON
             }
         }
 
-        public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
+        public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)
+            => DrawDither(position, dimensions, Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT, color);
+        public void DrawDither(Vector2 position, Point dimensions, int frame, Color? color = null)
         {
             if (dimensions.X % DITHER_TEXTURE_HEIGHT != 0 || dimensions.Y % DITHER_TEXTURE_HEIGHT != 0) throw new ArgumentOutOfRangeException(nameof(dimensions));
-            if (state < 0 || state >= DITHER_FRAME_COUNT) throw new ArgumentOutOfRangeException(nameof(state));
-            for (int ox = 0; ox < dimensions.X; ox += _ditherAtlas[state].Width)
-                for (int oy = 0; oy < dimensions.Y; oy += _ditherAtlas[state].Height)
+            if (frame < 0 || frame >= DITHER_FRAME_COUNT) throw new ArgumentOutOfRangeException(nameof(frame));
+            for (int ox = 0; ox < dimensions.X; ox += _ditherAtlas[frame].Width)
+                for (int oy = 0; oy < dimensions.Y; oy += _ditherAtlas[frame].Height)
                 {
-                    Size size = new Size(Math.Min(_ditherAtlas[state].Width, dimensions.X - ox), Math.Min(_ditherAtlas[state].Height, dimensions.Y - oy));
-                    Draw(_ditherAtlas[state].Texture, new Rectangle((int)position.X + ox, (int)position.Y + oy, size.Width, size.Height), sourceRectangle: new Rectangle(_ditherAtlas[state].Bounds.Location, size), color: color ?? Color.White);
+                    Size size = new Size(Math.Min(_ditherAtlas[frame].Width, dimensions.X - ox), Math.Min(_ditherAtlas[frame].Height, dimensions.Y - oy));
+                    Draw(_ditherAtlas[frame].Texture, new Rectangle((int)position.X + ox, (int)position.Y + oy, size.Width, size.Height), sourceRectangle: new Rectangle(_ditherAtlas[frame].Bounds.Location, size), color: color ?? Color.White);
                 }
         }
 
