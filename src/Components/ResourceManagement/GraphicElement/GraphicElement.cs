@@ -31,7 +31,7 @@ namespace STOLON
     {
         private Vector2 _scale;
 
-        public virtual GameTexture Texture { get; protected set; }
+        public virtual Texture2D Texture { get; protected set; }
         public Vector2 Position { get; set; } //relative to parent
         public virtual Vector2 Scale { get => _scale; set => _scale = value; }
         public virtual Rectangle Bounds => new Rectangle((int)Position.X, (int)Position.Y, (int)Width, (int)Height);
@@ -42,18 +42,18 @@ namespace STOLON
         public virtual float Height => (Texture.Height * Scale.Y);
         public virtual float Width => (Texture.Width * Scale.X);
 
-        public ReadOnlyCollection<GameTexture> Textures => _textures.ToList().AsReadOnly();
-        protected GameTexture[] _textures;
+        public ReadOnlyCollection<Texture2D> Textures => _textures.ToList().AsReadOnly();
+        protected Texture2D[] _textures;
 
-        public GraphicElement(IGraphicElementParent source, GameTexture texture) : this(source, texture, Vector2.Zero, Vector2.One) { }
+        public GraphicElement(IGraphicElementParent source, Texture2D texture) : this(source, texture, Vector2.Zero, Vector2.One) { }
 
-        public GraphicElement(IGraphicElementParent source, GameTexture texture, Vector2 position, Vector2 scale, int textureSlots = 10)
+        public GraphicElement(IGraphicElementParent source, Texture2D texture, Vector2 position, Vector2 scale, int textureSlots = 10)
         {
             Texture = texture;
             Position = position;
             Source = source;
 
-            _textures = new GameTexture[textureSlots];
+            _textures = new Texture2D[textureSlots];
             _textures[0] = texture;
 
             this._scale = scale;
@@ -68,7 +68,7 @@ namespace STOLON
         public virtual bool IsHovered(Point mousepos) => Bounds.Contains(mousepos);
         public virtual bool IsClicked(MouseState mouseState) => IsHovered(mouseState) && mouseState.LeftButton == ButtonState.Pressed;
 
-        public virtual GraphicElement AddTexture(int index, GameTexture texture)
+        public virtual GraphicElement AddTexture(int index, Texture2D texture)
         {
             if (texture == null) throw new Exception();
             _textures[index] = texture;
@@ -87,7 +87,7 @@ namespace STOLON
             else throw new InvalidOperationException("dimensions do not match.");
         }
 
-        internal void _SetTextures(GameTexture[] textures) => this._textures = textures;
+        internal void _SetTextures(Texture2D[] textures) => this._textures = textures;
         public GraphicElement SetPosition(Vector2 newPos, Orgin orgin = Orgin.TopLeft)
         {
             Position = orgin switch

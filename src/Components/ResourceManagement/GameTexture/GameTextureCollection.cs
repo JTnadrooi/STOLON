@@ -31,28 +31,28 @@ using Microsoft.Xna.Framework.Content;
 
 namespace STOLON
 {
-    public class GameTextureCollection : ResourceCollection<GameTexture>
+    public class Texture2DCollection : ResourceCollection<Texture2D>
     {
-        private readonly GameTexture _pixel;
+        private readonly Texture2D _pixel;
 
-        public GameTexture Pixel => _pixel;
+        public Texture2D Pixel => _pixel;
 
-        public GameTextureCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
+        public Texture2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
         {
             try
             {
-                GameTexture texture = new GameTexture(contentManager.Load<Texture2D>(toLoad));
+                Texture2D texture = contentManager.Load<Texture2D>(toLoad);
                 if (debug)
                 {
                     Color[] data = new Color[texture.Width * texture.Height];
-                    texture.GetColorData(data);
+                    texture.GetData(data);
                 }
                 return texture;
             }
             catch { return null; }
         }, "Textures")
         {
-            _pixel = new GameTexture(new Texture2D(contentManager.GetGraphicsDevice(), 1, 1));
+            _pixel = new Texture2D(contentManager.GetGraphicsDevice(), 1, 1);
             ((Texture2D)_pixel).SetData(new Color[] { Color.White });
         }
         public override void UnloadContent()

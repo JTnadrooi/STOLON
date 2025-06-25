@@ -1,5 +1,6 @@
 ﻿using Betwixt;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
@@ -26,13 +27,13 @@ namespace STOLON
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Size(128, 128)).Contains(STOLON.Input.VirtualMousePos);
         }
 
-        private GameTexture _tileTexture;
+        private Texture2D _tileTexture;
         private MenuGameState _menuGameState;
 
         private int _line1x;
         private int _line2x;
         private Tweener<float> _lineTweener;
-        private int _selectedEntityIndex;
+        private int _hoveredEntityIndex;
 
         private int _entityCount;
 
@@ -59,7 +60,7 @@ namespace STOLON
             Entity[] entities = STOLON.Environment.Entities.Values.ToArray();
             _entityCount = entities.Length;
             _drawData = new EntityDrawData[_entityCount];
-            _selectedEntityIndex = -1;
+            _hoveredEntityIndex = -1;
 
             for (int i = 0; i < _entityCount; i++) _drawData[i] = new EntityDrawData(GetPosFromProfileIndex(i), entities[i]);
         }
@@ -79,12 +80,16 @@ namespace STOLON
 
             if (_lineTweener.Running) return;
 
+            _hoveredEntityIndex = -1;
             for (int i = 0; i < _drawData.Length; i++)
-                if (_drawData[i].IsHovered() && STOLON.Input.IsClicked(GameInput.MouseButton.Left)) _selectedEntityIndex = i;
+                if (_drawData[i].IsHovered()) _hoveredEntityIndex = i;
+            //if (_drawData[i].IsHovered() && STOLON.Input.IsClicked(GameInput.MouseButton.Left)) _hoveredEntityIndex = i;
 
         }
 
-        public Vector2 GetPosFromProfileIndex(int i) => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos : _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT));
+        public Vector2 GetPosFromProfileIndex(int i)
+            => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos :
+                _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT));
 
         public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
@@ -98,7 +103,7 @@ namespace STOLON
                     if (i < _entityCount)
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
-                        drawingContext.Draw(ddc.Profile, 128, ddc.Pos, Vector2.One);
+                        drawingContext.Draw(ddc.Profile, TILE_SIZE, ddc.Pos);
 
                         drawingContext.DrawArea(ddc.SymbolNotationBox, Color.Black);
                         drawingContext.DrawRectangle(ddc.SymbolNotationBox, Color.White, UserInterface.LINE_WIDTH);
@@ -107,13 +112,13 @@ namespace STOLON
                         //drawingContext.DrawArea(new Rectangle(pos.ToPoint() + new Point(0, 100), new Point(STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_profiles), )), Color.Black);
                         //drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
                         //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
-                        if (_selectedEntityIndex == i)
+                        if (_hoveredEntityIndex == i)
                         {
-                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], pos, Vector2.One);
+                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], pos);
                         }
                     }
-                    else drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetPosFromProfileIndex(i), Vector2.One);
-                    drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(128)), Color.White, 1);
+                    else drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetPosFromProfileIndex(i));
+                    drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                 }
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }

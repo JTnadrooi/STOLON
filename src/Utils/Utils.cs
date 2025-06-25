@@ -23,11 +23,11 @@ namespace STOLON
     }
     public static class Utils
     {
-        //public static GameTexture Copy(this GameTexture texture, GraphicsDevice graphicsDevice, GameTextureCollection collection,
+        //public static Texture2D Copy(this Texture2D texture, GraphicsDevice graphicsDevice, Texture2DCollection collection,
         //    string? newName = null, bool onlyPostFix = true,
-        //    bool lazyCopy = true, Action<GameTexture>? action = null)
+        //    bool lazyCopy = true, Action<Texture2D>? action = null)
         //{
-        //    action ??= new Action<GameTexture>(t => { });
+        //    action ??= new Action<Texture2D>(t => { });
         //    newName ??= texture.Name;
         //    newName = onlyPostFix ? (texture.Name.Split("\\")[..^1].ToJoinedString("\\") + "\\" + newName) : newName;
 
@@ -35,7 +35,7 @@ namespace STOLON
         //    {
         //        return collection.GetReference(newName);
         //    }
-        //    GameTexture texture2 = new GameTexture(graphicsDevice, texture.Width, texture.Height);
+        //    Texture2D texture2 = new Texture2D(graphicsDevice, texture.Width, texture.Height);
         //    Color[] data = new Color[texture.Width * texture.Height];
         //    texture.GetColorData(data);
         //    texture2.SetColorData(data);
@@ -87,12 +87,12 @@ namespace STOLON
             texture.SetData(data);
             return texture;
         }
-        public static GameTexture SetAllColor(this GameTexture texture, Color color)
+        public static Texture2D SetAllColor(this Texture2D texture, Color color)
         {
             Color[] data = new Color[texture.Width * texture.Height];
-            texture.GetColorData(data);
+            texture.GetData(data);
             for (int i = 0; i < data.Length; i++) data[i] = data[i] == Color.Transparent ? Color.Transparent : color;
-            texture.SetColorData(data);
+            texture.SetData(data);
             return texture;
         }
         public static char ConvertKeyboardInput(KeyboardState keyboard, KeyboardState oldKeyboard)

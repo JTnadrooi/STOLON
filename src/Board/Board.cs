@@ -476,8 +476,8 @@ namespace STOLON
     public class TileType
     {
         public string Name { get; }
-        public GameTexture Texture { get; }
-        public TileType(string name, GameTexture texture)
+        public Texture2D Texture { get; }
+        public TileType(string name, Texture2D texture)
         {
             Name = name;
             Texture = texture;

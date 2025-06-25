@@ -30,26 +30,26 @@ namespace STOLON
 {
     public interface IMipmapped
     {
-        public IReadOnlyDictionary<int, GameTexture> Mipmaps { get; }
+        public IReadOnlyDictionary<int, Texture2D> Mipmaps { get; }
     }
 
     public static class MipmappedExtensions
     {
-        public static GameTexture GetMipmap(this IMipmapped mipmappedObj, int res) => mipmappedObj.Mipmaps[res] ?? throw new NullReferenceException();
+        public static Texture2D GetMipmap(this IMipmapped mipmappedObj, int res) => mipmappedObj.Mipmaps[res] ?? throw new NullReferenceException();
         /// <summary>
         /// Gets the highest available resolution mipmap.
         /// </summary>
-        public static GameTexture GetHighestResolutionMipmap(this IMipmapped mipmappedObj)
+        public static Texture2D GetHighestResolutionMipmap(this IMipmapped mipmappedObj)
             => mipmappedObj.GetMipmap(mipmappedObj.Mipmaps.Keys.Max());
         /// <summary>
         /// Gets the lowest available resolution mipmap.
         /// </summary>
-        public static GameTexture GetLowestResolutionMipmap(this IMipmapped mipmappedObj)
+        public static Texture2D GetLowestResolutionMipmap(this IMipmapped mipmappedObj)
             => mipmappedObj.GetMipmap(mipmappedObj.Mipmaps.Keys.Min());
         /// <summary>
         /// Tries to get a mipmap of a given resolution. Returns <see langword="true"/> if found.
         /// </summary>
-        public static bool TryGetMipmap(this IMipmapped mipmappedObj, int res, out GameTexture? texture)
+        public static bool TryGetMipmap(this IMipmapped mipmappedObj, int res, out Texture2D? texture)
             => mipmappedObj.Mipmaps.TryGetValue(res, out texture);
         public static bool HasMipmap(this IMipmapped mipmappedObj, int res)
             => mipmappedObj.Mipmaps.ContainsKey(res);

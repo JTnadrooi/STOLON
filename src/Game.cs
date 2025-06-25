@@ -32,7 +32,7 @@ namespace STOLON
         private GameEnvironment _environment;
         private int _desiredModifier;
         private Color[] _palette;
-        private GameTextureCollection _textures;
+        private Texture2DCollection _textures;
         private GameFontCollection _fonts;
         private Point _oldWindowSize;
 
@@ -142,8 +142,8 @@ namespace STOLON
 
             STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
+            STOLON.Textures = _textures = new Texture2DCollection(Content);
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
-            STOLON.Textures = _textures = new GameTextureCollection(Content);
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
             STOLON.Input = _input = new GameInput();
             STOLON.Environment = _environment = new GameEnvironment();
@@ -219,7 +219,7 @@ namespace STOLON
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static STOLON Instance { get; private set; }
-        public static GameTextureCollection Textures { get; private set; }
+        public static Texture2DCollection Textures { get; private set; }
         public static GameFontCollection Fonts { get; private set; }
         public static AudioEngine Audio { get; private set; }
         public static DebugStream Debug { get; private set; }

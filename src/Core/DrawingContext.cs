@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
+using MonoGame.Extended.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,7 +30,10 @@ namespace STOLON
 
         public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
         public Matrix InvertYMatrix => _invertYMatrix;
-        //public SpriteBatch SpriteBatch => _spriteBatch;
+
+        private Texture2DAtlas _ditherAtlas;
+
+        public const int DITHER_FRAME_COUNT = 5;
 
         public DrawingContext()
         {
@@ -53,6 +57,9 @@ namespace STOLON
                 _effects.Add(effect.Effect.Name["Effects\\".Length..], effect);
             }
             STOLON.Debug.Success();
+
+            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], 32, 32);
+
             STOLON.Debug.Success();
         }
 
@@ -145,18 +152,18 @@ namespace STOLON
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
 
-        public void Draw(GameTexture texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        public void Draw(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
-        public void Draw(GameTexture texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        public void Draw(Texture2D texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
-        public void Draw(GameTexture texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
             _spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, InvertY(effects), layerDepth);
         }
 
-        private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, float scale)
+        private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, float scale)
             => GetDestinationRectangle(texture, position, new Vector2(scale));
-        private Rectangle GetDestinationRectangle(GameTexture texture, Vector2 position, Vector2? scale = null)
+        private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, Vector2? scale = null)
             => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
         //private SpriteEffects InvertY(SpriteEffects effect) => effect switch
         //{
@@ -190,7 +197,7 @@ namespace STOLON
         public void Draw(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
         {
             Rectangle sourceRec;
-            GameTexture? texture;
+            Texture2D? texture;
             if (entityProfile.TryGetMipmap(res, out texture))
                 Draw(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
             else
@@ -207,6 +214,13 @@ namespace STOLON
                 }
             }
         }
+
+        //public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
+        //{
+        //    color ??= Color.White;
+        //    if (state > DITHER_FRAME_COUNT) throw new Exception();
+        //    Draw(_ditherAtlas[state], position);
+        //}
 
         protected virtual void Dispose(bool disposing)
         {

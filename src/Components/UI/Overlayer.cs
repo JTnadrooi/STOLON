@@ -127,7 +127,7 @@ namespace STOLON
         public string Id => "loading";
         public bool Ended { get; private set; }
 
-        private GameTexture lineTexture;
+        private Texture2D lineTexture;
 
         private float _rotation;
         private float _rotationSpeed;
@@ -172,7 +172,7 @@ namespace STOLON
 
         public bool Ended => _ended;
 
-        private GameTexture _ditherTexture;
+        private Texture2D _ditherTexture;
         private const int FRAME_PIXELS_TO_REMOVE = 11150 / RESOLUTION; // Number of pixels to turn transparent each frame
         private const int RESOLUTION = 2;
         private Color[] _pixelData; // Holds the pixel data for the dither texture
@@ -208,10 +208,10 @@ namespace STOLON
 
         public void ResetTexture()
         {
-            _ditherTexture = new GameTexture(_graphicsDevice, _width, _height);
+            _ditherTexture = new Texture2D(_graphicsDevice, _width, _height);
             _pixelData = new Color[_width * _height];
             for (int i = 0; i < _pixelData.Length; i++) _pixelData[i] = Color.White;
-            _ditherTexture.SetColorData(_pixelData);
+            _ditherTexture.SetData(_pixelData);
         }
 
         public void Reset()
@@ -242,7 +242,7 @@ namespace STOLON
                     return;
                 }
             }
-            _ditherTexture.SetColorData(_pixelData);
+            _ditherTexture.SetData(_pixelData);
         }
 
         public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)

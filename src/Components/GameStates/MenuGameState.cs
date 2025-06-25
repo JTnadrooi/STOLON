@@ -19,11 +19,11 @@ namespace STOLON
 {
     public class MenuGameState : GameState
     {
-        private GameTexture _menuLogoLines;
-        private GameTexture _menuLogoMarks;
-        private GameTexture _menuLogoFilledMarks;
-        private GameTexture _menuLogoFonted;
-        private GameTexture _dither32;
+        private Texture2D _menuLogoLines;
+        private Texture2D _menuLogoMarks;
+        private Texture2D _menuLogoFilledMarks;
+        private Texture2D _menuLogoFonted;
+        private Texture2D _dither32;
 
         private EntityProfile[] _entityProfiles;
 

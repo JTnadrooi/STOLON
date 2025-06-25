@@ -18,27 +18,27 @@ namespace STOLON
             None,
         }
 
-        private Dictionary<int, GameTexture> mipmaps;
+        private Dictionary<int, Texture2D> mipmaps;
         private Point _focus;
         private Point _menuOffset;
 
-        public GameTexture Texture512 => Mipmaps[512];
-        public GameTexture Texture256 => this.TryGetMipmap(256, out GameTexture? t) ? t! : throw new Exception();
-        public GameTexture Texture128 => this.TryGetMipmap(128, out GameTexture? t) ? t! : throw new Exception();
+        public Texture2D Texture512 => Mipmaps[512];
+        public Texture2D Texture256 => this.TryGetMipmap(256, out Texture2D? t) ? t! : throw new Exception();
+        public Texture2D Texture128 => this.TryGetMipmap(128, out Texture2D? t) ? t! : throw new Exception();
 
-        public IReadOnlyDictionary<int, GameTexture> Mipmaps => mipmaps;
+        public IReadOnlyDictionary<int, Texture2D> Mipmaps => mipmaps;
         public Point Focus { get => _focus; set => _focus = value; }
         public Point MenuOffset { get => _menuOffset; set => _menuOffset = value; }
 
         public EntityProfile(string entityName, Point? focus = null, Point? menuOffset = null) : this(
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out GameTexture? val512) ? val512 : throw new Exception(),
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out GameTexture? val256) ? val256 : null,
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out GameTexture? val128) ? val128 : null,
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : throw new Exception(),
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
+            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus)
         { }
-        public EntityProfile(GameTexture t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Point? menuOffset = null)
+        public EntityProfile(Texture2D t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
         {
-            mipmaps = new Dictionary<int, GameTexture>();
+            mipmaps = new Dictionary<int, Texture2D>();
             mipmaps[512] = t512;
             if (t256 != null) mipmaps[256] = t256;
             if (t128 != null) mipmaps[128] = t128;
@@ -50,13 +50,13 @@ namespace STOLON
             STOLON.Textures[$"Debug\\temp-512"],
             null,
             STOLON.Textures[$"Debug\\profile-128"]);
-        public static EntityProfile GetDebug(GameTexture? t512, GameTexture? t256 = null, GameTexture? t128 = null, Point? focus = null, Point? menuOffset = null)
+        public static EntityProfile GetDebug(Texture2D? t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
             => new EntityProfile(t512 ?? STOLON.Textures[$"Debug\\temp-512"], t256, t128, focus, menuOffset);
         public static EntityProfile GetDebug(string entityName, Point? focus = null, Point? menuOffset = null)
             => new EntityProfile(
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out GameTexture? val512) ? val512 : STOLON.Textures[$"Debug\\temp-512"],
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out GameTexture? val256) ? val256 : null,
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out GameTexture? val128) ? val128 : null,
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : STOLON.Textures[$"Debug\\temp-512"],
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
+                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus);
     }
     /// <summary>
@@ -65,7 +65,7 @@ namespace STOLON
     public abstract class Entity : IDialogueProvider, IMipmapped
     {
         public EntityProfile Profile { get; }
-        public IReadOnlyDictionary<int, GameTexture> Mipmaps => Profile.Mipmaps;
+        public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
         public Entity(string id, string name, string symbolNotation, EntityProfile? profile = null)
         {
             Id = id;
