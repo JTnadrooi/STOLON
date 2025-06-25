@@ -23,7 +23,7 @@ namespace STOLON
                 Entity = entity;
                 SymbolNotationBox = new Rectangle(pos.ToPoint(), new Point(20));
             }
-            public bool IsSelected() => new Rectangle(Pos.ToPoint(), new Size(128, 128)).Contains(STOLON.Input.VirtualMousePos);
+            public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Size(128, 128)).Contains(STOLON.Input.VirtualMousePos);
         }
 
         private GameTexture _tileTexture;
@@ -59,6 +59,7 @@ namespace STOLON
             Entity[] entities = STOLON.Environment.Entities.Values.ToArray();
             _entityCount = entities.Length;
             _drawData = new EntityDrawData[_entityCount];
+            _selectedEntityIndex = -1;
 
             for (int i = 0; i < _entityCount; i++) _drawData[i] = new EntityDrawData(GetPosFromProfileIndex(i), entities[i]);
         }
@@ -79,13 +80,8 @@ namespace STOLON
             if (_lineTweener.Running) return;
 
             for (int i = 0; i < _drawData.Length; i++)
-            {
-                EntityDrawData edd = _drawData[i];
-                if (edd.IsSelected())
-                {
-                    _selectedEntityIndex = i;
-                }
-            }
+                if (_drawData[i].IsHovered() && STOLON.Input.IsClicked(GameInput.MouseButton.Left)) _selectedEntityIndex = i;
+
         }
 
         public Vector2 GetPosFromProfileIndex(int i) => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos : _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - 32 - TILE_SIZE * TILE_COLUMN_AMOUNT));
@@ -110,6 +106,10 @@ namespace STOLON
                         //drawingContext.DrawArea(new Rectangle(pos.ToPoint() + new Point(0, 100), new Point(STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_profiles), )), Color.Black);
                         //drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
                         //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
+                        if (_selectedEntityIndex == i)
+                        {
+                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], GetPosFromProfileIndex(i), Vector2.One);
+                        }
                     }
                     else drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetPosFromProfileIndex(i), Vector2.One);
                     drawingContext.DrawRectangle(new Rectangle(GetPosFromProfileIndex(i).ToPoint(), new Point(128)), Color.White, 1);
