@@ -94,6 +94,7 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 for (int i = 0; i < TILE_COUNT; i++)
                 {
+                    Vector2 pos = GetPosFromProfileIndex(i);
                     if (i < _entityCount)
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
@@ -108,11 +109,11 @@ namespace STOLON
                         //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
                         if (_selectedEntityIndex == i)
                         {
-                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], GetPosFromProfileIndex(i), Vector2.One);
+                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], pos, Vector2.One);
                         }
                     }
                     else drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetPosFromProfileIndex(i), Vector2.One);
-                    drawingContext.DrawRectangle(new Rectangle(GetPosFromProfileIndex(i).ToPoint(), new Point(128)), Color.White, 1);
+                    drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(128)), Color.White, 1);
                 }
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
