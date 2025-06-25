@@ -59,6 +59,7 @@ namespace STOLON
             STOLON.Debug.Success();
 
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], 32, 32);
+            Console.WriteLine(_ditherAtlas[4].Bounds);
 
             STOLON.Debug.Success();
         }
@@ -215,12 +216,11 @@ namespace STOLON
             }
         }
 
-        //public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
-        //{
-        //    color ??= Color.White;
-        //    if (state > DITHER_FRAME_COUNT) throw new Exception();
-        //    Draw(_ditherAtlas[state], position);
-        //}
+        public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
+        {
+            if (state > DITHER_FRAME_COUNT - 1) throw new Exception();
+            Draw(_ditherAtlas[state].Texture, destinationRectangle: new Rectangle((int)position.X, (int)position.Y, _ditherAtlas[state].Width, _ditherAtlas[state].Height), color: color ?? Color.White, sourceRectangle: _ditherAtlas[state].Bounds);
+        }
 
         protected virtual void Dispose(bool disposing)
         {

@@ -114,7 +114,8 @@ namespace STOLON
                         //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
                         if (_hoveredEntityIndex == i)
                         {
-                            drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], pos);
+                            //drawingContext.Draw(STOLON.Textures["UI\\profile_overlay_selected-128"], pos);
+                            drawingContext.DrawDither(pos, new Point(128), 3);
                         }
                     }
                     else drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetPosFromProfileIndex(i));
