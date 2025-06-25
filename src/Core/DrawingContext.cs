@@ -218,9 +218,15 @@ namespace STOLON
 
         public void DrawDither(Vector2 position, Point dimensions, int state, Color? color = null)
         {
-            if (state > DITHER_FRAME_COUNT - 1) throw new Exception();
-            Draw(_ditherAtlas[state].Texture, destinationRectangle: new Rectangle((int)position.X, (int)position.Y, _ditherAtlas[state].Width, _ditherAtlas[state].Height), color: color ?? Color.White, sourceRectangle: _ditherAtlas[state].Bounds);
+            if (state < 0 || state >= DITHER_FRAME_COUNT) throw new ArgumentOutOfRangeException(nameof(state));
+            for (int ox = 0; ox < dimensions.X; ox += _ditherAtlas[state].Width)
+                for (int oy = 0; oy < dimensions.Y; oy += _ditherAtlas[state].Height)
+                {
+                    Size size = new Size(Math.Min(_ditherAtlas[state].Width, dimensions.X - ox), Math.Min(_ditherAtlas[state].Height, dimensions.Y - oy));
+                    Draw(_ditherAtlas[state].Texture, new Rectangle((int)position.X + ox, (int)position.Y + oy, size.Width, size.Height), sourceRectangle: new Rectangle(_ditherAtlas[state].Bounds.Location, size), color: color ?? Color.White);
+                }
         }
+
 
         protected virtual void Dispose(bool disposing)
         {
