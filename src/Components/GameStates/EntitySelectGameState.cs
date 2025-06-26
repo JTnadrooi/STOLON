@@ -23,7 +23,7 @@ namespace STOLON
             {
                 Pos = basePos + new Vector2(0, 10 * hoverAmount);
                 Entity = entity;
-                SymbolNotationBox = new Rectangle(Pos.ToPoint(), new Point(20));
+                SymbolNotationBox = new Rectangle(Pos.ToPoint(), new Point(28));
             }
 
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
@@ -129,7 +129,7 @@ namespace STOLON
                             drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
                         }
 
-                        drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox, 1);
+                        drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox);
 
                         drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }

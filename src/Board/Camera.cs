@@ -60,9 +60,5 @@ namespace STOLON
     }
     public static class CameraStatic
     {
-        public static Vector2 PixelLock(this Vector2 v, Camera2D camera2D)
-        {
-            return v;
-        }
     }
 }

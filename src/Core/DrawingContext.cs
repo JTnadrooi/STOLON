@@ -208,11 +208,16 @@ namespace STOLON
                 }
             }
         }
-        public void DrawSymbolNotation(string symbolNotationStr, Rectangle bounds, float textScale)
+        public void DrawSymbolNotation(string symbolNotationStr, Rectangle bounds)
         {
             DrawArea(bounds, Color.Black);
             DrawRectangle(bounds, Color.White, UserInterface.LINE_WIDTH);
-            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.MiddleXY((STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(symbolNotationStr) * textScale).ToPoint(), bounds));
+            Vector2 dimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(symbolNotationStr);
+            Vector2 scale = Vector2.One;
+            if (dimensions.X > bounds.Width - 10)
+                scale = new Vector2(0.8f, 1);
+            dimensions *= scale;
+            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.MiddleXY(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
         }
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)

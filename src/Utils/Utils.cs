@@ -23,6 +23,14 @@ namespace STOLON
     }
     public static class Utils
     {
+        public static Vector2 PixelLock(this Vector2 v)
+        {
+            return v.ToPoint().ToVector2();
+        }
+        public static Vector2 PixelLock(this Vector2 v, Camera2D camera2D)
+        {
+            return v;
+        }
         //public static Texture2D Copy(this Texture2D texture, GraphicsDevice graphicsDevice, Texture2DCollection collection,
         //    string? newName = null, bool onlyPostFix = true,
         //    bool lazyCopy = true, Action<Texture2D>? action = null)
