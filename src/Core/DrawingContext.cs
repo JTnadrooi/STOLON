@@ -221,7 +221,7 @@ namespace STOLON
         }
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)
-            => DrawDither(position, dimensions, Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT, color);
+            => DrawDither(position, dimensions, (int)(Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT), color);
         public void DrawDither(Vector2 position, Point dimensions, int frame, Color? color = null)
         {
             if (dimensions.X % DITHER_TEXTURE_HEIGHT != 0 || dimensions.Y % DITHER_TEXTURE_HEIGHT != 0) throw new ArgumentOutOfRangeException(nameof(dimensions));
