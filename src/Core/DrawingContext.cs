@@ -153,7 +153,6 @@ namespace STOLON
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
-
         public void Draw(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
         public void Draw(Texture2D texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
@@ -167,13 +166,6 @@ namespace STOLON
             => GetDestinationRectangle(texture, position, new Vector2(scale));
         private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, Vector2? scale = null)
             => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
-        //private SpriteEffects InvertY(SpriteEffects effect) => effect switch
-        //{
-        //    SpriteEffects.FlipHorizontally => SpriteEffects.FlipHorizontally & SpriteEffects.FlipVertically,
-        //    SpriteEffects.FlipVertically => SpriteEffects.None,
-        //    SpriteEffects.None => SpriteEffects.FlipVertically,
-        //    _ => effect,
-        //};
         private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // I don't think this completelly works.
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
@@ -215,6 +207,12 @@ namespace STOLON
                     default: throw new Exception();
                 }
             }
+        }
+        public void DrawSymbolNotation(string symbolNotationStr, Rectangle bounds, float textScale)
+        {
+            DrawArea(bounds, Color.Black);
+            DrawRectangle(bounds, Color.White, UserInterface.LINE_WIDTH);
+            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.MiddleXY((STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(symbolNotationStr) * textScale).ToPoint(), bounds));
         }
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)

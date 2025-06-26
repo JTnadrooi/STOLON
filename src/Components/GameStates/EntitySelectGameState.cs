@@ -119,8 +119,6 @@ namespace STOLON
                 //drawingContext.Draw(STOLON.Textures.GetReference("Entities\\silo\\silo-512"), new Vector2(448, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 for (int i = 0; i < TILE_COUNT; i++)
-                {
-                    Vector2 pos = GetBaseTilePos(i);
                     if (i < _entityCount)
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
@@ -131,21 +129,16 @@ namespace STOLON
                             drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
                         }
 
-                        drawingContext.DrawArea(ddc.SymbolNotationBox, Color.Black);
-                        drawingContext.DrawRectangle(ddc.SymbolNotationBox, Color.White, UserInterface.LINE_WIDTH);
-                        drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], ddc.Entity.SymbolNotation, ddc.Pos + new Vector2(3));
-                        drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
+                        drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox, 1);
 
-                        //drawingContext.DrawArea(new Rectangle(pos.ToPoint() + new Point(0, 100), new Point(STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_profiles), )), Color.Black);
-                        //drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(20)), Color.White, UserInterface.LINE_WIDTH);
-                        //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Sl", pos + new Vector2(3));
+                        drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
                     else
                     {
-                        drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], GetBaseTilePos(i));
+                        Vector2 pos = GetBaseTilePos(i);
+                        drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
-                }
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);
