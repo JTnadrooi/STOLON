@@ -21,8 +21,7 @@ namespace STOLON
 
             public EntityDrawData(Vector2 basePos, float hoverAmount, Entity? entity)
             {
-                Vector2 offset = new Vector2(0, 10 * hoverAmount);
-                Pos = basePos + offset;
+                Pos = basePos + new Vector2(0, 10 * hoverAmount);
                 Entity = entity;
                 SymbolNotationBox = new Rectangle(Pos.ToPoint(), new Point(20));
             }
@@ -125,7 +124,7 @@ namespace STOLON
                     if (i < _entityCount)
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
-                        drawingContext.Draw(ddc.Profile, TILE_SIZE, ddc.Pos);
+                        drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos);
 
                         if (_hoveredEntityIndex == i)
                         {

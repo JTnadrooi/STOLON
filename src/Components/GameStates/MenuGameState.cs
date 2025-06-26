@@ -449,8 +449,8 @@ namespace STOLON
 
             if (_showEntityProfiles)
             {
-                drawingContext.Draw(_entityProfiles[0], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), drawMode: EntityProfile.DrawMode.Menu);
-                drawingContext.Draw(_entityProfiles[1], 512, new Vector2(STOLON.V_WIDTH / 2 - 512, 0), drawMode: EntityProfile.DrawMode.Menu);
+                drawingContext.DrawEntity(_entityProfiles[0], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), drawMode: EntityProfile.DrawMode.Menu);
+                drawingContext.DrawEntity(_entityProfiles[1], 512, new Vector2(STOLON.V_WIDTH / 2 - 512, 0), drawMode: EntityProfile.DrawMode.Menu);
             }
         }
     }

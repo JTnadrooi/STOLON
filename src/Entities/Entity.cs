@@ -16,6 +16,7 @@ namespace STOLON
         {
             Menu,
             None,
+            SymbolNotation,
         }
 
         private Dictionary<int, Texture2D> mipmaps;
