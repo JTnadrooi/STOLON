@@ -300,24 +300,24 @@ namespace STOLON
         public static Vector2 BottomLeft(Texture2D texture, Vector2 pos, Vector2 scaling) => pos;
         public static Vector2 BottomRight(Texture2D texture, Vector2 pos, Vector2 scaling) => pos + new Vector2(texture.Width * scaling.X, 0);
 
-        public static Vector2 MiddleX(Texture2D texture, float y, float inX, Vector2 scaling) => MiddleX(texture, y, inX, scaling.X);
-        public static Vector2 MiddleX(int boxX, float y, float inX, Vector2 scaling) => MiddleX(boxX, y, inX, scaling.X);
-        public static Vector2 MiddleX(Texture2D texture, float y, float inX, float scaling = 1f) => MiddleX(texture.Width, y, inX, scaling);
-        public static Vector2 MiddleX(int boxX, float y, float inX, float scaling = 1f) => new Vector2(inX * 0.5f - boxX * scaling * 0.5f, y);
+        public static Vector2 CenterX(Texture2D texture, float y, float inX, Vector2 scaling) => CenterX(texture, y, inX, scaling.X);
+        public static Vector2 CenterX(int boxX, float y, float inX, Vector2 scaling) => CenterX(boxX, y, inX, scaling.X);
+        public static Vector2 CenterX(Texture2D texture, float y, float inX, float scaling = 1f) => CenterX(texture.Width, y, inX, scaling);
+        public static Vector2 CenterX(int boxX, float y, float inX, float scaling = 1f) => new Vector2(inX * 0.5f - boxX * scaling * 0.5f, y);
 
-        public static Vector2 MiddleY(Texture2D texture, float x, float inY, Vector2 scaling) => MiddleY(texture.Height, x, inY, scaling.Y);
-        public static Vector2 MiddleY(int boxY, float x, float inY, Vector2 scaling) => MiddleY(boxY, x, inY, scaling.Y);
-        public static Vector2 MiddleY(Texture2D texture, float x, float inY, float scaling = 1f) => MiddleY(texture.Height, x, inY, scaling);
-        public static Vector2 MiddleY(int boxY, float x, float inY, float scaling = 1f) => new Vector2(x, inY * 0.5f - boxY * scaling * 0.5f);
-        public static Vector2 MiddleXY(Rectangle inner, Rectangle outer)
+        public static Vector2 CenterY(Texture2D texture, float x, float inY, Vector2 scaling) => CenterY(texture.Height, x, inY, scaling.Y);
+        public static Vector2 CenterY(int boxY, float x, float inY, Vector2 scaling) => CenterY(boxY, x, inY, scaling.Y);
+        public static Vector2 CenterY(Texture2D texture, float x, float inY, float scaling = 1f) => CenterY(texture.Height, x, inY, scaling);
+        public static Vector2 CenterY(int boxY, float x, float inY, float scaling = 1f) => new Vector2(x, inY * 0.5f - boxY * scaling * 0.5f);
+        public static Vector2 Center(Rectangle inner, Rectangle outer)
         {
             float x = outer.X + (outer.Width - inner.Width) * 0.5f;
             float y = outer.Y + (outer.Height - inner.Height) * 0.5f;
             return new Vector2(x, y);
         }
 
-        public static Vector2 MiddleXY(Texture2D texture, Rectangle inXY, Vector2 scaling) => MiddleXY((new Vector2(texture.Width, texture.Height) * scaling).ToPoint(), inXY);
-        public static Vector2 MiddleXY(Point dimensions, Rectangle inXY) => MiddleXY(new Rectangle(Point.Zero, dimensions), inXY);
+        public static Vector2 Center(Texture2D texture, Rectangle inXY, Vector2 scaling) => Center((new Vector2(texture.Width, texture.Height) * scaling).ToPoint(), inXY);
+        public static Vector2 Center(Point dimensions, Rectangle inXY) => Center(new Rectangle(Point.Zero, dimensions), inXY);
 
         public static Vector2 Get(Rectangle rectangle) => rectangle.Center.ToVector2();
         public static Vector2 Get(Texture2D texture) => Get(texture.Bounds);

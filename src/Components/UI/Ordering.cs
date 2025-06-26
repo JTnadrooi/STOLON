@@ -59,7 +59,7 @@ namespace STOLON
         }
         public (UIElementDrawData drawData, bool isHovered) GetElementDrawData(UIElement element, Vector2 UIOrgin, int index)
         {
-            Vector2 elementPos = Centering.MiddleX((int)_font.FastMeasure(element.Text).X,
+            Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + UIOrgin.Y,
                                 STOLON.V_WIDTH, Vector2.One);
             Centering.OnPixel(ref elementPos);

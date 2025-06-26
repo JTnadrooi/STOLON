@@ -217,7 +217,7 @@ namespace STOLON
             if (dimensions.X > bounds.Width - 10)
                 scale = new Vector2(0.8f, 1);
             dimensions *= scale;
-            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.MiddleXY(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
+            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
         }
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)

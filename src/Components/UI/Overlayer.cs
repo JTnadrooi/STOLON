@@ -297,7 +297,7 @@ namespace STOLON
             _heightCoefficient = _tweener.Value;
 
             _drawArea = new Rectangle(_area.Location, new Point(_area.Width, (int)(desiredHeight * _heightCoefficient)));
-            _textPos = Centering.MiddleXY((STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
+            _textPos = Centering.Center((STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
             _textPos = new Vector2(_textPos.X, Math.Min(_textPos.Y, _drawArea.Height - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y * TextSizeMod));
 
             Centering.OnPixel(ref _textPos);

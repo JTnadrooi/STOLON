@@ -36,7 +36,6 @@ namespace STOLON
         private int _line1x;
         private int _line2x;
         private Tweener<float> _lineTweener;
-        private int _hoveredEntityIndex;
 
         private int _entityCount;
 
@@ -44,6 +43,9 @@ namespace STOLON
 
         private EntityDrawData[] _drawData;
         private float[] _entityHoverdata;
+        private int _hoveredEntityIndex;
+        private int _lastHoveredEntityIndex;
+        private int _hoverTime;
         private readonly Dictionary<int, Vector2> _posCache;
 
         //private Entity[] _entities;
@@ -87,6 +89,7 @@ namespace STOLON
 
             if (_lineTweener.Running) return;
 
+            _lastHoveredEntityIndex = _hoveredEntityIndex;
             _hoveredEntityIndex = -1;
             for (int i = 0; i < _entityCount; i++)
             {
@@ -102,6 +105,8 @@ namespace STOLON
                 _drawData[i] = new EntityDrawData(basePos, _entityHoverdata[i], _entities[i]);
             }
 
+            if (_lastHoveredEntityIndex == _hoveredEntityIndex) _hoverTime += elapsedMilliseconds;
+            else _hoverTime = 0;
 
 
             //if (_drawData[i].IsHovered() && STOLON.Input.IsClicked(GameInput.MouseButton.Left)) _hoveredEntityIndex = i;
@@ -127,6 +132,7 @@ namespace STOLON
                         if (_hoveredEntityIndex == i)
                         {
                             drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
+                            //drawingContext.DrawDither(ddc.Pos, new Point(128), _entityHoverdata[i] - 0.7f);
                         }
 
                         drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox);
