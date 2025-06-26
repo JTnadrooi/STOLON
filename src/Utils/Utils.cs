@@ -301,15 +301,15 @@ namespace STOLON
         public static Vector2 MiddleY(int boxY, float x, float inY, Vector2 scaling) => MiddleY(boxY, x, inY, scaling.Y);
         public static Vector2 MiddleY(Texture2D texture, float x, float inY, float scaling = 1f) => MiddleY(texture.Height, x, inY, scaling);
         public static Vector2 MiddleY(int boxY, float x, float inY, float scaling = 1f) => new Vector2(x, inY * 0.5f - boxY * scaling * 0.5f);
-
-        public static Vector2 MiddleXY(Rectangle tocenter, Rectangle inXY, Vector2 scaling)
+        public static Vector2 MiddleXY(Rectangle inner, Rectangle outer)
         {
-            float x = MiddleX(tocenter.Width, 0, inXY.Width, scaling).X;
-            float y = MiddleY(tocenter.Height, 0, inXY.Height, scaling).Y;
-            return new Vector2(x, y) + inXY.Location.ToVector2();
+            float x = outer.X + (outer.Width - inner.Width) * 0.5f;
+            float y = outer.Y + (outer.Height - inner.Height) * 0.5f;
+            return new Vector2(x, y);
         }
-        public static Vector2 MiddleXY(Texture2D texture, Rectangle inXY, Vector2 scaling) => MiddleXY(texture.Bounds, inXY, scaling);
-        public static Vector2 MiddleXY(Point dimensions, Rectangle inXY, Vector2 scaling) => MiddleXY(new Rectangle(Point.Zero, dimensions), inXY, scaling);
+
+        public static Vector2 MiddleXY(Texture2D texture, Rectangle inXY, Vector2 scaling) => MiddleXY((new Vector2(texture.Width, texture.Height) * scaling).ToPoint(), inXY);
+        public static Vector2 MiddleXY(Point dimensions, Rectangle inXY) => MiddleXY(new Rectangle(Point.Zero, dimensions), inXY);
 
         public static Vector2 Get(Rectangle rectangle) => rectangle.Center.ToVector2();
         public static Vector2 Get(Texture2D texture) => Get(texture.Bounds);
