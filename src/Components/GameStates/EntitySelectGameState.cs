@@ -131,7 +131,9 @@ namespace STOLON
 
                         if (_hoveredEntityIndex == i)
                         {
-                            drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
+                            //drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
+                            //drawingContext.DrawDither(ddc.Pos, new Point(128), 0);
+                            drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
                             //drawingContext.DrawDither(ddc.Pos, new Point(128), _entityHoverdata[i] - 0.7f);
                         }
 
