@@ -222,8 +222,9 @@ namespace STOLON
                 "Index is jealous.",
                 "the chairs have eyes",
                 "\"Its funny. You.\"",
-                "\"Human might be a over-/under- statement, whatever, its never quite right.\"",
                 "The BOULDER.",
+                "Merde before Mercy.",
+                "Seven-eyed wonders.",
             };
 
             _tipId = new Random().Next(0, _tips.Length);
