@@ -17,12 +17,14 @@ namespace STOLON
             public EntityProfile Profile => Entity.Profile;
             public Entity Entity { get; }
             public bool Selected { get; }
+            public string FullerName { get; }
 
             public EntityDrawData(Vector2 basePos, float floatAmount, Entity entity)
             {
                 Pos = basePos + new Vector2(0, 10 * floatAmount);
                 Entity = entity;
                 SymbolNotationBox = new Rectangle(Pos.ToPoint(), new Point(28));
+                FullerName = entity.FullName == entity.Name ? entity.Name : entity.Name + $" ({entity.FullName})";
             }
 
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
@@ -163,7 +165,7 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], selectedEntity.FullName.ToUpper(), new Vector2(5, lineY + 2));
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, lineY + 2));
                     //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
                 }
 

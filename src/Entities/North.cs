@@ -20,7 +20,7 @@ namespace STOLON
 {
     public class NorthEntity : Entity
     {
-        public NorthEntity() : base("north", "North", "Nth", EntityProfile.GetDebug("north"), string.Empty, "Noria-aeth (North)")
+        public NorthEntity() : base("north", "North", "Nth", EntityProfile.GetDebug("north"), string.Empty, "Noria-aeth")
         {
         }
 
