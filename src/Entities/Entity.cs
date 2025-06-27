@@ -84,7 +84,7 @@ namespace STOLON
         /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
         public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
         public abstract Computer? Computer { get; }
-        public virtual string Description { get; }
+        public string Description { get; }
         /// <summary>
         /// The unique ID of this <see cref="Entity"/>, no capital letters.
         /// </summary>
