@@ -142,8 +142,7 @@ namespace STOLON
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
 
-                        drawingContext.DrawArea(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.Black);
-                        drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos);
+                        drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityProfile.DrawMode.WithBackground);
 
                         if (_hoveredIndex == i) drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
 

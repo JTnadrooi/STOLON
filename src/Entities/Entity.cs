@@ -12,10 +12,12 @@ namespace STOLON
 {
     public class EntityProfile : IMipmapped
     {
+        [Flags]
         public enum DrawMode
         {
-            Menu,
-            None,
+            None = 0,
+            Menu = 1,
+            WithBackground = 2,
         }
 
         private Dictionary<int, Texture2D> mipmaps;

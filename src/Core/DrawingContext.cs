@@ -190,10 +190,15 @@ namespace STOLON
             => DrawEntity(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);
         public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
         {
+            void DrawEntity(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            {
+                if (drawMode == EntityProfile.DrawMode.WithBackground) DrawArea(new RectangleF(position, new Vector2(res) * scale).ToRectangle(), Color.Black);
+                Draw(texture, position, scale, rotation, origin, sourceRectangle, color, effects, layerDepth);
+            }
             Rectangle sourceRec;
             Texture2D? texture;
             if (entityProfile.TryGetMipmap(res, out texture))
-                Draw(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
+                DrawEntity(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
             else
             {
                 switch (res)
@@ -202,7 +207,7 @@ namespace STOLON
                         texture = entityProfile.Mipmaps[512];
                         sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
                         scale *= 0.25f;
-                        Draw(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
+                        DrawEntity(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
                         break;
                     default: throw new Exception();
                 }
@@ -214,8 +219,7 @@ namespace STOLON
             DrawRectangle(bounds, Color.White, UserInterface.LINE_WIDTH);
             Vector2 dimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(symbolNotationStr);
             Vector2 scale = Vector2.One;
-            if (dimensions.X > bounds.Width - 10)
-                scale = new Vector2(0.8f, 1);
+            if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
             dimensions *= scale;
             DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
         }
