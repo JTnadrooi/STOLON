@@ -65,9 +65,11 @@ namespace STOLON
         private const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
 
         private const int LINE1_TARGET = TILE_SIZE * TILE_ROW_AMOUNT;
-        private const int LINE2_TARGET = STOLON.V_WIDTH - 16;
+        private const int LINE2_TARGET = STOLON.V_WIDTH - ROSTER_CLEARANCE;
 
         private const float HOVER_INTENSITY = 0.25f;
+
+        private const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - ROSTER_CLEARANCE;
 
         private readonly Entity[] _entities;
 
@@ -136,6 +138,15 @@ namespace STOLON
             if (_initDone)
             {
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
+
+                drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, UserInterface.LINE_WIDTH);
+                if (_selectedIndex != -1)
+                {
+                    Entity selectedEntity = _drawData[_selectedIndex].Entity;
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE + 2));
+                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
+                }
+
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
                 drawingContext.DrawLine(0, ROSTER_BOTTOM_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_BOTTOM_LINE, Color.White, UserInterface.LINE_WIDTH);
                 for (int i = 0; i < TILE_COUNT; i++)
@@ -158,16 +169,6 @@ namespace STOLON
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
-
-                int lineY = ROSTER_BOTTOM_LINE - ROSTER_CLEARANCE;
-                drawingContext.DrawLine(0, lineY, TILE_SIZE * TILE_ROW_AMOUNT, lineY, Color.White, UserInterface.LINE_WIDTH);
-
-                if (_selectedIndex != -1)
-                {
-                    Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, lineY + 2));
-                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
-                }
 
 
 
