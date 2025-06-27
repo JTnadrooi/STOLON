@@ -10,16 +10,15 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
+    [Flags]
+    public enum EntityDrawMode
+    {
+        None = 0,
+        Menu = 1,
+        WithBackground = 2,
+    }
     public class EntityProfile : IMipmapped
     {
-        [Flags]
-        public enum DrawMode
-        {
-            None = 0,
-            Menu = 1,
-            WithBackground = 2,
-        }
-
         private Dictionary<int, Texture2D> mipmaps;
         private Point _focus;
         private Point _menuOffset;

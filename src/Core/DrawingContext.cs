@@ -182,17 +182,17 @@ namespace STOLON
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
-        public void DrawEntity(Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+        public void DrawEntity(Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+        public void DrawEntity(Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => DrawEntity(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityProfile.DrawMode drawMode = EntityProfile.DrawMode.None)
+        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
         {
             void DrawEntity(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             {
-                if (drawMode == EntityProfile.DrawMode.WithBackground) DrawArea(new RectangleF(position, new Vector2(res) * scale).ToRectangle(), Color.Black);
+                if (drawMode == EntityDrawMode.WithBackground) DrawArea(new RectangleF(position, new Vector2(res) * scale).ToRectangle(), Color.Black);
                 Draw(texture, position, scale, rotation, origin, sourceRectangle, color, effects, layerDepth);
             }
             Rectangle sourceRec;
@@ -207,7 +207,7 @@ namespace STOLON
                         texture = entityProfile.Mipmaps[512];
                         sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
                         scale *= 0.25f;
-                        DrawEntity(texture, position + (drawMode == EntityProfile.DrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
+                        DrawEntity(texture, position + (drawMode == EntityDrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
                         break;
                     default: throw new Exception();
                 }
