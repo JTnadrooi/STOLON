@@ -20,7 +20,7 @@ namespace STOLON
 {
     public class DeceitEntity : Entity
     {
-        public DeceitEntity() : base("deceit", "Deceit", "Dc", new EntityProfile("deceit", null, new Point(-130, -40)), "Yeah", "Tomboyish elf #82")
+        public DeceitEntity() : base("deceit", "Deceit", "Dc", new EntityProfile("deceit", null, new Point(-130, -40)), "Yeah")
         {
         }
 

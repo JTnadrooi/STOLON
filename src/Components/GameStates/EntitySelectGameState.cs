@@ -58,6 +58,9 @@ namespace STOLON
         private Rectangle _selectedNameBounds;
         private Vector2 _selectedNameTextPos;
 
+        private Rectangle _lvlNameBounds;
+        private Vector2 _lvlNameTextPos;
+
         //private Entity[] _entities;
 
         private const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
@@ -134,9 +137,21 @@ namespace STOLON
             if (_selectedIndex != -1)
             {
                 Point nameDimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
-                _selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + 8, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(16, 8));
-                _selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, 0)).PixelLock();
+                const int ENAME_CLEARING_X = 8;
+                const int ENAME_CLEARING_Y = 4;
+
+                _selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + ENAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(ENAME_CLEARING_X * 2, ENAME_CLEARING_Y * 2));
+                _selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, -1)).PixelLock();
             }
+
+            string lvlName = "Node 12b: LANU LANU LANU";
+            Point lvlNameDimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(lvlName).ToPoint();
+            const int LVL_NAME_CLEARING_X = 8;
+            const int LVL_NAME_CLEARING_Y = 4;
+
+            _lvlNameBounds = new Rectangle(Centering.CenterY(lvlNameDimensions.Y + LVL_NAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE), lvlNameDimensions + new Point(LVL_NAME_CLEARING_X * 2, LVL_NAME_CLEARING_Y * 2));
+            _lvlNameTextPos = (Centering.Center(lvlNameDimensions, _lvlNameBounds) + new Vector2(1, -1)).PixelLock();
+
         }
 
         public Vector2 GetBaseTilePos(int i)
@@ -154,8 +169,10 @@ namespace STOLON
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
                     drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
-                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
                     drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
+                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
+
+                    //drawingContext.DrawStringOutline(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE), 8, 4);
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
@@ -182,6 +199,8 @@ namespace STOLON
                     }
 
 
+                drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Node 12b: LANU LANU LANU", _lvlNameTextPos);
+                drawingContext.DrawRectangle(_lvlNameBounds, Color.White, UserInterface.LINE_WIDTH);
 
 
 

@@ -239,6 +239,16 @@ namespace STOLON
         }
 
 
+        //public void DrawStringOutline(GameFont font, string text, Vector2 position, int marginX, int marginY, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, bool background = false, int lineWidth = UserInterface.LINE_WIDTH)
+        //{
+        //    Point nameDimensions = font.FastMeasure(text).ToPoint();
+        //    Rectangle bounds = new Rectangle(position.ToPoint(), nameDimensions + new Point((int)(marginX * 2f), (int)(marginY * 2f)));
+        //    Vector2 calcPos = (Centering.Center(nameDimensions, bounds) + new Vector2(1, 0)).PixelLock();
+        //    DrawRectangle(bounds, color ?? Color.White, lineWidth);
+        //    DrawString(font, text, calcPos, color: color, effects: effects, layerDepth: layerDepth);
+        //}
+
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
