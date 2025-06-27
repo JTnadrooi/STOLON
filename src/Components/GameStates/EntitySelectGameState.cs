@@ -90,14 +90,13 @@ namespace STOLON
 
         protected override void UpdateUI(int elapsedMilliseconds)
         {
-            int To(int orgin, int target, float amount) => (int)(orgin + (target - orgin) * amount);
             _lineTweener.Update(elapsedMilliseconds / 1000f);
             _initDone = !_lineTweener.Running;
 
             if (SkipAnimation && _lineTweener.Running) _lineTweener.Update(12f);
 
-            _line1x = To(_menuGameState.MenuRemoveLine1x, LINE1_TARGET, _lineTweener.Value);
-            _line2x = To(_menuGameState.MenuRemoveLine2x, LINE2_TARGET, _lineTweener.Value);
+            _line1x = (int)MathHelper.Lerp(_menuGameState.MenuRemoveLine1x, LINE1_TARGET, _lineTweener.Value);
+            _line2x = (int)MathHelper.Lerp(_menuGameState.MenuRemoveLine2x, LINE2_TARGET, _lineTweener.Value);
 
             if (_lineTweener.Running) return;
 
