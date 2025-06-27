@@ -15,10 +15,10 @@ namespace STOLON
             public Vector2 Pos { get; }
             public Rectangle SymbolNotationBox { get; }
             public EntityProfile Profile => Entity.Profile;
-            public Entity? Entity { get; }
+            public Entity Entity { get; }
             public bool Selected { get; }
 
-            public EntityDrawData(Vector2 basePos, float floatAmount, Entity? entity)
+            public EntityDrawData(Vector2 basePos, float floatAmount, Entity entity)
             {
                 Pos = basePos + new Vector2(0, 10 * floatAmount);
                 Entity = entity;
@@ -53,12 +53,14 @@ namespace STOLON
 
         //private Entity[] _entities;
 
-        public const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
-        public const int TILE_ROW_AMOUNT = 4;
-        public const int TILE_COLUMN_AMOUNT = 2;
-        public const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
+        private const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
+        private const int TILE_ROW_AMOUNT = 4;
+        private const int TILE_COLUMN_AMOUNT = 2;
+        private const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
 
-        private const int TILES_CLEARANCE = 32;
+        private const int ROSTER_CLEARANCE = 16;
+        private const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - ROSTER_CLEARANCE;
+        private const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
 
         private const float HOVER_INTENSITY = 0.25f;
 
@@ -125,7 +127,7 @@ namespace STOLON
 
         public Vector2 GetBaseTilePos(int i)
             => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos :
-                _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - TILES_CLEARANCE - TILE_SIZE * TILE_COLUMN_AMOUNT));
+                _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - ROSTER_CLEARANCE - TILE_SIZE * TILE_COLUMN_AMOUNT));
 
         public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
@@ -133,10 +135,14 @@ namespace STOLON
             {
                 //drawingContext.Draw(STOLON.Textures.GetReference("Entities\\silo\\silo-512"), new Vector2(448, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
+                drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
+                drawingContext.DrawLine(0, ROSTER_BOTTOM_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_BOTTOM_LINE, Color.White, UserInterface.LINE_WIDTH);
                 for (int i = 0; i < TILE_COUNT; i++)
                     if (i < _entityCount)
                     {
                         ref EntityDrawData ddc = ref _drawData[i];
+
+                        drawingContext.DrawArea(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.Black);
                         drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos);
 
                         if (_hoveredIndex == i) drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
@@ -152,8 +158,20 @@ namespace STOLON
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
-                int lineY = STOLON.V_HEIGHT - TILE_COLUMN_AMOUNT * TILE_SIZE - TILES_CLEARANCE - 32;
-                //drawingContext.DrawLine(0, lineY, TILE_SIZE * TILE_ROW_AMOUNT, lineY, Color.White, UserInterface.LINE_WIDTH);
+
+                int lineY = ROSTER_BOTTOM_LINE - ROSTER_CLEARANCE;
+                drawingContext.DrawLine(0, lineY, TILE_SIZE * TILE_ROW_AMOUNT, lineY, Color.White, UserInterface.LINE_WIDTH);
+
+                if (_selectedIndex != -1)
+                {
+                    Entity selectedEntity = _drawData[_selectedIndex].Entity;
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], selectedEntity.Name.ToUpper(), new Vector2(5, lineY + 2));
+                }
+
+
+
+
+
                 //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);
