@@ -133,7 +133,6 @@ namespace STOLON
         {
             if (_initDone)
             {
-                //drawingContext.Draw(STOLON.Textures.GetReference("Entities\\silo\\silo-512"), new Vector2(448, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
                 drawingContext.DrawLine(0, ROSTER_BOTTOM_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_BOTTOM_LINE, Color.White, UserInterface.LINE_WIDTH);
@@ -164,7 +163,8 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], selectedEntity.Name.ToUpper(), new Vector2(5, lineY + 2));
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], selectedEntity.FullName.ToUpper(), new Vector2(5, lineY + 2));
+                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
                 }
 
 

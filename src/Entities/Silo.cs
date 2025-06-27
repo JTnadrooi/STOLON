@@ -20,7 +20,7 @@ namespace STOLON
 {
     public class SiloEntity : Entity
     {
-        public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)))
+        public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)), "Somehow here.", "Silo 28SHA")
         {
         }
 
