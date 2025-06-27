@@ -62,6 +62,9 @@ namespace STOLON
         private const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - ROSTER_CLEARANCE;
         private const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
 
+        private const int LINE1_TARGET = TILE_SIZE * TILE_ROW_AMOUNT;
+        private const int LINE2_TARGET = STOLON.V_WIDTH - 16;
+
         private const float HOVER_INTENSITY = 0.25f;
 
         private readonly Entity[] _entities;
@@ -90,13 +93,11 @@ namespace STOLON
             int To(int orgin, int target, float amount) => (int)(orgin + (target - orgin) * amount);
             _lineTweener.Update(elapsedMilliseconds / 1000f);
             _initDone = !_lineTweener.Running;
-            int line1Target = TILE_SIZE * TILE_ROW_AMOUNT;
-            int line2Target = STOLON.V_WIDTH - 16;
 
             if (SkipAnimation && _lineTweener.Running) _lineTweener.Update(12f);
 
-            _line1x = To(_menuGameState.MenuRemoveLine1x, line1Target, _lineTweener.Value);
-            _line2x = To(_menuGameState.MenuRemoveLine2x, line2Target, _lineTweener.Value);
+            _line1x = To(_menuGameState.MenuRemoveLine1x, LINE1_TARGET, _lineTweener.Value);
+            _line2x = To(_menuGameState.MenuRemoveLine2x, LINE2_TARGET, _lineTweener.Value);
 
             if (_lineTweener.Running) return;
 
