@@ -1,4 +1,5 @@
 ﻿using Betwixt;
+using DiscordRPC;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -52,6 +53,10 @@ namespace STOLON
         private TimedState<int> _selectedState;
 
         private readonly Dictionary<int, Vector2> _posCache;
+        private readonly Entity[] _entities;
+
+        private Rectangle _selectedNameBounds;
+        private Vector2 _selectedNameTextPos;
 
         //private Entity[] _entities;
 
@@ -60,18 +65,16 @@ namespace STOLON
         private const int TILE_COLUMN_AMOUNT = 2;
         private const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
 
-        private const int ROSTER_CLEARANCE = 16;
-        private const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - ROSTER_CLEARANCE;
+        private const int BOXED_TEXT_DIV_CLEARANCE = 32;
+        private const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE;
         private const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
 
         private const int LINE1_TARGET = TILE_SIZE * TILE_ROW_AMOUNT;
-        private const int LINE2_TARGET = STOLON.V_WIDTH - ROSTER_CLEARANCE;
+        private const int LINE2_TARGET = STOLON.V_WIDTH - BOXED_TEXT_DIV_CLEARANCE;
 
         private const float HOVER_INTENSITY = 0.25f;
 
-        private const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - ROSTER_CLEARANCE;
-
-        private readonly Entity[] _entities;
+        private const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - BOXED_TEXT_DIV_CLEARANCE;
 
         public EntitySelectGameState() : base("entity_select")
         {
@@ -127,11 +130,18 @@ namespace STOLON
 
                 _drawData[i] = new EntityDrawData(basePos, _entityHoverData[i], _entities[i]);
             }
+
+            if (_selectedIndex != -1)
+            {
+                Point nameDimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
+                _selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + 8, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(16, 8));
+                _selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, 0)).PixelLock();
+            }
         }
 
         public Vector2 GetBaseTilePos(int i)
             => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos :
-                _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - ROSTER_CLEARANCE - TILE_SIZE * TILE_COLUMN_AMOUNT));
+                _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE - TILE_SIZE * TILE_COLUMN_AMOUNT));
 
         public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
@@ -143,8 +153,9 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE + 2));
+                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
                     //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
+                    drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
