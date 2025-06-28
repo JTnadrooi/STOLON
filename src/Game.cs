@@ -150,8 +150,6 @@ namespace STOLON
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
-
-
             if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableEffect("crt");
 
             Debug.Success();
@@ -209,7 +207,7 @@ namespace STOLON
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);
-            _drawingContext.DrawString(STOLON.Fonts[SMALL_FONT_ID], "ver: " + VERSION_STRING, new Vector2(V_WIDTH / 2 - STOLON.Fonts[SMALL_FONT_ID].FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
+            _drawingContext.DrawString(STOLON.Fonts.Small, "ver: " + VERSION_STRING, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
             _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
             _drawingContext.EndScene();
@@ -232,8 +230,6 @@ namespace STOLON
         public static GameConfig Config { get; internal set; }
         public static DrawingContext DrawingContext { get; internal set; }
         public static TaskHeap Tasks { get; internal set; }
-        public const string MEDIUM_FONT_ID = "pixeloid";
-        public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";
         public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
         public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;

@@ -255,9 +255,9 @@ namespace STOLON
                     {
                         _boardSpriteBatch.Draw(STOLON.Textures.GetReference("player" + playerid + "_item-96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                     }
-                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
-                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
-                    else _boardSpriteBatch.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], "Z", tile.BoardPosition + new Vector2(10), Color.White);
+                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(STOLON.Fonts.Small, string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
+                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(STOLON.Fonts.Small, "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
+                    else _boardSpriteBatch.DrawString(STOLON.Fonts.Small, "Z", tile.BoardPosition + new Vector2(10), Color.White);
                 }
             _boardSpriteBatch.End();
             base.Draw(drawingContext, elapsedMilliseconds);

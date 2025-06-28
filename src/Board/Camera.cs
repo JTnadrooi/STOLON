@@ -56,9 +56,5 @@ namespace STOLON
             Vector2 r = Unproject(Vector2.Zero);
             return new Rectangle((int)r.X, (int)r.Y, (int)(ScreenSize.X / Zoom), (int)(ScreenSize.Y / Zoom));
         }
-
-    }
-    public static class CameraStatic
-    {
     }
 }

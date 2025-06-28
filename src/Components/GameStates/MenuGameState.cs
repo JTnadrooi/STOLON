@@ -413,8 +413,8 @@ namespace STOLON
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
-            _tipPos = Centering.CenterX((int)(STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_tips[_tipId]).X),
-                _menuLogoDrawPos.Y - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
+            _tipPos = Centering.CenterX((int)(STOLON.Fonts.Small.FastMeasure(_tips[_tipId]).X),
+                _menuLogoDrawPos.Y - STOLON.Fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
 
             _menuRemoveLineY = STOLON.V_HEIGHT - (int)(_menuRemoveTweener.Value * STOLON.V_HEIGHT);
             int lDelta = (int)(_menuLogoDrawPos.X - 8);
@@ -427,7 +427,7 @@ namespace STOLON
         {
             drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _tips[_tipId], _tipPos);
+            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _tips[_tipId], _tipPos);
 
             if (_drawMenuLogoLowResFonted)
             {

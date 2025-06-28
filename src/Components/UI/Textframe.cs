@@ -85,7 +85,7 @@ namespace STOLON
             _charsRead = 0;
             _toDrawDialogueText = string.Empty;
             _userInterface = userInterface;
-            _font = STOLON.Fonts[STOLON.MEDIUM_FONT_ID];
+            _font = STOLON.Fonts.Medium;
         }
         public void Queue(DialogueInfo[] dialogue)
         {

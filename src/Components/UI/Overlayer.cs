@@ -297,8 +297,8 @@ namespace STOLON
             _heightCoefficient = _tweener.Value;
 
             _drawArea = new Rectangle(_area.Location, new Point(_area.Width, (int)(desiredHeight * _heightCoefficient)));
-            _textPos = Centering.Center((STOLON.Fonts[STOLON.SMALL_FONT_ID].FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
-            _textPos = new Vector2(_textPos.X, Math.Min(_textPos.Y, _drawArea.Height - STOLON.Fonts[STOLON.SMALL_FONT_ID].Dimensions.Y * TextSizeMod));
+            _textPos = Centering.Center((STOLON.Fonts.Small.FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
+            _textPos = new Vector2(_textPos.X, Math.Min(_textPos.Y, _drawArea.Height - STOLON.Fonts.Small.Dimensions.Y * TextSizeMod));
 
             Centering.OnPixel(ref _textPos);
         }
@@ -307,7 +307,7 @@ namespace STOLON
         {
             drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);
-            drawingContext.DrawString(STOLON.Fonts[STOLON.SMALL_FONT_ID], _text, _textPos, TextSizeMod);
+            drawingContext.DrawString(STOLON.Fonts.Small, _text, _textPos, TextSizeMod);
         }
 
         public void Initialize(OverlayEngine overlayer, params object?[] args)

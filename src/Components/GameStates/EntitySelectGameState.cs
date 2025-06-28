@@ -136,7 +136,7 @@ namespace STOLON
 
             if (_selectedIndex != -1)
             {
-                Point nameDimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
+                Point nameDimensions = STOLON.Fonts.Medium.FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
                 const int ENAME_CLEARING_X = 8;
                 const int ENAME_CLEARING_Y = 4;
 
@@ -145,7 +145,7 @@ namespace STOLON
             }
 
             string lvlName = "Node 12b: LANU LANU LANU";
-            Point lvlNameDimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(lvlName).ToPoint();
+            Point lvlNameDimensions = STOLON.Fonts.Medium.FastMeasure(lvlName).ToPoint();
             const int LVL_NAME_CLEARING_X = 8;
             const int LVL_NAME_CLEARING_Y = 4;
 
@@ -168,11 +168,11 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
+                    drawingContext.DrawString(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
                     drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
                     //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
 
-                    //drawingContext.DrawStringOutline(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE), 8, 4);
+                    //drawingContext.DrawStringOutline(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE), 8, 4);
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
@@ -199,12 +199,12 @@ namespace STOLON
                     }
 
 
-                drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "Node 12b: LANU LANU LANU", _lvlNameTextPos);
+                drawingContext.DrawString(STOLON.Fonts.Medium, "Node 12b: LANU LANU LANU", _lvlNameTextPos);
                 drawingContext.DrawRectangle(_lvlNameBounds, Color.White, UserInterface.LINE_WIDTH);
 
 
 
-                //drawingContext.DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
+                //drawingContext.DrawString(STOLON.Fonts.Medium, "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, UserInterface.LINE_WIDTH);
             drawingContext.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, UserInterface.LINE_WIDTH);

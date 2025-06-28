@@ -217,11 +217,11 @@ namespace STOLON
         {
             DrawArea(bounds, Color.Black);
             DrawRectangle(bounds, Color.White, UserInterface.LINE_WIDTH);
-            Vector2 dimensions = STOLON.Fonts[STOLON.MEDIUM_FONT_ID].FastMeasure(symbolNotationStr);
+            Vector2 dimensions = STOLON.Fonts.Medium.FastMeasure(symbolNotationStr);
             Vector2 scale = Vector2.One;
             if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
             dimensions *= scale;
-            DrawString(STOLON.Fonts[STOLON.MEDIUM_FONT_ID], symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
+            DrawString(STOLON.Fonts.Medium, symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
         }
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)

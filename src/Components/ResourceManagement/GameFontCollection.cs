@@ -38,12 +38,14 @@ namespace STOLON
             {
                 return new GameFont(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[6..] switch
                 {
-                    STOLON.SMALL_FONT_ID => 0.5f,
+                    "smoller" => 0.5f,
                     _ => 1f,
                 });
             }
             catch { return null; }
         }, "Fonts")
         { }
+        public GameFont Small => this["smoller"];
+        public GameFont Medium => this["pixeloid"];
     }
 }
