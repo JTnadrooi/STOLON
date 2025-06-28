@@ -97,7 +97,7 @@ namespace STOLON
         /// <param name="posOffsetX"></param>
         /// <param name="posOffsetY"></param>
         /// <returns>The bounds of a <see cref="UIElement"/>.</returns>
-        public Rectangle GetBounds(Point elementPos, Point fontDimensions, int clearance = DefaultRectangleClearance, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
+        public Rectangle GetBounds(Point elementPos, Point fontDimensions, int clearance = DEFAULT_RECTANGLE_CLEARANCE, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
             => GetBounds(elementPos, Text, fontDimensions, clearance, supportMultiline, fontId, posOffsetX, posOffsetY);
 
         public static UIPath GetSelfPath(string id)
@@ -118,7 +118,7 @@ namespace STOLON
         /// <param name="posOffsetX"></param>
         /// <param name="posOffsetY"></param>
         /// <returns>The bounds of a <see cref="UIElement"/>.</returns>
-        public static Rectangle GetBounds(Point elementPos, string text, Point fontDimensions, int clearance = DefaultRectangleClearance, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
+        public static Rectangle GetBounds(Point elementPos, string text, Point fontDimensions, int clearance = DEFAULT_RECTANGLE_CLEARANCE, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
         {
             Point offset = new Point(posOffsetX, posOffsetY) + fontId switch
             {
@@ -139,8 +139,7 @@ namespace STOLON
             return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={ChildOf}" + "}";
         }
 
-        public const int DefaultRectangleClearance = 2;
-        public const int LongDefaultRectangleClearance = 5; // might delete later
+        public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
     }
     /// <summary>
     /// The data element relevant for draw methods.
