@@ -41,24 +41,16 @@ namespace STOLON
         /// </summary>
         /// <param name="elapsedMilliseconds">The milliseconds since last frame.</param>
         public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
-        /// <summary>
-        /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> featuring all the <see cref="GraphicElement"/> objects managed by this <see cref="IGameComponent"/>.
-        /// </summary>
-        public ReadOnlyDictionary<string, GraphicElement> Elements { get; }
     }
-    public abstract class GameComponent : IGameComponent, IGraphicElementParent
+    public abstract class GameComponent : IGameComponent
     {
-        public ReadOnlyDictionary<string, GraphicElement> Elements => new ReadOnlyDictionary<string, GraphicElement>(_graphicElements);
         public virtual Vector2 Position { get; protected set; }
         public IGameComponent? Source { get; }
-
-        protected GraphicElementCollection _graphicElements;
 
         protected GameComponent(IGameComponent? source = null)
         {
             Position = Vector2.Zero;
             Source = source;
-            _graphicElements = new GraphicElementCollection(this);
         }
         public virtual void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
@@ -67,11 +59,6 @@ namespace STOLON
         public virtual void Update(int elapsedMilliseconds)
         {
 
-        }
-        protected virtual GraphicElement AddGraphicElement(GraphicElement element)
-        {
-            _graphicElements.Add(element.Name, element);
-            return element;
         }
     }
 
