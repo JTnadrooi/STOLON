@@ -51,7 +51,7 @@ namespace STOLON
     /// </summary> 
     public class MenuOrderProvider : IOrderProvider
     {
-        private GameFont _font;
+        private Font2D _font;
         private bool _capitalise = true;
         public MenuOrderProvider()
         {

@@ -30,13 +30,13 @@ using Microsoft.Xna.Framework.Content;
 
 namespace STOLON
 {
-    public class GameFontCollection : ResourceCollection<GameFont>
+    public class Font2DCollection : ResourceCollection<Font2D>
     {
-        public GameFontCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
+        public Font2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
         {
             try
             {
-                return new GameFont(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[6..] switch
+                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[6..] switch
                 {
                     "smoller" => 0.5f,
                     _ => 1f,
@@ -45,7 +45,7 @@ namespace STOLON
             catch { return null; }
         }, "Fonts")
         { }
-        public GameFont Small => this["smoller"];
-        public GameFont Medium => this["pixeloid"];
+        public Font2D Small => this["smoller"];
+        public Font2D Medium => this["pixeloid"];
     }
 }

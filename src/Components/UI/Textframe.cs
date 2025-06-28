@@ -49,7 +49,7 @@ namespace STOLON
         private DialogueDrawArgs? _currentDialogueDrawArgs;
         private Point _dialogueTextPos;
         private string _toDrawDialogueText;
-        private GameFont _font;
+        private Font2D _font;
 
         private Point _providerTextPos;
         private float _providerTextScaleCoefficient;
