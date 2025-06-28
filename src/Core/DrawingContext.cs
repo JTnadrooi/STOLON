@@ -13,6 +13,10 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace STOLON
 {
+    public interface IGraphic
+    {
+        public void Draw(DrawingContext context, int elapsedMilliseconds);
+    }
     public class DrawingContext : IDisposable
     {
         private bool _disposedValue;
@@ -34,7 +38,7 @@ namespace STOLON
         private Texture2DAtlas _ditherAtlas;
 
         public const int DITHER_FRAME_COUNT = 5;
-        public const int DITHER_TEXTURE_HEIGHT = 32;
+        public const int DITHER_TEXTURE_SIZE = 32;
 
         public DrawingContext()
         {
@@ -59,7 +63,7 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_HEIGHT, DITHER_TEXTURE_HEIGHT);
+            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
             Console.WriteLine(_ditherAtlas[4].Bounds);
 
             STOLON.Debug.Success();
@@ -228,7 +232,7 @@ namespace STOLON
             => DrawDither(position, dimensions, (int)(Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT), color);
         public void DrawDither(Vector2 position, Point dimensions, int frame, Color? color = null)
         {
-            if (dimensions.X % DITHER_TEXTURE_HEIGHT != 0 || dimensions.Y % DITHER_TEXTURE_HEIGHT != 0) throw new ArgumentOutOfRangeException(nameof(dimensions));
+            if (dimensions.X % DITHER_TEXTURE_SIZE != 0 || dimensions.Y % DITHER_TEXTURE_SIZE != 0) throw new ArgumentOutOfRangeException(nameof(dimensions));
             if (frame < 0 || frame >= DITHER_FRAME_COUNT) throw new ArgumentOutOfRangeException(nameof(frame));
             for (int ox = 0; ox < dimensions.X; ox += _ditherAtlas[frame].Width)
                 for (int oy = 0; oy < dimensions.Y; oy += _ditherAtlas[frame].Height)
