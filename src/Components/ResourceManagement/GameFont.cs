@@ -11,20 +11,20 @@ namespace STOLON
 {
     public class GameFont
     {
-        public string Name { get; }
+        public string Id { get; }
         public SpriteFont SpriteFont { get; }
         public float Scale { get; }
         public Vector2 Dimensions { get; }
         public GameFont(string name, SpriteFont spriteFont, float scale = 1)
         {
-            Name = name;
+            Id = name;
             SpriteFont = spriteFont;
             Dimensions = spriteFont.MeasureString("A") * scale;
             Scale = scale;
         }
         public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing, 0) * Scale, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
-        public override string ToString() => Name + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
+        public override string ToString() => Id + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
         public static implicit operator SpriteFont(GameFont font) => font.SpriteFont;
     }
 }
