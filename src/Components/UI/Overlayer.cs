@@ -24,7 +24,7 @@ namespace STOLON
         private Dictionary<string, IOverlay> _overlays;
         private List<string> _initialized;
 
-        public OverlayEngine() : base(GameEnvironment.Instance)
+        public OverlayEngine() : base(STOLON.Environment)
         {
             _overlays = new Dictionary<string, IOverlay>();
             _initialized = new List<string>();

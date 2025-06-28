@@ -40,7 +40,6 @@ namespace STOLON
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
 
-        public TaskHeap TaskHeap { get; }
 
         private UserInterface _userInterface;
         private OverlayEngine _overlayer;
@@ -55,7 +54,6 @@ namespace STOLON
             _overlayer = null!;
 
 
-            TaskHeap = new TaskHeap();
         }
         public void Initialize()
         {
@@ -84,7 +82,6 @@ namespace STOLON
         }
         public override void Update(int elapsedMilliseconds)
         {
-            TaskHeap.Update(elapsedMilliseconds);
             _userInterface.Update(elapsedMilliseconds);
 
             STOLON.StateManager.Update(elapsedMilliseconds);
@@ -121,10 +118,5 @@ namespace STOLON
         {
             _entities.Remove(characterId);
         }
-
-        /// <summary>
-        /// The main StolonGame.Instance of the game.
-        /// </summary>
-        public static GameEnvironment Instance => STOLON.Environment;
     }
 }

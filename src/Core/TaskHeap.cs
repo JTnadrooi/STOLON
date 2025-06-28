@@ -30,7 +30,7 @@ namespace STOLON
     public class TaskHeap
     {
         public ReadOnlyDictionary<string, DynamicTask> Functions { get; }
-        public ReadOnlyDictionary<string, object?> FrameCompletedTasks { get; } 
+        public ReadOnlyDictionary<string, object?> FrameCompletedTasks { get; }
 
         private Dictionary<string, DynamicTask> _taskDictionary;
         private Dictionary<string, object?> _frameCompletedTasks;
@@ -77,7 +77,7 @@ namespace STOLON
 
         public string[] GetHistory() => _allCompletedTasks.ToArray();
         public bool IsCompleted(string id) => _frameCompletedTasks.ContainsKey(id);
-        public bool IsCompleted<T>(string id, out T? returned) 
+        public bool IsCompleted<T>(string id, out T? returned)
         {
             if (IsCompleted(id))
             {
@@ -111,7 +111,7 @@ namespace STOLON
                 return;
             }
 
-            if (_taskDictionary.ContainsKey(id)) 
+            if (_taskDictionary.ContainsKey(id))
                 if (overwrite) STOLON.Debug.Log("key already known, overwriting task with id: " + id);
                 else return;
             _taskWaitDataCollection[id] = waitTime;
@@ -136,7 +136,6 @@ namespace STOLON
             return id;
         }
 
-        public static TaskHeap Instance => STOLON.Environment.TaskHeap;
     }
     /// <summary>
     /// Represents a <see cref="Func{TResult}"/> or <see cref="Action"/> with no parameters.
@@ -152,7 +151,8 @@ namespace STOLON
         {
             action.Invoke();
             return null;
-        }) { }
+        })
+        { }
         /// <summary>
         /// Create a new <see cref="DynamicTask"/> from an <see cref="Func{TResult}"/> <see langword="delegate"/>.
         /// </summary>

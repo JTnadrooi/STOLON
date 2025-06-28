@@ -402,7 +402,7 @@ namespace STOLON
             #endregion
 
             _menuRemoveTweener.Update(elapsedMilliseconds / 1000f);
-            TaskHeap.Instance.SafePush("menu_logo_disapear", new DynamicTask(() => // fire and forget game logic ftw
+            STOLON.Tasks.SafePush("menu_logo_disapear", new DynamicTask(() => // fire and forget game logic ftw
             {
                 _onLeave?.Invoke();
                 _onLeave = null;

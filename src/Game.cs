@@ -146,6 +146,7 @@ namespace STOLON
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Fonts = _fonts = new GameFontCollection(Content);
             STOLON.Input = _input = new GameInput();
+            STOLON.Tasks = new TaskHeap();
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
@@ -195,6 +196,7 @@ namespace STOLON
                 //ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / new Vector2(V_WIDTH, V_HEIGHT)).Y;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
+                STOLON.Tasks.Update(gameTime.ElapsedGameTime.Milliseconds);
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
 
                 if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
@@ -229,6 +231,7 @@ namespace STOLON
         public static UserInterface UI { get; internal set; }
         public static GameConfig Config { get; internal set; }
         public static DrawingContext DrawingContext { get; internal set; }
+        public static TaskHeap Tasks { get; internal set; }
         public const string MEDIUM_FONT_ID = "pixeloid";
         public const string SMALL_FONT_ID = "smoller";
         public const string VERSION_STRING = "0.051 (Open Alpha)";

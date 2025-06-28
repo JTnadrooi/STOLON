@@ -193,7 +193,7 @@ namespace STOLON
             bool alreadyPlaying = _fadeInOutSampleProvider != null;
 
             if (alreadyPlaying && fade) _fadeInOutSampleProvider.BeginFadeOut(FadeTimeMilliseconds);
-            TaskHeap.Instance.SafePush(ostTaskId, new DynamicTask(() => // fire and forget game logic ftw
+            STOLON.Tasks.SafePush(ostTaskId, new DynamicTask(() => // fire and forget game logic ftw
             {
                 TryRemoveMixerInput(ostProviderId, AudioDomain.OST);
                 STOLON.Debug.Log("\ttrack changed to " + id);
