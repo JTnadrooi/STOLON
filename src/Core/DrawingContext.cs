@@ -13,10 +13,6 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace STOLON
 {
-    public interface IGraphic
-    {
-        public void Draw(DrawingContext context, int elapsedMilliseconds);
-    }
     public class DrawingContext : IDisposable
     {
         private bool _disposedValue;
@@ -240,6 +236,12 @@ namespace STOLON
                     Size size = new Size(Math.Min(_ditherAtlas[frame].Width, dimensions.X - ox), Math.Min(_ditherAtlas[frame].Height, dimensions.Y - oy));
                     Draw(_ditherAtlas[frame].Texture, new Rectangle((int)position.X + ox, (int)position.Y + oy, size.Width, size.Height), sourceRectangle: new Rectangle(_ditherAtlas[frame].Bounds.Location, size), color: color ?? Color.White);
                 }
+        }
+
+        public void DrawElement(UIElementDrawData drawData)
+        {
+            DrawString(STOLON.Fonts[drawData.FontName], drawData.Text, drawData.Position);
+            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, 1f);
         }
 
 
