@@ -68,9 +68,9 @@ namespace STOLON
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
             _lineX2 = (int)(STOLON.V_WIDTH - _lineOffset + _uiRightOffset);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
-            _board?.Draw(drawingContext, elapsedMilliseconds);
+            _board?.Draw(drawingContext);
 
             drawingContext.DrawArea(new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
             drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, UserInterface.LINE_WIDTH);

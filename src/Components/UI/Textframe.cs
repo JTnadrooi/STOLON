@@ -195,7 +195,7 @@ namespace STOLON
         {
             return text.Length * CHAR_READ_MILLISECONDS;
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawArea(_dialoguebounds, Color.Black);
             if (_currentDialogue.HasValue)
@@ -205,7 +205,7 @@ namespace STOLON
             }
             drawingContext.DrawRectangle(_dialoguebounds, Color.White, _userInterface.LineWidth);
 
-            base.Draw(drawingContext, elapsedMilliseconds);
+            base.Draw(drawingContext);
         }
     }
 }

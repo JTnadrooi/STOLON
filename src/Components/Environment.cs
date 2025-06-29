@@ -93,13 +93,13 @@ namespace STOLON
             _overlayer.Update(elapsedMilliseconds);
             base.Update(elapsedMilliseconds);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
-            STOLON.StateManager.Draw(drawingContext, elapsedMilliseconds);
-            _userInterface.Draw(drawingContext, elapsedMilliseconds);
+            STOLON.StateManager.Draw(drawingContext);
+            _userInterface.Draw(drawingContext);
 
-            _overlayer.Draw(drawingContext, elapsedMilliseconds);
-            base.Draw(drawingContext, elapsedMilliseconds);
+            _overlayer.Draw(drawingContext);
+            base.Draw(drawingContext);
         }
 
         /// <summary>

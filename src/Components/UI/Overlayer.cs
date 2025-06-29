@@ -100,13 +100,13 @@ namespace STOLON
             }
             base.Update(elapsedMilliseconds);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
             for (int i = 0; i < _initialized.Count; i++)
             {
-                _overlays[_initialized[i]].Draw(drawingContext, elapsedMilliseconds);
+                _overlays[_initialized[i]].Draw(drawingContext);
             }
-            base.Draw(drawingContext, elapsedMilliseconds);
+            base.Draw(drawingContext);
         }
 
         public static OverlayEngine Engine => STOLON.Environment.Overlayer;
@@ -116,7 +116,7 @@ namespace STOLON
     {
         public void Initialize(OverlayEngine overlayer, params object?[] args);
         public void Update(int elapsedMilliseconds);
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
+        public void Draw(DrawingContext drawingContext);
         public void Reset();
 
         public string Id { get; }
@@ -160,7 +160,7 @@ namespace STOLON
             _rotation += _rotationSpeed;
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public void Draw(DrawingContext drawingContext)
         {
             drawingContext.Draw(lineTexture, _pos, _scale, _rotation / 360f, new Vector2(lineTexture.Width / 2f, lineTexture.Height / 2f));
             //drawingContext.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
@@ -245,7 +245,7 @@ namespace STOLON
             _ditherTexture.SetData(_pixelData);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public void Draw(DrawingContext drawingContext)
         {
             drawingContext.Draw(_ditherTexture, Vector2.Zero, (float)_resolution);
         }
@@ -303,7 +303,7 @@ namespace STOLON
             Centering.OnPixel(ref _textPos);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);

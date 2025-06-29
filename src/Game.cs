@@ -206,7 +206,7 @@ namespace STOLON
             int elapsedMilliseconds = gameTime.ElapsedGameTime.Milliseconds;
             _drawingContext.BeginScene();
 
-            _environment.Draw(_drawingContext, gameTime.ElapsedGameTime.Milliseconds);
+            _environment.Draw(_drawingContext);
             _drawingContext.DrawString(STOLON.Fonts.Small, "ver: " + VERSION_STRING, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
             _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 

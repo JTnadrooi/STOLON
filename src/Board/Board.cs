@@ -242,7 +242,7 @@ namespace STOLON
         {
             State.GoNextPlayer();
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
             _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
             for (int x = 0; x < _state.Dimensions.X; x++)
@@ -260,7 +260,7 @@ namespace STOLON
                     else _boardSpriteBatch.DrawString(STOLON.Fonts.Small, "Z", tile.BoardPosition + new Vector2(10), Color.White);
                 }
             _boardSpriteBatch.End();
-            base.Draw(drawingContext, elapsedMilliseconds);
+            base.Draw(drawingContext);
         }
         public string GetPlayerTile(int playerIndex) => playerIndex switch
         {

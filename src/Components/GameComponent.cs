@@ -40,7 +40,7 @@ namespace STOLON
         /// Update this component so it draws all sub-drawables.
         /// </summary>
         /// <param name="elapsedMilliseconds">The milliseconds since last frame.</param>
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
+        public void Draw(DrawingContext drawingContext);
     }
     public abstract class GameComponent : IGameComponent
     {
@@ -52,7 +52,7 @@ namespace STOLON
             Position = Vector2.Zero;
             Source = source;
         }
-        public virtual void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public virtual void Draw(DrawingContext drawingContext)
         {
 
         }

@@ -152,12 +152,12 @@ namespace STOLON
                 }
         }
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
             foreach (UIElementDrawData elementDrawData in _drawData)
                 drawingContext.DrawElement(elementDrawData);
-            _textframe.Draw(drawingContext, elapsedMilliseconds);
-            base.Draw(drawingContext, elapsedMilliseconds);
+            _textframe.Draw(drawingContext);
+            base.Draw(drawingContext);
         }
         /// <summary>
         /// Add an element to the <see cref="UserInterface"/>.

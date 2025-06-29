@@ -9,7 +9,7 @@ namespace STOLON
 {
     public interface IGraphic
     {
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds);
+        public void Draw(DrawingContext drawingContext);
     }
     public abstract class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
     {
@@ -38,7 +38,7 @@ namespace STOLON
             UIOrdering.Order(_elements!, "_", _drawDump!, _updateData, Position, OrderProvider);
         }
 
-        public void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public void Draw(DrawingContext drawingContext)
         {
             foreach (UIElementDrawData elementDrawData in _drawDump)
                 drawingContext.DrawElement(elementDrawData);

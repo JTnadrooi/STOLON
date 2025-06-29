@@ -423,7 +423,7 @@ namespace STOLON
 
             Centering.OnPixel(ref _menuLogoDrawPos);
         }
-        public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
+        public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
             drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
