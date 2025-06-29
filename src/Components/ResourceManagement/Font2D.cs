@@ -18,7 +18,7 @@ namespace STOLON
         public Vector2 Dimensions { get; }
         public Font2D(string name, SpriteFont spriteFont, float scale = 1)
         {
-            Id = name;
+            Id = name[(Font2DCollection.BASE_PATH.Length + 1)..];
             SpriteFont = spriteFont;
             Dimensions = spriteFont.MeasureString("A") * scale;
             Scale = scale;

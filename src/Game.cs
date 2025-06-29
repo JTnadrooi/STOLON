@@ -143,8 +143,8 @@ namespace STOLON
             STOLON.Config = new GameConfig();
             STOLON.Audio = new AudioEngine();
             STOLON.Textures = _textures = new Texture2DCollection(Content);
-            STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Fonts = _fonts = new Font2DCollection(Content);
+            STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
             STOLON.Environment = _environment = new GameEnvironment();

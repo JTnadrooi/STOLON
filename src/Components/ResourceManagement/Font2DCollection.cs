@@ -32,18 +32,23 @@ namespace STOLON
 {
     public class Font2DCollection : ResourceCollection<Font2D>
     {
+        public const string BASE_PATH = "Fonts";
         public Font2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
         {
             try
             {
-                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[6..] switch
+                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[(BASE_PATH.Length + 1)..] switch
                 {
                     "smoller" => 0.5f,
                     _ => 1f,
                 });
             }
-            catch { return null; }
-        }, "Fonts")
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }, BASE_PATH)
         { }
         public Font2D Small => this["smoller"];
         public Font2D Medium => this["pixeloid"];
