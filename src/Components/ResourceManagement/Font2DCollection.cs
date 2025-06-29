@@ -45,8 +45,7 @@ namespace STOLON
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return null;
+                return e;
             }
         }, BASE_PATH)
         { }

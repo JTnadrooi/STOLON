@@ -49,7 +49,10 @@ namespace STOLON
                 }
                 return texture;
             }
-            catch { return null; }
+            catch (Exception e)
+            {
+                return e;
+            }
         }, "Textures")
         {
             _pixel = new Texture2D(contentManager.GetGraphicsDevice(), 1, 1);

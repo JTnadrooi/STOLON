@@ -49,7 +49,7 @@ namespace STOLON
         public int Count => dictionary.Count;
         public TContent this[string key] => dictionary[key];
 
-        public ResourceCollection(ContentManager contentManager, Func<string, TContent?> loader, string basePath)
+        public ResourceCollection(ContentManager contentManager, Func<string, object> loader, string basePath)
         {
             BasePath = basePath;
             string[] files = Directory.GetFiles(contentManager.RootDirectory, "*", SearchOption.AllDirectories);
@@ -64,14 +64,17 @@ namespace STOLON
                 if (!toLoad.StartsWith(basePath)) continue;
                 string toLoadId = toLoad[(basePath.Length + 1)..];
                 STOLON.Debug.Log(">attempting load of resource with id/key: " + toLoad);
-                TContent? loaderResult = loader(toLoad);
-                if (loaderResult != null)
+                object loaderResult = loader(toLoad);
+                if (loaderResult is Exception)
                 {
-                    dictionary[toLoadId] = loaderResult;
+                    STOLON.Debug.Log("<failed, exception: " + (loaderResult as Exception));
+                }
+                else
+                {
+                    dictionary[toLoadId] = (TContent)loaderResult;
                     STOLON.Debug.Log("added with id: " + toLoadId);
                     STOLON.Debug.Success();
                 }
-                else STOLON.Debug.Fail();
             }
             STOLON.Debug.Success();
             ContentManager = contentManager;
