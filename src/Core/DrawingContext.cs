@@ -60,7 +60,6 @@ namespace STOLON
             STOLON.Debug.Success();
 
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
-            Console.WriteLine(_ditherAtlas[4].Bounds);
 
             STOLON.Debug.Success();
         }
