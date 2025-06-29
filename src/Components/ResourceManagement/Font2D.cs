@@ -19,7 +19,7 @@ namespace STOLON
         public const char BASE_CHAR = 'A';
         public Font2D(string name, SpriteFont spriteFont, float scale = 1)
         {
-            Name = name[(Font2DCollection.BASE_PATH.Length + 1)..];
+            Name = name;
             SpriteFont = spriteFont;
             Dimensions = spriteFont.MeasureString(BASE_CHAR.ToString()) * scale;
             Scale = scale;
