@@ -244,6 +244,11 @@ namespace STOLON
             if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, 1f);
         }
 
+        public void Draw(IGraphic graphic)
+        {
+            graphic.Draw(this);
+        }
+
 
         //public void DrawStringOutline(GameFont font, string text, Vector2 position, int marginX, int marginY, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, bool background = false, int lineWidth = UserInterface.LINE_WIDTH)
         //{
