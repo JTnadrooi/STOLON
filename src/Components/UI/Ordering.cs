@@ -78,7 +78,7 @@ namespace STOLON
 
             return (new UIElementDrawData(element.Id, elementIsHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
-                : elementText, STOLON.Fonts.Medium.Id, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
+                : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
                 elementIsHovered);
         }
     }

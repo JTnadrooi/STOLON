@@ -240,7 +240,7 @@ namespace STOLON
 
         public void DrawElement(UIElementDrawData drawData)
         {
-            DrawString(STOLON.Fonts[drawData.FontName], drawData.Text, drawData.Position);
+            DrawString(drawData.Font, drawData.Text, drawData.Position);
             if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, 1f);
         }
 

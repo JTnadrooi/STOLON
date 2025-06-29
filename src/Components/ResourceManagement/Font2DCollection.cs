@@ -37,7 +37,7 @@ namespace STOLON
         {
             try
             {
-                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad[(BASE_PATH.Length + 1)..] switch
+                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad switch
                 {
                     "smoller" => 0.5f,
                     _ => 1f,
