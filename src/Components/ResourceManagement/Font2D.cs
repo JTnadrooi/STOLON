@@ -16,11 +16,12 @@ namespace STOLON
         public SpriteFont SpriteFont { get; }
         public float Scale { get; }
         public Vector2 Dimensions { get; }
+        public const char BASE_CHAR = 'A';
         public Font2D(string name, SpriteFont spriteFont, float scale = 1)
         {
             Name = name[(Font2DCollection.BASE_PATH.Length + 1)..];
             SpriteFont = spriteFont;
-            Dimensions = spriteFont.MeasureString("A") * scale;
+            Dimensions = spriteFont.MeasureString(BASE_CHAR.ToString()) * scale;
             Scale = scale;
         }
         public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing, 0) * Scale, Dimensions.Y);
