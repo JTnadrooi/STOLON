@@ -154,7 +154,6 @@ namespace STOLON
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(DrawingContext drawingContext, int elapsedMilliseconds)
         {
-            string id = STOLON.StateManager.Current.GetId();
             foreach (UIElementDrawData elementDrawData in _drawData)
                 drawingContext.DrawElement(elementDrawData);
             _textframe.Draw(drawingContext, elapsedMilliseconds);
