@@ -40,7 +40,7 @@ namespace STOLON
     {
         protected readonly Dictionary<string, TContent> dictionary = new Dictionary<string, TContent>();
         private bool _disposedValue;
-        private string _basePath;
+        public string BasePath { get; }
 
         public ContentManager ContentManager { get; }
 
@@ -51,9 +51,11 @@ namespace STOLON
 
         public ResourceCollection(ContentManager contentManager, Func<string, TContent?> loader, string basePath)
         {
-            _basePath = basePath;
+            BasePath = basePath;
             string[] files = Directory.GetFiles(contentManager.RootDirectory, "*", SearchOption.AllDirectories);
             if (files.Length == 0) throw new Exception("No initial content found.");
+
+            STOLON.Debug.Log($">loading data with basePath: \"{basePath}\" for type {this.GetType().Name}.");
 
             foreach (string file in files)
             {
@@ -61,12 +63,17 @@ namespace STOLON
                 STOLON.Debug.Log("found file: " + toLoad);
                 if (!toLoad.StartsWith(basePath)) continue;
                 string toLoadId = toLoad[(basePath.Length + 1)..];
-                STOLON.Debug.Log(">loading resource with id/key: " + toLoad);
+                STOLON.Debug.Log(">attempting load of resource with id/key: " + toLoad);
                 TContent? loaderResult = loader(toLoad);
-                if (loaderResult != null) dictionary[toLoadId] = loaderResult;
-                STOLON.Debug.Log("added with id: " + toLoadId);
-                STOLON.Debug.Success();
+                if (loaderResult != null)
+                {
+                    dictionary[toLoadId] = loaderResult;
+                    STOLON.Debug.Log("added with id: " + toLoadId);
+                    STOLON.Debug.Success();
+                }
+                else STOLON.Debug.Fail();
             }
+            STOLON.Debug.Success();
             ContentManager = contentManager;
         }
 
