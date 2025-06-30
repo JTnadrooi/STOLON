@@ -112,14 +112,14 @@ namespace STOLON
             //        break;
             //}
 
-            STOLON.UI.AddElement(new UIElement(UserInterface.TITLE_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement(UserInterface.HIGHEST_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
 
-            STOLON.UI.AddElement(new UIElement("story_start", UserInterface.TITLE_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
-            STOLON.UI.AddElement(new UIElement("com_start", UserInterface.TITLE_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
-            STOLON.UI.AddElement(new UIElement("xp_start", UserInterface.TITLE_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
-            STOLON.UI.AddElement(new UIElement("options", UserInterface.TITLE_PARENT_ID, "Options", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("special_thanks", UserInterface.TITLE_PARENT_ID, "Special Thanks", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("quit", UserInterface.TITLE_PARENT_ID, "Quit", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("story_start", UserInterface.HIGHEST_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
+            STOLON.UI.AddElement(new UIElement("com_start", UserInterface.HIGHEST_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("xp_start", UserInterface.HIGHEST_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
+            STOLON.UI.AddElement(new UIElement("options", UserInterface.HIGHEST_PARENT_ID, "Options", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("special_thanks", UserInterface.HIGHEST_PARENT_ID, "Special Thanks", UIElementType.Listen));
+            STOLON.UI.AddElement(new UIElement("quit", UserInterface.HIGHEST_PARENT_ID, "Quit", UIElementType.Listen));
 
             // options
             STOLON.UI.AddElement(new UIElement("sound", "options", "Sound", UIElementType.Listen));
@@ -128,7 +128,7 @@ namespace STOLON
             STOLON.UI.AddElement(new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen));
             STOLON.UI.AddElement(new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen));
 
-            STOLON.UI.MenuPath = GetSelfPath(UserInterface.TITLE_PARENT_ID);
+            STOLON.UI.MenuPath = GetSelfPath(UserInterface.HIGHEST_PARENT_ID);
             STOLON.Debug.Log(">autogenerating _back_ buttons");
             HashSet<string> parentIds = STOLON.UI.GetParentIds();
             foreach (string id in parentIds) STOLON.UI.AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));

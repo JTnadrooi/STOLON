@@ -49,7 +49,7 @@ namespace STOLON
             /// </summary>
             Ignore,
         }
-        public bool IsTop => ChildOf == TOP_ID;
+        public bool IsTop => Parent == TOP_ID;
         public string ClickSoundID { get; }
         public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundID];
         public const string TOP_ID = "_";
@@ -72,17 +72,17 @@ namespace STOLON
         /// <summary>
         /// The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> this is a child of. 
         /// </summary>
-        public string ChildOf { get; }
+        public string Parent { get; }
 
         public object?[] DrawArguments { get; }
 
-        public UIElement(string id, string childOf, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
+        public UIElement(string id, string parent = UserInterface.HIGHEST_PARENT_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
         {
             Text = text ?? id;
             Type = type;
             Id = id;
             Order = order;
-            ChildOf = childOf;
+            Parent = parent;
             DrawArguments = drawArgs;
             ClickSoundID = clickSoundId ?? "select3";
         }
@@ -103,7 +103,7 @@ namespace STOLON
         public static UIPath GetSelfPath(string id)
         {
             IEnumerable<string> GetListPath(string idForSearch)
-                => idForSearch == TOP_ID ? idForSearch.ToSingleArray() : GetListPath(STOLON.UI.Elements[idForSearch].ChildOf).Concat(idForSearch.ToSingleArray());
+                => idForSearch == TOP_ID ? idForSearch.ToSingleArray() : GetListPath(STOLON.UI.Elements[idForSearch].Parent).Concat(idForSearch.ToSingleArray());
             return new UIPath(GetListPath(id).ToArray()[1..]);
         }
         public static UIPath GetParentPath(string id) => new UIPath(GetSelfPath(id).Segments.ToArray()[..^1]);
@@ -136,7 +136,7 @@ namespace STOLON
 
         public override string ToString()
         {
-            return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={ChildOf}" + "}";
+            return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={Parent}" + "}";
         }
 
         public const int DEFAULT_RECTANGLE_CLEARANCE = 2;

@@ -43,7 +43,7 @@ namespace STOLON
         /// </summary>
         public ReadOnlyDictionary<string, UIElement> Elements => _elements.AsReadOnly();
 
-        public const string TITLE_PARENT_ID = "titleParent";
+        public const string HIGHEST_PARENT_ID = "titleParent";
         private Textframe _textframe;
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace STOLON
         public HashSet<string> GetParentIds()
         {
             var topIds = GetTopIds();
-            return Elements.Values.WhereSelect(e => (e.ChildOf, !e.IsTop && !topIds.Contains(e.ChildOf))).ToHashSet();
+            return Elements.Values.WhereSelect(e => (e.Parent, !e.IsTop && !topIds.Contains(e.Parent))).ToHashSet();
         }
         public override void Update(int elapsedMilliseconds)
         {
