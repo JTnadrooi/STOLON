@@ -11,7 +11,7 @@ namespace STOLON
     {
         public void Draw(DrawingContext drawingContext);
     }
-    public abstract class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
+    public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
     {
         public Vector2 Position { get; set; }
         public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
