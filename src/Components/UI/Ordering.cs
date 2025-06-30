@@ -94,15 +94,16 @@ namespace STOLON
     /// </summary>
     public static class UIOrdering
     {
-        public static void Order(UIElement[] uIElements, UIPath path, ICollection<UIElementDrawData> drawDump, IDictionary<string, UIElementUpdateData> updateDump,
+        public static void Order(UIElement[] uIElements, UIPath path, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             Order(uIElements, path.DestinationId, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
         }
-        public static void Order(UIElement[] uIElements, string parentId, ICollection<UIElementDrawData> drawDump, IDictionary<string, UIElementUpdateData> updateDump,
+        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             int orderIndex = 0;
+            if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
             for (int i = 0; i < uIElements.Length; i++)
             {
                 UIElement element = uIElements[i];
@@ -110,7 +111,7 @@ namespace STOLON
 
                 UIElementDrawData drawData = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++, out bool isHovered);
                 updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element.Id);
-                drawDump.Add(drawData);
+                drawDump[i] = drawData;
             }
         }
     }
