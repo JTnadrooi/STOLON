@@ -15,8 +15,8 @@ namespace STOLON
     {
         public Vector2 Position { get; set; }
         public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
+        public TOrderProvider OrderProvider { get; }
 
-        protected TOrderProvider OrderProvider { get; }
         protected UIElement[] Elements => _elements;
         protected UIElementDrawData[] DrawDump => _drawDump;
 
