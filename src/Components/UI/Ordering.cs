@@ -1,30 +1,8 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-using Betwixt;
-using MonoGame.Extended;
-
-using static STOLON.UIElement;
-
-using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Math = System.Math;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using RectangleF = MonoGame.Extended.RectangleF;
-using static STOLON.UserInterface;
-using AsitLib;
-using System.Collections;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using Microsoft.Xna.Framework.Media;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
 
 
 
@@ -99,7 +77,7 @@ namespace STOLON
         {
             Order(uIElements, path.DestinationId, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
         }
-        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
+        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateData,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             int orderIndex = 0;
@@ -110,7 +88,7 @@ namespace STOLON
                 if (element.Parent != parentId) continue;
 
                 UIElementDrawData drawData = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++, out bool isHovered);
-                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element.Id);
+                updateData[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element.Id);
                 drawDump[i] = drawData;
             }
         }

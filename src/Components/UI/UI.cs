@@ -37,7 +37,7 @@ namespace STOLON
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> containing all the <see cref="UIElementDrawData"/> objects from all the <see cref="UIElement"/> objects refreched AFTER the UI update.
         /// </summary>
-        public Dictionary<string, UIElementUpdateData> ElementUpdateData => _updateData;
+        public Dictionary<string, UIElementUpdateData> UpdateData => _updateData;
         /// <summary>
         /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing all <see cref="UIElement"/> added via the <see cref="AddElement(UIElement)"/> method.
         /// </summary>

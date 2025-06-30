@@ -14,7 +14,7 @@ namespace STOLON
     public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
     {
         public Vector2 Position { get; set; }
-        public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
+        public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
 
         protected TOrderProvider OrderProvider { get; }
         protected UIElement[] Elements => _elements;
@@ -22,20 +22,20 @@ namespace STOLON
 
         private UIElement[] _elements;
         private UIElementDrawData[] _drawDump;
-        private IDictionary<string, UIElementUpdateData> _updateDump;
+        private IDictionary<string, UIElementUpdateData> _updateData;
 
-        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateDump = null)
+        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateData = null)
         {
             OrderProvider = orderProvider;
             Position = position;
             _elements = elements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
-            _updateDump = updateDump ?? STOLON.UI.ElementUpdateData;
+            _updateData = updateData ?? STOLON.UI.UpdateData;
         }
 
         public virtual void Update(int elapsedMilliseconds)
         {
-            UIOrdering.Order(_elements!, UserInterface.HIGHEST_PARENT_ID, _drawDump, _updateDump, Position, OrderProvider);
+            UIOrdering.Order(_elements!, UserInterface.HIGHEST_PARENT_ID, _drawDump, _updateData, Position, OrderProvider);
         }
 
         public virtual void Draw(DrawingContext drawingContext)
