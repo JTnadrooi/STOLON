@@ -86,19 +86,6 @@ namespace STOLON
             DrawArguments = drawArgs;
             ClickSoundID = clickSoundId ?? "select3";
         }
-        /// <summary>
-        /// Get the bounds of a <see cref="UIElement"/>, this also is its hitbox.
-        /// </summary>
-        /// <param name="elementPos">The position of the <see cref="UIElement"/>.</param>
-        /// <param name="fontDimensions">The dimentions of the used font. <i>See: <see cref="Instance.Fonts["fonts\\smollerMono"]Dimensions"/>.</i></param>
-        /// <param name="clearance">The clearance between the text and the bounds. <i>(Or margin for the CSS enjoyers)</i></param>
-        /// <param name="supportMultiline"></param>
-        /// <param name="fontId"></param>
-        /// <param name="posOffsetX"></param>
-        /// <param name="posOffsetY"></param>
-        /// <returns>The bounds of a <see cref="UIElement"/>.</returns>
-        public Rectangle GetBounds(Point elementPos, Point fontDimensions, int clearance = DEFAULT_RECTANGLE_CLEARANCE, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
-            => GetBounds(elementPos, Text, fontDimensions, clearance, supportMultiline, fontId, posOffsetX, posOffsetY);
 
         public static UIPath GetSelfPath(string id)
         {
@@ -107,31 +94,6 @@ namespace STOLON
             return new UIPath(GetListPath(id).ToArray()[1..]);
         }
         public static UIPath GetParentPath(string id) => new UIPath(GetSelfPath(id).Segments.ToArray()[..^1]);
-        /// <summary>
-        /// Get the bounds of a <see cref="UIElement"/>, this also is its hitbox.
-        /// </summary>
-        /// <param name="elementPos">The position of the <see cref="UIElement"/>.</param>
-        /// <param name="fontDimensions">The dimentions of the used font. <i>See: <see cref="Instance.Fonts["fonts\\smollerMono"]Dimensions"/>.</i></param>
-        /// <param name="clearance">The clearance between the text and the bounds. <i>(Or padding for the CSS enjoyers)</i></param>
-        /// <param name="supportMultiline"></param>
-        /// <param name="fontId"></param>
-        /// <param name="posOffsetX"></param>
-        /// <param name="posOffsetY"></param>
-        /// <returns>The bounds of a <see cref="UIElement"/>.</returns>
-        public static Rectangle GetBounds(Point elementPos, string text, Point fontDimensions, int clearance = DEFAULT_RECTANGLE_CLEARANCE, bool supportMultiline = false, string fontId = "", int posOffsetX = 0, int posOffsetY = 0)
-        {
-            Point offset = new Point(posOffsetX, posOffsetY) + fontId switch
-            {
-                _ => new Point(-0, -1),
-            };
-
-            Point boundsPos = elementPos + new Point(-clearance, -clearance) + offset;
-
-            int rectangeSizeX = fontDimensions.X * text.Length + clearance * 2;
-            int rectangeSizeY = fontDimensions.Y + clearance * 2;
-
-            return new Rectangle(boundsPos, new Point(rectangeSizeX, rectangeSizeY));
-        }
 
 
         public override string ToString()
