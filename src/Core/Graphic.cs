@@ -14,31 +14,31 @@ namespace STOLON
     public abstract class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
     {
         public Vector2 Position { get; set; }
+        public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
 
         protected TOrderProvider OrderProvider { get; }
         protected UIElement[] Elements => _elements;
         protected UIElementDrawData[] DrawDump => _drawDump;
-        protected IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
 
         private UIElement[] _elements;
         private UIElementDrawData[] _drawDump;
-        private Dictionary<string, UIElementUpdateData> _updateDump;
+        private IDictionary<string, UIElementUpdateData> _updateDump;
 
-        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements)
+        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateDump = null)
         {
             OrderProvider = orderProvider;
             Position = position;
-            _updateDump = new Dictionary<string, UIElementUpdateData>();
             _elements = elements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
+            _updateDump = updateDump ?? STOLON.UI.ElementUpdateData;
         }
 
-        public void Update(int elapsedMilliseconds)
+        public virtual void Update(int elapsedMilliseconds)
         {
-            UIOrdering.Order(_elements!, "_", _drawDump!, _updateDump, Position, OrderProvider);
+            UIOrdering.Order(_elements!, "_", _drawDump, _updateDump, Position, OrderProvider);
         }
 
-        public void Draw(DrawingContext drawingContext)
+        public virtual void Draw(DrawingContext drawingContext)
         {
             foreach (UIElementDrawData elementDrawData in _drawDump)
                 drawingContext.DrawElement(elementDrawData);
