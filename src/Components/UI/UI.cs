@@ -31,17 +31,17 @@ namespace STOLON
         public List<UIElementDrawData> DrawData => _drawData;
 
         public const int LINE_WIDTH = 2;
-        private Dictionary<string, UIElement> _AllUIElements;
+        private Dictionary<string, UIElement> _elements;
         private Dictionary<string, UIElementUpdateData> _updateData;
 
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> containing all the <see cref="UIElementDrawData"/> objects from all the <see cref="UIElement"/> objects refreched AFTER the UI update.
         /// </summary>
-        public Dictionary<string, UIElementUpdateData> UIElementUpdateData => _updateData;
+        public Dictionary<string, UIElementUpdateData> ElementUpdateData => _updateData;
         /// <summary>
         /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing all <see cref="UIElement"/> added via the <see cref="AddElement(UIElement)"/> method.
         /// </summary>
-        public ReadOnlyDictionary<string, UIElement> UIElements => new ReadOnlyDictionary<string, UIElement>(_AllUIElements);
+        public ReadOnlyDictionary<string, UIElement> Elements => _elements.AsReadOnly();
 
         public const string TITLE_PARENT_ID = "titleParent";
         private Textframe _textframe;
@@ -83,7 +83,7 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            _AllUIElements = new Dictionary<string, UIElement>();
+            _elements = new Dictionary<string, UIElement>();
             _drawData = new List<UIElementDrawData>();
             _updateData = new Dictionary<string, UIElementUpdateData>();
 
@@ -124,15 +124,15 @@ namespace STOLON
         private void ResetElementData()
         {
             _updateData.Clear();
-            foreach (UIElement uiElement in _AllUIElements.Values)
+            foreach (UIElement uiElement in _elements.Values)
                 _updateData.Add(uiElement.Id, new UIElementUpdateData(false, uiElement.Id));
             _drawData.Clear();
         }
-        public HashSet<string> GetTopIds() => UIElements.Values.Where(e => e.IsTop).Select(e => e.Id).ToHashSet();
+        public HashSet<string> GetTopIds() => Elements.Values.Where(e => e.IsTop).Select(e => e.Id).ToHashSet();
         public HashSet<string> GetParentIds()
         {
             var topIds = GetTopIds();
-            return UIElements.Values.WhereSelect(e => (e.ChildOf, !e.IsTop && !topIds.Contains(e.ChildOf))).ToHashSet();
+            return Elements.Values.WhereSelect(e => (e.ChildOf, !e.IsTop && !topIds.Contains(e.ChildOf))).ToHashSet();
         }
         public override void Update(int elapsedMilliseconds)
         {
@@ -142,8 +142,8 @@ namespace STOLON
         }
         public void PostUpdate(int elapsedMilliseconds)
         {
-            foreach (string item in UIElements.Keys)
-                if (UIElements[item].Type == UIElementType.Listen)
+            foreach (string item in Elements.Keys)
+                if (Elements[item].Type == UIElementType.Listen)
                 {
                     if (_updateData[item].IsClicked)
                         STOLON.Audio.Play(_updateData[item].ClickSound);
@@ -165,7 +165,7 @@ namespace STOLON
         /// <param name="element">The <see cref="UIElement"/> to add.</param>
         public void AddElement(UIElement element)
         {
-            _AllUIElements.Add(element.Id, element);
+            _elements.Add(element.Id, element);
             STOLON.Debug.Log("ui-element with id " + element.Id + " added.");
             //updateData.Add(element.Id, default);
         }
@@ -175,7 +175,7 @@ namespace STOLON
         /// <param name="elementID">The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> to remove.</param>
         public void RemoveElement(string elementID)
         {
-            _AllUIElements.Remove(elementID);
+            _elements.Remove(elementID);
             STOLON.Debug.Log("ui-element with id " + elementID + " removed.");
         }
     }

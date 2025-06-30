@@ -18,24 +18,24 @@ namespace STOLON
         protected TOrderProvider OrderProvider { get; }
         protected UIElement[] Elements => _elements;
         protected UIElementDrawData[] DrawDump => _drawDump;
-        protected IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateData;
+        protected IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
 
         private UIElement[] _elements;
         private UIElementDrawData[] _drawDump;
-        private Dictionary<string, UIElementUpdateData> _updateData;
+        private Dictionary<string, UIElementUpdateData> _updateDump;
 
-        protected OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements)
+        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements)
         {
             OrderProvider = orderProvider;
             Position = position;
-            _updateData = new Dictionary<string, UIElementUpdateData>();
+            _updateDump = new Dictionary<string, UIElementUpdateData>();
             _elements = elements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
         }
 
         public void Update(int elapsedMilliseconds)
         {
-            UIOrdering.Order(_elements!, "_", _drawDump!, _updateData, Position, OrderProvider);
+            UIOrdering.Order(_elements!, "_", _drawDump!, _updateDump, Position, OrderProvider);
         }
 
         public void Draw(DrawingContext drawingContext)

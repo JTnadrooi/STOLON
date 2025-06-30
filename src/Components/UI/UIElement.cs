@@ -103,7 +103,7 @@ namespace STOLON
         public static UIPath GetSelfPath(string id)
         {
             IEnumerable<string> GetListPath(string idForSearch)
-                => idForSearch == TOP_ID ? idForSearch.ToSingleArray() : GetListPath(STOLON.UI.UIElements[idForSearch].ChildOf).Concat(idForSearch.ToSingleArray());
+                => idForSearch == TOP_ID ? idForSearch.ToSingleArray() : GetListPath(STOLON.UI.Elements[idForSearch].ChildOf).Concat(idForSearch.ToSingleArray());
             return new UIPath(GetListPath(id).ToArray()[1..]);
         }
         public static UIPath GetParentPath(string id) => new UIPath(GetSelfPath(id).Segments.ToArray()[..^1]);
@@ -216,7 +216,7 @@ namespace STOLON
         /// The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.
         /// </summary>
         public string SourceId { get; }
-        public string ClickSoundId => STOLON.UI.UIElements[SourceId].ClickSoundID;
+        public string ClickSoundId => STOLON.UI.Elements[SourceId].ClickSoundID;
         public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundId];
 
         /// <summary>

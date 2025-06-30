@@ -347,9 +347,9 @@ namespace STOLON
                         (i >= _menuDitherTexturePositions.Length / 2f) ? _menuLine2X : _menuLine1X - _dither32.Width,
                         (i % (int)(_menuDitherTexturePositions.Length / 2f)) * _dither32.Height);
 
-            UIOrdering.Order(STOLON.UI.UIElements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UIElementUpdateData, new Vector2(0, uiElementOffsetY), OrderProviders.Menu);
+            UIOrdering.Order(STOLON.UI.Elements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.ElementUpdateData, new Vector2(0, uiElementOffsetY), OrderProviders.Menu);
 
-            if (STOLON.UI.UIElementUpdateData["xp_start"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["xp_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
@@ -358,29 +358,29 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UIElementUpdateData["options"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["options"].IsClicked)
             {
                 STOLON.UI.MenuPath = UIElement.GetSelfPath("options");
             }
-            if (STOLON.UI.UIElementUpdateData["sound"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["sound"].IsClicked)
             {
                 STOLON.UI.MenuPath = UIElement.GetSelfPath("sound");
             }
-            if (STOLON.UI.UIElementUpdateData["vol_up"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["vol_up"].IsClicked)
             {
                 STOLON.Audio.MasterVolume += 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UIElementUpdateData["vol_down"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["vol_down"].IsClicked)
             {
                 STOLON.Audio.MasterVolume -= 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UIElementUpdateData["story_start"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["story_start"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Not yet implemented."));
             }
-            if (STOLON.UI.UIElementUpdateData["com_start"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["com_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
@@ -389,11 +389,11 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UIElementUpdateData["special_thanks"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["special_thanks"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Please read the github README."));
             }
-            if (STOLON.UI.UIElementUpdateData["quit"].IsClicked)
+            if (STOLON.UI.ElementUpdateData["quit"].IsClicked)
             {
                 STOLON.Instance.Exit();
             }
