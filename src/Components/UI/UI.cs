@@ -43,7 +43,7 @@ namespace STOLON
         /// </summary>
         public ReadOnlyDictionary<string, UIElement> Elements => _elements.AsReadOnly();
 
-        public const string HIGHEST_PARENT_ID = "titleParent";
+        public const string HIGHEST_PARENT_ID = "_";
         private Textframe _textframe;
 
         /// <summary>

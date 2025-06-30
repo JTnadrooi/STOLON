@@ -35,7 +35,7 @@ namespace STOLON
 
         public virtual void Update(int elapsedMilliseconds)
         {
-            UIOrdering.Order(_elements!, "_", _drawDump, _updateDump, Position, OrderProvider);
+            UIOrdering.Order(_elements!, UserInterface.HIGHEST_PARENT_ID, _drawDump, _updateDump, Position, OrderProvider);
         }
 
         public virtual void Draw(DrawingContext drawingContext)
