@@ -36,14 +36,7 @@ namespace STOLON
     /// </summary>
     public interface IOrderProvider
     {
-        /// <summary>
-        /// Cast a <see cref="UIElement"/> to a <see cref="UIElementDrawData"/> object.
-        /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to convert.</param>
-        /// <param name="UIOrgin">The orgin of the drawing UI.</param>
-        /// <param name="index">The index of the current <see cref="UIElement"/>.</param>
-        /// <returns>A <see cref="Tuple{T1, T2}"/> holding both the newly created <see cref="UIElementDrawData"/> and a value indicating if the <see cref="UIElement"/> is hovered or not.</returns>
-        public (UIElementDrawData drawData, bool isHovered) GetElementDrawData(UIElement element, Vector2 UIOrgin, int index);
+        public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered);
     }
 
     /// <summary>
@@ -57,7 +50,7 @@ namespace STOLON
         {
             _font = STOLON.Fonts.Medium;
         }
-        public (UIElementDrawData drawData, bool isHovered) GetElementDrawData(UIElement element, Vector2 UIOrgin, int index)
+        public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered)
         {
             Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + UIOrgin.Y,
@@ -74,12 +67,10 @@ namespace STOLON
                 "specialThanks" => "!",
                 _ => ">",
             };
-            bool elementIsHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
-
-            return (new UIElementDrawData(element.Id, elementIsHovered
+            isHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
+            return new UIElementDrawData(element.Id, isHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
-                : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (elementIsHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false),
-                elementIsHovered);
+                : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }
     }
 
@@ -117,9 +108,9 @@ namespace STOLON
                 UIElement element = uIElements[i];
                 if (element.ChildOf != parentId) continue;
 
-                var ret = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++);
-                updateDump[element.Id] = new UIElementUpdateData(ret.isHovered && isMouseRelevant, element.Id);
-                drawDump.Add(ret.drawData);
+                UIElementDrawData drawData = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++, out bool isHovered);
+                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element.Id);
+                drawDump.Add(drawData);
             }
         }
     }
