@@ -76,7 +76,7 @@ namespace STOLON
 
         public object?[] DrawArguments { get; }
 
-        public UIElement(string id, string parent = UserInterface.HIGHEST_PARENT_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
+        public UIElement(string id, string parent = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
         {
             Text = text ?? id;
             Type = type;
