@@ -182,21 +182,18 @@ namespace STOLON
 
     public struct UIPath : IEnumerable<string>
     {
-        public string TopId => segments[0];
-        public string ParentId => segments[^1];
-        public string DestinationId => segments.Last();
-        public int Lenght => segments.Count;
-        public ReadOnlyCollection<string> Segments => segments.AsReadOnly();
-        private readonly List<string> segments;
-        public UIPath(IEnumerable<string> segments)
-        {
-            this.segments = new List<string>(segments);
-        }
-        public string this[int index] => segments[index];
-        public IEnumerator<string> GetEnumerator() => segments.GetEnumerator();
+        public string TopId => _segments[0];
+        public string ParentId => _segments[^1];
+        public string DestinationId => _segments.Last();
+        public int Lenght => _segments.Count;
+        public ReadOnlyCollection<string> Segments => _segments.AsReadOnly();
+        private readonly List<string> _segments;
+        public UIPath(IEnumerable<string> segments) => _segments = new List<string>(segments);
+        public string this[int index] => _segments[index];
+        public IEnumerator<string> GetEnumerator() => _segments.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        public override string ToString() => "{" + segments.ToJoinedString(">") + "}";
-        public override int GetHashCode() => segments.ToJoinedString(string.Empty).GetHashCode();
+        public override string ToString() => "{" + _segments.ToJoinedString(">") + "}";
+        public override int GetHashCode() => _segments.ToJoinedString(string.Empty).GetHashCode();
         public override bool Equals([NotNullWhen(true)] object? obj) => obj.GetHashCode() == GetHashCode();
     }
 
