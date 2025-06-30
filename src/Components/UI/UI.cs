@@ -127,12 +127,7 @@ namespace STOLON
                 _updateData.Add(uiElement.Id, new UIElementUpdateData(false, uiElement.Id));
             _drawData.Clear();
         }
-        public HashSet<string> GetTopIds() => Elements.Values.Where(e => e.IsTop).Select(e => e.Id).ToHashSet();
-        public HashSet<string> GetParentIds()
-        {
-            var topIds = GetTopIds();
-            return Elements.Values.WhereSelect(e => (e.Parent, !e.IsTop && !topIds.Contains(e.Parent))).ToHashSet();
-        }
+        public HashSet<string> GetParentIds() => Elements.Values.WhereSelect(e => (e.Parent, !e.IsTop)).ToHashSet();
         public override void Update(int elapsedMilliseconds)
         {
             ResetElementData();
