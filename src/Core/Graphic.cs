@@ -21,13 +21,13 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
     public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
     public ReadOnlySpan<UIElement> Elements => _elements;
-    public ReadOnlySpan<string> Parents => _parents;
+    public IReadOnlySet<string> Parents => _parents;
 
     private readonly UIElement[] _elements;
     private readonly UIElementDrawData[] _drawDump;
     private readonly IDictionary<string, UIElementUpdateData> _updateData;
     private readonly Dictionary<string, UIElement> _elementMap;
-    private readonly string[] _parents;
+    private readonly HashSet<string> _parents;
 
     public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
     {
@@ -40,7 +40,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
         _elementMap = _elements.ToDictionary(e => e.Id);
         Path = path ?? GetSelfPath(UIElement.TOP_ID);
 
-        _parents = elements.Where(e => elements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id).ToArray();
+        _parents = new HashSet<string>(elements.Where(e => elements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id));
     }
 
     public UIPath GetSelfPath(string id)
