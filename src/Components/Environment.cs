@@ -68,7 +68,6 @@ namespace STOLON
             STOLON.Debug.Success();
 
             STOLON.UI = _userInterface = new UserInterface();
-            _userInterface.Initialize();
             STOLON.StateManager = _stateManager = new GameStateManager();
             STOLON.StateManager.ChangeState<MenuGameState>();
 

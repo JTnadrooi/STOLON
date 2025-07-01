@@ -87,34 +87,6 @@ namespace STOLON
 
             STOLON.Debug.Success();
         }
-        public void Initialize()
-        {
-            STOLON.Debug.Log(">[s]initializing ui..");
-            // top
-
-            // board l
-            //AddElement(new UIElement("exitGame", boardLeftParentId, "Exit Game", UIElementType.Listen));
-
-            //AddElement(new UIElement("screenRegion2", boardLeftParentId, string.Empty, UIElementType.Ignore));
-            //AddElement(new UIElement("screenRegion", boardLeftParentId, "Screen & Camera", UIElementType.Ignore));
-            //AddElement(new UIElement("toggleFullscreen", boardLeftParentId, "Go Fullscreen", UIElementType.Listen));
-            //AddElement(new UIElement("centerCamera", boardLeftParentId, "Center Camera", UIElementType.Listen));
-
-            //AddElement(new UIElement("boardRegion2", boardLeftParentId, string.Empty, UIElementType.Ignore));
-            //AddElement(new UIElement("boardRegion", boardLeftParentId, "Board", UIElementType.Ignore));
-            //AddElement(new UIElement("undoMove", boardLeftParentId, "Undo", UIElementType.Listen));
-            //AddElement(new UIElement("restartBoard", boardLeftParentId, "Restart", UIElementType.Listen));
-            //AddElement(new UIElement("boardSearch", boardLeftParentId, "Search", UIElementType.Listen));
-            //AddElement(new UIElement("skipMove", boardLeftParentId, "End Move", UIElementType.Listen));
-
-            // board
-            //AddElement(new UIElement("currentPlayer", boardRightParentId, null, UIElementType.Ignore));
-
-
-
-            STOLON.Debug.Success();
-            STOLON.Debug.Success();
-        }
         public override void Update(int elapsedMilliseconds)
         {
             _textframe.Update(elapsedMilliseconds);
