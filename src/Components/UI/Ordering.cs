@@ -81,6 +81,7 @@ namespace STOLON
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             int orderIndex = 0;
+            updateData.Clear();
             if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
             for (int i = 0; i < uIElements.Length; i++)
             {

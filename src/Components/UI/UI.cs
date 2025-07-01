@@ -115,22 +115,8 @@ namespace STOLON
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
-        /// <summary>
-        /// Clears both the updatedata and drawdata collections, making them ready to be repopulated by the methods in the <see cref="UIOrdering"/> class.<br/>
-        /// <i>Does populate the updatedata collection with unhovered <see cref="UIElementDrawData"/> objects.</i>
-        /// </summary>
-        private void ResetElementData()
-        {
-            _updateData.Clear();
-            foreach (UIElement uiElement in _elements.Values)
-                _updateData.Add(uiElement.Id, new UIElementUpdateData(false, uiElement.Id));
-            _drawData.Clear();
-        }
-        public HashSet<string> GetParentIds() => Elements.Values.WhereSelect(e => (e.Parent, !e.IsTop)).ToHashSet();
         public override void Update(int elapsedMilliseconds)
         {
-            ResetElementData();
-
             _textframe.Update(elapsedMilliseconds);
         }
         //public void PostUpdate(int elapsedMilliseconds)
@@ -151,15 +137,6 @@ namespace STOLON
                 drawingContext.DrawElement(elementDrawData);
             _textframe.Draw(drawingContext);
             base.Draw(drawingContext);
-        }
-        /// <summary>
-        /// Remove an <see cref="UIElement"/> from the <see cref="UserInterface"/>.
-        /// </summary>
-        /// <param name="elementID">The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> to remove.</param>
-        public void RemoveElement(string elementID)
-        {
-            _elements.Remove(elementID);
-            STOLON.Debug.Log("ui-element with id " + elementID + " removed.");
         }
     }
 
