@@ -167,22 +167,15 @@ namespace STOLON
         /// A value indicating if the source <see cref="UIElement"/> is clicked by the mouse.
         /// </summary>
         public bool IsClicked => IsPressed && STOLON.Input.PreviousMouse.LeftButton == ButtonState.Released;
+        public UIElement Source { get; }
         /// <summary>
-        /// The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.
-        /// </summary>
-        public string SourceId { get; }
-        public string ClickSoundId => STOLON.UI.Elements[SourceId].ClickSoundID;
-        public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundId];
-
-        /// <summary>
-        /// Create a new <see cref="UIElementUpdateData"/> with the propeties <see cref="IsHovered"/> and <see cref="SourceId"/> set.
+        /// Create a new <see cref="UIElementUpdateData"/> with the propeties <see cref="IsHovered"/> and <see cref="Source"/> set.
         /// </summary>
         /// <param name="isHovered">A value indicating if the source <see cref="UIElement"/> is hovered by the mouse.</param>
-        /// <param name="sourceId">The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.</param>
-        public UIElementUpdateData(bool isHovered, string sourceId)
+        public UIElementUpdateData(bool isHovered, UIElement source)
         {
             IsHovered = isHovered;
-            SourceId = sourceId;
+            Source = source;
         }
     }
 }

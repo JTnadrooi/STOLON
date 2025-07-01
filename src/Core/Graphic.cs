@@ -72,9 +72,9 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
         UIOrdering.Order(_elements, Path, _drawDump, _updateData, Position, OrderProvider);
         foreach (UIElementUpdateData data in _updateData.Values)
         {
-            if (_parents.Contains(data.SourceId))
+            if (_parents.Contains(data.Source.Id))
             {
-                Path = GetSelfPath(data.SourceId);
+                Path = GetSelfPath(data.Source.Id);
             }
         }
     }
