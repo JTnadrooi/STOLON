@@ -153,16 +153,6 @@ namespace STOLON
             base.Draw(drawingContext);
         }
         /// <summary>
-        /// Add an element to the <see cref="UserInterface"/>.
-        /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to add.</param>
-        public void AddElement(UIElement element)
-        {
-            _elements.Add(element.Id, element);
-            STOLON.Debug.Log("ui-element with id " + element.Id + " added.");
-            //updateData.Add(element.Id, default);
-        }
-        /// <summary>
         /// Remove an <see cref="UIElement"/> from the <see cref="UserInterface"/>.
         /// </summary>
         /// <param name="elementID">The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> to remove.</param>

@@ -62,6 +62,8 @@ namespace STOLON
 
         private Point[] _menuDitherTexturePositions;
 
+        private OrderContainer<MenuOrderProvider> _mainOrderContainer;
+
         private Tweener<float> _menuLogoEaseTweener;
         private Tweener<float> _menuRemoveTweener;
 
@@ -102,6 +104,19 @@ namespace STOLON
                 STOLON.Environment.Entities.Values.Last().Profile,
             };
 
+            _mainOrderContainer = new OrderContainer<MenuOrderProvider>(OrderProviders.Menu, [
+                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"),
+                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"),
+                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"),
+                new UIElement("options", UIElement.TOP_ID, "Options", UIElementType.Listen),
+                new UIElement("special_thanks", UIElement.TOP_ID, "Special Thanks", UIElementType.Listen),
+                new UIElement("quit", UIElement.TOP_ID, "Quit", UIElementType.Listen),
+                new UIElement("sound", "options", "Sound", UIElementType.Listen),
+                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"),
+                new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
+                new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
+            ]);
+
             //switch (_skipTo)
             //{
             //    case "main_menu":
@@ -112,23 +127,6 @@ namespace STOLON
             //        break;
             //}
 
-            STOLON.UI.AddElement(new UIElement(UserInterface.HIGHEST_PARENT_ID, UIElement.TOP_ID, string.Empty, UIElementType.Listen));
-
-            STOLON.UI.AddElement(new UIElement("story_start", UserInterface.HIGHEST_PARENT_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"));
-            STOLON.UI.AddElement(new UIElement("com_start", UserInterface.HIGHEST_PARENT_ID, "COM", UIElementType.Listen, clickSoundId: "coin4"));
-            STOLON.UI.AddElement(new UIElement("xp_start", UserInterface.HIGHEST_PARENT_ID, "2P", UIElementType.Listen, clickSoundId: "coin4"));
-            STOLON.UI.AddElement(new UIElement("options", UserInterface.HIGHEST_PARENT_ID, "Options", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("special_thanks", UserInterface.HIGHEST_PARENT_ID, "Special Thanks", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("quit", UserInterface.HIGHEST_PARENT_ID, "Quit", UIElementType.Listen));
-
-            // options
-            STOLON.UI.AddElement(new UIElement("sound", "options", "Sound", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"));
-
-            STOLON.UI.AddElement(new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen));
-            STOLON.UI.AddElement(new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen));
-
-            STOLON.UI.MenuPath = GetSelfPath(UserInterface.HIGHEST_PARENT_ID);
             STOLON.Debug.Log(">autogenerating _back_ buttons");
             HashSet<string> parentIds = STOLON.UI.GetParentIds();
             foreach (string id in parentIds) STOLON.UI.AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
@@ -347,7 +345,9 @@ namespace STOLON
                         (i >= _menuDitherTexturePositions.Length / 2f) ? _menuLine2X : _menuLine1X - _dither32.Width,
                         (i % (int)(_menuDitherTexturePositions.Length / 2f)) * _dither32.Height);
 
-            UIOrdering.Order(STOLON.UI.Elements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UpdateData, new Vector2(0, uiElementOffsetY), OrderProviders.Menu);
+            _mainOrderContainer.Position = new Vector2(0, uiElementOffsetY);
+            _mainOrderContainer.Update(elapsedMilliseconds);
+            //UIOrdering.Order(STOLON.UI.Elements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UpdateData, , );
 
             if (STOLON.UI.UpdateData["xp_start"].IsClicked)
             {
