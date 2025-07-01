@@ -23,6 +23,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
     public ReadOnlySpan<UIElement> Elements => _elements;
     public IReadOnlySet<string> Parents => _parents;
+    public UIElementUpdateData this[string elementId] => UpdateData[elementId];
 
     private readonly UIElement[] _elements;
     private readonly UIElementDrawData[] _drawDump;
