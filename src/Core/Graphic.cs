@@ -17,7 +17,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 {
     public Vector2 Position { get; set; }
     public TOrderProvider OrderProvider { get; }
-    public TOrderProvider Path { get; }
+    public UIPath Path { get; }
 
     public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
     public ReadOnlySpan<UIElement> Elements => _elements;
