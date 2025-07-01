@@ -5,6 +5,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using static STOLON.UIElement;
 
 namespace STOLON;
 
@@ -31,16 +32,20 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
     public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
     {
+        List<UIElement> tempElements = new List<UIElement>(elements);
+
         OrderProvider = orderProvider;
         Position = position;
-        _elements = elements.ToArray();
         _drawDump = new UIElementDrawData[_elements.Length];
 
         _updateData = updateData ?? STOLON.UI.UpdateData;
-        _elementMap = _elements.ToDictionary(e => e.Id);
+        _elementMap = tempElements.ToDictionary(e => e.Id);
         Path = path ?? GetSelfPath(UIElement.TOP_ID);
 
-        _parents = new HashSet<string>(elements.Where(e => elements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id));
+        _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id));
+        foreach (string id in _parents) tempElements.Add(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
+
+        _elements = tempElements.ToArray();
     }
 
     public UIPath GetSelfPath(string id)

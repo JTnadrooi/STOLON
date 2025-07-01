@@ -128,8 +128,6 @@ namespace STOLON
             //}
 
             STOLON.Debug.Log(">autogenerating _back_ buttons");
-            HashSet<string> parentIds = STOLON.UI.GetParentIds();
-            foreach (string id in parentIds) STOLON.UI.AddElement(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
 
             _menuLogoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
             _menuRemoveTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
