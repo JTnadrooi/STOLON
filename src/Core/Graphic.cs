@@ -36,7 +36,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
         OrderProvider = orderProvider;
         Position = position;
-        _drawDump = new UIElementDrawData[_elements.Length];
+        _drawDump = new UIElementDrawData[tempElements.Count];
 
         _updateData = updateData ?? STOLON.UI.UpdateData;
         _elementMap = tempElements.ToDictionary(e => e.Id);
