@@ -29,7 +29,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     private readonly Dictionary<string, UIElement> _elementMap;
     private readonly string[] _gates;
 
-    public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+    public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
     {
         OrderProvider = orderProvider;
         Position = position;
@@ -59,7 +59,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     public UIPath GetParentPath(string id)
     {
         UIPath path = GetSelfPath(id);
-        return path.Segments.Length <= 1 ? new UIPath(Array.Empty<string>()) : new UIPath(path.Segments[..^1].ToArray());
+        return new UIPath(path.Segments[..^1].ToArray());
     }
 
     public virtual void Update(int elapsedMilliseconds)
