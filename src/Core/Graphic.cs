@@ -26,6 +26,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     private readonly UIElementDrawData[] _drawDump;
     private readonly IDictionary<string, UIElementUpdateData> _updateData;
     private readonly Dictionary<string, UIElement> _elementMap;
+    private readonly string[] _gates;
 
     public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
     {
@@ -37,6 +38,8 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
         _updateData = updateData ?? STOLON.UI.UpdateData;
         _elementMap = _elements.ToDictionary(e => e.Id);
         Path = path ?? GetSelfPath(UIElement.TOP_ID);
+
+        _gates = elements.Where(e => elements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id).ToArray();
     }
 
     public UIPath GetSelfPath(string id)
