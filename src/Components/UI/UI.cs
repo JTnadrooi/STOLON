@@ -55,7 +55,6 @@ namespace STOLON
         /// </summary>
         public int LineWidth => LINE_WIDTH;
 
-        public UIPath MenuPath { get; set; }
         /// <summary>
         /// Main UIInterface contructor.
         /// </summary>
@@ -179,12 +178,12 @@ namespace STOLON
         public string TopId => _segments[0];
         public string ParentId => _segments[^1];
         public string DestinationId => _segments.Last();
-        public int Lenght => _segments.Count;
-        public ReadOnlyCollection<string> Segments => _segments.AsReadOnly();
-        private readonly List<string> _segments;
-        public UIPath(IEnumerable<string> segments) => _segments = new List<string>(segments);
+        public int Lenght => _segments.Length;
+        public ReadOnlySpan<string> Segments => _segments;
+        private readonly string[] _segments;
+        public UIPath(IEnumerable<string> segments) => _segments = segments.ToArray();
         public string this[int index] => _segments[index];
-        public IEnumerator<string> GetEnumerator() => _segments.GetEnumerator();
+        public IEnumerator<string> GetEnumerator() => (IEnumerator<string>)_segments.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public override string ToString() => "{" + _segments.ToJoinedString(">") + "}";
         public override int GetHashCode() => _segments.ToJoinedString(string.Empty).GetHashCode();

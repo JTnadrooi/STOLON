@@ -49,13 +49,13 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
             stack.Push(currentId);
             currentId = element.Parent;
         }
-        return new UIPath(stack.ToArray());
+        return new UIPath(stack);
     }
 
     public UIPath GetParentPath(string id)
     {
         UIPath path = GetSelfPath(id);
-        return path.Segments.Count <= 1 ? new UIPath([]) : new UIPath(path.Segments[..^1]);
+        return path.Segments.Length <= 1 ? new UIPath([]) : new UIPath(path.Segments[..^1].ToArray());
     }
 
     public virtual void Update(int elapsedMilliseconds)
