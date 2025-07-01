@@ -87,13 +87,6 @@ namespace STOLON
             ClickSoundID = clickSoundId ?? "select3";
         }
 
-        public static UIPath GetSelfPath(string id)
-        {
-            IEnumerable<string> GetListPath(string idForSearch)
-                => idForSearch == TOP_ID ? idForSearch.ToSingleArray() : GetListPath(STOLON.UI.Elements[idForSearch].Parent).Concat(idForSearch.ToSingleArray());
-            return new UIPath(GetListPath(id).ToArray()[1..]);
-        }
-        public static UIPath GetParentPath(string id) => new UIPath(GetSelfPath(id).Segments.ToArray()[..^1]);
 
 
         public override string ToString()
