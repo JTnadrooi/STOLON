@@ -358,14 +358,6 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UpdateData["options"].IsClicked)
-            {
-                STOLON.UI.MenuPath = UIElement.GetSelfPath("options");
-            }
-            if (STOLON.UI.UpdateData["sound"].IsClicked)
-            {
-                STOLON.UI.MenuPath = UIElement.GetSelfPath("sound");
-            }
             if (STOLON.UI.UpdateData["vol_up"].IsClicked)
             {
                 STOLON.Audio.MasterVolume += 0.1001f;

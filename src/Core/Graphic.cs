@@ -17,7 +17,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 {
     public Vector2 Position { get; set; }
     public TOrderProvider OrderProvider { get; }
-    public UIPath Path { get; }
+    public UIPath Path { get; protected set; }
 
     public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
     public ReadOnlySpan<UIElement> Elements => _elements;
@@ -64,7 +64,14 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
     public virtual void Update(int elapsedMilliseconds)
     {
-        UIOrdering.Order(_elements, UIElement.TOP_ID, _drawDump, _updateData, Position, OrderProvider);
+        UIOrdering.Order(_elements, Path, _drawDump, _updateData, Position, OrderProvider);
+        foreach (UIElementUpdateData data in _updateData.Values)
+        {
+            if (_gates.Contains(data.SourceId))
+            {
+                Path = GetSelfPath(data.SourceId);
+            }
+        }
     }
 
     public virtual void Draw(DrawingContext drawingContext)
