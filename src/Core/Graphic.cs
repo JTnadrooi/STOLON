@@ -36,23 +36,22 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
         OrderProvider = orderProvider;
         Position = position;
-        _drawDump = new UIElementDrawData[tempElements.Count];
-
-        _updateData = updateData ?? STOLON.UI.UpdateData;
-        _elementMap = tempElements.ToDictionary(e => e.Id);
-        Path = path ?? GetSelfPath(UIElement.TOP_ID);
 
         _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id));
         foreach (string id in _parents) tempElements.Add(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
-
         _elements = tempElements.ToArray();
+
+        _drawDump = new UIElementDrawData[_elements.Length];
+        _updateData = updateData ?? STOLON.UI.UpdateData;
+        _elementMap = _elements.ToDictionary(e => e.Id);
+        Path = path ?? GetSelfPath(UIElement.TOP_ID);
     }
 
     public UIPath GetSelfPath(string id)
     {
         Stack<string> stack = new Stack<string>();
         string currentId = id;
-        stack.Push(UIElement.TOP_ID);
+        stack.Push(id);
         while (currentId != UIElement.TOP_ID)
         {
             if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
