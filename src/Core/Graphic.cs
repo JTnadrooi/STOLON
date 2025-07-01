@@ -1,58 +1,70 @@
 ﻿using AsitLib;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace STOLON
+namespace STOLON;
+
+public interface IGraphic
 {
-    public interface IGraphic
+    void Draw(DrawingContext drawingContext);
+}
+
+public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
+{
+    public required Vector2 Position { get; init; }
+    public required TOrderProvider OrderProvider { get; init; }
+    public required UIPath Path { get; init; }
+
+    public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
+    public ReadOnlySpan<UIElement> Elements => _elements;
+
+    private readonly UIElement[] _elements;
+    private readonly UIElementDrawData[] _drawDump;
+    private readonly IDictionary<string, UIElementUpdateData> _updateData;
+    private readonly Dictionary<string, UIElement> _elementMap;
+
+    public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
     {
-        public void Draw(DrawingContext drawingContext);
+        OrderProvider = orderProvider;
+        Position = position;
+        _elements = elements.ToArray();
+        _drawDump = new UIElementDrawData[_elements.Length];
+
+        _updateData = updateData ?? STOLON.UI.UpdateData;
+        _elementMap = _elements.ToDictionary(e => e.Id);
+        Path = path ?? new UIPath([UIElement.TOP_ID]);
     }
-    public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
+
+    public UIPath GetSelfPath(string id)
     {
-        public Vector2 Position { get; set; }
-        public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
-        public TOrderProvider OrderProvider { get; }
-        public UIPath Path { get; set; }
-
-        protected UIElement[] Elements => _elements;
-        protected UIElementDrawData[] DrawDump => _drawDump;
-
-        private UIElement[] _elements;
-        private UIElementDrawData[] _drawDump;
-        private IDictionary<string, UIElementUpdateData> _updateData;
-
-        public OrderContainer(TOrderProvider orderProvider, Vector2 position, IEnumerable<UIElement> elements, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        Stack<string> stack = new Stack<string>();
+        string currentId = id;
+        while (currentId != UIElement.TOP_ID)
         {
-            OrderProvider = orderProvider;
-            Position = position;
-            _elements = elements.ToArray();
-            _drawDump = new UIElementDrawData[_elements.Length];
-            _updateData = updateData ?? STOLON.UI.UpdateData;
-            Path = path ?? new UIPath(new string[] { UIElement.TOP_ID });
+            if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
+            stack.Push(currentId);
+            currentId = element.Parent;
         }
+        return new UIPath(stack.ToArray());
+    }
 
-        public UIPath GetSelfPath(string id)
-        {
-            IEnumerable<string> GetListPath(string idForSearch)
-                => idForSearch == UIElement.TOP_ID ? idForSearch.ToSingleArray() : GetListPath(_elements[idForSearch].Parent).Concat(idForSearch.ToSingleArray());
-            return new UIPath(GetListPath(id).ToArray()[1..]);
-        }
-        public UIPath GetParentPath(string id) => new UIPath(GetSelfPath(id).Segments.ToArray()[..^1]);
+    public UIPath GetParentPath(string id)
+    {
+        UIPath path = GetSelfPath(id);
+        return path.Segments.Count <= 1 ? new UIPath([]) : new UIPath(path.Segments[..^1]);
+    }
 
-        public virtual void Update(int elapsedMilliseconds)
-        {
-            UIOrdering.Order(_elements!, UIElement.TOP_ID, _drawDump, _updateData, Position, OrderProvider);
-        }
+    public virtual void Update(int elapsedMilliseconds)
+    {
+        UIOrdering.Order(_elements, UIElement.TOP_ID, _drawDump, _updateData, Position, OrderProvider);
+    }
 
-        public virtual void Draw(DrawingContext drawingContext)
-        {
-            foreach (UIElementDrawData elementDrawData in _drawDump)
-                drawingContext.DrawElement(elementDrawData);
-        }
+    public virtual void Draw(DrawingContext drawingContext)
+    {
+        foreach (UIElementDrawData elementDrawData in _drawDump) drawingContext.DrawElement(elementDrawData);
     }
 }
