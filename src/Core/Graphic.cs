@@ -52,6 +52,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     {
         Stack<string> stack = new Stack<string>();
         string currentId = id;
+        stack.Push(UIElement.TOP_ID);
         while (currentId != UIElement.TOP_ID)
         {
             if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
@@ -63,8 +64,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
     public UIPath GetParentPath(string id)
     {
-        UIPath path = GetSelfPath(id);
-        return new UIPath(path.Segments[..^1].ToArray());
+        return new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
     }
 
     public virtual void Update(int elapsedMilliseconds)
