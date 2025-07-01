@@ -133,17 +133,17 @@ namespace STOLON
 
             _textframe.Update(elapsedMilliseconds);
         }
-        public void PostUpdate(int elapsedMilliseconds)
-        {
-            foreach (string item in Elements.Keys)
-                if (Elements[item].Type == UIElementType.Listen)
-                {
-                    if (_updateData[item].IsClicked)
-                        STOLON.Audio.Play(_updateData[item].ClickSound);
-                    if (_updateData.TryGetValue("_back_" + item, out UIElementUpdateData updateData2))
-                        if (updateData2.IsClicked) MenuPath = UIElement.GetParentPath(item);
-                }
-        }
+        //public void PostUpdate(int elapsedMilliseconds)
+        //{
+        //    foreach (string item in Elements.Keys)
+        //        if (Elements[item].Type == UIElementType.Listen)
+        //        {
+        //            if (_updateData[item].IsClicked)
+        //                STOLON.Audio.Play(_updateData[item].ClickSound);
+        //            if (_updateData.TryGetValue("_back_" + item, out UIElementUpdateData updateData2))
+        //                if (updateData2.IsClicked) MenuPath = UIElement.GetParentPath(item);
+        //        }
+        //}
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(DrawingContext drawingContext)
         {
