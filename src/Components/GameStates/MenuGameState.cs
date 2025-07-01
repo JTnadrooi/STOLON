@@ -347,7 +347,7 @@ namespace STOLON
             _mainOrderContainer.Update(elapsedMilliseconds);
             //UIOrdering.Order(STOLON.UI.Elements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UpdateData, , );
 
-            if (STOLON.UI.UpdateData["xp_start"].IsClicked)
+            if (STOLON.UI.UpdateDump["xp_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
@@ -356,21 +356,21 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UpdateData["vol_up"].IsClicked)
+            if (STOLON.UI.UpdateDump["vol_up"].IsClicked)
             {
                 STOLON.Audio.MasterVolume += 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UpdateData["vol_down"].IsClicked)
+            if (STOLON.UI.UpdateDump["vol_down"].IsClicked)
             {
                 STOLON.Audio.MasterVolume -= 0.1001f;
                 STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
             }
-            if (STOLON.UI.UpdateData["story_start"].IsClicked)
+            if (STOLON.UI.UpdateDump["story_start"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Not yet implemented."));
             }
-            if (STOLON.UI.UpdateData["com_start"].IsClicked)
+            if (STOLON.UI.UpdateDump["com_start"].IsClicked)
             {
                 _boardPlayers = new Player[]
                         {
@@ -379,11 +379,11 @@ namespace STOLON
                         };
                 Leave();
             }
-            if (STOLON.UI.UpdateData["special_thanks"].IsClicked)
+            if (STOLON.UI.UpdateDump["special_thanks"].IsClicked)
             {
                 STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Please read the github README."));
             }
-            if (STOLON.UI.UpdateData["quit"].IsClicked)
+            if (STOLON.UI.UpdateDump["quit"].IsClicked)
             {
                 STOLON.Instance.Exit();
             }

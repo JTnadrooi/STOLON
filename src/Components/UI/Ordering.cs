@@ -77,11 +77,11 @@ namespace STOLON
         {
             Order(uIElements, path.DestinationId, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
         }
-        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateData,
+        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
             Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
         {
             int orderIndex = 0;
-            updateData.Clear();
+            updateDump.Clear();
             if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
             for (int i = 0; i < uIElements.Length; i++)
             {
@@ -89,7 +89,7 @@ namespace STOLON
                 if (element.Parent != parentId) continue;
 
                 UIElementDrawData drawData = orderProvider.GetElementDrawData(element, uiOrgin, orderIndex++, out bool isHovered);
-                updateData[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
+                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
                 drawDump[i] = drawData;
             }
         }

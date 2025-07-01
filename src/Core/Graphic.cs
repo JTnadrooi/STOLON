@@ -20,18 +20,18 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     public TOrderProvider OrderProvider { get; }
     public UIPath Path { get; protected set; }
 
-    public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
+    public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
     public ReadOnlySpan<UIElement> Elements => _elements;
     public IReadOnlySet<string> Parents => _parents;
     public UIElementUpdateData this[string elementId] => UpdateData[elementId];
 
     private readonly UIElement[] _elements;
     private readonly UIElementDrawData[] _drawDump;
-    private readonly IDictionary<string, UIElementUpdateData> _updateData;
+    private readonly IDictionary<string, UIElementUpdateData> _updateDump;
     private readonly Dictionary<string, UIElement> _elementMap;
     private readonly HashSet<string> _parents;
 
-    public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+    public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateDump = null, UIPath? path = null)
     {
         List<UIElement> tempElements = new List<UIElement>(elements);
 
@@ -43,7 +43,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
         _elements = tempElements.ToArray();
 
         _drawDump = new UIElementDrawData[_elements.Length];
-        _updateData = updateData ?? STOLON.UI.UpdateData;
+        _updateDump = updateDump ?? STOLON.UI.UpdateDump;
         _elementMap = _elements.ToDictionary(e => e.Id);
         Path = path ?? GetSelfPath(UIElement.TOP_ID);
     }
@@ -69,8 +69,8 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
     public virtual void Update(int elapsedMilliseconds)
     {
-        UIOrdering.Order(_elements, Path, _drawDump, _updateData, Position, OrderProvider);
-        foreach (UIElementUpdateData data in _updateData.Values)
+        UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
+        foreach (UIElementUpdateData data in _updateDump.Values)
         {
             if (_parents.Contains(data.Source.Id))
             {

@@ -35,7 +35,7 @@ namespace STOLON
         /// The <see cref="Textframe"/> managed by the <see cref="UserInterface"/>.
         /// </summary>
         public Textframe Textframe => _textframe;
-        public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
+        public IDictionary<string, UIElementUpdateData> UpdateDump => _updateData;
         private readonly IDictionary<string, UIElementUpdateData> _updateData;
 
         /// <summary>
@@ -72,6 +72,7 @@ namespace STOLON
 
             STOLON.Debug.Success();
         }
+
         public override void Update(int elapsedMilliseconds)
         {
             _textframe.Update(elapsedMilliseconds);
