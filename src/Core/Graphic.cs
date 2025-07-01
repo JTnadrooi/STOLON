@@ -15,9 +15,9 @@ public interface IGraphic
 
 public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
 {
-    public required Vector2 Position { get; init; }
-    public required TOrderProvider OrderProvider { get; init; }
-    public required UIPath Path { get; init; }
+    public Vector2 Position { get; set; }
+    public TOrderProvider OrderProvider { get; }
+    public TOrderProvider Path { get; }
 
     public IDictionary<string, UIElementUpdateData> UpdateData => _updateData;
     public ReadOnlySpan<UIElement> Elements => _elements;
