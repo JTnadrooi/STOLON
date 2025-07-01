@@ -36,7 +36,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
 
         _updateData = updateData ?? STOLON.UI.UpdateData;
         _elementMap = _elements.ToDictionary(e => e.Id);
-        Path = path ?? new UIPath([UIElement.TOP_ID]);
+        Path = path ?? GetSelfPath(UIElement.TOP_ID);
     }
 
     public UIPath GetSelfPath(string id)
@@ -55,7 +55,7 @@ public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IO
     public UIPath GetParentPath(string id)
     {
         UIPath path = GetSelfPath(id);
-        return path.Segments.Length <= 1 ? new UIPath([]) : new UIPath(path.Segments[..^1].ToArray());
+        return path.Segments.Length <= 1 ? new UIPath(Array.Empty<string>()) : new UIPath(path.Segments[..^1].ToArray());
     }
 
     public virtual void Update(int elapsedMilliseconds)
