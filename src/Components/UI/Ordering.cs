@@ -64,7 +64,7 @@ namespace STOLON
         /// <summary>
         /// The <see cref="IOrderProvider"/> that orders the main menu.
         /// </summary>
-        public static IOrderProvider Menu { get; }
+        public static MenuOrderProvider Menu { get; }
     }
 
     /// <summary>

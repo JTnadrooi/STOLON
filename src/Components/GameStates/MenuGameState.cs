@@ -115,7 +115,7 @@ namespace STOLON
                 new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSoundId: "exit3"),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
                 new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
-            ]);
+            ], Vector2.Zero);
 
             //switch (_skipTo)
             //{
