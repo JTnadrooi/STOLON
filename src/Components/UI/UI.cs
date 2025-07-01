@@ -27,21 +27,7 @@ namespace STOLON
     /// </summary>
     public class UserInterface : GameComponent
     {
-        private List<UIElementDrawData> _drawData;
-        public List<UIElementDrawData> DrawData => _drawData;
-
         public const int LINE_WIDTH = 2;
-        private Dictionary<string, UIElement> _elements;
-        private Dictionary<string, UIElementUpdateData> _updateData;
-
-        /// <summary>
-        /// A <see cref="Dictionary{TKey, TValue}"/> containing all the <see cref="UIElementDrawData"/> objects from all the <see cref="UIElement"/> objects refreched AFTER the UI update.
-        /// </summary>
-        public Dictionary<string, UIElementUpdateData> UpdateData => _updateData;
-        /// <summary>
-        /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing all <see cref="UIElement"/> added via the <see cref="AddElement(UIElement)"/> method.
-        /// </summary>
-        public ReadOnlyDictionary<string, UIElement> Elements => _elements.AsReadOnly();
 
         private Textframe _textframe;
 
@@ -81,10 +67,6 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            _elements = new Dictionary<string, UIElement>();
-            _drawData = new List<UIElementDrawData>();
-            _updateData = new Dictionary<string, UIElementUpdateData>();
-
             STOLON.Debug.Success();
         }
         public override void Update(int elapsedMilliseconds)
@@ -105,8 +87,6 @@ namespace STOLON
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(DrawingContext drawingContext)
         {
-            foreach (UIElementDrawData elementDrawData in _drawData)
-                drawingContext.DrawElement(elementDrawData);
             _textframe.Draw(drawingContext);
             base.Draw(drawingContext);
         }
