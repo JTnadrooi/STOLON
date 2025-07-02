@@ -31,24 +31,24 @@ using System.Text.RegularExpressions;
 namespace STOLON
 {
     /// <summary>
+    /// What type the <see cref="UIElement"/> is. When <see cref="Listen"/>, "collisions" with the mouse will be calculated for its hitbox.
+    /// </summary>
+    public enum UIElementType
+    {
+        /// <summary>
+        /// Its relevant when this <see cref="UIElement"/> gets clicked.
+        /// </summary>
+        Listen,
+        /// <summary>
+        /// Its not relevant when this <see cref="UIElement"/> gets clicked.
+        /// </summary>
+        Ignore,
+    }
+    /// <summary>
     /// Reprecents a button or textplane in the UI. Add new elements to the <see cref="UserInterface"/> using the <see cref="UserInterface.AddElement(UIElement)"/> method.
     /// </summary>
     public class UIElement
     {
-        /// <summary>
-        /// What type the <see cref="UIElement"/> is. When <see cref="Listen"/>, "collisions" with the mouse will be calculated for its hitbox.
-        /// </summary>
-        public enum UIElementType
-        {
-            /// <summary>
-            /// Its relevant when this <see cref="UIElement"/> gets clicked.
-            /// </summary>
-            Listen,
-            /// <summary>
-            /// Its not relevant when this <see cref="UIElement"/> gets clicked.
-            /// </summary>
-            Ignore,
-        }
         public bool IsTop => Parent == TOP_ID;
         public string ClickSoundID { get; }
         public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundID];
