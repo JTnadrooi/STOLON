@@ -70,12 +70,17 @@ namespace STOLON
                     Path = GetSelfPath(data.Source.Id);
                 }
             }
+            for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
             UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
         }
 
         public virtual void Draw(DrawingContext drawingContext)
         {
-            foreach (UIElementDrawData elementDrawData in _drawDump) drawingContext.DrawElement(elementDrawData);
+            foreach (UIElementDrawData elementDrawData in _drawDump)
+            {
+                if (elementDrawData.Id == null) continue;
+                drawingContext.DrawElement(elementDrawData);
+            }
         }
     }
 }
