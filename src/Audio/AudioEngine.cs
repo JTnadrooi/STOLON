@@ -107,7 +107,7 @@ namespace STOLON
             foreach (string filePath in Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories))
             {
                 string fileName = CamelCase(Path.GetFileNameWithoutExtension(filePath).Replace(" ", string.Empty));
-                STOLON.Audio.Library.Add(fileName, new CachedAudio(filePath, fileName));
+                Library.Add(fileName, new CachedAudio(filePath, fileName));
                 STOLON.Debug.Log("loaded audio with id: " + fileName);
             }
             STOLON.Debug.Success();
