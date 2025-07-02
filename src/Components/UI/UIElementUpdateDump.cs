@@ -14,9 +14,9 @@ namespace STOLON
         private readonly Func<TKey, TValue> _defaultValueFactory;
         private bool _caching;
 
-        public DefaultDictionary(Func<TKey, TValue> defaultValueFactory, bool caching = false, int? capasity = null)
+        public DefaultDictionary(Func<TKey, TValue> defaultValueFactory, bool caching = false, int? capacity = null)
         {
-            _inner = capasity.HasValue ? new Dictionary<TKey, TValue>(capasity.Value) : new Dictionary<TKey, TValue>();
+            _inner = capacity.HasValue ? new Dictionary<TKey, TValue>(capacity.Value) : new Dictionary<TKey, TValue>();
             _defaultValueFactory = defaultValueFactory;
             _caching = caching;
         }
@@ -42,7 +42,7 @@ namespace STOLON
         public void Add(TKey key, TValue value) => _inner.Add(key, value);
         public bool ContainsKey(TKey key) => _inner.ContainsKey(key);
         public bool Remove(TKey key) => _inner.Remove(key);
-        public bool TryGetValue(TKey key, out TValue value) => _inner.TryGetValue(key, out value);
+        public bool TryGetValue(TKey key, out TValue value) => _inner.TryGetValue(key, out value!);
         public void Add(KeyValuePair<TKey, TValue> item) => _inner.Add(item.Key, item.Value);
         public void Clear() => _inner.Clear();
         public bool Contains(KeyValuePair<TKey, TValue> item) => _inner.Contains(item);
@@ -52,13 +52,4 @@ namespace STOLON
         IEnumerator IEnumerable.GetEnumerator() => _inner.GetEnumerator();
     }
 
-    //public class UIElementUpdateDump
-    //{
-    //    private readonly Dictionary<string, UIElementUpdateData> _updateDump;
-
-    //    public UIElementUpdateDump(int capacity)
-    //    {
-    //        _updateDump = new Dictionary<string, UIElementUpdateData>(capacity);
-    //    }
-    //}
 }
