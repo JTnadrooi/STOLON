@@ -62,11 +62,11 @@ namespace STOLON
             }
             return new UIPath(stack);
         }
-
-        public UIPath GetParentPath(string id) => id == UIElement.TOP_ID ? throw new InvalidOperationException("Can\'t get path from TOP_ID") : new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
-
+        public UIPath GetParentPath(string id) => id == UIElement.TOP_ID ? throw new InvalidOperationException("Id equal to UIElement.TOP_ID") : new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
         public virtual void Update(int elapsedMilliseconds)
         {
+            for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
+            UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
             foreach (UIElementUpdateData data in _updateDump.Values)
             {
                 if (data.IsClicked)
@@ -75,11 +75,9 @@ namespace STOLON
                         Path = GetParentPath(data.Source.Id.Substring("_back_".Length));
                     else if (_parents.Contains(data.Source.Id))
                         Path = GetSelfPath(data.Source.Id);
-                    Console.WriteLine(Path);
+                    STOLON.Debug.Log("element clicked: " + data.Source.Id);
                 }
             }
-            for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
-            UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
         }
 
         public virtual void Draw(DrawingContext drawingContext)
