@@ -66,9 +66,9 @@ namespace STOLON
         public virtual void Update(int elapsedMilliseconds)
         {
             for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
+            _updateDump.Clear();
             UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
             foreach (UIElementUpdateData data in _updateDump.Values)
-            {
                 if (data.IsClicked)
                 {
                     if (data.Source.Id.StartsWith("_back_"))
@@ -77,16 +77,13 @@ namespace STOLON
                         Path = GetSelfPath(data.Source.Id);
                     STOLON.Debug.Log("element clicked: " + data.Source.Id);
                 }
-            }
         }
 
         public virtual void Draw(DrawingContext drawingContext)
         {
             foreach (UIElementDrawData elementDrawData in _drawDump)
-            {
                 if (elementDrawData.Id == null) continue;
-                drawingContext.DrawElement(elementDrawData);
-            }
+                else drawingContext.DrawElement(elementDrawData);
         }
     }
 }
