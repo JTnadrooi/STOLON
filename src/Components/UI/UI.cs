@@ -48,27 +48,11 @@ namespace STOLON
         /// </summary>
         public UserInterface() : base(STOLON.Environment)
         {
-            string CamelCase(string s)
-            {
-                string x = s.Replace("_", "");
-                if (x.Length == 0) return "null";
-                x = Regex.Replace(x, "([A-Z])([A-Z]+)($|[A-Z])",
-                    m => m.Groups[1].Value + m.Groups[2].Value.ToLower() + m.Groups[3].Value);
-                return char.ToLower(x[0]) + x.Substring(1);
-            }
             STOLON.Debug.Log(">[s]contructing stolon ui");
 
             _textframe = new Textframe(this);
             _updateData = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
-            STOLON.Debug.Log(">loading audio");
-            foreach (string filePath in Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories))
-            {
-                string fileName = CamelCase(Path.GetFileNameWithoutExtension(filePath).Replace(" ", string.Empty));
-                STOLON.Audio.Library.Add(fileName, new CachedAudio(filePath, fileName));
-                STOLON.Debug.Log("loaded audio with id: " + fileName);
-            }
-            STOLON.Debug.Success();
 
             STOLON.Debug.Success();
         }

@@ -11,6 +11,7 @@ using AsitLib;
 
 using NAudio.Mixer;
 using System.IO;
+using System.Text.RegularExpressions;
 
 
 
@@ -80,14 +81,35 @@ namespace STOLON
             set => _ostVolumeSampleProvider.Volume = Math.Clamp(value, 0f, 1f);
         }
         /// <summary>
+        /// All loaded sounds relevant for the stolon <see cref="GameEnvironment"/>
+        /// </summary>
+        public Dictionary<string, CachedAudio> Library { get; }
+        public const int FadeTimeMilliseconds = 2000;
+        /// <summary>
         /// Initialize a new <see cref="AudioEngine"/>.
         /// </summary>
         public AudioEngine()
         {
+            string CamelCase(string s)
+            {
+                string x = s.Replace("_", "");
+                if (x.Length == 0) return "null";
+                x = Regex.Replace(x, "([A-Z])([A-Z]+)($|[A-Z])",
+                    m => m.Groups[1].Value + m.Groups[2].Value.ToLower() + m.Groups[3].Value);
+                return char.ToLower(x[0]) + x.Substring(1);
+            }
             STOLON.Debug.Log(">initating audioengine");
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
             Library = new Dictionary<string, CachedAudio>();
+            STOLON.Debug.Log(">loading audio");
+            foreach (string filePath in Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories))
+            {
+                string fileName = CamelCase(Path.GetFileNameWithoutExtension(filePath).Replace(" ", string.Empty));
+                STOLON.Audio.Library.Add(fileName, new CachedAudio(filePath, fileName));
+                STOLON.Debug.Log("loaded audio with id: " + fileName);
+            }
+            STOLON.Debug.Success();
 
             _masterMixer = new MixingSampleProvider(waveFormat);
             _masterMixer.ReadFully = true;
@@ -262,11 +284,6 @@ namespace STOLON
             STOLON.Debug.Log("disposing audio engine..");
             _outputDevice.Dispose();
         }
-        /// <summary>
-        /// All loaded sounds relevant for the stolon <see cref="GameEnvironment"/>
-        /// </summary>
-        public Dictionary<string, CachedAudio> Library { get; }
-        public const int FadeTimeMilliseconds = 2000;
     }
     public class Playlist
     {
