@@ -219,7 +219,7 @@ namespace STOLON
                 "the chairs have eyes",
                 "\"Its funny. You.\"",
                 "The BOULDER.",
-                "Merde before Mercy.",
+                "Merde.",
                 "Seven-eyed wonders.",
             };
 

@@ -63,7 +63,6 @@ namespace STOLON
 
         public virtual void Update(int elapsedMilliseconds)
         {
-            UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
             foreach (UIElementUpdateData data in _updateDump.Values)
             {
                 if (_parents.Contains(data.Source.Id))
@@ -71,6 +70,7 @@ namespace STOLON
                     Path = GetSelfPath(data.Source.Id);
                 }
             }
+            UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
         }
 
         public virtual void Draw(DrawingContext drawingContext)

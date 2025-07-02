@@ -125,6 +125,7 @@ namespace STOLON
         /// The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.
         /// </summary>
         public string Id { get; }
+        public bool Hide { get; }
         public Font2D Font { get; }
         /// <summary>
         /// Create a new <see cref="UIElementDrawData"/> object.
@@ -135,7 +136,7 @@ namespace STOLON
         /// <param name="position"></param>
         /// <param name="rectangle"></param>
         /// <param name="drawRectangle"></param>
-        public UIElementDrawData(string sourceId, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle)
+        public UIElementDrawData(string sourceId, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false)
         {
             Position = position;
             Type = type;
@@ -144,11 +145,10 @@ namespace STOLON
             DrawRectangle = drawRectangle;
             Id = sourceId;
             Font = font;
+            Hide = hide;
         }
-        public override string ToString()
-        {
-            return "{pos: " + Position + ", text: " + Text + ", rectangle: " + Rectangle + "}";
-        }
+        public override string ToString() => $"UIElementDrawData {{ Id: \"{Id}\", Text: \"{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
+
     }
     /// <summary>
     /// The data element relevant for update methods. <i>(Knowing when an <see cref="UIElement"/> is clicked.)</i>
