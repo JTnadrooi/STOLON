@@ -102,14 +102,14 @@ namespace STOLON
             _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
 
             _mainOrderContainer = new OrderContainer<MenuOrderProvider>(OrderProviders.Menu, [
-                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, STOLON.Audio["exit3"]),
-                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, STOLON.Audio[ "coin4"]),
-                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, STOLON.Audio[ "coin4"]),
+                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: STOLON.Audio["exit3"]),
+                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: STOLON.Audio["coin4"]),
+                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: STOLON.Audio["coin4"]),
                 new UIElement("options", UIElement.TOP_ID, "Options", UIElementType.Listen),
                 new UIElement("special_thanks", UIElement.TOP_ID, "Special Thanks", UIElementType.Listen),
                 new UIElement("quit", UIElement.TOP_ID, "Quit", UIElementType.Listen),
                 new UIElement("sound", "options", "Sound", UIElementType.Listen),
-                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, STOLON.Audio[ "exit3"]),
+                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: STOLON.Audio["exit3"]),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
                 new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
             ], Vector2.Zero);
