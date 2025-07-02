@@ -35,8 +35,8 @@ namespace STOLON
         /// The <see cref="Textframe"/> managed by the <see cref="UserInterface"/>.
         /// </summary>
         public Textframe Textframe => _textframe;
-        public IDictionary<string, UIElementUpdateData> UpdateDump => _updateData;
-        private readonly IDictionary<string, UIElementUpdateData> _updateData;
+        public DefaultDictionary<string, UIElementUpdateData> UpdateDump => _updateData;
+        private readonly DefaultDictionary<string, UIElementUpdateData> _updateData;
 
         /// <summary>
         /// The width of a <see cref="UserInterface"/> line.
@@ -59,7 +59,7 @@ namespace STOLON
             STOLON.Debug.Log(">[s]contructing stolon ui");
 
             _textframe = new Textframe(this);
-            _updateData = new Dictionary<string, UIElementUpdateData>();
+            _updateData = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
             STOLON.Debug.Log(">loading audio");
             foreach (string filePath in Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories))
