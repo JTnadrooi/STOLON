@@ -26,8 +26,7 @@ namespace STOLON
     public class UIElement
     {
         public bool IsTop => ParentId == TOP_ID;
-        public string ClickSoundID { get; }
-        public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundID];
+        public CachedAudio ClickSound { get; }
         public const string TOP_ID = "_";
         /// <summary>
         /// The type of the <see cref="UIElement"/>.
@@ -52,7 +51,7 @@ namespace STOLON
 
         public object?[] DrawArguments { get; }
 
-        public UIElement(string id, string parentId = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
+        public UIElement(string id, string parentId = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
         {
             Text = text ?? id;
             Type = type;
@@ -60,10 +59,8 @@ namespace STOLON
             Order = order;
             ParentId = parentId;
             DrawArguments = drawArgs;
-            ClickSoundID = clickSoundId ?? "select3";
+            ClickSound = clickSound ?? STOLON.Audio.Library["select3"];
         }
-
-
 
         public override string ToString()
         {
