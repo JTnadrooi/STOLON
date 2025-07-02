@@ -14,9 +14,9 @@ namespace STOLON
         private readonly Func<TKey, TValue> _defaultValueFactory;
         private bool _caching;
 
-        public DefaultDictionary(Func<TKey, TValue> defaultValueFactory, bool caching = false)
+        public DefaultDictionary(Func<TKey, TValue> defaultValueFactory, bool caching = false, int? capasity = null)
         {
-            _inner = new();
+            _inner = capasity.HasValue ? new Dictionary<TKey, TValue>(capasity.Value) : new Dictionary<TKey, TValue>();
             _defaultValueFactory = defaultValueFactory;
             _caching = caching;
         }
