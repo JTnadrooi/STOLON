@@ -279,13 +279,6 @@ namespace STOLON
             Random rnd = new Random();
             return new Vector2(rnd.Next((int)minSize.Value.X, (int)max.Value.X), rnd.Next((int)minSize.Value.Y, (int)max.Value.Y));
         }
-        public static Texture2D GetPixel(GraphicsDevice graphics, string name = "pixel")
-        {
-            Texture2D pixel = new Texture2D(graphics, 1, 1);
-            pixel.SetData([Color.White]);
-            pixel.Name = name;
-            return pixel;
-        }
     }
     public static class Centering
     {
