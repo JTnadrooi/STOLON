@@ -44,30 +44,38 @@ namespace STOLON
 
         public UIPath GetSelfPath(string id)
         {
+            if (id == UIElement.TOP_ID) return new UIPath([UIElement.TOP_ID]);
+
             Stack<string> stack = new Stack<string>();
             string currentId = id;
-            stack.Push(id);
-            while (currentId != UIElement.TOP_ID)
+
+            while (true)
             {
-                if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
                 stack.Push(currentId);
+                if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
+                if (element.Parent == UIElement.TOP_ID)
+                {
+                    stack.Push(UIElement.TOP_ID);
+                    break;
+                }
                 currentId = element.Parent;
             }
             return new UIPath(stack);
         }
 
-        public UIPath GetParentPath(string id)
-        {
-            return new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
-        }
+        public UIPath GetParentPath(string id) => id == UIElement.TOP_ID ? throw new InvalidOperationException("Can\'t get path from TOP_ID") : new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
 
         public virtual void Update(int elapsedMilliseconds)
         {
             foreach (UIElementUpdateData data in _updateDump.Values)
             {
-                if (_parents.Contains(data.Source.Id))
+                if (data.IsClicked)
                 {
-                    Path = GetSelfPath(data.Source.Id);
+                    if (data.Source.Id.StartsWith("_back_"))
+                        Path = GetParentPath(data.Source.Id.Substring("_back_".Length));
+                    else if (_parents.Contains(data.Source.Id))
+                        Path = GetSelfPath(data.Source.Id);
+                    Console.WriteLine(Path);
                 }
             }
             for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
