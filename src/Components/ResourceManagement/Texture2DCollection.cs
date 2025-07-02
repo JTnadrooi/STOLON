@@ -56,7 +56,7 @@ namespace STOLON
         }, "Textures")
         {
             _pixel = new Texture2D(contentManager.GetGraphicsDevice(), 1, 1);
-            ((Texture2D)_pixel).SetData(new Color[] { Color.White });
+            ((Texture2D)_pixel).SetData([Color.White]);
         }
         public override void UnloadContent()
         {

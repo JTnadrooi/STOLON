@@ -99,11 +99,7 @@ namespace STOLON
             _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
             _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
 
-            _entityProfiles = new EntityProfile[]
-            {
-                STOLON.Environment.Entities.Values.First().Profile,
-                STOLON.Environment.Entities.Values.Last().Profile,
-            };
+            _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
 
             _mainOrderContainer = new OrderContainer<MenuOrderProvider>(OrderProviders.Menu, [
                 new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSoundId: "exit3"),
@@ -267,11 +263,7 @@ namespace STOLON
                         _millisecondsSinceStartup = 10001;
                         _done = true;
                         _removeTweener.Update(10);
-                        _boardPlayers = new Player[]
-                                {
-                                new Player("player0"),
-                                new Player("player1"),
-                                };
+                        _boardPlayers = [new Player("player0"), new Player("player1")];
                         _fastLeave = true;
                         Leave();
                     }
@@ -350,11 +342,7 @@ namespace STOLON
 
             if (STOLON.UI.UpdateDump["xp_start"].IsClicked)
             {
-                _boardPlayers = new Player[]
-                        {
-                            new Player("player0"),
-                            new Player("player1"),
-                        };
+                _boardPlayers = [new Player("player0"), new Player("player1")];
                 Leave();
             }
             if (STOLON.UI.UpdateDump["vol_up"].IsClicked)
@@ -373,11 +361,7 @@ namespace STOLON
             }
             if (STOLON.UI.UpdateDump["com_start"].IsClicked)
             {
-                _boardPlayers = new Player[]
-                        {
-                            new Player("player0"),
-                            STOLON.Environment.Entities["goldsilk"].GetPlayer()
-                        };
+                _boardPlayers = [new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()];
                 Leave();
             }
             if (STOLON.UI.UpdateDump["special_thanks"].IsClicked)

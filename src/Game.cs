@@ -133,11 +133,10 @@ namespace STOLON
         {
             Debug.Log(">[s]loading stolon content");
 
-            _palette = new Color[]
-            {
+            _palette = [
                 new Color(242, 251, 235), // #f2fbeb
                 new Color(23, 18, 25), // #171219
-            };
+            ];
             STOLON.Debug.Log("palette set.");
 
             STOLON.Config = new GameConfig();

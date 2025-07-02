@@ -35,21 +35,21 @@ namespace STOLON
         public override string? ToString() => Name;
         public override int GetHashCode() => Name.GetHashCode();
         public object Clone() => new Player(Name, Computer);
-        /// <summary>
-        /// The default configuration for a 2p senario.
-        /// </summary>
-        public static Player[] TwoPlayers => new Player[]
-                        {
-                            new Player("player0"),
-                            new Player("player1"),
-                        };
-        /// <summary>
-        /// The default configuration for a player vs com senario.
-        /// </summary>
-        public static Player[] PlayersCom => new Player[]
-                        {
-                            new Player("player0"),
-                            STOLON.Environment.Entities["goldsilk"].GetPlayer()
-                        };
+        ///// <summary>
+        ///// The default configuration for a 2p senario.
+        ///// </summary>
+        //public static Player[] TwoPlayers => new Player[]
+        //                {
+        //                    new Player("player0"),
+        //                    new Player("player1"),
+        //                };
+        ///// <summary>
+        ///// The default configuration for a player vs com senario.
+        ///// </summary>
+        //public static Player[] PlayersCom => new Player[]
+        //                {
+        //                    new Player("player0"),
+        //                    STOLON.Environment.Entities["goldsilk"].GetPlayer()
+        //                };
     }
 }

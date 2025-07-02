@@ -282,7 +282,7 @@ namespace STOLON
         public static Texture2D GetPixel(GraphicsDevice graphics, string name = "pixel")
         {
             Texture2D pixel = new Texture2D(graphics, 1, 1);
-            pixel.SetData(new Color[] { Color.White });
+            pixel.SetData([Color.White]);
             pixel.Name = name;
             return pixel;
         }

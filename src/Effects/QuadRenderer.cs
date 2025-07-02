@@ -23,7 +23,7 @@ namespace STOLON
             _vertexBuffer[2] = new VertexPositionTexture(new Vector3(-1, -1, 1), new Vector2(0, 1));
             _vertexBuffer[3] = new VertexPositionTexture(new Vector3(1, -1, 1), new Vector2(1, 1));
 
-            _indexBuffer = new short[] { 0, 3, 2, 0, 1, 3 };
+            _indexBuffer = [0, 3, 2, 0, 1, 3];
         }
         public void RenderQuad(GraphicsDevice graphicsDevice, Vector2 v1, Vector2 v2)
         {
