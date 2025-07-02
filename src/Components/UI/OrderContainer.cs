@@ -32,7 +32,7 @@ namespace STOLON
             OrderProvider = orderProvider;
             Position = position;
 
-            _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.Parent == e.Id)).Select(e => e.Id));
+            _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.ParentId == e.Id)).Select(e => e.Id));
             foreach (string id in _parents) tempElements.Add(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
             _elements = tempElements.ToArray();
 
@@ -53,12 +53,12 @@ namespace STOLON
             {
                 stack.Push(currentId);
                 if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
-                if (element.Parent == UIElement.TOP_ID)
+                if (element.ParentId == UIElement.TOP_ID)
                 {
                     stack.Push(UIElement.TOP_ID);
                     break;
                 }
-                currentId = element.Parent;
+                currentId = element.ParentId;
             }
             return new UIPath(stack);
         }

@@ -1,30 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-using Betwixt;
-using MonoGame.Extended;
-
-using static STOLON.UIElement;
-
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Math = System.Math;
+﻿using Microsoft.Xna.Framework;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using RectangleF = MonoGame.Extended.RectangleF;
-using static STOLON.UserInterface;
-using AsitLib;
-using System.Collections;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using Microsoft.Xna.Framework.Media;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
 
 
 
@@ -49,7 +25,7 @@ namespace STOLON
     /// </summary>
     public class UIElement
     {
-        public bool IsTop => Parent == TOP_ID;
+        public bool IsTop => ParentId == TOP_ID;
         public string ClickSoundID { get; }
         public CachedAudio ClickSound => STOLON.Audio.Library[ClickSoundID];
         public const string TOP_ID = "_";
@@ -72,17 +48,17 @@ namespace STOLON
         /// <summary>
         /// The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> this is a child of. 
         /// </summary>
-        public string Parent { get; }
+        public string ParentId { get; }
 
         public object?[] DrawArguments { get; }
 
-        public UIElement(string id, string parent = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
+        public UIElement(string id, string parentId = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, string? clickSoundId = null, params object?[] drawArgs)
         {
             Text = text ?? id;
             Type = type;
             Id = id;
             Order = order;
-            Parent = parent;
+            ParentId = parentId;
             DrawArguments = drawArgs;
             ClickSoundID = clickSoundId ?? "select3";
         }
@@ -91,7 +67,7 @@ namespace STOLON
 
         public override string ToString()
         {
-            return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={Parent}" + "}";
+            return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={ParentId}" + "}";
         }
 
         public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
