@@ -105,8 +105,8 @@ namespace STOLON
 
             if (SkipAnimation && _lineTweener.Running) _lineTweener.Update(12f);
 
-            _line1x = (int)MathHelper.Lerp(_menuGameState.MenuRemoveLine1x, LINE1_TARGET, _lineTweener.Value);
-            _line2x = (int)MathHelper.Lerp(_menuGameState.MenuRemoveLine2x, LINE2_TARGET, _lineTweener.Value);
+            _line1x = (int)MathHelper.Lerp(_menuGameState.RemoveLine1x, LINE1_TARGET, _lineTweener.Value);
+            _line2x = (int)MathHelper.Lerp(_menuGameState.RemoveLine2x, LINE2_TARGET, _lineTweener.Value);
 
             if (_lineTweener.Running) return;
 

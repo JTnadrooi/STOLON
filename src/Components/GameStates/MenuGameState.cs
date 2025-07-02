@@ -19,53 +19,54 @@ namespace STOLON
 {
     public class MenuGameState : GameState
     {
-        private Texture2D _menuLogoLines;
-        private Texture2D _menuLogoMarks;
-        private Texture2D _menuLogoFilledMarks;
-        private Texture2D _menuLogoFonted;
+        private Texture2D _logoLines;
+        private Texture2D _logoMarks;
+        private Texture2D _logoFilledMarks;
+        private Texture2D _logoFonted;
         private Texture2D _dither32;
 
         private EntityProfile[] _entityProfiles;
 
-        private Rectangle _menuLogoTileHider;
+        private Rectangle _logoTileHider;
 
-        private bool _drawMenuLogoLines;
-        private bool _drawMenuLogoDummyTiles;
-        private bool _drawMenuLogoFilledTiles;
-        private bool _drawMenuLogoLowResFonted;
-        private int _menuLogoRowsHidden;
-        private Rectangle _menuLogoBoundingBox;
+        private bool _drawLogoLines;
+        private bool _drawLogoDummyTiles;
+        private bool _drawLogoFilledTiles;
+        private bool _drawLogoLowResFonted;
+        private int _logoRowsHidden;
+        private Rectangle _logoBoundingBox;
 
-        private Vector2 _menuLogoDrawPos;
+        private Vector2 _logoDrawPos;
         private int _millisecondsSinceStartup;
 
-        private int _menuLogoFlashTime;
-        private int? _menuFlashStart;
-        private int? _menuFlashEnd;
-        private int _menuLogoMillisecondsFlashing;
+        private int _logoFlashTime;
+        private int? _flashStart;
+        private int? _flashEnd;
+        private int _millisecondsFlashing;
         private int _millisecondsSinceMenuRemoveStart;
-        private bool _menuDone;
+        private bool _done;
 
-        private int _menuLine1X;
-        private int _menuLine2X;
-        private int _menuLineLenght;
-        private int _menuLineWidth;
+        private int _divLine1X;
+        private int _divLine2X;
+        private int _divLineLenght;
+        private int _divLineWidth;
 
-        private int _menuRemoveLineY;
-        internal int MenuRemoveLine1x;
-        internal int MenuRemoveLine2x;
+        private int _removeLineYAmount;
+
+        internal int RemoveLine1x;
+        internal int RemoveLine2x;
 
         private bool _showSplashtexts;
         private bool _showEntityProfiles;
 
         private List<UIElement> _depthPath;
 
-        private Point[] _menuDitherTexturePositions;
+        private Point[] _ditherTexturePositions;
 
         private OrderContainer<MenuOrderProvider> _mainOrderContainer;
 
-        private Tweener<float> _menuLogoEaseTweener;
-        private Tweener<float> _menuRemoveTweener;
+        private Tweener<float> _logoEaseTweener;
+        private Tweener<float> _removeTweener;
 
         private string[] _tips;
         private Vector2 _tipPos;
@@ -73,25 +74,25 @@ namespace STOLON
         private Action? _onLeave;
         private bool _fastLeave;
 
-        private const int MENU_LOGO_ROW_COUNT = 5;
+        private const int LOGO_ROW_COUNT = 5;
         private Player[]? _boardPlayers;
 
         public MenuGameState() : base("main_menu")
         {
-            _menuLogoLines = STOLON.Textures.GetReference("UI\\Logo\\Menu\\lines");
-            _menuLogoMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\marks");
-            _menuLogoFilledMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\filled_marks");
-            _menuLogoFonted = STOLON.Textures.GetReference("UI\\Logo\\Menu\\fonted");
+            _logoLines = STOLON.Textures.GetReference("UI\\Logo\\Menu\\lines");
+            _logoMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\marks");
+            _logoFilledMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\filled_marks");
+            _logoFonted = STOLON.Textures.GetReference("UI\\Logo\\Menu\\fonted");
             _dither32 = STOLON.Textures.GetReference("dither-32");
-            _drawMenuLogoLines = true;
-            _drawMenuLogoDummyTiles = true;
-            _drawMenuLogoFilledTiles = false;
+            _drawLogoLines = true;
+            _drawLogoDummyTiles = true;
+            _drawLogoFilledTiles = false;
             _fastLeave = false;
 
-            _menuLogoFlashTime = 0;
-            _menuFlashStart = null;
-            _menuLogoRowsHidden = 5;
-            _menuDitherTexturePositions = Array.Empty<Point>();
+            _logoFlashTime = 0;
+            _flashStart = null;
+            _logoRowsHidden = 5;
+            _ditherTexturePositions = Array.Empty<Point>();
 
             _depthPath = new List<UIElement>();
 
@@ -129,8 +130,8 @@ namespace STOLON
 
             STOLON.Debug.Log(">autogenerating _back_ buttons");
 
-            _menuLogoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
-            _menuRemoveTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
+            _logoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
+            _removeTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
 
             //Console.WriteLine(STOLON.UI.UIElements.ToJoinedString(", "));
 
@@ -243,19 +244,19 @@ namespace STOLON
         /// </summary>
         public void Leave(Action? onLeave = null)
         {
-            _menuDone = true;
+            _done = true;
             this._onLeave = onLeave;
         }
         protected override void UpdateUI(int elapsedMilliseconds)
         {
-            int rowHeight = (int)(_menuLogoLines.Height / (float)MENU_LOGO_ROW_COUNT);
-            float menuRemoveTweenerOffset = -300f * _menuRemoveTweener.Value;
+            int rowHeight = (int)(_logoLines.Height / (float)LOGO_ROW_COUNT);
+            float menuRemoveTweenerOffset = -300f * _removeTweener.Value;
             int lineFromMid = (int)(170f - menuRemoveTweenerOffset);
-            bool menuFlashEnded = _millisecondsSinceStartup > _menuFlashEnd;
+            bool menuFlashEnded = _millisecondsSinceStartup > _flashEnd;
             int uiElementOffsetY = (int)(280f + menuRemoveTweenerOffset);
-            int logoYoffset = (int)(512 - 30 - _menuLogoLines.Height + 8f * _menuLogoEaseTweener.Value * (1 - _menuRemoveTweener.Value));
-            int logoYScreenCenter = (int)Centering.CenterY(_menuLogoLines, 0, STOLON.V_HEIGHT).Y;
-            logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _menuRemoveTweener.Value);
+            int logoYoffset = (int)(512 - 30 - _logoLines.Height + 8f * _logoEaseTweener.Value * (1 - _removeTweener.Value));
+            int logoYScreenCenter = (int)Centering.CenterY(_logoLines, 0, STOLON.V_HEIGHT).Y;
+            logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
             switch (GameStateHelpers.SkipData.SkipTo)
@@ -264,8 +265,8 @@ namespace STOLON
                     if (_millisecondsSinceStartup < 10000)
                     {
                         _millisecondsSinceStartup = 10001;
-                        _menuDone = true;
-                        _menuRemoveTweener.Update(10);
+                        _done = true;
+                        _removeTweener.Update(10);
                         _boardPlayers = new Player[]
                                 {
                                 new Player("player0"),
@@ -280,68 +281,68 @@ namespace STOLON
 
             #region inFlash
             _millisecondsSinceStartup += elapsedMilliseconds;
-            _menuLogoDrawPos = Vector2.Round(Centering.CenterX(_menuLogoLines, logoYoffset, STOLON.V_WIDTH));
-            _menuLogoTileHider = new Rectangle(
-                _menuLogoDrawPos.ToPoint() + new Point(0, (int)(rowHeight * (MENU_LOGO_ROW_COUNT - _menuLogoRowsHidden))),
-                new Point((int)(_menuLogoLines.Width), (int)(rowHeight * _menuLogoRowsHidden))
+            _logoDrawPos = Vector2.Round(Centering.CenterX(_logoLines, logoYoffset, STOLON.V_WIDTH));
+            _logoTileHider = new Rectangle(
+                _logoDrawPos.ToPoint() + new Point(0, (int)(rowHeight * (LOGO_ROW_COUNT - _logoRowsHidden))),
+                new Point((int)(_logoLines.Width), (int)(rowHeight * _logoRowsHidden))
             );
 
-            _menuFlashStart = 1200;
-            _menuFlashEnd = _menuFlashStart + 400;
+            _flashStart = 1200;
+            _flashEnd = _flashStart + 400;
 
-            _menuLine1X = (int)(STOLON.V_WIDTH / 2f) - lineFromMid;
-            _menuLine2X = (int)(STOLON.V_WIDTH / 2f) + lineFromMid;
+            _divLine1X = (int)(STOLON.V_WIDTH / 2f) - lineFromMid;
+            _divLine2X = (int)(STOLON.V_WIDTH / 2f) + lineFromMid;
 
-            _menuLineLenght = _drawMenuLogoFilledTiles ? STOLON.V_HEIGHT : 0;
-            _menuLineWidth = 2 + (menuFlashEnded ? 2 : 0);
+            _divLineLenght = _drawLogoFilledTiles ? STOLON.V_HEIGHT : 0;
+            _divLineWidth = 2 + (menuFlashEnded ? 2 : 0);
 
-            if (_millisecondsSinceStartup > 300) _menuLogoRowsHidden = 4;
-            if (_millisecondsSinceStartup > 600) _menuLogoRowsHidden = 3;
-            if (_millisecondsSinceStartup > 800) _menuLogoRowsHidden = 2;
-            if (_millisecondsSinceStartup > 1000) _menuLogoRowsHidden = 1;
-            if (_millisecondsSinceStartup > _menuFlashStart) _menuLogoRowsHidden = 0;
+            if (_millisecondsSinceStartup > 300) _logoRowsHidden = 4;
+            if (_millisecondsSinceStartup > 600) _logoRowsHidden = 3;
+            if (_millisecondsSinceStartup > 800) _logoRowsHidden = 2;
+            if (_millisecondsSinceStartup > 1000) _logoRowsHidden = 1;
+            if (_millisecondsSinceStartup > _flashStart) _logoRowsHidden = 0;
 
-            if (_menuLogoFlashTime > 0)
+            if (_logoFlashTime > 0)
             {
-                _menuLogoMillisecondsFlashing += elapsedMilliseconds;
-                if (_menuLogoMillisecondsFlashing > _menuLogoFlashTime)
+                _millisecondsFlashing += elapsedMilliseconds;
+                if (_millisecondsFlashing > _logoFlashTime)
                 {
-                    _drawMenuLogoFilledTiles = !_drawMenuLogoFilledTiles;
-                    _menuLogoMillisecondsFlashing = 0;
+                    _drawLogoFilledTiles = !_drawLogoFilledTiles;
+                    _millisecondsFlashing = 0;
                 }
             }
 
-            if (!_menuFlashStart.HasValue) return; // code below only relevant when the dummy board show animation ended.
+            if (!_flashStart.HasValue) return; // code below only relevant when the dummy board show animation ended.
 
-            if (_millisecondsSinceStartup > _menuFlashStart.Value) _menuLogoFlashTime = 120;
-            if (_millisecondsSinceStartup > _menuFlashStart.Value + 200) _menuLogoFlashTime = 100;
-            if (_millisecondsSinceStartup > _menuFlashStart.Value + 300) _menuLogoFlashTime = 75;
-            if (_millisecondsSinceStartup > _menuFlashStart.Value + 350) _menuLogoFlashTime = 60;
-            if (_millisecondsSinceStartup < _menuFlashEnd) return; // code below only relevant when the full animation ended.
+            if (_millisecondsSinceStartup > _flashStart.Value) _logoFlashTime = 120;
+            if (_millisecondsSinceStartup > _flashStart.Value + 200) _logoFlashTime = 100;
+            if (_millisecondsSinceStartup > _flashStart.Value + 300) _logoFlashTime = 75;
+            if (_millisecondsSinceStartup > _flashStart.Value + 350) _logoFlashTime = 60;
+            if (_millisecondsSinceStartup < _flashEnd) return; // code below only relevant when the full animation ended.
 
             #endregion
             #region inMenu
-            _drawMenuLogoLowResFonted = true;
-            _drawMenuLogoDummyTiles = true;
-            _drawMenuLogoFilledTiles = true;
-            _drawMenuLogoLines = true;
+            _drawLogoLowResFonted = true;
+            _drawLogoDummyTiles = true;
+            _drawLogoFilledTiles = true;
+            _drawLogoLines = true;
 
-            _menuLogoFlashTime = 0; // ensures disabled flashing.
-            _menuLogoEaseTweener.Update(elapsedMilliseconds / 1000f); // update the tweener.
-            if (_menuLogoEaseTweener.Value == 1 || _menuLogoEaseTweener.Value == 0) // reverse and restart if finished.
+            _logoFlashTime = 0; // ensures disabled flashing.
+            _logoEaseTweener.Update(elapsedMilliseconds / 1000f); // update the tweener.
+            if (_logoEaseTweener.Value == 1 || _logoEaseTweener.Value == 0) // reverse and restart if finished.
             {
-                _menuLogoEaseTweener.Reverse();
-                _menuLogoEaseTweener.Start();
+                _logoEaseTweener.Reverse();
+                _logoEaseTweener.Start();
                 STOLON.Debug.Log("reversed icon tweener.");
             }
-            _menuLogoBoundingBox =
-                new Rectangle(_menuLogoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _menuLogoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
+            _logoBoundingBox =
+                new Rectangle(_logoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _logoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
 
-            _menuDitherTexturePositions = new Point[(int)Math.Ceiling(STOLON.V_HEIGHT / (float)_dither32.Height) * 2];
-            for (int i = 0; i < _menuDitherTexturePositions.Length; i++) // dithering positions.
-                _menuDitherTexturePositions[i] = new Point(
-                        (i >= _menuDitherTexturePositions.Length / 2f) ? _menuLine2X : _menuLine1X - _dither32.Width,
-                        (i % (int)(_menuDitherTexturePositions.Length / 2f)) * _dither32.Height);
+            _ditherTexturePositions = new Point[(int)Math.Ceiling(STOLON.V_HEIGHT / (float)_dither32.Height) * 2];
+            for (int i = 0; i < _ditherTexturePositions.Length; i++) // dithering positions.
+                _ditherTexturePositions[i] = new Point(
+                        (i >= _ditherTexturePositions.Length / 2f) ? _divLine2X : _divLine1X - _dither32.Width,
+                        (i % (int)(_ditherTexturePositions.Length / 2f)) * _dither32.Height);
 
             _mainOrderContainer.Position = new Vector2(0, uiElementOffsetY);
             _mainOrderContainer.Update(elapsedMilliseconds);
@@ -388,10 +389,10 @@ namespace STOLON
                 STOLON.Instance.Exit();
             }
 
-            if (!_menuDone) return;
+            if (!_done) return;
             #endregion
 
-            _menuRemoveTweener.Update(elapsedMilliseconds / 1000f);
+            _removeTweener.Update(elapsedMilliseconds / 1000f);
             STOLON.Tasks.SafePush("menu_logo_disapear", new DynamicTask(() => // fire and forget game logic ftw
             {
                 _onLeave?.Invoke();
@@ -404,39 +405,39 @@ namespace STOLON
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
             _tipPos = Centering.CenterX((int)(STOLON.Fonts.Small.FastMeasure(_tips[_tipId]).X),
-                _menuLogoDrawPos.Y - STOLON.Fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_menuRemoveTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
+                _logoDrawPos.Y - STOLON.Fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
 
-            _menuRemoveLineY = STOLON.V_HEIGHT - (int)(_menuRemoveTweener.Value * STOLON.V_HEIGHT);
-            int lDelta = (int)(_menuLogoDrawPos.X - 8);
-            MenuRemoveLine1x = lDelta;
-            MenuRemoveLine2x = STOLON.V_WIDTH - lDelta;
+            _removeLineYAmount = STOLON.V_HEIGHT - (int)(_removeTweener.Value * STOLON.V_HEIGHT);
+            int lDelta = (int)(_logoDrawPos.X - 8);
+            RemoveLine1x = lDelta;
+            RemoveLine2x = STOLON.V_WIDTH - lDelta;
 
-            Centering.OnPixel(ref _menuLogoDrawPos);
+            Centering.OnPixel(ref _logoDrawPos);
         }
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawLine(_menuLine1X, -10f, _menuLine1X, _menuLineLenght, Color.White, _menuLineWidth);
-            drawingContext.DrawLine(_menuLine2X, -10f, _menuLine2X, _menuLineLenght, Color.White, _menuLineWidth);
-            if (_menuDone && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _tips[_tipId], _tipPos);
+            drawingContext.DrawLine(_divLine1X, -10f, _divLine1X, _divLineLenght, Color.White, _divLineWidth);
+            drawingContext.DrawLine(_divLine2X, -10f, _divLine2X, _divLineLenght, Color.White, _divLineWidth);
+            if (_done && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _tips[_tipId], _tipPos);
 
-            if (_drawMenuLogoLowResFonted)
+            if (_drawLogoLowResFonted)
             {
-                for (int i = 0; i < _menuDitherTexturePositions.Length; i++)
-                    drawingContext.Draw(_dither32, _menuDitherTexturePositions[i].ToVector2(), effects: (i >= _menuDitherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+                for (int i = 0; i < _ditherTexturePositions.Length; i++)
+                    drawingContext.Draw(_dither32, _ditherTexturePositions[i].ToVector2(), effects: (i >= _ditherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
-                drawingContext.DrawArea(_menuLogoBoundingBox, Color.Black);
-                drawingContext.DrawRectangle(_menuLogoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
+                drawingContext.DrawArea(_logoBoundingBox, Color.Black);
+                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
 
             }
-            if (_drawMenuLogoDummyTiles) drawingContext.Draw(_menuLogoMarks, _menuLogoDrawPos);
-            if (_drawMenuLogoFilledTiles) drawingContext.Draw(_menuLogoFilledMarks, _menuLogoDrawPos);
-            if (_drawMenuLogoLowResFonted) drawingContext.Draw(_menuLogoFonted, _menuLogoDrawPos);
+            if (_drawLogoDummyTiles) drawingContext.Draw(_logoMarks, _logoDrawPos);
+            if (_drawLogoFilledTiles) drawingContext.Draw(_logoFilledMarks, _logoDrawPos);
+            if (_drawLogoLowResFonted) drawingContext.Draw(_logoFonted, _logoDrawPos);
 
-            drawingContext.DrawArea(_menuLogoTileHider, Color.Black);
-            if (_drawMenuLogoLines) drawingContext.Draw(_menuLogoLines, _menuLogoDrawPos);
+            drawingContext.DrawArea(_logoTileHider, Color.Black);
+            if (_drawLogoLines) drawingContext.Draw(_logoLines, _logoDrawPos);
 
-            drawingContext.DrawLine(MenuRemoveLine1x, STOLON.V_HEIGHT, MenuRemoveLine1x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
-            drawingContext.DrawLine(MenuRemoveLine2x, STOLON.V_HEIGHT, MenuRemoveLine2x, _menuRemoveLineY, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(RemoveLine1x, STOLON.V_HEIGHT, RemoveLine1x, _removeLineYAmount, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(RemoveLine2x, STOLON.V_HEIGHT, RemoveLine2x, _removeLineYAmount, Color.White, UserInterface.LINE_WIDTH);
 
             if (_showEntityProfiles)
             {
