@@ -443,6 +443,8 @@ namespace STOLON
                 drawingContext.DrawEntity(_entityProfiles[0], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), drawMode: EntityDrawMode.Menu);
                 drawingContext.DrawEntity(_entityProfiles[1], 512, new Vector2(STOLON.V_WIDTH / 2 - 512, 0), drawMode: EntityDrawMode.Menu);
             }
+
+            _mainOrderContainer.Draw(drawingContext);
         }
     }
 }
