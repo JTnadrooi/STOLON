@@ -46,7 +46,7 @@ namespace STOLON
                 _ => ">",
             };
             isHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
-            return new UIElementDrawData(element.Id, isHovered
+            return new UIElementDrawData(element, isHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
                 : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }

@@ -97,11 +97,8 @@ namespace STOLON
         /// The text to draw inside the <see cref="Rectangle"/>.
         /// </summary>
         public string Text { get; }
-        /// <summary>
-        /// The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.
-        /// </summary>
-        public string? Id { get; }
-        public bool IsEmpty => Id == null;
+        public UIElement? Source { get; }
+        public bool IsEmpty => Source == null;
         public bool Hide { get; }
         public Font2D Font { get; }
         /// <summary>
@@ -113,18 +110,18 @@ namespace STOLON
         /// <param name="position"></param>
         /// <param name="rectangle"></param>
         /// <param name="drawRectangle"></param>
-        public UIElementDrawData(string? sourceId, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false)
+        public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false)
         {
             Position = position;
             Type = type;
             Text = text;
             Rectangle = rectangle;
             DrawRectangle = drawRectangle;
-            Id = sourceId;
+            Source = source;
             Font = font;
             Hide = hide;
         }
-        public override string ToString() => $"UIElementDrawData {{ Id: \"{Id}\", Text: \"{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
+        public override string ToString() => $"UIElementDrawData {{ Id: \"{Source}\", Text: \"{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
 
         public static UIElementDrawData Empty = new UIElementDrawData(null, string.Empty, STOLON.Fonts.Medium, UIElementType.Ignore, default, default, false, true);
     }

@@ -82,7 +82,7 @@ namespace STOLON
         public virtual void Draw(DrawingContext drawingContext)
         {
             foreach (UIElementDrawData elementDrawData in _drawDump)
-                if (elementDrawData.Id == null) continue;
+                if (elementDrawData.Source == null) continue;
                 else drawingContext.DrawElement(elementDrawData);
         }
     }
