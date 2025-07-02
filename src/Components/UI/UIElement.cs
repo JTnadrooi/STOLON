@@ -101,6 +101,7 @@ namespace STOLON
         /// The <see cref="UIElement.Id"/> of the source <see cref="UIElement"/>.
         /// </summary>
         public string? Id { get; }
+        public bool IsEmpty => Id == null;
         public bool Hide { get; }
         public Font2D Font { get; }
         /// <summary>
@@ -144,6 +145,7 @@ namespace STOLON
         /// A value indicating if the source <see cref="UIElement"/> is clicked by the mouse.
         /// </summary>
         public bool IsClicked => IsPressed && STOLON.Input.PreviousMouse.LeftButton == ButtonState.Released;
+        public bool IsEmpty => Source == null;
         public UIElement? Source { get; }
         /// <summary>
         /// Create a new <see cref="UIElementUpdateData"/> with the propeties <see cref="IsHovered"/> and <see cref="Source"/> set.
