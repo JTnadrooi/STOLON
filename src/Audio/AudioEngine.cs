@@ -84,6 +84,7 @@ namespace STOLON
         /// All loaded sounds relevant for the stolon <see cref="GameEnvironment"/>
         /// </summary>
         public Dictionary<string, CachedAudio> Library { get; }
+        public CachedAudio this[string audioId] => Library[audioId];
         public const int FadeTimeMilliseconds = 2000;
         /// <summary>
         /// Initialize a new <see cref="AudioEngine"/>.
