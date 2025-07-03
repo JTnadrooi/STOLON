@@ -51,6 +51,8 @@ namespace STOLON
 
         public object?[] DrawArguments { get; }
 
+        public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
+
         public UIElement(string id, string parentId = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
         {
             Text = text ?? id;
@@ -66,8 +68,6 @@ namespace STOLON
         {
             return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={ParentId}" + "}";
         }
-
-        public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
     }
     /// <summary>
     /// The data element relevant for draw methods.

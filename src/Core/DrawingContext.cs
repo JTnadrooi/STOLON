@@ -78,7 +78,9 @@ namespace STOLON
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, newRes.Y, 0);
+            _rt1.Dispose();
             _rt1 = GetDesired(newRes);
+            _rt2.Dispose();
             _rt2 = GetDesired(newRes);
             foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
             STOLON.Debug.Log($"updated fx pipeline res.");
