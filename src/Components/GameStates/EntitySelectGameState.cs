@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Point = Microsoft.Xna.Framework.Point;
 
+using static STOLON.EntitySelectGameState;
+
 namespace STOLON
 {
     public class EntitySelectOrderProvider : IOrderProvider
@@ -28,9 +30,12 @@ namespace STOLON
 
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
+            const int PADDING_X = 8;
+            const int PADDING_Y = 4;
+
             isHovered = false;
             Vector2 pos = _origin + new Vector2(index * 20, 0);
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), 8, 4, 5, (int)(16 - _font.Dimensions.Y / 2 - 4), out Point textPos);
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
             return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true);
         }
     }
