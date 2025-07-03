@@ -113,6 +113,7 @@ namespace STOLON
         public UIElement? Source { get; }
         public bool IsEmpty => Source == null;
         public bool Hide { get; }
+        public bool DrawBackground { get; }
         public Font2D Font { get; }
         /// <summary>
         /// Create a new <see cref="UIElementDrawData"/> object.
@@ -123,7 +124,7 @@ namespace STOLON
         /// <param name="position"></param>
         /// <param name="rectangle"></param>
         /// <param name="drawRectangle"></param>
-        public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false)
+        public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false, bool drawBg = false)
         {
             Position = position;
             Type = type;
@@ -133,6 +134,7 @@ namespace STOLON
             Source = source;
             Font = font;
             Hide = hide;
+            DrawBackground = drawBg;
         }
         public override string ToString() => $"UIElementDrawData {{ Id: \"{Source}\", Text: \"{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
 

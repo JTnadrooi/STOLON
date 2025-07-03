@@ -244,6 +244,7 @@ namespace STOLON
         {
             if (drawData.Source == null) throw new InvalidOperationException();
             if (drawData.Hide) return;
+            if (drawData.DrawBackground) DrawArea(drawData.Rectangle.ToRectangle(), Color.Black);
             DrawString(drawData.Font, drawData.Text, drawData.Position);
             if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, UserInterface.LINE_WIDTH);
         }
