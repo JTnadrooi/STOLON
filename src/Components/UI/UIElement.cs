@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using RectangleF = MonoGame.Extended.RectangleF;
+using System;
 
 
 
@@ -63,6 +66,18 @@ namespace STOLON
             DrawArguments = drawArgs;
             ClickSound = clickSound ?? STOLON.Audio.Library["select3"];
         }
+        public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null)
+        {
+            font ??= STOLON.Fonts.Medium;
+
+            Vector2 contentSize = font.FastMeasure(Text);
+            int recW = (int)contentSize.X + 2 * padding;
+            int recH = (int)contentSize.Y + 2 * padding;
+
+            textPos = new Point(pos.X + padding + margin, pos.Y + padding + margin);
+            return new Rectangle(pos + new Point(margin), new Point(recW, recH));
+        }
+
 
         public override string ToString()
         {

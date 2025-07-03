@@ -29,7 +29,10 @@ namespace STOLON
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             isHovered = false;
-            return new UIElementDrawData(element, element.Text, _font, element.Type, _origin + new Vector2(index * 20, 0), RectangleF.Empty, false);
+            Vector2 pos = _origin + new Vector2(index * 20, 0);
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), 2, 2, out Point textPos);
+            Console.WriteLine(bounds.ToString());
+            return new UIElementDrawData(element, element.Text, _font, element.Type, textPos.ToVector2(), bounds, true);
         }
     }
 
