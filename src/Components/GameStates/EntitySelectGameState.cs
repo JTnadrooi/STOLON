@@ -30,8 +30,7 @@ namespace STOLON
         {
             isHovered = false;
             Vector2 pos = _origin + new Vector2(index * 20, 0);
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), 2, 2, out Point textPos);
-            Console.WriteLine(bounds.ToString());
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), 8, 4, 10, 4, out Point textPos);
             return new UIElementDrawData(element, element.Text, _font, element.Type, textPos.ToVector2(), bounds, true);
         }
     }

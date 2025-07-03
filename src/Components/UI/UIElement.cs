@@ -66,16 +66,17 @@ namespace STOLON
             DrawArguments = drawArgs;
             ClickSound = clickSound ?? STOLON.Audio.Library["select3"];
         }
-        public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null)
+        public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null) => GetBounds(pos, padding, padding, margin, margin, out textPos, font);
+        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, out Point textPos, Font2D? font = null)
         {
             font ??= STOLON.Fonts.Medium;
 
             Vector2 contentSize = font.FastMeasure(Text);
-            int recW = (int)contentSize.X + 2 * padding;
-            int recH = (int)contentSize.Y + 2 * padding;
+            int recW = (int)contentSize.X + 2 * paddingX;
+            int recH = (int)contentSize.Y + 2 * paddingY;
 
-            textPos = new Point(pos.X + padding + margin, pos.Y + padding + margin);
-            return new Rectangle(pos + new Point(margin), new Point(recW, recH));
+            textPos = new Point(pos.X + paddingX + marginX, pos.Y + paddingY + marginY);
+            return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
         }
 
 
