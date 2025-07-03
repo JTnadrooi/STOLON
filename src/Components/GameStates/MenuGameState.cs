@@ -101,7 +101,7 @@ namespace STOLON
 
             _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
 
-            _mainOrderContainer = new OrderContainer<MenuOrderProvider>(OrderProviders.Menu, [
+            _mainOrderContainer = new OrderContainer<MenuOrderProvider>(new MenuOrderProvider(), [
                 new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: STOLON.Audio["exit3"]),
                 new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: STOLON.Audio["coin4"]),
                 new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: STOLON.Audio["coin4"]),

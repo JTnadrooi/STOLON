@@ -53,21 +53,6 @@ namespace STOLON
     }
 
     /// <summary>
-    /// A static list of the most common <see cref="IOrderProvider"/> objects.
-    /// </summary>
-    public static class OrderProviders
-    {
-        static OrderProviders()
-        {
-            Menu = new MenuOrderProvider();
-        }
-        /// <summary>
-        /// The <see cref="IOrderProvider"/> that orders the main menu.
-        /// </summary>
-        public static MenuOrderProvider Menu { get; }
-    }
-
-    /// <summary>
     /// Provides methods for ordering <see cref="UIElement"/> objects. (Casting them to <see cref="UIElementDrawData"/> or/and <see cref="UIElementUpdateData"/>.
     /// </summary>
     public static class UIOrdering
