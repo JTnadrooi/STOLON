@@ -15,7 +15,6 @@ namespace STOLON
     public class EntitySelectOrderProvider : IOrderProvider
     {
         private Font2D _font;
-        private bool _capitalize = true;
         private Vector2 _origin;
 
         private int _leftSpace;
@@ -26,7 +25,11 @@ namespace STOLON
             _leftSpace = 0;
         }
 
-        public void PrepareOrdering(Vector2 origin) => _origin = origin;
+        public void PrepareOrdering(Vector2 origin)
+        {
+            _origin = origin;
+            _leftSpace = 0;
+        }
 
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
@@ -34,8 +37,9 @@ namespace STOLON
             const int PADDING_Y = 4;
 
             isHovered = false;
-            Vector2 pos = _origin + new Vector2(index * 20, 0);
+            Vector2 pos = _origin + new Vector2(_leftSpace, 0);
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
+            _leftSpace += bounds.Width + 5;
             return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true);
         }
     }
@@ -131,6 +135,7 @@ namespace STOLON
             _selectedState = new TimedState<int>();
             _infoWindowHeader = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
+                new UIElement("synergy_warning", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
         }
 
@@ -173,6 +178,7 @@ namespace STOLON
             if (_selectedIndex != -1)
             {
                 _infoWindowHeader.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
+                _infoWindowHeader.Elements["synergy_warning"].Text = "72%";
                 _infoWindowHeader.Update(elapsedMilliseconds);
             }
 
