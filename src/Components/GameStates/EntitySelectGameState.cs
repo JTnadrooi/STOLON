@@ -2,6 +2,7 @@
 using DiscordRPC;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,26 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
+    public class EntitySelectOrderProvider : IOrderProvider
+    {
+        private Font2D _font;
+        private bool _capitalize = true;
+
+        private int _leftSpace;
+
+        public EntitySelectOrderProvider()
+        {
+            _font = STOLON.Fonts.Medium;
+            _leftSpace = 0;
+        }
+
+        public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered)
+        {
+            isHovered = false;
+            return new UIElementDrawData(element, element.Text, _font, element.Type, UIOrgin + new Vector2(index * 20, 0), RectangleF.Empty, false);
+        }
+    }
+
     public class EntitySelectGameState : GameState
     {
         private readonly struct EntityDrawData
@@ -61,6 +82,8 @@ namespace STOLON
         private Rectangle _lvlNameBounds;
         private Vector2 _lvlNameTextPos;
 
+        private OrderContainer<EntitySelectOrderProvider> _infoWindowHeader;
+
         //private Entity[] _entities;
 
         private const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
@@ -96,6 +119,9 @@ namespace STOLON
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
+            _infoWindowHeader = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
+                new UIElement("extended_name", UIElement.TOP_ID, "Options", UIElementType.Ignore),
+            ], new Vector2(0, INFO_WINDOW_TOPLINE));
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)
@@ -136,12 +162,13 @@ namespace STOLON
 
             if (_selectedIndex != -1)
             {
-                Point nameDimensions = STOLON.Fonts.Medium.FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
-                const int ENAME_CLEARING_X = 8;
-                const int ENAME_CLEARING_Y = 4;
+                //Point nameDimensions = STOLON.Fonts.Medium.FastMeasure(_drawData[_selectedIndex].FullerName).ToPoint();
+                //const int ENAME_CLEARING_X = 8;
+                //const int ENAME_CLEARING_Y = 4;
 
-                _selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + ENAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(ENAME_CLEARING_X * 2, ENAME_CLEARING_Y * 2));
-                _selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, -1)).PixelLock();
+                //_selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + ENAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(ENAME_CLEARING_X * 2, ENAME_CLEARING_Y * 2));
+                //_selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, -1)).PixelLock();
+                _infoWindowHeader.Update(elapsedMilliseconds);
             }
 
             string lvlName = "Node 12b: LANU LANU LANU";
@@ -168,8 +195,11 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    drawingContext.DrawString(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
-                    drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
+                    //drawingContext.DrawString(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
+                    //drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
+
+                    _infoWindowHeader.Draw(drawingContext);
+
                     //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
 
                     //drawingContext.DrawStringOutline(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE), 8, 4);
