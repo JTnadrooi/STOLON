@@ -130,7 +130,7 @@ namespace STOLON
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
             _infoWindowHeader = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
-                new UIElement("extended_name", UIElement.TOP_ID, "Options", UIElementType.Ignore),
+                new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
         }
 
@@ -178,6 +178,8 @@ namespace STOLON
 
                 //_selectedNameBounds = new Rectangle(Centering.CenterY(nameDimensions.Y + ENAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, INFO_WINDOW_TOPLINE), nameDimensions + new Point(ENAME_CLEARING_X * 2, ENAME_CLEARING_Y * 2));
                 //_selectedNameTextPos = (Centering.Center(nameDimensions, _selectedNameBounds) + new Vector2(1, -1)).PixelLock();
+
+                _infoWindowHeader.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
                 _infoWindowHeader.Update(elapsedMilliseconds);
             }
 
