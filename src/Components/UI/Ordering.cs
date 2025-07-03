@@ -15,7 +15,7 @@ namespace STOLON
     public interface IOrderProvider
     {
         public void PrepareOrdering(Vector2 origin) { }
-        public UIElementDrawData GetElementDrawData(UIElement element, int index, out bool isHovered);
+        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
         public void AfterOrdering() { }
     }
 
@@ -42,7 +42,7 @@ namespace STOLON
                 UIElement element = uIElements[i];
                 if (element.ParentId != parentId) continue;
 
-                UIElementDrawData drawData = orderProvider.GetElementDrawData(element, orderIndex++, out bool isHovered);
+                UIElementDrawData drawData = orderProvider.GetDrawData(element, orderIndex++, out bool isHovered);
                 updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
                 drawDump[i] = drawData;
             }

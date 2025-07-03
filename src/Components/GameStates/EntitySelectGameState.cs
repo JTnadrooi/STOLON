@@ -26,7 +26,7 @@ namespace STOLON
 
         public void PrepareOrdering(Vector2 origin) => _origin = origin;
 
-        public UIElementDrawData GetElementDrawData(UIElement element, int index, out bool isHovered)
+        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             isHovered = false;
             return new UIElementDrawData(element, element.Text, _font, element.Type, _origin + new Vector2(index * 20, 0), RectangleF.Empty, false);

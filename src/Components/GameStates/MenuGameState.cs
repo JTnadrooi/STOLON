@@ -30,7 +30,7 @@ namespace STOLON
             _font = STOLON.Fonts.Medium;
         }
         public void PrepareOrdering(Vector2 origin) => _origin = origin;
-        public UIElementDrawData GetElementDrawData(UIElement element, int index, out bool isHovered)
+        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + _origin.Y,
