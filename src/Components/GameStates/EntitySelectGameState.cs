@@ -14,6 +14,7 @@ namespace STOLON
     {
         private Font2D _font;
         private bool _capitalize = true;
+        private Vector2 _origin;
 
         private int _leftSpace;
 
@@ -23,10 +24,12 @@ namespace STOLON
             _leftSpace = 0;
         }
 
-        public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered)
+        public void PrepareOrdering(Vector2 origin) => _origin = origin;
+
+        public UIElementDrawData GetElementDrawData(UIElement element, int index, out bool isHovered)
         {
             isHovered = false;
-            return new UIElementDrawData(element, element.Text, _font, element.Type, UIOrgin + new Vector2(index * 20, 0), RectangleF.Empty, false);
+            return new UIElementDrawData(element, element.Text, _font, element.Type, _origin + new Vector2(index * 20, 0), RectangleF.Empty, false);
         }
     }
 
