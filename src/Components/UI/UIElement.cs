@@ -75,7 +75,7 @@ namespace STOLON
             int recW = (int)contentSize.X + 2 * paddingX;
             int recH = (int)contentSize.Y + 2 * paddingY;
 
-            textPos = new Point(pos.X + paddingX + marginX, pos.Y + paddingY + marginY);
+            textPos = new Point(pos.X + paddingX + marginX, pos.Y + paddingY + marginY) + new Point(1, -1);
             return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
         }
 
