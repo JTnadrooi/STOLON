@@ -91,21 +91,21 @@ namespace STOLON
 
         //private Entity[] _entities;
 
-        private const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
-        private const int TILE_ROW_AMOUNT = 4;
-        private const int TILE_COLUMN_AMOUNT = 2;
-        private const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
+        public const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
+        public const int TILE_ROW_AMOUNT = 4;
+        public const int TILE_COLUMN_AMOUNT = 2;
+        public const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
 
-        private const int BOXED_TEXT_DIV_CLEARANCE = 32;
-        private const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE;
-        private const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
+        public const int BOXED_TEXT_DIV_CLEARANCE = 32;
+        public const int ROSTER_TOP_LINE = STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE;
+        public const int ROSTER_BOTTOM_LINE = ROSTER_TOP_LINE - TILE_COLUMN_AMOUNT * TILE_SIZE;
 
-        private const int LINE1_TARGET = TILE_SIZE * TILE_ROW_AMOUNT;
-        private const int LINE2_TARGET = STOLON.V_WIDTH - BOXED_TEXT_DIV_CLEARANCE;
+        public const int LINE1_TARGET = TILE_SIZE * TILE_ROW_AMOUNT;
+        public const int LINE2_TARGET = STOLON.V_WIDTH - BOXED_TEXT_DIV_CLEARANCE;
 
         private const float HOVER_INTENSITY = 0.25f;
 
-        private const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - BOXED_TEXT_DIV_CLEARANCE;
+        public const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - BOXED_TEXT_DIV_CLEARANCE;
 
         public EntitySelectGameState() : base("entity_select")
         {
