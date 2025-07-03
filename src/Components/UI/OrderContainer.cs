@@ -15,7 +15,7 @@ namespace STOLON
         public UIPath Path { get; protected set; }
 
         public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
-        public ReadOnlySpan<UIElement> Elements => _elements;
+        public IReadOnlyDictionary<string, UIElement> Elements => _elementMap;
         public IReadOnlySet<string> Parents => _parents;
         public UIElementUpdateData this[string elementId] => UpdateData[elementId];
 
