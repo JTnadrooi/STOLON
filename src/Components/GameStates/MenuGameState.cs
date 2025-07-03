@@ -17,6 +17,40 @@ using static STOLON.UIElement;
 
 namespace STOLON
 {
+    /// <summary>
+    /// The <see cref="IOrderProvider"/> that orders the main menu.
+    /// </summary> 
+    public class MenuOrderProvider : IOrderProvider
+    {
+        private Font2D _font;
+        private bool _capitalise = true;
+        public MenuOrderProvider()
+        {
+            _font = STOLON.Fonts.Medium;
+        }
+        public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered)
+        {
+            Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
+                                index * (-_font.Dimensions.Y * 2 - 2) + UIOrgin.Y,
+                                STOLON.V_WIDTH, Vector2.One);
+            Centering.OnPixel(ref elementPos);
+
+            Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
+            string elementText = element.Text;
+            if (_capitalise) elementText = elementText.ToUpper();
+
+            string postPre = element.Id switch
+            {
+                "quit" => "x",
+                "specialThanks" => "!",
+                _ => ">",
+            };
+            isHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
+            return new UIElementDrawData(element, isHovered
+                ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
+                : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
+        }
+    }
     public class MenuGameState : GameState
     {
         private Texture2D _logoLines;
