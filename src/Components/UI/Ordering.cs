@@ -14,7 +14,9 @@ namespace STOLON
     /// </summary>
     public interface IOrderProvider
     {
+        public void PrepareOrdering() { }
         public UIElementDrawData GetElementDrawData(UIElement element, Vector2 UIOrgin, int index, out bool isHovered);
+        public void AfterOrdering() { }
     }
 
     /// <summary>
@@ -33,6 +35,8 @@ namespace STOLON
             int orderIndex = 0;
             updateDump.Clear();
             if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
+
+            orderProvider.PrepareOrdering();
             for (int i = 0; i < uIElements.Length; i++)
             {
                 UIElement element = uIElements[i];
@@ -42,6 +46,7 @@ namespace STOLON
                 updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
                 drawDump[i] = drawData;
             }
+            orderProvider.AfterOrdering();
         }
     }
 }
