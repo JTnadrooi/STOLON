@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DiscordRPC;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
@@ -244,7 +245,7 @@ namespace STOLON
             if (drawData.Source == null) throw new InvalidOperationException();
             if (drawData.Hide) return;
             DrawString(drawData.Font, drawData.Text, drawData.Position);
-            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, 1f);
+            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, UserInterface.LINE_WIDTH);
         }
 
         public void Draw(IGraphic graphic)
