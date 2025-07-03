@@ -23,7 +23,7 @@ namespace STOLON
     public class MenuOrderProvider : IOrderProvider
     {
         private Font2D _font;
-        private bool _capitalise = true;
+        private bool _capitalize = true;
         public MenuOrderProvider()
         {
             _font = STOLON.Fonts.Medium;
@@ -37,7 +37,7 @@ namespace STOLON
 
             Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
             string elementText = element.Text;
-            if (_capitalise) elementText = elementText.ToUpper();
+            if (_capitalize) elementText = elementText.ToUpper();
 
             string postPre = element.Id switch
             {
