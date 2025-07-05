@@ -161,12 +161,12 @@ namespace STOLON
                     _hoveredIndex = i;
                     _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 1, HOVER_INTENSITY);
                     if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (_selectedIndex == i) _selectedIndex = -1;
-                        else
+                        if (_selectedIndex == i) _selectedIndex = -1; // entity deselection.
+                        else // if new entity gets selected.
                         {
                             _selectedIndex = i;
                             _currentEntitySelectedCoefficient = 0;
-                            STOLON.Debug.Log("changed selected to " + i + ".");
+                            STOLON.Debug.Log("changed selected entity to " + i + ".");
                         }
                 }
                 else _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 0, HOVER_INTENSITY / 5);
@@ -174,11 +174,11 @@ namespace STOLON
                 _drawData[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
             }
 
-            if (_selectedIndex == -1)
+            if (_selectedIndex == -1) // if no entity selected.
             {
                 _currentEntitySelectedCoefficient = 0;
             }
-            else
+            else // if entity selected.
             {
                 _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
 
