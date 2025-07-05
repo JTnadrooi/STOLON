@@ -16,6 +16,9 @@ namespace STOLON
 
         private int _leftSpace;
 
+        private const int PADDING_X = 8;
+        private const int PADDING_Y = 4;
+
         public EntitySelectOrderProvider()
         {
             _font = STOLON.Fonts.Medium;
@@ -30,9 +33,6 @@ namespace STOLON
 
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
-            const int PADDING_X = 8;
-            const int PADDING_Y = 4;
-
             isHovered = false;
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
@@ -77,7 +77,8 @@ namespace STOLON
 
         private EntityDrawData[] _drawData;
 
-        private float[] _entityHoverData;
+        private float[] _entityHoverCoefficients;
+        private float _currentEntitySelectedCoefficient;
         private int _hoveredIndex;
         private TimedState<int> _hoveredState;
 
@@ -118,13 +119,14 @@ namespace STOLON
 
             _entities = STOLON.Environment.Entities.Values.ToArray();
             _entityCount = _entities.Length;
-            _entityHoverData = new float[_entityCount];
+            _entityHoverCoefficients = new float[_entityCount];
             _hoveredIndex = -1;
             _selectedIndex = -1;
             _drawData = new EntityDrawData[_entityCount];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
+
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("synergy_warning", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -157,22 +159,31 @@ namespace STOLON
                 if (new Rectangle(basePos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos))
                 {
                     _hoveredIndex = i;
-                    _entityHoverData[i] = MathHelper.Lerp(_entityHoverData[i], 1, HOVER_INTENSITY);
+                    _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 1, HOVER_INTENSITY);
                     if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                         if (_selectedIndex == i) _selectedIndex = -1;
                         else
                         {
                             _selectedIndex = i;
+                            _currentEntitySelectedCoefficient = 0;
                             STOLON.Debug.Log("changed selected to " + i + ".");
                         }
                 }
-                else _entityHoverData[i] = MathHelper.Lerp(_entityHoverData[i], 0, HOVER_INTENSITY / 5);
+                else _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 0, HOVER_INTENSITY / 5);
 
-                _drawData[i] = new EntityDrawData(basePos, _entityHoverData[i], _entities[i]);
+                _drawData[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
             }
 
-            if (_selectedIndex != -1)
+            if (_selectedIndex == -1)
             {
+                _currentEntitySelectedCoefficient = 0;
+            }
+            else
+            {
+                _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
+
+                _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
+
                 _entityInfoContainer.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
                 _entityInfoContainer.Elements["synergy_warning"].Text = "72%";
                 _entityInfoContainer.Update(elapsedMilliseconds);
