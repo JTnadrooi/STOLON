@@ -209,6 +209,7 @@ namespace STOLON
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
                     _entityInfoContainer.Draw(drawingContext);
+                    drawingContext.DrawString(STOLON.Fonts.Medium, STOLON.Fonts.Medium.InBounds(selectedEntity.Description ?? string.Empty, 1000, 1000, 0, out int _), new Vector2(10));
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
