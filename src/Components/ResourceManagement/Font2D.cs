@@ -32,32 +32,64 @@ namespace STOLON
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
         public string InBounds(string text, Rectangle bounds, int padding, out int lineCount) => InBounds(text, bounds.Width, bounds.Height, padding, out lineCount);
-        public string InBounds(string text, int maxLineWidth, int maxLineHeight, int padding, out int lineCount)
+        public string InBounds(string text,
+                       int maxLineWidth,
+                       int maxLineHeight,
+                       int padding,
+                       out int lineCount)
         {
-            string[] words = text.Split(' ');
-            StringBuilder sb = new StringBuilder();
-            float lineWidth = 0f;
-            lineCount = 0;
-
-            foreach (string word in words)
+            if (string.IsNullOrEmpty(text))
             {
-                Vector2 size = FastMeasure(word);
-
-                if (lineWidth + size.X < maxLineWidth)
-                {
-                    sb.Append(word + " ");
-                    lineWidth += size.X + Dimensions.X;
-                }
-                else
-                {
-                    sb.Append("\n" + word + " ");
-                    lineCount++;
-                    lineWidth = size.X + Dimensions.X;
-                }
+                lineCount = 0;
+                return string.Empty;
             }
 
+            var sb = new StringBuilder(text.Length + 32);
+            var words = text.AsSpan();
+            int start = 0;
+            float lineW = 0;
+            int lines = 1;
+
+            int maxLines = (int)((maxLineHeight - 2 * padding) / Dimensions.Y);
+            if (maxLines <= 0) { lineCount = 0; return string.Empty; }
+
+            while (start < words.Length)
+            {
+                int space = words[start..].IndexOf(' ');
+                bool last = space == -1;
+
+                ReadOnlySpan<char> span = last ? words[start..] : words.Slice(start, space);
+                string word = span.ToString();
+                float wordW = FastMeasure(word).X + Dimensions.X;
+
+                // will the word fit on this line?
+                if (lineW + wordW > maxLineWidth)
+                {
+                    // would a new line fit vertically?
+                    if (lines + 1 > maxLines)
+                    {
+                        sb.Append("...");           // or "..."
+                        break;                    // no more space
+                    }
+
+                    sb.Append('\n');
+                    lineW = 0;
+                    lines++;
+                }
+
+                if (lineW > 0) sb.Append(' ');
+                sb.Append(word);
+                lineW += wordW;
+
+                if (!last) start += space + 1;
+                else break;
+            }
+
+            lineCount = lines;
             return sb.ToString();
         }
+
+
 
         public override string ToString() => Name + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
         public static implicit operator SpriteFont(Font2D font) => font.SpriteFont;
