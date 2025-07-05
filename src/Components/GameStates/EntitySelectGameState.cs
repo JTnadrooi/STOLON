@@ -1,14 +1,11 @@
 ﻿using Betwixt;
-using DiscordRPC;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Point = Microsoft.Xna.Framework.Point;
-
 using static STOLON.EntitySelectGameState;
+using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
@@ -40,7 +37,7 @@ namespace STOLON
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
             _leftSpace += bounds.Width + 5;
-            return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true);
+            return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
         }
     }
 
@@ -90,13 +87,8 @@ namespace STOLON
         private readonly Dictionary<int, Vector2> _posCache;
         private readonly Entity[] _entities;
 
-        private Rectangle _selectedNameBounds;
-        private Vector2 _selectedNameTextPos;
-
-        private Rectangle _lvlNameBounds;
-        private Vector2 _lvlNameTextPos;
-
-        private OrderContainer<EntitySelectOrderProvider> _infoWindowHeader;
+        private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
+        private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
         //private Entity[] _entities;
 
@@ -133,10 +125,14 @@ namespace STOLON
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
-            _infoWindowHeader = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
+            _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("synergy_warning", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
+            _lvlInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
+                new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
+                new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
+            ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)
@@ -177,19 +173,14 @@ namespace STOLON
 
             if (_selectedIndex != -1)
             {
-                _infoWindowHeader.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
-                _infoWindowHeader.Elements["synergy_warning"].Text = "72%";
-                _infoWindowHeader.Update(elapsedMilliseconds);
+                _entityInfoContainer.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
+                _entityInfoContainer.Elements["synergy_warning"].Text = "72%";
+                _entityInfoContainer.Update(elapsedMilliseconds);
             }
 
-            string lvlName = "Node 12b: LANU LANU LANU";
-            Point lvlNameDimensions = STOLON.Fonts.Medium.FastMeasure(lvlName).ToPoint();
-            const int LVL_NAME_CLEARING_X = 8;
-            const int LVL_NAME_CLEARING_Y = 4;
-
-            _lvlNameBounds = new Rectangle(Centering.CenterY(lvlNameDimensions.Y + LVL_NAME_CLEARING_Y * 2, 5, BOXED_TEXT_DIV_CLEARANCE).ToPoint() + new Point(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE), lvlNameDimensions + new Point(LVL_NAME_CLEARING_X * 2, LVL_NAME_CLEARING_Y * 2));
-            _lvlNameTextPos = (Centering.Center(lvlNameDimensions, _lvlNameBounds) + new Vector2(1, -1)).PixelLock();
-
+            _lvlInfoContainer.Elements["lvl_name"].Text = "Node 12b: LANU LANU LANU";
+            _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 5";
+            _lvlInfoContainer.Update(elapsedMilliseconds);
         }
 
         public Vector2 GetBaseTilePos(int i)
@@ -206,14 +197,7 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
-                    //drawingContext.DrawString(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), _selectedNameTextPos);
-                    //drawingContext.DrawRectangle(_selectedNameBounds, Color.White, UserInterface.LINE_WIDTH);
-
-                    _infoWindowHeader.Draw(drawingContext);
-
-                    //drawingContext.DrawEntity(selectedEntity, 512, new Vector2(448, 0));
-
-                    //drawingContext.DrawStringOutline(STOLON.Fonts.Medium, _drawData[_selectedIndex].FullerName.ToUpper(), new Vector2(5, INFO_WINDOW_TOPLINE), 8, 4);
+                    _entityInfoContainer.Draw(drawingContext);
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
@@ -238,12 +222,7 @@ namespace STOLON
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
-
-
-                drawingContext.DrawString(STOLON.Fonts.Medium, "Node 12b: LANU LANU LANU", _lvlNameTextPos);
-                drawingContext.DrawRectangle(_lvlNameBounds, Color.White, UserInterface.LINE_WIDTH);
-
-
+                _lvlInfoContainer.Draw(drawingContext);
 
                 //drawingContext.DrawString(STOLON.Fonts.Medium, "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
