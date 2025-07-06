@@ -31,8 +31,8 @@ namespace STOLON
         public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing, 0) * Scale, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
-        public string InBounds(string text, Rectangle bounds, int padding, out int lineCount) => InBounds(text, bounds.Width, bounds.Height, padding, out lineCount);
-        public string InBounds(string text,
+        public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
+        public string Wrap(string text,
                        int maxLineWidth,
                        int maxLineHeight,
                        int padding,

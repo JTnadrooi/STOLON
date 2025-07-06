@@ -212,7 +212,7 @@ namespace STOLON
                 {
                     Entity selectedEntity = _drawData[_selectedIndex].Entity;
                     _entityInfoContainer.Draw(drawingContext);
-                    drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.InBounds(selectedEntity.Description ?? string.Empty, LINE1_TARGET / 2, INFO_WINDOW_TOPLINE - 12, 0, out int _).ToUpper(), new Vector2(10));
+                    drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, LINE1_TARGET / 2, INFO_WINDOW_TOPLINE - 12, 0, out int _).ToUpper(), new Vector2(10));
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
