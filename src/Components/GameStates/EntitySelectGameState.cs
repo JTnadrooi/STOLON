@@ -94,7 +94,7 @@ namespace STOLON
         //private Entity[] _entities;
 
         public const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
-        public const int TILE_ROW_AMOUNT = 4;
+        public const int TILE_ROW_AMOUNT = 5;
         public const int TILE_COLUMN_AMOUNT = 2;
         public const int TILE_COUNT = TILE_ROW_AMOUNT * TILE_COLUMN_AMOUNT;
 
@@ -202,7 +202,10 @@ namespace STOLON
         {
             if (_initDone)
             {
+                if (_selectedIndex != -1)
+                    drawingContext.DrawEntity(_drawData[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
+                drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, UserInterface.LINE_WIDTH);
                 if (_selectedIndex != -1)
