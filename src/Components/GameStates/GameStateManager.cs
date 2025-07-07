@@ -28,11 +28,13 @@ namespace STOLON
         public string Id { get; }
         public bool IsSkipTarget { get; }
         protected bool SkipAnimation { get; }
+        protected ReadOnlyCollection<string>? SkipArgs { get; }
 
         protected GameState(string id)
         {
             IsSkipTarget = GameStateHelpers.SkipTo == id;
             SkipAnimation = IsSkipTarget && GameStateHelpers.SkipAnimation;
+            SkipArgs = IsSkipTarget ? GameStateHelpers.SkipArgs : null;
 
             Id = id;
         }
@@ -57,11 +59,13 @@ namespace STOLON
 
         public static string SkipTo { get; }
         public static bool SkipAnimation { get; }
+        public static ReadOnlyCollection<string> SkipArgs { get; }
 
         static GameStateHelpers()
         {
             SkipTo = STOLON.Config.GetString("Debug.skip_to");
             SkipAnimation = STOLON.Config.GetBool("Debug.skip_gamestage_animation");
+            SkipArgs = STOLON.Config.GetString("Debug.skip_to_parameters")[1..^1].Split(",").Select(s => s.Trim()).ToArray().AsReadOnly();
         }
     }
     public class GameStateManager

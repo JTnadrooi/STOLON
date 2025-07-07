@@ -135,6 +135,7 @@ namespace STOLON
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
+
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)
