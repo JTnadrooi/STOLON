@@ -203,7 +203,7 @@ namespace STOLON
             if (_initDone)
             {
                 if (_selectedIndex != -1)
-                    drawingContext.DrawEntity(_drawData[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
+                    drawingContext.DrawEntity(_drawData[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, (_currentEntitySelectedCoefficient - 1) * 512));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
