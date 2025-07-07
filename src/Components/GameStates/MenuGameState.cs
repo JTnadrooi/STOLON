@@ -291,7 +291,7 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (GameStateHelpers.SkipData.SkipTo)
+            switch (GameStateHelpers.SkipTo)
             {
                 case "entity_select":
                     if (_millisecondsSinceStartup < 10000)

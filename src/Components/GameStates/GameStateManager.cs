@@ -31,8 +31,8 @@ namespace STOLON
 
         protected GameState(string id)
         {
-            IsSkipTarget = GameStateHelpers.SkipData.SkipTo == id;
-            SkipAnimation = IsSkipTarget && GameStateHelpers.SkipData.SkipAnimation;
+            IsSkipTarget = GameStateHelpers.SkipTo == id;
+            SkipAnimation = IsSkipTarget && GameStateHelpers.SkipAnimation;
 
             Id = id;
         }
@@ -50,26 +50,18 @@ namespace STOLON
         public static string GetId(this IGameState state) => GameStateHelpers.GetId(state.GetType());
     }
 
-    public struct GameStageSkipData
-    {
-        public string SkipTo { get; }
-        public bool SkipAnimation { get; }
-        public GameStageSkipData(string skipTo, bool skipAnimation)
-        {
-            SkipTo = skipTo;
-            SkipAnimation = skipAnimation;
-        }
-    }
     public static class GameStateHelpers
     {
         public static string GetId<T>() where T : IGameState => GetId(typeof(T));
         public static string GetId(Type type) => type.FullName ?? throw new Exception();
 
-        public static GameStageSkipData SkipData { get; }
+        public static string SkipTo { get; }
+        public static bool SkipAnimation { get; }
 
         static GameStateHelpers()
         {
-            SkipData = new GameStageSkipData(STOLON.Config.GetString("Debug.skip_to"), STOLON.Config.GetBool("Debug.skip_gamestage_animation"));
+            SkipTo = STOLON.Config.GetString("Debug.skip_to");
+            SkipAnimation = STOLON.Config.GetBool("Debug.skip_gamestage_animation");
         }
     }
     public class GameStateManager
