@@ -1,4 +1,5 @@
-﻿using Betwixt;
+﻿using AsitLib;
+using Betwixt;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -136,6 +137,10 @@ namespace STOLON
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
 
+            if (SkipArgs != null)
+            {
+                _selectedIndex = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _selectedIndex;
+            }
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)
