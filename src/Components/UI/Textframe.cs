@@ -29,15 +29,11 @@ namespace STOLON
         }
         public static DialogueDrawArgs FromInfo(DialogueInfo info)
         {
-            return new DialogueDrawArgs(info, new int[info.Text.Length].Select((item, i) =>
+            return new DialogueDrawArgs(info, new int[info.Text.Length].Select((item, i) => info.Text[i] switch
             {
-                char c = info.Text[i];
-                return c switch
-                {
-                    '.' => Textframe.CHAR_READ_MILLISECONDS * 3,
-                    '?' => Textframe.CHAR_READ_MILLISECONDS * 3,
-                    _ => Textframe.CHAR_READ_MILLISECONDS,
-                };
+                '.' => Textframe.CHAR_READ_MILLISECONDS * 3,
+                '?' => Textframe.CHAR_READ_MILLISECONDS * 3,
+                _ => Textframe.CHAR_READ_MILLISECONDS,
             }).ToArray(), info.PostMilliseconds);
         }
     }
@@ -72,8 +68,6 @@ namespace STOLON
         private int _charsRead;
         private int _postTimeRead;
 
-        private UserInterface _userInterface;
-
         public Textframe(UserInterface userInterface)
         {
             _dialogueQueue = new Queue<DialogueInfo>();
@@ -84,7 +78,6 @@ namespace STOLON
             _msSinceLastChar = 0;
             _charsRead = 0;
             _toDrawDialogueText = string.Empty;
-            _userInterface = userInterface;
             _font = STOLON.Fonts.Medium;
         }
         public void Queue(DialogueInfo[] dialogue)
@@ -203,7 +196,7 @@ namespace STOLON
                 drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2());
                 drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), _providerTextScaleCoefficient);
             }
-            drawingContext.DrawRectangle(_dialoguebounds, Color.White, _userInterface.LineWidth);
+            drawingContext.DrawRectangle(_dialoguebounds, Color.White, STOLON.UI.LineWidth);
 
             base.Draw(drawingContext);
         }
