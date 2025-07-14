@@ -32,11 +32,7 @@ namespace STOLON
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
         public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
-        public string Wrap(string text,
-                       int maxLineWidth,
-                       int maxLineHeight,
-                       int padding,
-                       out int lineCount)
+        public string Wrap(string text, int maxLineWidth, int maxLineHeight, int padding, out int lineCount)
         {
             if (string.IsNullOrEmpty(text))
             {

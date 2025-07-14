@@ -76,7 +76,7 @@ namespace STOLON
 
         private bool _initDone;
 
-        private EntityDrawData[] _drawData;
+        private EntityDrawData[] _entityDrawDump;
 
         private float[] _entityHoverCoefficients;
         private float _currentEntitySelectedCoefficient;
@@ -123,7 +123,7 @@ namespace STOLON
             _entityHoverCoefficients = new float[_entityCount];
             _hoveredIndex = -1;
             _selectedIndex = -1;
-            _drawData = new EntityDrawData[_entityCount];
+            _entityDrawDump = new EntityDrawData[_entityCount];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
@@ -177,7 +177,7 @@ namespace STOLON
                 }
                 else _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 0, HOVER_INTENSITY / 5);
 
-                _drawData[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
+                _entityDrawDump[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
             }
 
             if (_selectedIndex == -1) // if no entity selected.
@@ -190,7 +190,7 @@ namespace STOLON
 
                 _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
-                _entityInfoContainer.Elements["extended_name"].Text = _drawData[_selectedIndex].FullerName;
+                _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_selectedIndex].FullerName;
                 _entityInfoContainer.Elements["synergy_warning"].Text = "72%";
                 _entityInfoContainer.Update(elapsedMilliseconds);
             }
@@ -209,16 +209,16 @@ namespace STOLON
             if (_initDone)
             {
                 if (_selectedIndex != -1)
-                    drawingContext.DrawEntity(_drawData[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
+                    drawingContext.DrawEntity(_entityDrawDump[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, UserInterface.LINE_WIDTH);
                 if (_selectedIndex != -1)
                 {
-                    Entity selectedEntity = _drawData[_selectedIndex].Entity;
+                    Entity selectedEntity = _entityDrawDump[_selectedIndex].Entity;
                     _entityInfoContainer.Draw(drawingContext);
-                    drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, LINE1_TARGET / 2, INFO_WINDOW_TOPLINE - 12, 0, out int _).ToUpper(), new Vector2(10));
+                    drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 10, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper(), new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
                 }
 
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, UserInterface.LINE_WIDTH);
@@ -226,7 +226,7 @@ namespace STOLON
                 for (int i = 0; i < TILE_COUNT; i++)
                     if (i < _entityCount)
                     {
-                        ref EntityDrawData ddc = ref _drawData[i];
+                        ref EntityDrawData ddc = ref _entityDrawDump[i];
 
                         drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
