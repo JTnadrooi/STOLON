@@ -130,7 +130,8 @@ namespace STOLON
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
-                new UIElement("synergy_warning", UIElement.TOP_ID, null, UIElementType.Ignore),
+                new UIElement("alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
+                new UIElement("v_alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
             _lvlInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -193,11 +194,12 @@ namespace STOLON
                 _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
                 _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_selectedIndex].FullerName;
-                _entityInfoContainer.Elements["synergy_warning"].Text = "72%";
+                _entityInfoContainer.Elements["alloc"].Text = "(alloc) 100%";
+                _entityInfoContainer.Elements["v_alloc"].Text = "(valloc) 100%";
                 _entityInfoContainer.Update(elapsedMilliseconds);
             }
 
-            _lvlInfoContainer.Elements["lvl_name"].Text = "Node 12b: LANU LANU LANU";
+            _lvlInfoContainer.Elements["lvl_name"].Text = "Node 12b";
             _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 5";
             _lvlInfoContainer.Update(elapsedMilliseconds);
         }
