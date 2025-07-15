@@ -136,7 +136,7 @@ namespace STOLON
         {
             bool textFrameGoUp = false;
             _dialoguebounds = new Rectangle(
-                (int)(STOLON.V_WIDTH * 0.5f - BOX_W * 0.5f),
+                (int)Centering.CenterX(BOX_W, 0, STOLON.V_WIDTH).X, 
                 (int)((BOX_H * _dialogueShowCoefficient - BOX_H) + BOX_OFFSET_Y),
                 BOX_W, BOX_H
             );
