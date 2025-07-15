@@ -39,11 +39,6 @@ namespace STOLON
         private readonly DefaultDictionary<string, UIElementUpdateData> _updateData;
 
         /// <summary>
-        /// The width of a <see cref="Interface"/> line.
-        /// </summary>
-        public int LineWidth => LINE_WIDTH;
-
-        /// <summary>
         /// Main UIInterface contructor.
         /// </summary>
         public Interface() : base(STOLON.Environment)

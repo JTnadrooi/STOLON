@@ -199,7 +199,7 @@ namespace STOLON
                 drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2());
                 drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), _providerTextScaleCoefficient);
             }
-            drawingContext.DrawRectangle(_dialoguebounds, Color.White, STOLON.UI.LineWidth);
+            drawingContext.DrawRectangle(_dialoguebounds, Color.White, Interface.LINE_WIDTH);
 
             base.Draw(drawingContext);
         }
