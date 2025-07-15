@@ -141,6 +141,8 @@ namespace STOLON
             {
                 _selectedIndex = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _selectedIndex;
             }
+
+            STOLON.UI.Textframe.Hide = true;
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)

@@ -53,11 +53,11 @@ namespace STOLON
 
         private float _dialogueShowCoefficient;
         private bool _awaitingMouseDialogueHover;
-        private bool _dialogueIsHidden;
-        public bool DialogueIsHidden
+        private bool _hide;
+        public bool Hide
         {
-            get => _dialogueIsHidden;
-            set => _dialogueIsHidden = value;
+            get => _hide;
+            set => _hide = value;
         }
 
         public Rectangle DialogueBounds => _dialoguebounds;
@@ -135,11 +135,6 @@ namespace STOLON
         public override void Update(int elapsedMilliseconds)
         {
             bool textFrameGoUp = false;
-            _dialoguebounds = new Rectangle(
-                (int)Centering.CenterX(BOX_W, 0, STOLON.V_WIDTH).X, 
-                (int)((BOX_H * _dialogueShowCoefficient - BOX_H) + BOX_OFFSET_Y),
-                BOX_W, BOX_H
-            );
 
             _msSinceLastChar += elapsedMilliseconds;
 
@@ -171,8 +166,9 @@ namespace STOLON
                 _providerTextPos = _dialoguebounds.Location
                     + new Point((int)(_dialoguebounds.Width / 2f - _font.FastMeasure(_currentDialogue.Value.Provider.Name).X * _providerTextScaleCoefficient / 2f), (int)(BOX_H - _font.Dimensions.Y - 5));
             }
+
             if (_awaitingMouseDialogueHover) textFrameGoUp = true;
-            if (STOLON.Input.Domain == GameInput.MouseDomain.Dialogue)
+            if (STOLON.Input.Domain == GameInput.MouseDomain.Dialogue && !_hide)
             {
                 _awaitingMouseDialogueHover = false;
                 textFrameGoUp = true;
@@ -184,6 +180,12 @@ namespace STOLON
 
             DynamicTweening.PushSubunitary(ref _dialogueShowCoefficient, textFrameGoUp, elapsedMilliseconds, smoothness: 2);
             _dialogueShowCoefficient = Math.Clamp(_dialogueShowCoefficient, 0.1f, 1f);
+
+            _dialoguebounds = new Rectangle(
+                (int)Centering.CenterX(BOX_W, 0, STOLON.V_WIDTH).X,
+                (int)((BOX_H * _dialogueShowCoefficient - BOX_H) + BOX_OFFSET_Y) - (_hide ? 100 : 0),
+                BOX_W, BOX_H
+            );
         }
         public int GetMillisecondsFromText(string text)
         {
