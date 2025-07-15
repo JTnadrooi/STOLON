@@ -41,7 +41,7 @@ namespace STOLON
         public string Name => "Environment";
 
 
-        private UserInterface _userInterface;
+        private Interface _userInterface;
         private OverlayEngine _overlayer;
         private Dictionary<string, Entity> _entities;
         private GameStateManager _stateManager;
@@ -67,7 +67,7 @@ namespace STOLON
             }
             STOLON.Debug.Success();
 
-            STOLON.UI = _userInterface = new UserInterface();
+            STOLON.UI = _userInterface = new Interface();
             STOLON.StateManager = _stateManager = new GameStateManager();
             STOLON.StateManager.ChangeState<MenuGameState>();
 

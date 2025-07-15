@@ -446,7 +446,7 @@ namespace STOLON
                     drawingContext.Draw(_dither32, _ditherTexturePositions[i].ToVector2(), effects: (i >= _ditherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
                 drawingContext.DrawArea(_logoBoundingBox, Color.Black);
-                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, UserInterface.LINE_WIDTH);
+                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, Interface.LINE_WIDTH);
 
             }
             if (_drawLogoDummyTiles) drawingContext.Draw(_logoMarks, _logoDrawPos);
@@ -456,8 +456,8 @@ namespace STOLON
             drawingContext.DrawArea(_logoTileHider, Color.Black);
             if (_drawLogoLines) drawingContext.Draw(_logoLines, _logoDrawPos);
 
-            drawingContext.DrawLine(RemoveLine1x, STOLON.V_HEIGHT, RemoveLine1x, _removeLineYAmount, Color.White, UserInterface.LINE_WIDTH);
-            drawingContext.DrawLine(RemoveLine2x, STOLON.V_HEIGHT, RemoveLine2x, _removeLineYAmount, Color.White, UserInterface.LINE_WIDTH);
+            drawingContext.DrawLine(RemoveLine1x, STOLON.V_HEIGHT, RemoveLine1x, _removeLineYAmount, Color.White, Interface.LINE_WIDTH);
+            drawingContext.DrawLine(RemoveLine2x, STOLON.V_HEIGHT, RemoveLine2x, _removeLineYAmount, Color.White, Interface.LINE_WIDTH);
 
             if (_showEntityProfiles)
             {

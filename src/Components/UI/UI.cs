@@ -25,34 +25,33 @@ namespace STOLON
     /// <summary>
     /// The user interface for the <see cref="GameEnvironment"/>.
     /// </summary>
-    public class UserInterface : GameComponent
+    public class Interface : GameComponent
     {
         public const int LINE_WIDTH = 2;
 
         private Textframe _textframe;
 
         /// <summary>
-        /// The <see cref="Textframe"/> managed by the <see cref="UserInterface"/>.
+        /// The <see cref="Textframe"/> managed by the <see cref="Interface"/>.
         /// </summary>
         public Textframe Textframe => _textframe;
         public DefaultDictionary<string, UIElementUpdateData> UpdateDump => _updateData;
         private readonly DefaultDictionary<string, UIElementUpdateData> _updateData;
 
         /// <summary>
-        /// The width of a <see cref="UserInterface"/> line.
+        /// The width of a <see cref="Interface"/> line.
         /// </summary>
         public int LineWidth => LINE_WIDTH;
 
         /// <summary>
         /// Main UIInterface contructor.
         /// </summary>
-        public UserInterface() : base(STOLON.Environment)
+        public Interface() : base(STOLON.Environment)
         {
             STOLON.Debug.Log(">[s]contructing stolon ui");
 
             _textframe = new Textframe(this);
             _updateData = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
-
 
             STOLON.Debug.Success();
         }

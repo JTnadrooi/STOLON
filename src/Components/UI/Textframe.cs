@@ -72,7 +72,7 @@ namespace STOLON
         public const int BOX_H = 96;
         public const int BOX_OFFSET_Y = 10;
 
-        public Textframe(UserInterface userInterface)
+        public Textframe(Interface userInterface)
         {
             _dialogueQueue = new Queue<DialogueInfo>();
             _dialogueTextPos = Point.Zero;

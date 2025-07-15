@@ -24,7 +24,7 @@ namespace STOLON
         Ignore,
     }
     /// <summary>
-    /// Reprecents a button or textplane in the UI. Add new elements to the <see cref="UserInterface"/> using the <see cref="UserInterface.AddElement(UIElement)"/> method.
+    /// Reprecents a button or textplane in the UI. Add new elements to the <see cref="Interface"/> using the <see cref="Interface.AddElement(UIElement)"/> method.
     /// </summary>
     public class UIElement
     {

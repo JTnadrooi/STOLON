@@ -218,7 +218,7 @@ namespace STOLON
         public void DrawSymbolNotation(string symbolNotationStr, Rectangle bounds)
         {
             DrawArea(bounds, Color.Black);
-            DrawRectangle(bounds, Color.White, UserInterface.LINE_WIDTH);
+            DrawRectangle(bounds, Color.White, Interface.LINE_WIDTH);
             Vector2 dimensions = STOLON.Fonts.Medium.FastMeasure(symbolNotationStr);
             Vector2 scale = Vector2.One;
             if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
@@ -246,7 +246,7 @@ namespace STOLON
             if (drawData.Hide) return;
             if (drawData.DrawBackground) DrawArea(drawData.Rectangle.ToRectangle(), Color.Black);
             DrawString(drawData.Font, drawData.Text, drawData.Position);
-            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, UserInterface.LINE_WIDTH);
+            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, Interface.LINE_WIDTH);
         }
 
         public void Draw(IGraphic graphic)

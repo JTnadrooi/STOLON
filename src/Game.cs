@@ -225,7 +225,7 @@ namespace STOLON
         public static GameEnvironment Environment { get; private set; }
         public static GameInput Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
-        public static UserInterface UI { get; internal set; }
+        public static Interface UI { get; internal set; }
         public static GameConfig Config { get; internal set; }
         public static DrawingContext DrawingContext { get; internal set; }
         public static TaskHeap Tasks { get; internal set; }
