@@ -45,7 +45,7 @@ namespace STOLON
         {
             STOLON.Debug.Log(">[s]contructing stolon ui");
 
-            _textframe = new Textframe(this);
+            _textframe = new Textframe();
             _updateData = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
             STOLON.Debug.Success();
