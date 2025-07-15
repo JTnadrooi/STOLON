@@ -68,6 +68,10 @@ namespace STOLON
         private int _charsRead;
         private int _postTimeRead;
 
+        public const int BOX_W = 384;
+        public const int BOX_H = 96;
+        public const int BOX_OFFSET_Y = 10;
+
         public Textframe(UserInterface userInterface)
         {
             _dialogueQueue = new Queue<DialogueInfo>();
@@ -130,14 +134,11 @@ namespace STOLON
 
         public override void Update(int elapsedMilliseconds)
         {
-            Point dialogueBoxDimensions = new Point(384, 96);
-            int dialogueYoffset = (int)(10f * (_dialogueIsHidden ? _dialogueShowCoefficient : 1f));
             bool textFrameGoUp = false;
             _dialoguebounds = new Rectangle(
-                (int)(STOLON.V_WIDTH * 0.5f - dialogueBoxDimensions.X * 0.5f),
-                (int)((dialogueBoxDimensions.Y * _dialogueShowCoefficient - dialogueBoxDimensions.Y) + dialogueYoffset),
-                dialogueBoxDimensions.X,
-                dialogueBoxDimensions.Y
+                (int)(STOLON.V_WIDTH * 0.5f - BOX_W * 0.5f),
+                (int)((BOX_H * _dialogueShowCoefficient - BOX_H) + BOX_OFFSET_Y),
+                BOX_W, BOX_H
             );
 
             _msSinceLastChar += elapsedMilliseconds;
@@ -168,7 +169,7 @@ namespace STOLON
                     (int)(_dialoguebounds.Height / 2f));
 
                 _providerTextPos = _dialoguebounds.Location
-                    + new Point((int)(_dialoguebounds.Width / 2f - _font.FastMeasure(_currentDialogue.Value.Provider.Name).X * _providerTextScaleCoefficient / 2f), (int)(dialogueBoxDimensions.Y - _font.Dimensions.Y - 5));
+                    + new Point((int)(_dialoguebounds.Width / 2f - _font.FastMeasure(_currentDialogue.Value.Provider.Name).X * _providerTextScaleCoefficient / 2f), (int)(BOX_H - _font.Dimensions.Y - 5));
             }
             if (_awaitingMouseDialogueHover) textFrameGoUp = true;
             if (STOLON.Input.Domain == GameInput.MouseDomain.Dialogue)
