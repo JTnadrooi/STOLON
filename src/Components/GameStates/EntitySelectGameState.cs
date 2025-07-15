@@ -92,7 +92,7 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
-        //private Entity[] _entities;
+        #region CONSTANTS
 
         public const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
         public const int TILE_ROW_AMOUNT = 5;
@@ -109,6 +109,8 @@ namespace STOLON
         private const float HOVER_INTENSITY = 0.25f;
 
         public const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - BOXED_TEXT_DIV_CLEARANCE;
+
+        #endregion
 
         public EntitySelectGameState() : base("entity_select")
         {
