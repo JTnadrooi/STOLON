@@ -40,7 +40,7 @@ namespace STOLON
             for (int i = 0; i < uIElements.Length; i++)
             {
                 UIElement element = uIElements[i];
-                if (element.ParentId != parentId) continue;
+                if (element.Skip || element.ParentId != parentId) continue;
 
                 UIElementDrawData drawData = orderProvider.GetDrawData(element, orderIndex++, out bool isHovered);
                 updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);

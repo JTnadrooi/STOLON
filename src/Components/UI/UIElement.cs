@@ -39,6 +39,7 @@ namespace STOLON
         /// The text in this <see cref="UIElement"/>.
         /// </summary>
         public string Text { get; set; }
+        public bool Skip { get; set; }
         /// <summary>
         /// The ID of the <see cref="UIElement"/>.
         /// </summary>
@@ -65,6 +66,7 @@ namespace STOLON
             ParentId = parentId;
             DrawArguments = drawArgs;
             ClickSound = clickSound ?? STOLON.Audio.Library["select3"];
+            Skip = false;
         }
         public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null) => GetBounds(pos, padding, padding, margin, margin, out textPos, font);
         public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, out Point textPos, Font2D? font = null)
