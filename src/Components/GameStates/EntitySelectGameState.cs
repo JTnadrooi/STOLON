@@ -201,8 +201,8 @@ namespace STOLON
                 _entityInfoContainer.Update(elapsedMilliseconds);
             }
 
-            _lvlInfoContainer.Elements["lvl_name"].Text = "Node 12b";
-            _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 5";
+            _lvlInfoContainer.Elements["lvl_name"].Text = "STOLON Test Level";
+            _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
             _lvlInfoContainer.Update(elapsedMilliseconds);
         }
 
