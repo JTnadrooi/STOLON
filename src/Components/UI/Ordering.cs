@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
@@ -14,7 +15,7 @@ namespace STOLON
     /// </summary>
     public interface IOrderProvider
     {
-        public void PrepareOrdering(Vector2 origin) { }
+        public void PrepareOrdering(Vector2 origin, int elementCount) { }
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
         public void AfterOrdering() { }
     }
@@ -36,7 +37,7 @@ namespace STOLON
             updateDump.Clear();
             if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
 
-            orderProvider.PrepareOrdering(uiOrgin);
+            orderProvider.PrepareOrdering(uiOrgin, uIElements.Count(e => !e.Skip));
             for (int i = 0; i < uIElements.Length; i++)
             {
                 UIElement element = uIElements[i];
