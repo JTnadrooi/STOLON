@@ -53,7 +53,6 @@ namespace STOLON
             _leftSpace += bounds.Width + 5;
             return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true);
         }
-
     }
 
     public class EntitySelectGameState : GameState
@@ -236,7 +235,7 @@ namespace STOLON
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _entityDrawDump[_selectedIndex].Entity;
-                    _entityInfoContainer.Draw(drawingContext);
+                    drawingContext.Draw(_entityInfoContainer);
                     drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 10, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper(), new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
                 }
 
@@ -262,7 +261,7 @@ namespace STOLON
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
-                _lvlInfoContainer.Draw(drawingContext);
+                drawingContext.Draw(_lvlInfoContainer);
 
                 //drawingContext.DrawString(STOLON.Fonts.Medium, "ENTITY #" + typeof(GoldsilkEntity).GetHashCode(), new Vector2(STOLON.V_WIDTH - 4f, 10f), rotation: 1.57079633f);
             }
