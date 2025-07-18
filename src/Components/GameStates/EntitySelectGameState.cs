@@ -51,7 +51,7 @@ namespace STOLON
 
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, hoverPaddingY, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - hoverPaddingY), out Point textPos);
             _leftSpace += bounds.Width + 5;
-            return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true);
+            return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
         }
     }
 
@@ -232,6 +232,8 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, Interface.LINE_WIDTH);
+                drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
+                drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
                 if (_selectedIndex != -1)
                 {
                     Entity selectedEntity = _entityDrawDump[_selectedIndex].Entity;
