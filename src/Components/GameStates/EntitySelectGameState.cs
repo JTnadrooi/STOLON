@@ -39,7 +39,6 @@ namespace STOLON
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
-            isHovered = false;
 
             isHovered = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, 0, out _).Contains(STOLON.Input.VirtualMousePos);
 
@@ -89,13 +88,14 @@ namespace STOLON
         private bool _initDone;
 
         private EntityDrawData[] _entityDrawDump;
+        private List<int> _selection;
 
         private float[] _entityHoverCoefficients;
         private float _currentEntitySelectedCoefficient;
         private int _hoveredIndex;
         private TimedState<int> _hoveredState;
 
-        private int _selectedIndex;
+        private int _lastSelected;
         private TimedState<int> _selectedState;
 
         private readonly Dictionary<int, Vector2> _posCache;
@@ -136,11 +136,12 @@ namespace STOLON
             _entityCount = _entities.Length;
             _entityHoverCoefficients = new float[_entityCount];
             _hoveredIndex = -1;
-            _selectedIndex = -1;
+            _lastSelected = -1;
             _entityDrawDump = new EntityDrawData[_entityCount];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
+            _selection = new List<int>(4);
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -154,7 +155,7 @@ namespace STOLON
 
             if (SkipArgs != null)
             {
-                _selectedIndex = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _selectedIndex;
+                _lastSelected = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _lastSelected;
             }
 
             STOLON.UI.Textframe.Hide = true;
@@ -173,7 +174,7 @@ namespace STOLON
             if (_lineTweener.Running) return;
 
             _hoveredState.UpdatePositive(_hoveredIndex, elapsedMilliseconds);
-            _selectedState.UpdatePositive(_selectedIndex, elapsedMilliseconds);
+            _selectedState.UpdatePositive(_lastSelected, elapsedMilliseconds);
 
             _hoveredIndex = -1;
             for (int i = 0; i < _entityCount; i++)
@@ -184,10 +185,10 @@ namespace STOLON
                     _hoveredIndex = i;
                     _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 1, HOVER_INTENSITY);
                     if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (_selectedIndex == i) _selectedIndex = -1; // entity deselection.
+                        if (_lastSelected == i) _lastSelected = -1; // entity deselection.
                         else // if new entity gets selected.
                         {
-                            _selectedIndex = i;
+                            _lastSelected = i;
                             _currentEntitySelectedCoefficient = 0;
                             STOLON.Debug.Log("changed selected entity to " + i + ".");
                         }
@@ -197,7 +198,7 @@ namespace STOLON
                 _entityDrawDump[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
             }
 
-            if (_selectedIndex == -1) // if no entity selected.
+            if (_lastSelected == -1) // if no entity selected.
             {
                 _currentEntitySelectedCoefficient = 0;
             }
@@ -207,7 +208,7 @@ namespace STOLON
 
                 _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
-                _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_selectedIndex].FullerName;
+                _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
                 _entityInfoContainer.Elements["alloc"].Text = "(alloc) 100%";
                 _entityInfoContainer.Elements["v_alloc"].Text = "(valloc) 100%";
                 _entityInfoContainer.Update(elapsedMilliseconds);
@@ -226,17 +227,17 @@ namespace STOLON
         {
             if (_initDone)
             {
-                if (_selectedIndex != -1)
-                    drawingContext.DrawEntity(_entityDrawDump[_selectedIndex].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
+                if (_lastSelected != -1)
+                    drawingContext.DrawEntity(_entityDrawDump[_lastSelected].Entity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
-                if (_selectedIndex != -1)
+                if (_lastSelected != -1)
                 {
-                    Entity selectedEntity = _entityDrawDump[_selectedIndex].Entity;
+                    Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
                     drawingContext.Draw(_entityInfoContainer);
                     drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 10, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper(), new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
                 }
@@ -251,11 +252,12 @@ namespace STOLON
                         drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
                         if (_hoveredIndex == i) drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
+                        drawingContext.Draw(STOLON.Textures["UI\\selected_1-overlay"], ddc.Pos);
 
                         drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox);
                         drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
 
-                        if (_selectedIndex == i) drawingContext.Draw(STOLON.Textures["UI\\profile_selected"], ddc.Pos + new Vector2(0, -32));
+                        if (_lastSelected == i) drawingContext.Draw(STOLON.Textures["UI\\profile_selected"], ddc.Pos + new Vector2(0, -32));
                     }
                     else
                     {
