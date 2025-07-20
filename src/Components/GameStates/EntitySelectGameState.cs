@@ -58,6 +58,8 @@ namespace STOLON
 
     public class EntitySelectGameState : GameState
     {
+        #region SUBSTRUCTS
+
         private readonly struct EntityDrawData
         {
             public Vector2 Pos { get; }
@@ -78,6 +80,22 @@ namespace STOLON
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
         }
 
+        private readonly struct EntityAllocationData
+        {
+            public int VirtualAllocation { get; }
+            public int Allocation { get; }
+            public Entity Entity { get; }
+
+            public EntityAllocationData(int allocation, Entity entity)
+            {
+                Allocation = allocation;
+                VirtualAllocation = (int)(allocation * 1.2f);
+                Entity = entity;
+            }
+        }
+
+        #endregion
+
         private Texture2D _tileTexture;
         private MenuGameState _menuGameState;
 
@@ -90,6 +108,7 @@ namespace STOLON
         private bool _initDone;
 
         private EntityDrawData[] _entityDrawDump;
+        private EntityAllocationData?[] _allocationDataDump;
         private int[] _selection;
 
         private float[] _entityHoverCoefficients;
@@ -124,6 +143,8 @@ namespace STOLON
 
         public const int INFO_WINDOW_TOPLINE = ROSTER_BOTTOM_LINE - BOXED_TEXT_DIV_CLEARANCE;
 
+        public const int MAX_SELECTION = 4;
+
         #endregion
 
         public EntitySelectGameState() : base("entity_select")
@@ -140,10 +161,11 @@ namespace STOLON
             _hoveredIndex = -1;
             _lastSelected = -1;
             _entityDrawDump = new EntityDrawData[_entityCount];
+            _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
-            _selection = Enumerable.Repeat(-1, 4).ToArray();
+            _selection = Enumerable.Repeat(-1, MAX_SELECTION).ToArray();
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -201,8 +223,8 @@ namespace STOLON
 
                     if (clickZone.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
-                        if (_selection.Contains(i)) Deselect(i);
-                        else Select(i);
+                        if (_selection.Contains(i)) RemoveFromSelection(i);
+                        else AddToSelection(i);
                     }
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
@@ -246,7 +268,7 @@ namespace STOLON
         }
 
 
-        public void Select(int entityIndex)
+        public void AddToSelection(int entityIndex)
         {
             STOLON.Debug.Log("selecting entity " + entityIndex + ".");
             for (int i2 = 0; i2 < _selection.Length; i2++)
@@ -255,11 +277,26 @@ namespace STOLON
                     _selection[i2] = entityIndex;
                     break;
                 }
+            UpdateAllocations();
         }
-        public void Deselect(int entityIndex)
+        public void RemoveFromSelection(int entityIndex)
         {
             STOLON.Debug.Log("deselecting entity " + entityIndex + ".");
             _selection[_selection.GetFirstIndexWhere(i => entityIndex == i)] = -1;
+            UpdateAllocations();
+        }
+        private void UpdateAllocations()
+        {
+            STOLON.Debug.Log("updating allocations..");
+
+            HashSet<Entity> selectedEntities = _selection.WhereSelect(id => (id != -1 ? _entities[id] : null!, id != -1)).ToHashSet();
+            for (int i = 0; i < _selection.Length; i++)
+            {
+                if (_selection[i] == -1) _allocationDataDump[i] = null;
+
+                _allocationDataDump[i] = new EntityAllocationData(100, _entities[i]);
+            }
+            STOLON.Debug.Success();
         }
 
         public Vector2 GetBaseTilePos(int i)
