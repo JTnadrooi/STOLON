@@ -24,6 +24,11 @@ namespace STOLON
         {
         }
 
+        //public override int GetVirtualAllocation(int allocation, HashSet<Entity> entities)
+        //{
+        //    return allocation * (entities.Contains())
+        //}
+
         public override Computer? Computer => null;
     }
 }

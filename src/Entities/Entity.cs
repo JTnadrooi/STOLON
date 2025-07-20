@@ -68,6 +68,14 @@ namespace STOLON
         public string FullName { get; }
         public EntityProfile Profile { get; }
         public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
+        public abstract Computer? Computer { get; }
+        public string Description { get; }
+        /// <summary>
+        /// The unique ID of this <see cref="Entity"/>, no capital letters.
+        /// </summary>
+        public string Id { get; }
+        public string Name { get; }
+        public string SymbolNotation { get; }
         public Entity(string id, string name, string symbolNotation, EntityProfile profile, string description, string? fullName = null)
         {
             Id = id;
@@ -82,15 +90,10 @@ namespace STOLON
         /// </summary>
         /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
         public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
-        public abstract Computer? Computer { get; }
-        public string Description { get; }
-        /// <summary>
-        /// The unique ID of this <see cref="Entity"/>, no capital letters.
-        /// </summary>
-        public string Id { get; }
-        public string Name { get; }
-        public string SymbolNotation { get; }
-
+        public virtual int GetVirtualAllocation(int allocation, HashSet<Entity> entities)
+        {
+            return allocation;
+        }
     }
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
