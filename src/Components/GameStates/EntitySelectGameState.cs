@@ -190,19 +190,9 @@ namespace STOLON
                     if (new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - 32), new Point(32)).Contains(STOLON.Input.VirtualMousePos) &&
                         STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
-                        if (_selection.Contains(i))
-                        {
-                            _selection[_selection.GetFirstIndexWhere(i2 => i == i2)] = -1;
-                        }
-                        else
-                        {
-                            for (int i2 = 0; i2 < _selection.Length; i2++)
-                                if (_selection[i2] == -1)
-                                {
-                                    _selection[i2] = i;
-                                    break;
-                                }
-                        }
+                        if (_selection.Contains(i)) Deselect(i);
+                        else Select(i);
+
                     }
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left)) // if clicked.
                         if (_lastSelected == i) _lastSelected = -1; // entity deselection.
@@ -237,6 +227,22 @@ namespace STOLON
             _lvlInfoContainer.Elements["lvl_name"].Text = "STOLON Test Level";
             _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
             _lvlInfoContainer.Update(elapsedMilliseconds);
+        }
+
+        public void Select(int entityIndex)
+        {
+            STOLON.Debug.Log("selecting entity " + entityIndex + ".");
+            for (int i2 = 0; i2 < _selection.Length; i2++)
+                if (_selection[i2] == -1)
+                {
+                    _selection[i2] = entityIndex;
+                    break;
+                }
+        }
+        public void Deselect(int entityIndex)
+        {
+            STOLON.Debug.Log("deselecting entity " + entityIndex + ".");
+            _selection[_selection.GetFirstIndexWhere(i => entityIndex == i)] = -1;
         }
 
         public Vector2 GetBaseTilePos(int i)
