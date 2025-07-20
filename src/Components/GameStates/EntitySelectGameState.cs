@@ -196,7 +196,6 @@ namespace STOLON
                         }
                         else
                         {
-                            Console.WriteLine("A");
                             for (int i2 = 0; i2 < _selection.Length; i2++)
                                 if (_selection[i2] == -1)
                                 {
