@@ -63,7 +63,7 @@ namespace STOLON
     /// <summary>
     /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
-    public abstract class Entity : IDialogueProvider, IMipmapped
+    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
         public string FullName { get; }
         public EntityProfile Profile { get; }
@@ -94,6 +94,7 @@ namespace STOLON
         {
             return allocation;
         }
+        public bool Equals(Entity? other) => other != null && other.Id == Id;
     }
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
