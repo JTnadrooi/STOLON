@@ -2,10 +2,12 @@
 using Betwixt;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static STOLON.EntitySelectGameState;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
@@ -88,7 +90,7 @@ namespace STOLON
         private bool _initDone;
 
         private EntityDrawData[] _entityDrawDump;
-        private List<int> _selection;
+        private int[] _selection;
 
         private float[] _entityHoverCoefficients;
         private float _currentEntitySelectedCoefficient;
@@ -141,7 +143,7 @@ namespace STOLON
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
-            _selection = new List<int>(4);
+            _selection = Enumerable.Repeat(-1, 4).ToArray();
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -180,11 +182,30 @@ namespace STOLON
             for (int i = 0; i < _entityCount; i++)
             {
                 Vector2 basePos = GetBaseTilePos(i);
-                if (new Rectangle(basePos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos))
+                if (new Rectangle(basePos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos)) // if hovered.
                 {
                     _hoveredIndex = i;
                     _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], 1, HOVER_INTENSITY);
-                    if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
+
+                    if (new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - 32), new Point(32)).Contains(STOLON.Input.VirtualMousePos) &&
+                        STOLON.Input.IsClicked(GameInput.MouseButton.Left))
+                    {
+                        if (_selection.Contains(i))
+                        {
+                            _selection[_selection.GetFirstIndexWhere(i2 => i == i2)] = -1;
+                        }
+                        else
+                        {
+                            Console.WriteLine("A");
+                            for (int i2 = 0; i2 < _selection.Length; i2++)
+                                if (_selection[i2] == -1)
+                                {
+                                    _selection[i2] = i;
+                                    break;
+                                }
+                        }
+                    }
+                    else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left)) // if clicked.
                         if (_lastSelected == i) _lastSelected = -1; // entity deselection.
                         else // if new entity gets selected.
                         {
@@ -239,6 +260,9 @@ namespace STOLON
                 {
                     Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
                     drawingContext.Draw(_entityInfoContainer);
+                    //drawingContext.DrawLine(LINE1_TARGET - TILE_SIZE, INFO_WINDOW_TOPLINE, LINE1_TARGET - TILE_SIZE, INFO_WINDOW_TOPLINE + 32, Color.White, 2);
+
+
                     drawingContext.DrawString(STOLON.Fonts.Small, STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 10, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper(), new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
                 }
 
@@ -251,8 +275,18 @@ namespace STOLON
 
                         drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
-                        if (_hoveredIndex == i) drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
-                        drawingContext.Draw(STOLON.Textures["UI\\selected_1-overlay"], ddc.Pos);
+                        //drawingContext.Draw(STOLON.Textures["UI\\selected_1-overlay"], ddc.Pos);
+                        if (_hoveredIndex == i)
+                        {
+                            drawingContext.Draw(STOLON.Textures["UI\\spotlight-128"], ddc.Pos);
+
+                            if (!_selection.Contains(i)) drawingContext.Draw(STOLON.Textures["UI\\selected_add-overlay"], ddc.Pos);
+                        }
+
+                        if (_selection.Contains(i))
+                        {
+                            drawingContext.Draw(STOLON.Textures[$"UI\\selected_{_selection.GetFirstIndexWhere(x => i == x) + 1}-overlay"], ddc.Pos);
+                        }
 
                         drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox);
                         drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
@@ -271,6 +305,10 @@ namespace STOLON
             }
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, Interface.LINE_WIDTH);
             drawingContext.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, Interface.LINE_WIDTH);
+
+            //drawingContext.DrawArea(new Rectangle(LINE1_TARGET - TILE_SIZE - 5, INFO_WINDOW_TOPLINE - 5, 128 + 10, 32 + 10), Color.Black);
+            //drawingContext.DrawRectangle(new Rectangle(LINE1_TARGET - TILE_SIZE - 5, INFO_WINDOW_TOPLINE - 5, 128 + 10, 32 + 10), Color.White, Interface.LINE_WIDTH);
+            //drawingContext.Draw(STOLON.Textures["UI\\add-txt"], new Vector2(LINE1_TARGET - TILE_SIZE, INFO_WINDOW_TOPLINE), scale: new Vector2(1, _currentEntitySelectedCoefficient));
         }
     }
 }
