@@ -181,6 +181,8 @@ namespace STOLON
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
         public void DrawLine(Vector2 point1, Vector2 point2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(point1, point2, color, thickness, layerDepth);
+        public void DrawLine(Line line, Color color, float thickness = 1f, float layerDepth = 0f)
+            => _spriteBatch.DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
