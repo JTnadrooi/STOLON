@@ -86,10 +86,10 @@ namespace STOLON
             public int Allocation { get; }
             public Entity Entity { get; }
 
-            public EntityAllocationData(int allocation, Entity entity)
+            public EntityAllocationData(int allocation, int virtualAllocation, Entity entity)
             {
                 Allocation = allocation;
-                VirtualAllocation = (int)(allocation * 1.2f);
+                VirtualAllocation = virtualAllocation;
                 Entity = entity;
             }
         }
@@ -255,8 +255,8 @@ namespace STOLON
                 _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
                 _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
-                _entityInfoContainer.Elements["alloc"].Text = "(alloc) 100%";
-                _entityInfoContainer.Elements["v_alloc"].Text = "(valloc) 100%";
+                _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.Allocation : 0)}%";
+                _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.VirtualAllocation : 0)}%";
 
                 _entityInfoContainer.Update(elapsedMilliseconds);
             }
@@ -277,25 +277,36 @@ namespace STOLON
                     _selection[i2] = entityIndex;
                     break;
                 }
-            UpdateAllocations();
+            UpdateSelection();
         }
+        public int GetSlot(int entityIndex) => _selection.GetFirstIndexWhere(s => s == entityIndex);
+        public bool IsInSelection(int entityIndex) => _selection.Any(x => x == entityIndex);
         public void RemoveFromSelection(int entityIndex)
         {
             STOLON.Debug.Log("deselecting entity " + entityIndex + ".");
             _selection[_selection.GetFirstIndexWhere(i => entityIndex == i)] = -1;
-            UpdateAllocations();
+            UpdateSelection();
         }
-        private void UpdateAllocations()
+        private void UpdateSelection()
         {
-            STOLON.Debug.Log("updating allocations..");
+            STOLON.Debug.Log(">updating allocations..");
 
             HashSet<Entity> selectedEntities = _selection.WhereSelect(id => (id != -1 ? _entities[id] : null!, id != -1)).ToHashSet();
             for (int i = 0; i < _selection.Length; i++)
             {
-                if (_selection[i] == -1) _allocationDataDump[i] = null;
-
-                _allocationDataDump[i] = new EntityAllocationData(100, _entities[i]);
+                STOLON.Debug.Log($">checking slot {i}..");
+                if (_selection[i] == -1)
+                {
+                    _allocationDataDump[i] = null;
+                    STOLON.Debug.Log($"<skipped slot {i}.");
+                    continue;
+                }
+                STOLON.Debug.Log($"found {_entities[_selection[i]]}.");
+                _allocationDataDump[i] = new EntityAllocationData(100, _entities[_selection[i]].GetVirtualAllocation(100, selectedEntities), _entities[_selection[i]]);
+                STOLON.Debug.Log($"added to allocdump as; " + _allocationDataDump[i]);
+                STOLON.Debug.Success();
             }
+
             STOLON.Debug.Success();
         }
 
