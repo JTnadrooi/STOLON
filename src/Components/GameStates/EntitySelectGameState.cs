@@ -95,6 +95,21 @@ namespace STOLON
             }
         }
 
+        private readonly struct EntityDrawAllocationData
+        {
+            public Rectangle SymbolNotationRect { get; }
+            public Rectangle AllocationRect { get; }
+            public Rectangle VirtualAllocationRect { get; }
+            public EntityDrawAllocationData(int x)
+            {
+                Rectangle GetMiniSlot(int h) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * h, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+
+                SymbolNotationRect = GetMiniSlot(0);
+                AllocationRect = GetMiniSlot(1);
+                VirtualAllocationRect = GetMiniSlot(2);
+            }
+        }
+
         #endregion
 
         private Texture2D _tileTexture;
@@ -110,6 +125,8 @@ namespace STOLON
 
         private EntityDrawData[] _entityDrawDump;
         private EntityAllocationData?[] _allocationDataDump;
+        private EntityDrawAllocationData?[] _drawAllocationDataDump;
+
         private int[] _selection;
 
         private float[] _entityHoverCoefficients;
@@ -167,6 +184,7 @@ namespace STOLON
             _lastSelected = -1;
             _entityDrawDump = new EntityDrawData[_entityCount];
             _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
+            _drawAllocationDataDump = new EntityDrawAllocationData?[MAX_SELECTION];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
@@ -295,10 +313,11 @@ namespace STOLON
         }
         private void UpdateSelection()
         {
-            STOLON.Debug.Log(">updating allocations..");
+            STOLON.Debug.Log(">updating allocations (and draw data)..");
 
             HashSet<Entity> selectedEntities = _selection.WhereSelect(id => (id != -1 ? _entities[id] : null!, id != -1)).ToHashSet();
             int usedSlots = _selection.Where(i => i != -1).Count();
+            int secondarySymbolPosOffsetX = TILE_SIZE * 2;
 
             for (int i = 0; i < _selection.Length; i++)
             {
@@ -309,12 +328,18 @@ namespace STOLON
                     STOLON.Debug.Log($"<skipped slot {i}.");
                     continue;
                 }
-                STOLON.Debug.Log($"found {_entities[_selection[i]]}.");
+                STOLON.Debug.Log($"<found {_entities[_selection[i]]}.");
+
+                STOLON.Debug.Log($">creating allocation data for slot {i}..");
                 _allocationDataDump[i] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[i]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[i]]);
-                STOLON.Debug.Log($"added to allocdump as; " + _allocationDataDump[i]);
+                STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[i]);
+                STOLON.Debug.Success();
+
+                STOLON.Debug.Log($">creating allocation DRAW data for slot {i}..");
+                _drawAllocationDataDump[i] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
+                secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
-
             STOLON.Debug.Success();
         }
 
@@ -356,29 +381,26 @@ namespace STOLON
                     #region ALLOC_DISPLAYS
 
                     int secondarySymbolPosOffsetX = TILE_SIZE * 2;
-                    foreach (EntityAllocationData? allocData in _allocationDataDump) // alloc display
+                    for (int i = 0; i < MAX_SELECTION; i++)
                     {
-                        if (allocData == null) continue;
+                        if (!_allocationDataDump[i].HasValue) continue;
 
-                        EntityAllocationData value = allocData.Value;
+                        EntityAllocationData allocData = _allocationDataDump[i]!.Value;
+                        EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
 
-                        string allocationStr = value.Allocation.ToString();
-                        string virtualAllocStr = value.VirtualAllocation.ToString();
+                        string allocationStr = allocData.Allocation.ToString();
+                        string virtualAllocStr = allocData.VirtualAllocation.ToString();
 
                         Point allocationSize = STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint();
                         Point virtualAllocSize = STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint();
 
-                        Rectangle symbolRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
-                        Rectangle allocRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
-                        Rectangle virtualAllocRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * 2, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                        drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
+                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(allocationSize, drawAllocData.AllocationRect));
+                        drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(virtualAllocSize, drawAllocData.VirtualAllocationRect));
 
-                        drawingContext.DrawSymbolNotation(value.Entity.SymbolNotation, symbolRect);
-                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(allocationSize, allocRect));
-                        drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(virtualAllocSize, virtualAllocRect));
-
-                        if (value.VirtualAllocation > value.Allocation)
+                        if (allocData.VirtualAllocation > allocData.Allocation)
                         {
-                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], virtualAllocRect);
+                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
                         }
 
                         secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
