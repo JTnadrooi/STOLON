@@ -239,10 +239,10 @@ namespace STOLON
         {
             Line[] lines = new Line[4];
 
-            Vector2 topLeft = new Vector2(rectangle.Left, rectangle.Top);
-            Vector2 topRight = new Vector2(rectangle.Right, rectangle.Top);
-            Vector2 bottomLeft = new Vector2(rectangle.Left, rectangle.Bottom);
-            Vector2 bottomRight = new Vector2(rectangle.Right, rectangle.Bottom);
+            Point topLeft = new Point(rectangle.Left, rectangle.Top);
+            Point topRight = new Point(rectangle.Right, rectangle.Top);
+            Point bottomLeft = new Point(rectangle.Left, rectangle.Bottom);
+            Point bottomRight = new Point(rectangle.Right, rectangle.Bottom);
 
             lines[0] = new Line(topLeft, bottomLeft);       //left
             lines[1] = new Line(topLeft, topRight);         //top
@@ -321,26 +321,26 @@ namespace STOLON
     }
     public struct Line
     {
-        public Vector2 Start { get; private set; }
-        public Vector2 End { get; private set; }
-        public Line(Vector2 start, Vector2 end)
+        public Point Start { get; private set; }
+        public Point End { get; private set; }
+        public Line(Point start, Point end)
         {
             Start = start;
             End = end;
         }
-        public void Offset(Vector2 amount)
+        public void Offset(Point amount)
         {
             throw new NotImplementedException();
         }
         public bool IsNear(Vector2 vector, int threshold = 10)
         {
-            Vector2 lineDirection = End - Start;
-            float projectionLength = Vector2.Dot(vector - Start, lineDirection) / lineDirection.Length();
+            Vector2 lineDirection = (End - Start).ToVector2();
+            float projectionLength = Vector2.Dot(vector - Start.ToVector2(), lineDirection) / lineDirection.Length();
 
             if (projectionLength < 0) projectionLength = 0;
             else if (projectionLength > lineDirection.Length()) projectionLength = lineDirection.Length();
 
-            return Vector2.Distance(vector, Start + projectionLength * Vector2.Normalize(lineDirection)) <= threshold;
+            return Vector2.Distance(vector, Start.ToVector2() + projectionLength * Vector2.Normalize(lineDirection)) <= threshold;
         }
     }
     public enum Orgin
