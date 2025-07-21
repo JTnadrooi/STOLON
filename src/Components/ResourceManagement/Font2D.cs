@@ -28,7 +28,7 @@ namespace STOLON
             Dimensions = spriteFont.MeasureString(BASE_CHAR.ToString()) * scale;
             Scale = scale;
         }
-        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing, 0) * Scale, Dimensions.Y);
+        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing - 1, 0) * Scale - 1, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
         public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
@@ -64,8 +64,8 @@ namespace STOLON
                     // would a new line fit vertically?
                     if (lines + 1 > maxLines)
                     {
-                        sb.Append("...");           // or "..."
-                        break;                    // no more space
+                        sb.Append("...");
+                        break; // no more space
                     }
 
                     sb.Append('\n');
