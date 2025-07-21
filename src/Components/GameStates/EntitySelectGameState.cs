@@ -26,6 +26,7 @@ namespace STOLON
 
         private const float HOVER_INTENSITY = 0.1f;
 
+
         public EntitySelectOrderProvider()
         {
             _font = STOLON.Fonts.Medium;
@@ -292,6 +293,8 @@ namespace STOLON
             STOLON.Debug.Log(">updating allocations..");
 
             HashSet<Entity> selectedEntities = _selection.WhereSelect(id => (id != -1 ? _entities[id] : null!, id != -1)).ToHashSet();
+            int usedSlots = _selection.Where(i => i != -1).Count();
+
             for (int i = 0; i < _selection.Length; i++)
             {
                 STOLON.Debug.Log($">checking slot {i}..");
@@ -302,7 +305,7 @@ namespace STOLON
                     continue;
                 }
                 STOLON.Debug.Log($"found {_entities[_selection[i]]}.");
-                _allocationDataDump[i] = new EntityAllocationData(100, _entities[_selection[i]].GetVirtualAllocation(100, selectedEntities), _entities[_selection[i]]);
+                _allocationDataDump[i] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[i]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[i]]);
                 STOLON.Debug.Log($"added to allocdump as; " + _allocationDataDump[i]);
                 STOLON.Debug.Success();
             }

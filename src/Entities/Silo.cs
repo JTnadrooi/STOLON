@@ -26,7 +26,6 @@ namespace STOLON
 
         public override int GetVirtualAllocation(int allocation, HashSet<Entity> entities)
         {
-            Console.WriteLine("A");
             return (int)(allocation * (entities.Any(e => e.Id == "deceit") ? 1.2f : 1f));
         }
 
