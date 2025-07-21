@@ -211,6 +211,8 @@ namespace STOLON
 
             _hoveredIndex = -1;
 
+            #region TILES
+
             for (int i = 0; i < _entityCount; i++)
             {
                 Vector2 basePos = GetBaseTilePos(i);
@@ -245,6 +247,8 @@ namespace STOLON
 
                 _entityDrawDump[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
             }
+
+            #endregion
 
             if (_lastSelected == -1)
             {
@@ -338,22 +342,25 @@ namespace STOLON
                 drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
 
+                #region INFO_WINDOW
+
                 // draw entity info window.
                 if (_lastSelected != -1)
                 {
                     Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
                     drawingContext.Draw(_entityInfoContainer);
 
-                    string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 10, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
+                    string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
                     drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
 
-                    int secondarySymbolPosOffsetX = TILE_SIZE * 2;
+                    #region ALLOC_DISPLAYS
 
-                    foreach (EntityAllocationData? allocData in _allocationDataDump)
+                    int secondarySymbolPosOffsetX = TILE_SIZE * 2;
+                    foreach (EntityAllocationData? allocData in _allocationDataDump) // alloc display
                     {
                         if (allocData == null) continue;
 
-                        var value = allocData.Value;
+                        EntityAllocationData value = allocData.Value;
 
                         string allocationStr = value.Allocation.ToString();
                         string virtualAllocStr = value.VirtualAllocation.ToString();
@@ -362,16 +369,27 @@ namespace STOLON
                         Point virtualAllocSize = STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint();
 
                         Rectangle symbolRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
-                        Rectangle allocationRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                        Rectangle allocRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
                         Rectangle virtualAllocRect = new Rectangle(secondarySymbolPosOffsetX, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * 2, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                         drawingContext.DrawSymbolNotation(value.Entity.SymbolNotation, symbolRect);
-                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(allocationSize, allocationRect));
+                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(allocationSize, allocRect));
                         drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(virtualAllocSize, virtualAllocRect));
+
+                        if (value.VirtualAllocation > value.Allocation)
+                        {
+                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], virtualAllocRect);
+                        }
 
                         secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                     }
+
+                    #endregion
                 }
+
+                #endregion
+
+                #region ROSTER
 
                 // draw roster lines.
                 drawingContext.DrawLine(0, ROSTER_TOP_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_TOP_LINE, Color.White, Interface.LINE_WIDTH);
@@ -415,6 +433,8 @@ namespace STOLON
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
                 }
+
+                #endregion
 
                 // draw level info.
                 drawingContext.Draw(_lvlInfoContainer);
