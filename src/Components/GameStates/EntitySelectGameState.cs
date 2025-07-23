@@ -369,41 +369,6 @@ namespace STOLON
                 drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
 
-                #region INFO_WINDOW
-
-                // draw entity info window.
-                if (_lastSelected != -1)
-                {
-                    Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
-                    drawingContext.Draw(_entityInfoContainer);
-
-                    string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
-                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
-
-                    #region ALLOC_DISPLAYS
-
-                    for (int i = 0; i < MAX_SELECTION; i++)
-                    {
-                        if (!IsSlotOccupied(i)) continue;
-
-                        EntityAllocationData allocData = _allocationDataDump[i]!.Value;
-                        EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
-
-                        string allocationStr = allocData.Allocation.ToString();
-                        string virtualAllocStr = allocData.VirtualAllocation.ToString();
-
-                        drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
-                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
-                        drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
-
-                        if (allocData.VirtualAllocation > allocData.Allocation)
-                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
-                    }
-
-                    #endregion
-                }
-
-                #endregion
 
                 #region ROSTER
 
@@ -448,6 +413,44 @@ namespace STOLON
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
+                }
+
+                #endregion
+
+                #region INFO_WINDOW
+
+                // draw entity info window.
+                if (_lastSelected != -1)
+                {
+                    Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
+                    drawingContext.Draw(_entityInfoContainer);
+
+                    string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
+                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+
+                    #region ALLOC_DISPLAYS
+
+                    for (int i = 0; i < MAX_SELECTION; i++)
+                    {
+                        if (!IsSlotOccupied(i)) continue;
+
+                        EntityAllocationData allocData = _allocationDataDump[i]!.Value;
+                        EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
+
+                        string allocationStr = allocData.Allocation.ToString();
+                        string virtualAllocStr = allocData.VirtualAllocation.ToString();
+
+                        drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
+                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
+                        drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
+
+                        if (allocData.VirtualAllocation > allocData.Allocation)
+                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
+                        if(_hoveredIndex == _selection[i])
+                            drawingContext.DrawLine(new Line(drawAllocData.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE), _entityDrawDump[_selection[i]].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0)), Color.White, 2);
+                    }
+
+                    #endregion
                 }
 
                 #endregion
