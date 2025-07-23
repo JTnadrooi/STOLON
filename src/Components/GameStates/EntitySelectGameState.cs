@@ -262,15 +262,20 @@ namespace STOLON
                             STOLON.Debug.Log("changed selected entity to " + entityIndex + ".");
                         }
                     }
-
-                    if (IsInSelection(entityIndex))
-                    {
-                        _drawConnectionLine = true;
-                        _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
-                    }
                 }
 
                 _entityDrawDump[entityIndex] = new EntityDrawData(basePos, _entityHoverCoefficients[entityIndex], _entities[entityIndex]);
+            }
+
+            for (int slotIndex = 0; slotIndex < _selection.Length; slotIndex++)
+            {
+                int entityIndex = _selection[slotIndex];
+                if (entityIndex == -1) continue;
+                if (_hoveredIndex == entityIndex)
+                {
+                    _drawConnectionLine = true;
+                    _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
+                }
             }
 
             #endregion
