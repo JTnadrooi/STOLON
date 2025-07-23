@@ -181,7 +181,7 @@ namespace STOLON
             _entityCount = _entities.Length;
             _entityHoverCoefficients = new float[_entityCount];
             _hoveredIndex = -1;
-            _lastSelected = -1;
+            _lastSelected = new Random().Next(0, 4);
             _entityDrawDump = new EntityDrawData[_entityCount];
             _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
             _drawAllocationDataDump = new EntityDrawAllocationData?[MAX_SELECTION];
@@ -250,11 +250,7 @@ namespace STOLON
                         else AddToSelection(i);
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
-                        if (_lastSelected == i)
-                        {
-                            _lastSelected = -1; // entity deselection.
-                        }
-                        else
+                        if (_lastSelected != i)
                         {
                             _lastSelected = i; // new entity selection.
                             _currentEntitySelectedCoefficient = 0;
@@ -268,22 +264,15 @@ namespace STOLON
 
             #endregion
 
-            if (_lastSelected == -1)
-            {
-                _currentEntitySelectedCoefficient = 0; // no entity selected.
-            }
-            else
-            {
-                // update selected entity UI panel.
-                _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
-                _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
+            // update selected entity UI panel.
+            _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
+            _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
-                _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
-                _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.Allocation : 0)}%";
-                _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.VirtualAllocation : 0)}%";
+            _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
+            _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.Allocation : 0)}%";
+            _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.VirtualAllocation : 0)}%";
 
-                _entityInfoContainer.Update(elapsedMilliseconds);
-            }
+            _entityInfoContainer.Update(elapsedMilliseconds);
 
             // update level info container.
             _lvlInfoContainer.Elements["lvl_name"].Text = "STOLON Test Level";
@@ -353,12 +342,10 @@ namespace STOLON
         {
             if (_initDone)
             {
+                Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
+
                 // draw selected entity preview.
-                if (_lastSelected != -1)
-                {
-                    Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
-                    drawingContext.DrawEntity(selectedEntity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
-                }
+                drawingContext.DrawEntity(selectedEntity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
 
                 // draw side black areas.
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
@@ -419,39 +406,34 @@ namespace STOLON
 
                 #region INFO_WINDOW
 
-                // draw entity info window.
-                if (_lastSelected != -1)
+                drawingContext.Draw(_entityInfoContainer);
+
+                string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
+                drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+
+                #region ALLOC_DISPLAYS
+
+                for (int i = 0; i < MAX_SELECTION; i++)
                 {
-                    Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
-                    drawingContext.Draw(_entityInfoContainer);
+                    if (!IsSlotOccupied(i)) continue;
 
-                    string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
-                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+                    EntityAllocationData allocData = _allocationDataDump[i]!.Value;
+                    EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
 
-                    #region ALLOC_DISPLAYS
+                    string allocationStr = allocData.Allocation.ToString();
+                    string virtualAllocStr = allocData.VirtualAllocation.ToString();
 
-                    for (int i = 0; i < MAX_SELECTION; i++)
-                    {
-                        if (!IsSlotOccupied(i)) continue;
+                    drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
+                    drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
+                    drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
 
-                        EntityAllocationData allocData = _allocationDataDump[i]!.Value;
-                        EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
-
-                        string allocationStr = allocData.Allocation.ToString();
-                        string virtualAllocStr = allocData.VirtualAllocation.ToString();
-
-                        drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
-                        drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
-                        drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
-
-                        if (allocData.VirtualAllocation > allocData.Allocation)
-                            drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
-                        if(_hoveredIndex == _selection[i])
-                            drawingContext.DrawLine(new Line(drawAllocData.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE), _entityDrawDump[_selection[i]].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0)), Color.White, 2);
-                    }
-
-                    #endregion
+                    if (allocData.VirtualAllocation > allocData.Allocation)
+                        drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
+                    if (_hoveredIndex == _selection[i])
+                        drawingContext.DrawLine(new Line(drawAllocData.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE), _entityDrawDump[_selection[i]].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0)), Color.White, 2);
                 }
+
+                #endregion
 
                 #endregion
 
