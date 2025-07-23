@@ -63,12 +63,12 @@ namespace STOLON
 
         private readonly struct EntityDrawData
         {
-            public Vector2 Pos { get; }
-            public Rectangle SymbolNotationBox { get; }
+            public readonly Vector2 Pos;
+            public readonly Rectangle SymbolNotationBox;
             public EntityProfile Profile => Entity.Profile;
-            public Entity Entity { get; }
-            public bool Selected { get; }
-            public string FullerName { get; }
+            public readonly Entity Entity;
+            public readonly bool Selected;
+            public readonly string FullerName;
 
             public EntityDrawData(Vector2 basePos, float floatAmount, Entity entity)
             {
@@ -83,9 +83,9 @@ namespace STOLON
 
         private readonly struct EntityAllocationData
         {
-            public int VirtualAllocation { get; }
-            public int Allocation { get; }
-            public Entity Entity { get; }
+            public readonly int VirtualAllocation;
+            public readonly int Allocation;
+            public readonly Entity Entity;
 
             public EntityAllocationData(int allocation, int virtualAllocation, Entity entity)
             {
@@ -97,9 +97,10 @@ namespace STOLON
 
         private readonly struct EntityDrawAllocationData
         {
-            public Rectangle SymbolNotationRect { get; }
-            public Rectangle AllocationRect { get; }
-            public Rectangle VirtualAllocationRect { get; }
+            public readonly Rectangle SymbolNotationRect;
+            public readonly Rectangle AllocationRect;
+            public readonly Rectangle VirtualAllocationRect;
+
             public EntityDrawAllocationData(int x)
             {
                 Rectangle GetMiniSlot(int h) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * h, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
