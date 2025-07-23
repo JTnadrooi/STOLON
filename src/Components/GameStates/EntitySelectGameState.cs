@@ -185,7 +185,7 @@ namespace STOLON
             _entityCount = _entities.Length;
             _entityHoverCoefficients = new float[_entityCount];
             _hoveredIndex = -1;
-            _lastSelected = new Random().Next(0, 4);
+            _lastSelected = new Random().Next(0, _entityCount);
             _entityDrawDump = new EntityDrawData[_entityCount];
             _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
             _drawAllocationDataDump = new EntityDrawAllocationData?[MAX_SELECTION];
