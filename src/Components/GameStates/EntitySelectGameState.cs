@@ -143,6 +143,10 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
+        private BoardState _boardState;
+        private bool _drawConnectionLine;
+        private Line _connectionLine;
+
         #region CONSTANTS
 
         public const int TILE_SIZE = 128; // naming conventions for const variables aren't ALL_CAPS? oh no! anyway-
@@ -189,6 +193,7 @@ namespace STOLON
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
             _selection = Enumerable.Repeat(-1, MAX_SELECTION).ToArray();
+            _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -220,8 +225,7 @@ namespace STOLON
             _line1x = (int)MathHelper.Lerp(_menuGameState.RemoveLine1x, LINE1_TARGET, _lineTweener.Value);
             _line2x = (int)MathHelper.Lerp(_menuGameState.RemoveLine2x, LINE2_TARGET, _lineTweener.Value);
 
-            if (_lineTweener.Running)
-                return;
+            if (_lineTweener.Running) return;
 
             // update UI animation states.
             _hoveredState.UpdatePositive(_hoveredIndex, elapsedMilliseconds);
@@ -231,38 +235,45 @@ namespace STOLON
 
             #region TILES
 
-            for (int i = 0; i < _entityCount; i++)
+            for (int entityIndex = 0; entityIndex < _entityCount; entityIndex++)
             {
-                Vector2 basePos = GetBaseTilePos(i);
+                Vector2 basePos = GetBaseTilePos(entityIndex);
                 Rectangle entityRect = new Rectangle(basePos.ToPoint(), new Point(128));
 
                 bool isHovered = entityRect.Contains(STOLON.Input.VirtualMousePos);
-                _entityHoverCoefficients[i] = MathHelper.Lerp(_entityHoverCoefficients[i], isHovered ? 1 : 0, isHovered ? HOVER_INTENSITY : HOVER_INTENSITY / 5);
+                _entityHoverCoefficients[entityIndex] = MathHelper.Lerp(_entityHoverCoefficients[entityIndex], isHovered ? 1 : 0, isHovered ? HOVER_INTENSITY : HOVER_INTENSITY / 5);
 
                 if (isHovered)
                 {
-                    _hoveredIndex = i;
+                    _hoveredIndex = entityIndex;
 
                     Rectangle addBox = new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - ADD_BOX_SIZE), new Point(32));
 
                     if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (_selection.Contains(i)) RemoveFromSelection(i);
-                        else AddToSelection(i);
+                        if (_selection.Contains(entityIndex)) RemoveFromSelection(entityIndex);
+                        else AddToSelection(entityIndex);
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
-                        if (_lastSelected != i)
+                        if (_lastSelected != entityIndex)
                         {
-                            _lastSelected = i; // new entity selection.
+                            _lastSelected = entityIndex; // new entity selection.
                             _currentEntitySelectedCoefficient = 0;
-                            STOLON.Debug.Log("changed selected entity to " + i + ".");
+                            STOLON.Debug.Log("changed selected entity to " + entityIndex + ".");
                         }
+                    }
+
+                    if (IsInSelection(entityIndex))
+                    {
+                        _drawConnectionLine = true;
+                        _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
                     }
                 }
 
-                _entityDrawDump[i] = new EntityDrawData(basePos, _entityHoverCoefficients[i], _entities[i]);
+                _entityDrawDump[entityIndex] = new EntityDrawData(basePos, _entityHoverCoefficients[entityIndex], _entities[entityIndex]);
             }
 
             #endregion
+
 
             // update selected entity UI panel.
             _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
@@ -429,8 +440,10 @@ namespace STOLON
 
                     if (allocData.VirtualAllocation > allocData.Allocation)
                         drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
-                    if (_hoveredIndex == _selection[i])
-                        drawingContext.DrawLine(new Line(drawAllocData.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE), _entityDrawDump[_selection[i]].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0)), Color.White, 2);
+                    if (_drawConnectionLine)
+                    {
+                        drawingContext.DrawLine(_connectionLine, Color.White, 2);
+                    }
                 }
 
                 #endregion
