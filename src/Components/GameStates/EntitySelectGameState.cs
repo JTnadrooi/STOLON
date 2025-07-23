@@ -65,7 +65,6 @@ namespace STOLON
         {
             public readonly Vector2 Pos;
             public readonly Rectangle SymbolNotationBox;
-            public EntityProfile Profile => Entity.Profile;
             public readonly Entity Entity;
             public readonly bool Selected;
             public readonly string FullerName;
@@ -383,7 +382,7 @@ namespace STOLON
                     {
                         ref EntityDrawData ddc = ref _entityDrawDump[i];
 
-                        drawingContext.DrawEntity(ddc.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
+                        drawingContext.DrawEntity(ddc.Entity.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
                         bool isHovered = (_hoveredIndex == i);
                         bool isSelected = _selection.Contains(i);
