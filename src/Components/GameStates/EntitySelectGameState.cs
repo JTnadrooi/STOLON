@@ -216,6 +216,7 @@ namespace STOLON
         protected override void UpdateUI(int elapsedMilliseconds)
         {
             float deltaTime = elapsedMilliseconds / 1000f;
+            _drawConnectionLine = false;
 
             _lineTweener.Update(deltaTime);
             _initDone = !_lineTweener.Running;
