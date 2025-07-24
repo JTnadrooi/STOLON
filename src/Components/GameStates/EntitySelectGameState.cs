@@ -301,10 +301,10 @@ namespace STOLON
         public void AddToSelection(int entityIndex)
         {
             STOLON.Debug.Log("selecting entity " + entityIndex + ".");
-            for (int i2 = 0; i2 < _selection.Length; i2++)
-                if (_selection[i2] == -1)
+            for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
+                if (_selection[slotIndex] == -1)
                 {
-                    _selection[i2] = entityIndex;
+                    _selection[slotIndex] = entityIndex;
                     break;
                 }
             UpdateSelection();
@@ -326,25 +326,25 @@ namespace STOLON
             int usedSlots = _selection.Where(i => i != -1).Count();
             int secondarySymbolPosOffsetX = TILE_SIZE * 2;
 
-            for (int i = 0; i < _selection.Length; i++)
+            for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
-                STOLON.Debug.Log($">checking slot {i}..");
-                if (_selection[i] == -1)
+                STOLON.Debug.Log($">checking slot {slotIndex}..");
+                if (_selection[slotIndex] == -1)
                 {
-                    _allocationDataDump[i] = null;
-                    _drawAllocationDataDump[i] = null;
-                    STOLON.Debug.Log($"<skipped slot {i}.");
+                    _allocationDataDump[slotIndex] = null;
+                    _drawAllocationDataDump[slotIndex] = null;
+                    STOLON.Debug.Log($"<skipped slot {slotIndex}.");
                     continue;
                 }
-                STOLON.Debug.Log($"<found {_entities[_selection[i]]}.");
+                STOLON.Debug.Log($"<found {_entities[_selection[slotIndex]]}.");
 
-                STOLON.Debug.Log($">creating allocation data for slot {i}..");
-                _allocationDataDump[i] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[i]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[i]]);
-                STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[i]);
+                STOLON.Debug.Log($">creating allocation data for slot {slotIndex}..");
+                _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[slotIndex]]);
+                STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
                 STOLON.Debug.Success();
 
-                STOLON.Debug.Log($">creating allocation DRAW data for slot {i}..");
-                _drawAllocationDataDump[i] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
+                STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");
+                _drawAllocationDataDump[slotIndex] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
                 secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
@@ -381,16 +381,16 @@ namespace STOLON
                 drawingContext.DrawLine(0, ROSTER_BOTTOM_LINE, TILE_SIZE * TILE_ROW_AMOUNT, ROSTER_BOTTOM_LINE, Color.White, Interface.LINE_WIDTH);
 
                 // draw entity tiles.
-                for (int i = 0; i < TILE_COUNT; i++)
+                for (int tileIndex = 0; tileIndex < TILE_COUNT; tileIndex++)
                 {
-                    if (i < _entityCount)
+                    if (tileIndex < _entityCount)
                     {
-                        ref EntityDrawData ddc = ref _entityDrawDump[i];
+                        ref EntityDrawData ddc = ref _entityDrawDump[tileIndex];
 
                         drawingContext.DrawEntity(ddc.Entity.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
-                        bool isHovered = (_hoveredIndex == i);
-                        bool isSelected = _selection.Contains(i);
+                        bool isHovered = (_hoveredIndex == tileIndex);
+                        bool isSelected = _selection.Contains(tileIndex);
 
                         if (isHovered)
                         {
@@ -400,7 +400,7 @@ namespace STOLON
 
                         if (isSelected)
                         {
-                            int selectedIndex = _selection.GetFirstIndexWhere(x => i == x);
+                            int selectedIndex = _selection.GetFirstIndexWhere(x => tileIndex == x);
                             drawingContext.Draw(STOLON.Textures[$"UI\\selected_{selectedIndex + 1}-overlay"], ddc.Pos);
                             if (isHovered) drawingContext.Draw(STOLON.Textures["UI\\selected_remove-overlay"], ddc.Pos);
                         }
@@ -408,12 +408,12 @@ namespace STOLON
                         drawingContext.DrawSymbolNotation(ddc.Entity.SymbolNotation, ddc.SymbolNotationBox);
                         drawingContext.DrawRectangle(new Rectangle(ddc.Pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
 
-                        if (_lastSelected == i)
+                        if (_lastSelected == tileIndex)
                             drawingContext.Draw(STOLON.Textures["UI\\profile_selected"], ddc.Pos + new Vector2(0, -32));
                     }
                     else
                     {
-                        Vector2 pos = GetBaseTilePos(i);
+                        Vector2 pos = GetBaseTilePos(tileIndex);
                         drawingContext.Draw(STOLON.Textures["UI\\profile_question-128"], pos);
                         drawingContext.DrawRectangle(new Rectangle(pos.ToPoint(), new Point(TILE_SIZE)), Color.White, 1);
                     }
@@ -430,12 +430,12 @@ namespace STOLON
 
                 #region ALLOC_DISPLAYS
 
-                for (int i = 0; i < MAX_SELECTION; i++)
+                for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 {
-                    if (!IsSlotOccupied(i)) continue;
+                    if (!IsSlotOccupied(slotIndex)) continue;
 
-                    EntityAllocationData allocData = _allocationDataDump[i]!.Value;
-                    EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[i]!.Value;
+                    EntityAllocationData allocData = _allocationDataDump[slotIndex]!.Value;
+                    EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
 
                     string allocationStr = allocData.Allocation.ToString();
                     string virtualAllocStr = allocData.VirtualAllocation.ToString();
@@ -446,10 +446,9 @@ namespace STOLON
 
                     if (allocData.VirtualAllocation > allocData.Allocation)
                         drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
+
                     if (_drawConnectionLine)
-                    {
                         drawingContext.DrawLine(_connectionLine, Color.White, 2);
-                    }
                 }
 
                 #endregion
