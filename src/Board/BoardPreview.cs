@@ -14,7 +14,7 @@ namespace STOLON
     {
         public BoardState SourceState { get; }
         public Vector2 Pos { get; set; }
-        public Point Dimensions => SourceState.Dimensions;
+        public Point Dimensions => new Point(SourceState.Dimensions.X * TILE_SIZE, SourceState.Dimensions.Y * TILE_SIZE);
 
         private Texture2D _tileTexure;
 
@@ -31,8 +31,10 @@ namespace STOLON
             for (int x = 0; x < SourceState.Dimensions.X; x++)
                 for (int y = 0; y < SourceState.Dimensions.Y; y++)
                 {
-                    drawingContext.Draw(_tileTexure, Pos + new Vector2(x, y) * TILE_SIZE);
+                    //drawingContext.Draw(_tileTexure, Pos + new Vector2(x, y) * TILE_SIZE);
+                    drawingContext.DrawString(STOLON.Fonts.Small, "?", Pos + new Vector2(x, y) * TILE_SIZE);
                 }
+            //drawingContext.DrawRectangle(new Rectangle(Pos, Dimensions));
         }
     }
 }
