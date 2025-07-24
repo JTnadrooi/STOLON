@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static STOLON.EntitySelectGameState;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
