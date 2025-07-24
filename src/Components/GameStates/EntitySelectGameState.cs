@@ -281,7 +281,7 @@ namespace STOLON
 
             #endregion
 
-            _boardPreview.Pos = new Vector2(LINE1_TARGET - 16 - _boardPreview.Dimensions.X, 16);
+            _boardPreview.Pos = new Vector2(LINE1_TARGET - 16 - _boardPreview.Dimensions.X, INFO_WINDOW_TOPLINE - 16 - _boardPreview.Dimensions.Y);
 
             // update selected entity UI panel.
             _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
@@ -465,6 +465,5 @@ namespace STOLON
             drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, Interface.LINE_WIDTH);
             drawingContext.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, Interface.LINE_WIDTH);
         }
-
     }
 }
