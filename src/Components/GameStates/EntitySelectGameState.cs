@@ -143,6 +143,7 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
         private BoardState _boardState;
+        private BoardPreview _boardPreview;
         private bool _drawConnectionLine;
         private Line _connectionLine;
 
@@ -193,6 +194,7 @@ namespace STOLON
             _selectedState = new TimedState<int>();
             _selection = Enumerable.Repeat(-1, MAX_SELECTION).ToArray();
             _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
+            _boardPreview = _boardState.GetPreview();
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -279,6 +281,7 @@ namespace STOLON
 
             #endregion
 
+            _boardPreview.Pos = new Vector2(LINE1_TARGET - 16 - _boardPreview.Dimensions.X, 16);
 
             // update selected entity UI panel.
             _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
@@ -451,6 +454,8 @@ namespace STOLON
                 }
 
                 #endregion
+
+                drawingContext.Draw(_boardPreview);
 
                 #endregion
 
