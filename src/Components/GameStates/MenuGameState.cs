@@ -160,7 +160,6 @@ namespace STOLON
             //        break;
             //}
 
-            STOLON.Debug.Log(">autogenerating _back_ buttons");
 
             _logoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
             _removeTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
