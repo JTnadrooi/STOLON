@@ -123,7 +123,7 @@ namespace STOLON
             STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
 
             STOLON.Debug.Log(">creating screentexture.");
-            using Texture2D texture = new Texture2D(STOLON.Instance.GraphicsDevice, final.Width, final.Height, false, final.Format );
+            using Texture2D texture = new Texture2D(STOLON.Instance.GraphicsDevice, final.Width, final.Height, false, final.Format);
             STOLON.Debug.Success();
 
             string path = "sl_screenshot.png";
@@ -200,7 +200,7 @@ namespace STOLON
 
             if (_screenshotPending)
             {
-                ScreenshotFrom(finalTarget);
+                ScreenshotFrom(finalVTarget);
                 _screenshotPending = false;
             }
         }
