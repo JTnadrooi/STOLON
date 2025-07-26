@@ -125,7 +125,16 @@ namespace STOLON
             STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Directory.CreateDirectory("Screenshots");
-            string path = "Screenshots\\sl_screenshot.png";
+
+            STOLON.Debug.Log(">getting screenshot file index.");
+
+            int screenshotIndex = 0;
+            for (; true; screenshotIndex++)
+                if (!File.Exists($"Screenshots\\sl_screenshot{screenshotIndex}.png")) break;
+
+            STOLON.Debug.Log("<found avalible with id: " + screenshotIndex);
+
+            string path = $"Screenshots\\sl_screenshot{screenshotIndex}.png";
 
             STOLON.Debug.Log(">reading and flipping screentexture data.");
             Color[] data = new Color[virtualFinal.Width * virtualFinal.Height];
