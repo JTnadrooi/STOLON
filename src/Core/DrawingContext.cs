@@ -126,7 +126,7 @@ namespace STOLON
             using Texture2D texture = new Texture2D(STOLON.Instance.GraphicsDevice, final.Width, final.Height, false, final.Format);
             STOLON.Debug.Success();
 
-            string path = "sl_screenshot";
+            string path = "sl_screenshot.png";
 
             STOLON.Debug.Log(">storing screentexture to file.");
             Color[] data = new Color[final.Width * final.Height];
