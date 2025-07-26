@@ -7,6 +7,7 @@ using MonoGame.Extended.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace STOLON
         public Matrix InvertYMatrix => _invertYMatrix;
 
         private Texture2DAtlas _ditherAtlas;
+        private bool _screenshotPending;
 
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
@@ -108,6 +110,38 @@ namespace STOLON
             STOLON.Debug.Log($"enabled effect with name \"{name}\".");
         }
 
+        public void Screenshot()
+        {
+            _screenshotPending = true;
+            STOLON.Debug.Log("screenshot request submitted.");
+        }
+
+        private string ScreenshotFrom(RenderTarget2D final)
+        {
+            STOLON.Debug.Log(">attempting screenshot.");
+
+            STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
+
+            STOLON.Debug.Log(">creating screentexture.");
+            using Texture2D texture = new Texture2D(STOLON.Instance.GraphicsDevice, final.Width, final.Height, false, final.Format);
+            STOLON.Debug.Success();
+
+            string path = "sl_screenshot";
+
+            STOLON.Debug.Log(">storing screentexture to file.");
+            Color[] data = new Color[final.Width * final.Height];
+            final.GetData(data);
+            texture.SetData(data);
+
+            using (FileStream stream = File.Create(path)) texture.SaveAsPng(stream, texture.Width, texture.Height);
+            _screenshotPending = false;
+
+            STOLON.Debug.Success();
+            STOLON.Debug.Success();
+
+            return path;
+        }
+
         public void EndScene()
         {
             _spriteBatch.End();
@@ -151,7 +185,14 @@ namespace STOLON
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
+
+            if (_screenshotPending)
+            {
+                ScreenshotFrom(finalTarget);
+            }
         }
+
+        #region DRAW_FUNCTIONS
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
@@ -255,6 +296,8 @@ namespace STOLON
         {
             graphic.Draw(this);
         }
+
+        #endregion
 
 
         //public void DrawStringOutline(GameFont font, string text, Vector2 position, int marginX, int marginY, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, bool background = false, int lineWidth = UserInterface.LINE_WIDTH)
