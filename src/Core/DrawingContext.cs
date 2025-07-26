@@ -34,6 +34,7 @@ namespace STOLON
         public Matrix InvertYMatrix => _invertYMatrix;
 
         private Texture2DAtlas _ditherAtlas;
+        private Texture2D _screenshotCache;
         private bool _screenshotPending;
 
         public const int DITHER_FRAME_COUNT = 5;
@@ -63,6 +64,7 @@ namespace STOLON
             STOLON.Debug.Success();
 
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
+            _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.V_WIDTH, STOLON.V_HEIGHT);
 
             STOLON.Debug.Success();
         }
@@ -116,38 +118,34 @@ namespace STOLON
             STOLON.Debug.Log("screenshot request submitted.");
         }
 
-        private string ScreenshotFrom(RenderTarget2D final)
+        private string ScreenshotFrom(RenderTarget2D virtualFinal)
         {
             STOLON.Debug.Log(">attempting screenshot.");
 
             STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
 
-            STOLON.Debug.Log(">creating screentexture.");
-            using Texture2D texture = new Texture2D(STOLON.Instance.GraphicsDevice, final.Width, final.Height, false, final.Format);
-            STOLON.Debug.Success();
-
             string path = "sl_screenshot.png";
 
             STOLON.Debug.Log(">reading and flipping screentexture data.");
-            Color[] data = new Color[final.Width * final.Height];
-            final.GetData(data);
+            Color[] data = new Color[virtualFinal.Width * virtualFinal.Height];
+            virtualFinal.GetData(data);
 
-            Color[] rowBuffer = new Color[final.Width];
-            for (int y = 0; y < final.Height / 2; y++)
+            Color[] rowBuffer = new Color[virtualFinal.Width];
+            for (int y = 0; y < virtualFinal.Height / 2; y++)
             {
-                int topIndex = y * final.Width;
-                int bottomIndex = (final.Height - y - 1) * final.Width;
+                int topIndex = y * virtualFinal.Width;
+                int bottomIndex = (virtualFinal.Height - y - 1) * virtualFinal.Width;
 
-                Array.Copy(data, topIndex, rowBuffer, 0, final.Width);           
-                Array.Copy(data, bottomIndex, data, topIndex, final.Width);           
-                Array.Copy(rowBuffer, 0, data, bottomIndex, final.Width);              
+                Array.Copy(data, topIndex, rowBuffer, 0, virtualFinal.Width);           
+                Array.Copy(data, bottomIndex, data, topIndex, virtualFinal.Width);           
+                Array.Copy(rowBuffer, 0, data, bottomIndex, virtualFinal.Width);              
             }
 
-            texture.SetData(data);
+            _screenshotCache.SetData(data);
             STOLON.Debug.Success();
 
             STOLON.Debug.Log(">saving screentexture to file.");
-            using (FileStream stream = File.Create(path)) texture.SaveAsPng(stream, texture.Width, texture.Height);
+            using (FileStream stream = File.Create(path)) _screenshotCache.SaveAsPng(stream, STOLON.V_WIDTH, STOLON.V_HEIGHT);
             STOLON.Debug.Success();
 
             STOLON.Debug.Success();
