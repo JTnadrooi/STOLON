@@ -134,7 +134,6 @@ namespace STOLON
             texture.SetData(data);
 
             using (FileStream stream = File.Create(path)) texture.SaveAsPng(stream, texture.Width, texture.Height);
-            _screenshotPending = false;
 
             STOLON.Debug.Success();
             STOLON.Debug.Success();
@@ -189,6 +188,7 @@ namespace STOLON
             if (_screenshotPending)
             {
                 ScreenshotFrom(finalTarget);
+                _screenshotPending = false;
             }
         }
 
