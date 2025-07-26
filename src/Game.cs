@@ -197,6 +197,7 @@ namespace STOLON
                 _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
 
                 if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
+                if (STOLON.Input.IsClicked(Keys.S)) _drawingContext.Screenshot();
             }
             base.Update(gameTime);
         }
