@@ -299,7 +299,6 @@ namespace STOLON
             _lvlInfoContainer.Update(elapsedMilliseconds);
         }
 
-
         public void AddToSelection(int entityIndex)
         {
             STOLON.Debug.Log(">selecting entity " + entityIndex + ".");
@@ -346,12 +345,12 @@ namespace STOLON
                 _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[slotIndex]]);
                 STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
 
-
                 STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");
                 _drawAllocationDataDump[slotIndex] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
                 secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
+
             STOLON.Debug.Success();
         }
 
