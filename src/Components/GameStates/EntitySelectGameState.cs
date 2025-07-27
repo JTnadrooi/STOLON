@@ -302,7 +302,7 @@ namespace STOLON
 
         public void AddToSelection(int entityIndex)
         {
-            STOLON.Debug.Log("selecting entity " + entityIndex + ".");
+            STOLON.Debug.Log(">selecting entity " + entityIndex + ".");
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 if (_selection[slotIndex] == -1)
                 {
@@ -310,15 +310,17 @@ namespace STOLON
                     break;
                 }
             UpdateSelection();
+            STOLON.Debug.Success();
         }
         public int GetSlot(int entityIndex) => _selection.GetFirstIndexWhere(s => s == entityIndex);
         public bool IsInSelection(int entityIndex) => _selection.Any(x => x == entityIndex);
         public bool IsSlotOccupied(int slotIndex) => _selection[slotIndex] != -1;
         public void RemoveFromSelection(int entityIndex)
         {
-            STOLON.Debug.Log("deselecting entity " + entityIndex + ".");
+            STOLON.Debug.Log(">deselecting entity " + entityIndex + ".");
             _selection[_selection.GetFirstIndexWhere(i => entityIndex == i)] = -1;
             UpdateSelection();
+            STOLON.Debug.Success();
         }
         private void UpdateSelection()
         {
@@ -343,7 +345,7 @@ namespace STOLON
                 STOLON.Debug.Log($">creating allocation data for slot {slotIndex}..");
                 _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[slotIndex]]);
                 STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
-                STOLON.Debug.Success();
+
 
                 STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");
                 _drawAllocationDataDump[slotIndex] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
