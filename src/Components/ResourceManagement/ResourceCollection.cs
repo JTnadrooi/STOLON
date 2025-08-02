@@ -76,6 +76,7 @@ namespace STOLON
                     STOLON.Debug.Success();
                 }
             }
+            STOLON.Debug.Log(dictionary.Values.Count + " assets loaded.");
             STOLON.Debug.Success();
             ContentManager = contentManager;
         }
