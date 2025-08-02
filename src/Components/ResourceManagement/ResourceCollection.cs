@@ -49,6 +49,8 @@ namespace STOLON
         public int Count => dictionary.Count;
         public TContent this[string key] => dictionary[key];
 
+        public const bool SILENT = true;
+
         public ResourceCollection(ContentManager contentManager, Func<string, object> loader, string basePath)
         {
             BasePath = basePath;
@@ -67,7 +69,7 @@ namespace STOLON
                 object loaderResult = loader(toLoad);
                 if (loaderResult is Exception)
                 {
-                    STOLON.Debug.Log("<failed, exception: " + (loaderResult as Exception));
+                    STOLON.Debug.Log("<failed, exception: " + (SILENT ? "SILENT" : (loaderResult as Exception)));
                 }
                 else
                 {
