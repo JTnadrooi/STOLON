@@ -32,6 +32,10 @@ namespace STOLON
 
         public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
         public Matrix InvertYMatrix => _invertYMatrix;
+        /// <summary>
+        /// Note everything drawn to this will be inverted. Please use the extension methods or call <see cref="InvertY(SpriteEffects)"/> on the input <see cref="SpriteEffects"/> enum.
+        /// </summary>
+        public SpriteBatch SpriteBatch => _spriteBatch;
 
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
