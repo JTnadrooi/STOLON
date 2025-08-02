@@ -1,30 +1,29 @@
-﻿using Microsoft.Xna.Framework;
+﻿using AsitLib;
+using AsitLib.Collections;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
-using System.Linq;
-using System.Collections.Generic;
+using MonoGame.Extended.BitmapFonts;
+using MonoGame.Extended.Content;
 using System;
-using System.Runtime.Versioning;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
-using AsitLib;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Windows;
 using System.Xml.Linq;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Collections;
-using AsitLib.Collections;
-using System.Diagnostics.CodeAnalysis;
-
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Color = Microsoft.Xna.Framework.Color;
+using Math = System.Math;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Math = System.Math;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using System.IO;
-using MonoGame.Extended.Content;
-using Microsoft.Xna.Framework.Content;
 
 
 
@@ -37,9 +36,9 @@ namespace STOLON
         {
             try
             {
-                return new Font2D(toLoad, contentManager.Load<SpriteFont>(toLoad), toLoad switch
+                return new Font2D(toLoad, contentManager.Load<BitmapFont>(toLoad), toLoad switch
                 {
-                    BASE_PATH + "\\smoller" => 0.5f,
+                    //BASE_PATH + "\\smoller" => 0.5f,
                     _ => 1f,
                 });
             }

@@ -19,6 +19,7 @@ using RectangleF = MonoGame.Extended.RectangleF;
 using System.Diagnostics;
 using System.Xml.Linq;
 using MonoGame.Extended.Tiled;
+using MonoGame.Extended.BitmapFonts;
 
 
 

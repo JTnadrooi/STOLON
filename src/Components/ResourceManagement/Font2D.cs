@@ -17,18 +17,18 @@ namespace STOLON
     public class Font2D // yeah i know 3d fonts are rare but they do exist (and I want the naming to be inline with Texture2D)
     {
         public string Name { get; }
-        public SpriteFont SpriteFont { get; }
+        public BitmapFont CoreFont { get; }
         public float Scale { get; }
         public Vector2 Dimensions { get; }
         public const char BASE_CHAR = 'A';
-        public Font2D(string name, SpriteFont spriteFont, float scale = 1)
+        public Font2D(string name, BitmapFont spriteFont, float scale = 1)
         {
             Name = name;
-            SpriteFont = spriteFont;
+            CoreFont = spriteFont;
             Dimensions = spriteFont.MeasureString(BASE_CHAR.ToString()) * scale;
             Scale = scale;
         }
-        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * SpriteFont.Spacing - 1, 0) * Scale - 1, Dimensions.Y);
+        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * CoreFont.LetterSpacing - 1, 0) * Scale - 1, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
         public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
@@ -85,9 +85,7 @@ namespace STOLON
             return sb.ToString();
         }
 
-
-
         public override string ToString() => Name + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
-        public static implicit operator SpriteFont(Font2D font) => font.SpriteFont;
+        public static implicit operator BitmapFont(Font2D font) => font.CoreFont;
     }
 }
