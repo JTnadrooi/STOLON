@@ -1,9 +1,11 @@
 {
   "root": "",
-  "references": [],
+  "references": [
+    "..\\pipeline-references\\MonoGame.Extended.Content.Pipeline.dll"
+  ],
   "content": {
     "textures": {
-      "path": "Textures/*.png",
+      "path": "Fonts/*.png",
       "recursive": "True",
       "action": "build",
       "importer": "TextureImporter",
@@ -19,11 +21,11 @@
       }
     },
     "spriteFonts": {
-      "path": "Fonts/*.spritefont",
+      "path": "Fonts/*.fnt",
       "recursive": "True",
       "action": "build",
-      "importer": "FontDescriptionImporter",
-      "processor": "FontDescriptionProcessor"
+      "importer": "BitmapFontImporter",
+      "processor": "BitmapFontProcessor"
     },
     "spriteEffects": {
       "path": "Effects/*.fx",
