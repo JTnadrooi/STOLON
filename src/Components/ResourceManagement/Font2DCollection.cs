@@ -36,11 +36,8 @@ namespace STOLON
         {
             try
             {
-                return new Font2D(toLoad, contentManager.Load<BitmapFont>(toLoad), toLoad switch
-                {
-                    //BASE_PATH + "\\smoller" => 0.5f,
-                    _ => 1f,
-                });
+                BitmapFont font = BitmapFont.FromFile(STOLON.Instance.GraphicsDevice, toLoad + ".fnt");
+                return new Font2D(toLoad, font);
             }
             catch (Exception e)
             {
@@ -48,7 +45,7 @@ namespace STOLON
             }
         }, BASE_PATH)
         { }
-        public Font2D Small => this["smoller"];
+        public Font2D Small => this["smollerMono"];
         public Font2D Medium => this["pixeloid"];
     }
 }
