@@ -49,7 +49,7 @@ namespace STOLON
         public int Count => dictionary.Count;
         public TContent this[string key] => dictionary[key];
 
-        public const bool SILENT = true;
+        public const bool SILENT = false;
 
         public ResourceCollection(ContentManager contentManager, Func<string, object> loader, string basePath)
         {
