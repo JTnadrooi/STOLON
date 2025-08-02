@@ -217,6 +217,8 @@ namespace STOLON
             }
         }
 
+        public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // to test still..
+
         #region DRAW_FUNCTIONS
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
@@ -234,7 +236,6 @@ namespace STOLON
             => GetDestinationRectangle(texture, position, new Vector2(scale));
         private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, Vector2? scale = null)
             => new Rectangle(position.ToPoint(), (texture.Bounds.Size.ToVector2() * (scale ?? Vector2.One)).ToPoint());
-        private SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // I don't think this completelly works.
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
