@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace STOLON
 {
@@ -239,15 +238,7 @@ namespace STOLON
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
-        public void DrawString(Font2D font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-            => DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
-        public void DrawString(Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-        {
-            if (text == null) throw new ArgumentNullException("text");
-            foreach (BitmapFont.BitmapFontGlyph glyph in font.CoreFont.GetGlyphs(text, position))
-                if (glyph.Character != null)
-                    _spriteBatch.Draw(glyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - glyph.Position + (origin ?? Vector2.Zero), scale, InvertY(effects), layerDepth);
-        }
+
         public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
         public void DrawLine(Vector2 point1, Vector2 point2, Color color, float thickness = 1f, float layerDepth = 0f)

@@ -1,13 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DiscordRPC;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
+using MonoGame.Extended.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
@@ -87,5 +90,18 @@ namespace STOLON
 
         public override string ToString() => Name + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
         public static implicit operator BitmapFont(Font2D font) => font.CoreFont;
+    }
+
+    public static class Font2DDrawingExtensions
+    {
+        public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => context.DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
+        public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        {
+            if (text == null) throw new ArgumentNullException("text");
+            foreach (BitmapFont.BitmapFontGlyph glyph in font.CoreFont.GetGlyphs(text, position))
+                if (glyph.Character != null)
+                    context.SpriteBatch.Draw(glyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - glyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
+        }
     }
 }
