@@ -36,7 +36,8 @@ namespace STOLON
         {
             try
             {
-                BitmapFont font = BitmapFont.FromFile(STOLON.Instance.GraphicsDevice, toLoad + ".fnt");
+                //BitmapFont font = BitmapFont.FromFile(STOLON.Instance.GraphicsDevice, toLoad + ".fnt");
+                BitmapFont font = contentManager.Load<BitmapFont>(toLoad);
                 return new Font2D(toLoad, font);
             }
             catch (Exception e)
