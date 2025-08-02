@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using static System.Net.Mime.MediaTypeNames;
+using MonoGame.Extended;
+using System;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using RectangleF = MonoGame.Extended.RectangleF;
-using System;
 
 
 
@@ -172,5 +173,17 @@ namespace STOLON
         }
 
         public static UIElementUpdateData Empty = new UIElementUpdateData(false, null);
+    }
+
+    public static class UIElementDrawingExtensions
+    {
+        public static void DrawElement(this DrawingContext context, UIElementDrawData drawData)
+        {
+            if (drawData.Source == null) throw new InvalidOperationException();
+            if (drawData.Hide) return;
+            if (drawData.DrawBackground) context.DrawArea(drawData.Rectangle.ToRectangle(), Color.Black);
+            context.DrawString(drawData.Font, drawData.Text, drawData.Position);
+            if (drawData.DrawRectangle) context.DrawRectangle(drawData.Rectangle, Color.White, Interface.LINE_WIDTH);
+        }
     }
 }

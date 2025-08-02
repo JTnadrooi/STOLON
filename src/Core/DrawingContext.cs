@@ -304,15 +304,6 @@ namespace STOLON
                 }
         }
 
-        public void DrawElement(UIElementDrawData drawData)
-        {
-            if (drawData.Source == null) throw new InvalidOperationException();
-            if (drawData.Hide) return;
-            if (drawData.DrawBackground) DrawArea(drawData.Rectangle.ToRectangle(), Color.Black);
-            DrawString(drawData.Font, drawData.Text, drawData.Position);
-            if (drawData.DrawRectangle) DrawRectangle(drawData.Rectangle, Color.White, Interface.LINE_WIDTH);
-        }
-
         public void Draw(IGraphic graphic)
         {
             graphic.Draw(this);
