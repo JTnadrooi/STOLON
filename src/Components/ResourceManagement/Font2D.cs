@@ -25,10 +25,13 @@ namespace STOLON
         {
             Name = name;
             CoreFont = spriteFont;
-            Dimensions = spriteFont.MeasureString(BASE_CHAR.ToString()) * scale;
             Scale = scale;
+
+            float charAdvance = CoreFont.GetGlyphs(BASE_CHAR.ToString()).First().Character.XAdvance * scale;
+            float lineHeight = CoreFont.LineHeight * scale;
+            Dimensions = new Vector2(charAdvance, lineHeight);
         }
-        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i + Math.Max(i * CoreFont.LetterSpacing - 1, 0) * Scale - 1, Dimensions.Y);
+        public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
         public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
