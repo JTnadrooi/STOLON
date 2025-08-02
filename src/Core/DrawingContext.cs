@@ -248,48 +248,6 @@ namespace STOLON
         public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
-        public void DrawEntity(Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
-            => DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
-            => DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
-            => DrawEntity(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);
-        public void DrawEntity(EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
-        {
-            void DrawEntity(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-            {
-                if (drawMode == EntityDrawMode.WithBackground) DrawArea(new RectangleF(position, new Vector2(res) * scale).ToRectangle(), Color.Black);
-                Draw(texture, position, scale, rotation, origin, sourceRectangle, color, effects, layerDepth);
-            }
-            Rectangle sourceRec;
-            Texture2D? texture;
-            if (entityProfile.TryGetMipmap(res, out texture))
-                DrawEntity(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
-            else
-            {
-                switch (res)
-                {
-                    case 128:
-                        texture = entityProfile.Mipmaps[512];
-                        sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
-                        scale *= 0.25f;
-                        DrawEntity(texture, position + (drawMode == EntityDrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
-                        break;
-                    default: throw new Exception();
-                }
-            }
-        }
-        public void DrawSymbolNotation(string symbolNotationStr, Rectangle bounds)
-        {
-            DrawArea(bounds, Color.Black);
-            DrawRectangle(bounds, Color.White, Interface.LINE_WIDTH);
-            Vector2 dimensions = STOLON.Fonts.Medium.FastMeasure(symbolNotationStr);
-            Vector2 scale = Vector2.One;
-            if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
-            dimensions *= scale;
-            DrawString(STOLON.Fonts.Medium, symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
-        }
-
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)
             => DrawDither(position, dimensions, (int)(Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT), color);
         public void DrawDither(Vector2 position, Point dimensions, int frame, Color? color = null)

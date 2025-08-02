@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,6 +96,51 @@ namespace STOLON
             return allocation;
         }
         public bool Equals(Entity? other) => other != null && other.Id == Id;
+    }
+    public static class EntityDrawingExtensions
+    {
+        public static void DrawEntity(this DrawingContext context, Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+            => context.DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
+        public static void DrawEntity(this DrawingContext context, Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+            => context.DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
+        public static void DrawEntity(this DrawingContext context, EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+            => context.DrawEntity(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);
+        public static void DrawEntity(this DrawingContext context, EntityProfile entityProfile, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+        {
+            void DrawEntity(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            {
+                if (drawMode == EntityDrawMode.WithBackground) context.DrawArea(new RectangleF(position, new Vector2(res) * scale).ToRectangle(), Color.Black);
+                context.Draw(texture, position, scale, rotation, origin, sourceRectangle, color, effects, layerDepth);
+            }
+            Rectangle sourceRec;
+            Texture2D? texture;
+            if (entityProfile.TryGetMipmap(res, out texture))
+                DrawEntity(texture!, position, scale, rotation, origin, null, null, effects, layerDepth);
+            else
+            {
+                switch (res)
+                {
+                    case 128:
+                        texture = entityProfile.Mipmaps[512];
+                        sourceRec = new Rectangle(entityProfile.Focus - new Point(128), new Size(256, 256));
+                        scale *= 0.25f;
+                        DrawEntity(texture, position + (drawMode == EntityDrawMode.Menu ? entityProfile.MenuOffset : Point.Zero).ToVector2(), scale, rotation, origin, sourceRec, null, effects, layerDepth);
+                        break;
+                    default: throw new Exception();
+                }
+            }
+        }
+        public static void DrawSymbolNotation(this DrawingContext context, string symbolNotationStr, Rectangle bounds)
+        {
+            context.DrawArea(bounds, Color.Black);
+            context.DrawRectangle(bounds, Color.White, Interface.LINE_WIDTH);
+            Vector2 dimensions = STOLON.Fonts.Medium.FastMeasure(symbolNotationStr);
+            Vector2 scale = Vector2.One;
+            if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
+            dimensions *= scale;
+            context.DrawString(STOLON.Fonts.Medium, symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
+        }
+
     }
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
