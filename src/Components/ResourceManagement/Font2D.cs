@@ -113,7 +113,7 @@ namespace STOLON
 
             BitmapFont.BitmapFontGlyph currentGlyph;
             BitmapFont.BitmapFontGlyph? previousGlyph = null;
-            Vector2 positionDelta = Vector2.Zero;
+            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.Dimensions.Y * scale.Y);
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -137,7 +137,7 @@ namespace STOLON
                 previousGlyph = currentGlyph;
                 if (unicodeCodePoint == 10) // newline.
                 {
-                    positionDelta.Y += font.CoreFont.LineHeight;
+                    positionDelta.Y -= font.CoreFont.LineHeight;
                     positionDelta.X = 0f;
                     previousGlyph = null;
                 }
