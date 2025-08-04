@@ -103,14 +103,14 @@ namespace STOLON
             {
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
                 currentGlyph.CharacterID = unicodeCodePoint;
-                font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character);
+                if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
+                    throw new ArgumentNullException("unsupported char: " + unicodeCodePoint);
+
                 currentGlyph.Position = position + _positionDelta;
-                if (currentGlyph.Character != null)
-                {
-                    currentGlyph.Position.X += currentGlyph.Character.XOffset;
-                    currentGlyph.Position.Y += currentGlyph.Character.YOffset;
-                    _positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
-                }
+
+                currentGlyph.Position.X += currentGlyph.Character.XOffset;
+                currentGlyph.Position.Y += currentGlyph.Character.YOffset;
+                _positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
 
                 if (font.CoreFont.UseKernings && previousGlyph?.Character != null && previousGlyph!.Value.Character.Kernings.TryGetValue(unicodeCodePoint, out var value))
                 {
@@ -119,7 +119,7 @@ namespace STOLON
                 }
 
                 previousGlyph = currentGlyph;
-                if (unicodeCodePoint == 10)
+                if (unicodeCodePoint == 10) // newline.
                 {
                     _positionDelta.Y += font.CoreFont.LineHeight;
                     _positionDelta.X = 0f;
