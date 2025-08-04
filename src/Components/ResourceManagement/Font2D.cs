@@ -1,16 +1,10 @@
-﻿using DiscordRPC;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace STOLON
 {
@@ -98,9 +92,46 @@ namespace STOLON
             => context.DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
         public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
+            int GetUnicodeCodePoint(string text, ref int index)
+            {
+                if (!char.IsHighSurrogate(text[index]) || ++index >= text.Length) return text[index];
+                return char.ConvertToUtf32(text[index - 1], text[index]);
+            }
             if (text == null) throw new ArgumentNullException("text");
-            foreach (BitmapFont.BitmapFontGlyph glyph in font.CoreFont.GetGlyphs(text, position))
-               context.SpriteBatch.Draw(glyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - glyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
+
+            BitmapFont.BitmapFontGlyph currentGlyph;
+            BitmapFont.BitmapFontGlyph? previousGlyph = null;
+            Vector2 _positionDelta = Vector2.Zero;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
+                currentGlyph.CharacterID = unicodeCodePoint;
+                font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character);
+                currentGlyph.Position = position + _positionDelta;
+                if (currentGlyph.Character != null)
+                {
+                    currentGlyph.Position.X += currentGlyph.Character.XOffset;
+                    currentGlyph.Position.Y += currentGlyph.Character.YOffset;
+                    _positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
+                }
+
+                if (font.CoreFont.UseKernings && previousGlyph?.Character != null && previousGlyph!.Value.Character.Kernings.TryGetValue(unicodeCodePoint, out var value))
+                {
+                    _positionDelta.X += value;
+                    currentGlyph.Position.X += value;
+                }
+
+                previousGlyph = currentGlyph;
+                if (unicodeCodePoint == 10)
+                {
+                    _positionDelta.Y += font.CoreFont.LineHeight;
+                    _positionDelta.X = 0f;
+                    previousGlyph = null;
+                }
+
+                context.SpriteBatch.Draw(currentGlyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - currentGlyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
+            }
         }
     }
 }
