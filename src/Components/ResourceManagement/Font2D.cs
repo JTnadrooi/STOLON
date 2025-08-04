@@ -128,12 +128,6 @@ namespace STOLON
                 currentGlyph.Position.Y += currentGlyph.Character.YOffset;
                 positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
 
-                if (font.CoreFont.UseKernings && previousGlyph?.Character != null && previousGlyph!.Value.Character.Kernings.TryGetValue(unicodeCodePoint, out var value))
-                {
-                    positionDelta.X += value;
-                    currentGlyph.Position.X += value;
-                }
-
                 previousGlyph = currentGlyph;
                 if (unicodeCodePoint == 10) // newline.
                 {
