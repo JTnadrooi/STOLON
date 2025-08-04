@@ -113,7 +113,7 @@ namespace STOLON
 
             BitmapFont.BitmapFontGlyph currentGlyph;
             BitmapFont.BitmapFontGlyph? previousGlyph = null;
-            Vector2 _positionDelta = Vector2.Zero;
+            Vector2 positionDelta = Vector2.Zero;
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -122,23 +122,23 @@ namespace STOLON
                 if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
                     throw new ArgumentNullException("unsupported char: " + unicodeCodePoint);
 
-                currentGlyph.Position = position + _positionDelta;
+                currentGlyph.Position = position + positionDelta;
 
                 currentGlyph.Position.X += currentGlyph.Character.XOffset;
                 currentGlyph.Position.Y += currentGlyph.Character.YOffset;
-                _positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
+                positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
 
                 if (font.CoreFont.UseKernings && previousGlyph?.Character != null && previousGlyph!.Value.Character.Kernings.TryGetValue(unicodeCodePoint, out var value))
                 {
-                    _positionDelta.X += value;
+                    positionDelta.X += value;
                     currentGlyph.Position.X += value;
                 }
 
                 previousGlyph = currentGlyph;
                 if (unicodeCodePoint == 10) // newline.
                 {
-                    _positionDelta.Y += font.CoreFont.LineHeight;
-                    _positionDelta.X = 0f;
+                    positionDelta.Y += font.CoreFont.LineHeight;
+                    positionDelta.X = 0f;
                     previousGlyph = null;
                 }
 
