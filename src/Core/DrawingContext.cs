@@ -238,7 +238,6 @@ namespace STOLON
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
-
         public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
         public void DrawLine(Vector2 point1, Vector2 point2, Color color, float thickness = 1f, float layerDepth = 0f)

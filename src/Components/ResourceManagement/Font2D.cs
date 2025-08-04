@@ -100,8 +100,7 @@ namespace STOLON
         {
             if (text == null) throw new ArgumentNullException("text");
             foreach (BitmapFont.BitmapFontGlyph glyph in font.CoreFont.GetGlyphs(text, position))
-                if (glyph.Character != null)
-                    context.SpriteBatch.Draw(glyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - glyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
+               context.SpriteBatch.Draw(glyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - glyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
         }
     }
 }
