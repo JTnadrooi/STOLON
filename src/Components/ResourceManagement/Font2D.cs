@@ -93,6 +93,22 @@ namespace STOLON
         public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
             int GetUnicodeCodePoint(string text, ref int index) => (!char.IsHighSurrogate(text[index]) || ++index >= text.Length) ? text[index] : char.ConvertToUtf32(text[index - 1], text[index]);
+            unsafe int CountNewline(string input)
+            {
+                int count = 0;
+                fixed (char* ptr = input)
+                {
+                    char* current = ptr;
+                    char* end = ptr + input.Length;
+                    while (current < end)
+                    {
+                        if (*current == '\n') count++;
+                        current++;
+                    }
+                }
+                return count;
+            }
+
             if (text == null) throw new ArgumentNullException("text");
 
             BitmapFont.BitmapFontGlyph currentGlyph;
