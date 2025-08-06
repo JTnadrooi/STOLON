@@ -5,7 +5,7 @@
   ],
   "content": {
     "textures": {
-      "path": "Fonts/*.png",
+      "path": "*.png",
       "recursive": "True",
       "action": "build",
       "importer": "TextureImporter",
