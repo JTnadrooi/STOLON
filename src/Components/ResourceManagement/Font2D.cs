@@ -110,23 +110,29 @@ namespace STOLON
             }
 
             if (text == null) throw new ArgumentNullException("text");
+            //if (!text.StartsWith("IN THE")) return;
 
             BitmapFont.BitmapFontGlyph currentGlyph;
             BitmapFont.BitmapFontGlyph? previousGlyph = null;
-            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.Dimensions.Y * scale.Y);
+            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.CoreFont.LineHeight * scale.Y );
 
             for (int i = 0; i < text.Length; i++)
             {
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
                 currentGlyph.CharacterID = unicodeCodePoint;
                 if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
-                    throw new ArgumentNullException("unsupported char: " + unicodeCodePoint);
+                    throw new ArgumentNullException("unsupported unicodeCodePoint: " + unicodeCodePoint);
 
                 currentGlyph.Position = position + positionDelta;
 
                 currentGlyph.Position.X += currentGlyph.Character.XOffset;
-                currentGlyph.Position.Y += currentGlyph.Character.YOffset;
+                currentGlyph.Position.Y -= (currentGlyph.Character.YOffset + currentGlyph.Character.TextureRegion.Size.Height);
                 positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
+
+                //if (currentGlyph.Character.YOffset != 0)
+                //{
+                //    Console.WriteLine(currentGlyph.Character.YOffset + " " + text[i].ToString());
+                //}
 
                 previousGlyph = currentGlyph;
                 if (unicodeCodePoint == 10) // newline.
@@ -138,6 +144,8 @@ namespace STOLON
 
                 context.SpriteBatch.Draw(currentGlyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - currentGlyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
             }
+            //throw new Exception("a");
+
         }
     }
 }
