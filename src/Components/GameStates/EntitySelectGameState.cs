@@ -281,7 +281,8 @@ namespace STOLON
 
             #endregion
 
-            _boardPreview.Pos = new Vector2(LINE1_TARGET - 16 - _boardPreview.Dimensions.X, INFO_WINDOW_TOPLINE - 16 - _boardPreview.Dimensions.Y);
+            const int BOARDPREVIEW_CLEARANCE = 0;
+            _boardPreview.Pos = new Vector2(LINE1_TARGET - BOARDPREVIEW_CLEARANCE - _boardPreview.Dimensions.X, INFO_WINDOW_TOPLINE - BOARDPREVIEW_CLEARANCE - _boardPreview.Dimensions.Y);
 
             // update selected entity UI panel.
             _currentEntitySelectedCoefficient = MathHelper.Lerp(_currentEntitySelectedCoefficient, 1, HOVER_INTENSITY / 2);
@@ -457,6 +458,7 @@ namespace STOLON
                 #endregion
 
                 drawingContext.Draw(_boardPreview);
+                drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
 
                 #endregion
 
