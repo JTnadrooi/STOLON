@@ -145,7 +145,6 @@ namespace STOLON
                 context.SpriteBatch.Draw(currentGlyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - currentGlyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
             }
             //throw new Exception("a");
-
         }
     }
 }
