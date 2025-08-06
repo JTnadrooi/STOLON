@@ -114,7 +114,7 @@ namespace STOLON
 
             BitmapFont.BitmapFontGlyph currentGlyph;
             BitmapFont.BitmapFontGlyph? previousGlyph = null;
-            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.CoreFont.LineHeight * scale.Y );
+            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.CoreFont.LineHeight * scale.Y + font.CoreFont.LineHeight * scale.Y);
 
             for (int i = 0; i < text.Length; i++)
             {
