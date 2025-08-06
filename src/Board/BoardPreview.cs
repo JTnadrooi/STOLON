@@ -41,7 +41,7 @@ namespace STOLON
                 for (int y = 0; y < SourceState.Dimensions.Y; y++)
                 {
                     //drawingContext.Draw(_tileTexure, Pos + new Vector2(x, y) * TILE_SIZE);
-                    drawingContext.DrawString(STOLON.Fonts.Small, "?", Pos + new Vector2(x, y) * TILE_SIZE + new Vector2(TILE_SIZE / 2, 4));
+                    drawingContext.DrawString(STOLON.Fonts.Small, "?", Pos + new Vector2(x, y) * TILE_SIZE + new Vector2(7, 3));
                 }
             drawingContext.DrawRectangle(Bounds, Color.White, 2);
         }
