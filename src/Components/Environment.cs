@@ -117,5 +117,7 @@ namespace STOLON
         {
             _entities.Remove(characterId);
         }
+
+        public Entity GetEntityInstance<TEntity>() => Entities.First(kvp => kvp.Value is TEntity).Value;
     }
 }
