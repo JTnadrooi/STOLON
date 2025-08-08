@@ -27,7 +27,7 @@ namespace STOLON
 
         private GoldsilkComputer _computer;
 
-        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl", EntityProfile.Debug, string.Empty)
+        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl", EntityProfile.Debug, [], string.Empty)
         {
             _computer = new GoldsilkComputer(this);
         }
