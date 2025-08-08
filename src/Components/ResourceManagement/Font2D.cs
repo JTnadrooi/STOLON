@@ -28,8 +28,8 @@ namespace STOLON
         public Vector2 FastMeasure(int i) => new Vector2(Dimensions.X * i, Dimensions.Y);
         public Vector2 FastMeasure(string s) => FastMeasure(s.Length);
 
-        public string Wrap(string text, Rectangle bounds, int padding, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, padding, out lineCount);
-        public string Wrap(string text, int maxLineWidth, int maxLineHeight, int padding, out int lineCount)
+        public string Wrap(string text, Rectangle bounds, out int lineCount) => Wrap(text, bounds.Width, bounds.Height, out lineCount);
+        public string Wrap(string text, int maxLineWidth, int maxLineHeight, out int lineCount)
         {
             if (string.IsNullOrEmpty(text))
             {
@@ -43,7 +43,7 @@ namespace STOLON
             float lineW = 0;
             int lines = 1;
 
-            int maxLines = (int)((maxLineHeight - 2 * padding) / Dimensions.Y);
+            int maxLines = (int)((maxLineHeight) / Dimensions.Y);
             if (maxLines <= 0) { lineCount = 0; return string.Empty; }
 
             while (start < words.Length)
