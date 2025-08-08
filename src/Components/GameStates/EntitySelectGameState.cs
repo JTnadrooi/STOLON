@@ -38,6 +38,9 @@ namespace STOLON
             }
         }
 
+        public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.Entities.First(kvp => kvp.Value.GetType() == typeof(TEntity)).Key);
+        public bool IsSelected(string id) => Entries.ContainsKey(id);
+
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
     }
 
