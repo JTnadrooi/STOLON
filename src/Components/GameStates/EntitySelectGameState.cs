@@ -5,12 +5,42 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using static STOLON.EntitySelectGameState;
 using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
+    public struct SelectionEntry
+    {
+        public Entity Entity { get; }
+        public int Allocation { get; }
+        public int VirtualAllocation { get; }
+        public SelectionEntry(Entity entity, int alloc, int valloc)
+        {
+            Entity = entity;
+            Allocation = alloc;
+            VirtualAllocation = valloc;
+        }
+    }
+    public struct SelectionInfo
+    {
+        public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
+        public int TotalVirtualAllocation { get; }
+
+        public SelectionInfo(SelectionEntry[] entries)
+        {
+            Entries = entries.ToDictionary(e => e.Entity.Id).AsReadOnly();
+            foreach (SelectionEntry entry in entries)
+            {
+                TotalVirtualAllocation += entry.VirtualAllocation;
+            }
+        }
+
+        public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
+    }
+
     public class EntitySelectOrderProvider : IOrderProvider
     {
         private Font2D _font;
@@ -146,6 +176,8 @@ namespace STOLON
         private BoardPreview _boardPreview;
         private bool _drawConnectionLine;
         private Line _connectionLine;
+
+        public SelectionInfo Selection { get; private set; }
 
         #region CONSTANTS
 
@@ -352,6 +384,9 @@ namespace STOLON
                 STOLON.Debug.Success();
             }
 
+            Selection = new SelectionInfo(_allocationDataDump.WhereSelect(d => (d!.Value, d.HasValue)).Select(d => new SelectionEntry(d.Entity, d.Allocation, d.VirtualAllocation)).ToArray());
+
+
             STOLON.Debug.Success();
         }
 
@@ -457,8 +492,9 @@ namespace STOLON
 
                 #endregion
 
-                drawingContext.Draw(_boardPreview);
-                drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
+                //drawingContext.Draw(_boardPreview);
+                //drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
+                //drawingContext.DrawVerticalLine(_boardPreview.Pos + new Vector2(1, -STOLON.Textures["UI\\play"].Height), STOLON.Textures["UI\\play"].Height, Color.White, 2);
 
                 #endregion
 
