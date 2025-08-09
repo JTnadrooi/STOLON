@@ -41,6 +41,7 @@ namespace STOLON
         public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
 
+
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
     }
 
@@ -77,10 +78,10 @@ namespace STOLON
 
             isHovered = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, 0, out _).Contains(STOLON.Input.VirtualMousePos);
 
-            if (isHovered)  _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 1, HOVER_INTENSITY * 2);
-            else  _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 0, HOVER_INTENSITY);
+            if (isHovered) _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 1, HOVER_INTENSITY * 2);
+            else _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 0, HOVER_INTENSITY);
 
-            float hoverHeightBoost = 4f * _elementHovData[index]; 
+            float hoverHeightBoost = 4f * _elementHovData[index];
             int hoverPaddingY = PADDING_Y + (int)hoverHeightBoost;
 
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, hoverPaddingY, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - hoverPaddingY), out Point textPos);
@@ -245,6 +246,8 @@ namespace STOLON
             {
                 _lastSelected = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _lastSelected;
             }
+
+            Selection = SelectionInfo.Empty;
 
             STOLON.UI.Textframe.Hide = true;
         }
@@ -476,7 +479,8 @@ namespace STOLON
 
                     string wrapped = STOLON.Fonts.Small.Wrap("-    " + entityNote.Text, TILE_SIZE * 2 - 20, int.MaxValue, out int lc).ToUpper();
                     //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
-                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight));
+                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight),
+                        color: entityNote.IsEffective(Selection) ? (entityNote.IsNegative ? Color.Red : Color.Green) : Color.White);
                     notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + STOLON.Fonts.Small.CoreFont.LineHeight / 2;
                 }
 
