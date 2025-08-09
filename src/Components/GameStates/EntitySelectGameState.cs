@@ -38,9 +38,9 @@ namespace STOLON
             }
         }
 
-        public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
+        //public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
-
+        public int GetAllocation(string id) => Entries[id].Allocation;
 
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
     }
@@ -381,7 +381,7 @@ namespace STOLON
                 STOLON.Debug.Log($"<found {_entities[_selection[slotIndex]]}.");
 
                 STOLON.Debug.Log($">creating allocation data for slot {slotIndex}..");
-                _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation((int)(100f / usedSlots), selectedEntities), _entities[_selection[slotIndex]]);
+                _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation(Selection), _entities[_selection[slotIndex]]);
                 STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
 
                 STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");

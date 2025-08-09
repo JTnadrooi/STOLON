@@ -28,9 +28,9 @@ namespace STOLON
         {
         }
 
-        public override int GetVirtualAllocation(int allocation, HashSet<Entity> entities)
+        public override int GetVirtualAllocation(SelectionInfo info)
         {
-            return (int)(allocation * (entities.Any(e => e.Id == "deceit") ? 1.2f : 1f));
+            return (int)(info.Entries[this.Id].Allocation * (info.IsSelected("deceit") ? 1.2f : 1f));
         }
 
         public override Computer? Computer => null;

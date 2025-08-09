@@ -64,6 +64,11 @@ namespace STOLON
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
+        public static class AllocationHelpers
+        {
+
+        }
+
         public string FullName { get; }
         public EntityProfile Profile { get; }
         public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
@@ -95,9 +100,9 @@ namespace STOLON
         /// </summary>
         /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
         public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
-        public virtual int GetVirtualAllocation(int allocation, HashSet<Entity> entities)
+        public virtual int GetVirtualAllocation(SelectionInfo info)
         {
-            return allocation;
+            return info.Entries[this.Id].Allocation;
         }
         public bool Equals(Entity? other) => other != null && other.Id == Id;
     }
