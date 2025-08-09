@@ -38,7 +38,7 @@ namespace STOLON
             }
         }
 
-        public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.Entities.First(kvp => kvp.Value.GetType() == typeof(TEntity)).Key);
+        public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
 
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
@@ -387,7 +387,7 @@ namespace STOLON
                 STOLON.Debug.Success();
             }
 
-            Selection = new SelectionInfo(_allocationDataDump.WhereSelect(d => (d!.Value, d.HasValue)).Select(d => new SelectionEntry(d.Entity, d.Allocation, d.VirtualAllocation)).ToArray());
+            Selection = new SelectionInfo(_allocationDataDump.WhereSelect(d => (d.HasValue ? d.Value : default, d.HasValue)).Select(d => new SelectionEntry(d.Entity, d.Allocation, d.VirtualAllocation)).ToArray());
 
 
             STOLON.Debug.Success();
@@ -414,7 +414,6 @@ namespace STOLON
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
-
 
                 #region ROSTER
 
@@ -467,8 +466,19 @@ namespace STOLON
 
                 drawingContext.Draw(_entityInfoContainer);
 
-                string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
-                drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+                //string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
+                //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+
+                int notesClearingUp = 10;
+                for (int i = 0; i < selectedEntity.EntityNotes.Length; i++)
+                {
+                    EntityNoteBase entityNote = selectedEntity.EntityNotes[i];
+
+                    string wrapped = STOLON.Fonts.Small.Wrap("-    " + entityNote.Text, TILE_SIZE * 2 - 20, int.MaxValue, out int lc).ToUpper();
+                    //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
+                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight));
+                    notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+                }
 
                 #region ALLOC_DISPLAYS
 
