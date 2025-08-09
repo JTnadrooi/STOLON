@@ -14,9 +14,11 @@ namespace STOLON
     public abstract class EntityNoteBase
     {
         public string Text { get; }
-        public EntityNoteBase(string text)
+        public bool IsNegative { get; }
+        public EntityNoteBase(string text, bool isNegative)
         {
             Text = text;
+            IsNegative = isNegative;
         }
         public abstract bool IsEffective(SelectionInfo info);
     }
@@ -25,7 +27,7 @@ namespace STOLON
     {
         private Func<SelectionInfo, bool> _isEffective;
 
-        public EntityNote(string text, Func<SelectionInfo, bool> isEffective) : base(text)
+        public EntityNote(string text, Func<SelectionInfo, bool> isEffective, bool isNegative) : base(text, isNegative)
         {
             _isEffective = isEffective;
         }
@@ -35,7 +37,7 @@ namespace STOLON
     public sealed class DependentEntityNote<TOtherEntity> : EntityNoteBase where TOtherEntity : Entity
     {
         private string _entityId;
-        public DependentEntityNote(string text) : base("When " + STOLON.Environment.GetEntityInstance<TOtherEntity>().Id + " is selected: " + text)
+        public DependentEntityNote(string text, bool isNegative) : base("When " + STOLON.Environment.GetEntityInstance<TOtherEntity>().Id + " is selected: " + text, isNegative)
         {
             _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
         }
