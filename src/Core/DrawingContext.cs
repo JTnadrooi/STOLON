@@ -243,8 +243,8 @@ namespace STOLON
         public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
             => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
 
-        public void DrawVerticalLine(Vector2 point1, float amountDown, Color color, float thickness = 1f, float layerDepth = 0f)
-            => DrawVerticalLine(point1.X, point1.Y, amountDown, color, thickness, layerDepth);
+        public void DrawVerticalLine(Vector2 point1, float amountUp, Color color, float thickness = 1f, float layerDepth = 0f)
+            => DrawVerticalLine(point1.X, point1.Y, amountUp, color, thickness, layerDepth);
         public void DrawVerticalLine(float x1, float y1, float amountDown, Color color, float thickness = 1f, float layerDepth = 0f)
             => DrawLine(x1, y1, x1, y1 + amountDown, color, thickness, layerDepth);
 
