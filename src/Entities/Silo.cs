@@ -20,9 +20,10 @@ namespace STOLON
 {
     public class SiloEntity : Entity
     {
-        public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)), 
+        public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)),
             [
-                new EntityNote("Gains a 20% boost in virtual allocation when Deceit is included in the selection.", i => i.IsSelected("deceit")),
+                new EntityNote("Gains 20% allocation when Deceit is included in the selection.", i => i.IsSelected("deceit"), false),
+                new EntityNote("Loses 50% allocation when more than 3 entities are included in the selection.", i => i.Entries.Count > 3, true),
             ], "Silo", "Silo 28SHA")
         {
         }
