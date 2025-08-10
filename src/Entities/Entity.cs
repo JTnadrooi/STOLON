@@ -64,10 +64,6 @@ namespace STOLON
     /// </summary>
     public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
-        public static class AllocationHelpers
-        {
-
-        }
 
         public string FullName { get; }
         public EntityProfile Profile { get; }
@@ -102,7 +98,7 @@ namespace STOLON
         public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
         public virtual int GetVirtualAllocation(SelectionInfo info)
         {
-            return info.Entries[this.Id].Allocation;
+            return info.GetAllocation(this.Id);
         }
         public bool Equals(Entity? other) => other != null && other.Id == Id;
     }

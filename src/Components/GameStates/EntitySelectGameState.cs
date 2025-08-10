@@ -16,26 +16,19 @@ namespace STOLON
     {
         public Entity Entity { get; }
         public int Allocation { get; }
-        public int VirtualAllocation { get; }
-        public SelectionEntry(Entity entity, int alloc, int valloc)
+        public SelectionEntry(Entity entity, int alloc)
         {
             Entity = entity;
             Allocation = alloc;
-            VirtualAllocation = valloc;
         }
     }
     public struct SelectionInfo
     {
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
-        public int TotalVirtualAllocation { get; }
 
         public SelectionInfo(SelectionEntry[] entries)
         {
             Entries = entries.ToDictionary(e => e.Entity.Id).AsReadOnly();
-            foreach (SelectionEntry entry in entries)
-            {
-                TotalVirtualAllocation += entry.VirtualAllocation;
-            }
         }
 
         //public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
@@ -368,6 +361,7 @@ namespace STOLON
             int usedSlots = _selection.Where(i => i != -1).Count();
             int secondarySymbolPosOffsetX = TILE_SIZE * 2;
 
+            Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots)).ToArray());
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
                 STOLON.Debug.Log($">checking slot {slotIndex}..");
@@ -390,7 +384,6 @@ namespace STOLON
                 STOLON.Debug.Success();
             }
 
-            Selection = new SelectionInfo(_allocationDataDump.WhereSelect(d => (d.HasValue ? d.Value : default, d.HasValue)).Select(d => new SelectionEntry(d.Entity, d.Allocation, d.VirtualAllocation)).ToArray());
 
 
             STOLON.Debug.Success();
