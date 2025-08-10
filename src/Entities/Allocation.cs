@@ -13,15 +13,11 @@ namespace STOLON
     {
         public struct AllocationHelperChain
         {
-            public bool Multiplicative { get; }
-            public int VAlloc { get; private set; }
-
             private int _initialAlloc;
             private List<int> _deltas;
 
             public AllocationHelperChain(int initialAlloc)
             {
-                VAlloc = initialAlloc;
                 _initialAlloc = initialAlloc;
                 _deltas = new List<int>();
             }
@@ -30,13 +26,13 @@ namespace STOLON
             public AllocationHelperChain ApplyFlat(bool shouldApply, int addition) => Apply(shouldApply, valloc => valloc + addition);
             public AllocationHelperChain Apply(bool shouldApply, Func<int, int> eval)
             {
-                if (shouldApply) _deltas.Add(eval(VAlloc));
+                if (shouldApply) _deltas.Add(eval(_initialAlloc));
                 return this;
             }
 
             public int End()
             {
-                return _deltas.Sum();
+                return _deltas.Sum() + _initialAlloc;
             }
         }
 
