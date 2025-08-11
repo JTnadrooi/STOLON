@@ -37,7 +37,6 @@ namespace STOLON
 
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
     }
-
     public class EntitySelectOrderProvider : IOrderProvider
     {
         private Font2D _font;
@@ -45,13 +44,8 @@ namespace STOLON
 
         private int _leftSpace;
 
-        private float[]? _elementHovData;
-
         private const int PADDING_X = 8;
         private const int PADDING_Y = 4;
-
-        private const float HOVER_INTENSITY = 0.1f;
-
 
         public EntitySelectOrderProvider()
         {
@@ -63,25 +57,18 @@ namespace STOLON
         {
             _origin = origin;
             _leftSpace = 0;
-            if (_elementHovData == null || _elementHovData.Length != elementCount) _elementHovData = new float[elementCount];
         }
+
         public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
-
             isHovered = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, 0, out _).Contains(STOLON.Input.VirtualMousePos);
-
-            if (isHovered) _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 1, HOVER_INTENSITY * 2);
-            else _elementHovData[index] = MathHelper.Lerp(_elementHovData[index], 0, HOVER_INTENSITY);
-
-            float hoverHeightBoost = 4f * _elementHovData[index];
-            int hoverPaddingY = PADDING_Y + (int)hoverHeightBoost;
-
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, hoverPaddingY, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - hoverPaddingY), out Point textPos);
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
             _leftSpace += bounds.Width + 5;
             return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
         }
     }
+
 
     public class EntitySelectGameState : GameState
     {
