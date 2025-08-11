@@ -245,8 +245,8 @@ namespace STOLON
 
         public void DrawVerticalLine(Vector2 point1, float amountUp, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawVerticalLine(point1.X, point1.Y, amountUp, color, thickness, layerDepth);
-        public void DrawVerticalLine(float x1, float y1, float amountDown, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
-            => DrawLine(x1, y1, x1, y1 + amountDown, color, thickness, layerDepth);
+        public void DrawVerticalLine(float x1, float y1, float amountUp, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+            => DrawLine(x1, y1, x1, y1 + amountUp, color, thickness, layerDepth);
 
         public void DrawHorizontalLine(Vector2 point1, float amountLeft, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawHorizontalLine(point1.X, point1.Y, amountLeft, color, thickness, layerDepth);
