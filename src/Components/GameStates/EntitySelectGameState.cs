@@ -407,10 +407,10 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 // draw vertical and horizontal layout lines.
-                drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, Interface.LINE_WIDTH);
-                drawingContext.DrawLine(TILE_SIZE, INFO_WINDOW_TOPLINE, TILE_SIZE, 0, Color.White, Interface.LINE_WIDTH);
-                drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
-                drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
+                drawingContext.DrawHorizontalLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT);
+                drawingContext.DrawVerticalLine(TILE_SIZE, 0, INFO_WINDOW_TOPLINE);
+                drawingContext.DrawVerticalLine(TILE_SIZE * 2, 0, INFO_WINDOW_TOPLINE);
+                drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, INFO_WINDOW_TOPLINE);
 
                 #region ROSTER
 
@@ -522,8 +522,8 @@ namespace STOLON
                 drawingContext.Draw(_lvlInfoContainer);
             }
 
-            drawingContext.DrawLine(_line1x, -10f, _line1x, 1000f, Color.White, Interface.LINE_WIDTH);
-            drawingContext.DrawLine(_line2x, -10f, _line2x, 1000f, Color.White, Interface.LINE_WIDTH);
+            drawingContext.DrawVerticalLine(_line1x, -10f, 1000f);
+            drawingContext.DrawVerticalLine(_line2x, -10f, 1000f);
         }
     }
 }
