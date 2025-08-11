@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using AsitLib;
 
 namespace STOLON
 {
@@ -32,10 +33,8 @@ namespace STOLON
             }
 
             public int End() => End(ia => ia.Sum());
-            public int End(Func<int[], int> deltaEval)
-            {
-                return deltaEval(_deltas.ToArray()) + _initialAlloc;
-            }
+            public int End(Func<int[], int> deltaEval) => deltaEval(_deltas.ToArray()) + _initialAlloc;
+            public override string ToString() => $"[{(_deltas.Count == 0 ? _initialAlloc.ToString() : _deltas.ToJoinedString(", "))}]";
         }
 
         public static AllocationHelperChain Start(SelectionInfo info, Entity entity) => new AllocationHelperChain(info.GetAllocation(entity.Id));
