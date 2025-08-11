@@ -4,7 +4,6 @@ using System;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using RectangleF = MonoGame.Extended.RectangleF;
 
 
 
@@ -104,7 +103,7 @@ namespace STOLON
         /// <summary>
         /// The bounding rectangle to draw.
         /// </summary>
-        public RectangleF Rectangle { get; }
+        public Rectangle Rectangle { get; }
         /// <summary>
         /// The type of the <see cref="UIElement"/>. Sometimes relevant for drawing.
         /// </summary>
@@ -127,7 +126,7 @@ namespace STOLON
         /// <param name="position"></param>
         /// <param name="rectangle"></param>
         /// <param name="drawRectangle"></param>
-        public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, RectangleF rectangle, bool drawRectangle, bool hide = false, bool drawBg = false)
+        public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, Rectangle rectangle, bool drawRectangle, bool hide = false, bool drawBg = false)
         {
             Position = position;
             Type = type;
@@ -181,7 +180,7 @@ namespace STOLON
         {
             if (drawData.Source == null) throw new InvalidOperationException();
             if (drawData.Hide) return;
-            if (drawData.DrawBackground) context.DrawArea(drawData.Rectangle.ToRectangle(), Color.Black);
+            if (drawData.DrawBackground) context.DrawArea(drawData.Rectangle, Color.Black);
             context.DrawString(drawData.Font, drawData.Text, drawData.Position);
             if (drawData.DrawRectangle) context.DrawRectangle(drawData.Rectangle, Color.White, Interface.LINE_WIDTH);
         }
