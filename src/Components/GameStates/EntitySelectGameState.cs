@@ -408,6 +408,7 @@ namespace STOLON
 
                 // draw vertical and horizontal layout lines.
                 drawingContext.DrawLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT, INFO_WINDOW_TOPLINE, Color.White, Interface.LINE_WIDTH);
+                drawingContext.DrawLine(TILE_SIZE, INFO_WINDOW_TOPLINE, TILE_SIZE, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 2, INFO_WINDOW_TOPLINE, TILE_SIZE * 2, 0, Color.White, Interface.LINE_WIDTH);
                 drawingContext.DrawLine(TILE_SIZE * 3, INFO_WINDOW_TOPLINE, TILE_SIZE * 3, 0, Color.White, Interface.LINE_WIDTH);
 
@@ -465,18 +466,25 @@ namespace STOLON
                 //string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
                 //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
 
-                int notesClearingUp = 10;
+                int notesClearingUp = 7;
                 int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
                 const int TEXTOFFSET = 12;
-                const int NOTE_BORDER_CLEARANCE = 10;
+                const int NOTE_BORDER_CLEARANCE = 10; // distance from text to infowindow border
                 for (int i = 0; i < selectedEntity.EntityNotes.Length; i++)
                 {
                     EntityNoteBase entityNote = selectedEntity.EntityNotes[i];
 
-                    string wrapped = STOLON.Fonts.Small.Wrap(entityNote.Text, TILE_SIZE * 1 - NOTE_BORDER_CLEARANCE * 2 - TEXTOFFSET, int.MaxValue, out int lc).ToUpper();
+                    string wrapped = STOLON.Fonts.Small.Wrap(entityNote.Text, TILE_SIZE - NOTE_BORDER_CLEARANCE * 2 - TEXTOFFSET, int.MaxValue, out int lc).ToUpper();
+                    bool isActive = entityNote.IsActive(Selection);
                     //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
                     drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(NOTE_BORDER_CLEARANCE + TEXTOFFSET, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight));
                     drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2(NOTE_BORDER_CLEARANCE, INFO_WINDOW_TOPLINE - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+
+                    if (isActive)
+                    {
+                        drawingContext.DrawRectangle(new Rectangle(4, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TILE_SIZE - 8, lc * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+                    }
+
                     notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
                 }
 
