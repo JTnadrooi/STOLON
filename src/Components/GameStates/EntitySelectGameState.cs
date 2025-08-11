@@ -466,15 +466,18 @@ namespace STOLON
                 //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
 
                 int notesClearingUp = 10;
+                int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+                const int TEXTOFFSET = 12;
+                const int NOTE_BORDER_CLEARANCE = 10;
                 for (int i = 0; i < selectedEntity.EntityNotes.Length; i++)
                 {
                     EntityNoteBase entityNote = selectedEntity.EntityNotes[i];
 
-                    string wrapped = STOLON.Fonts.Small.Wrap("-    " + entityNote.Text, TILE_SIZE * 2 - 20, int.MaxValue, out int lc).ToUpper();
+                    string wrapped = STOLON.Fonts.Small.Wrap(entityNote.Text, TILE_SIZE * 1 - NOTE_BORDER_CLEARANCE * 2 - TEXTOFFSET, int.MaxValue, out int lc).ToUpper();
                     //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
-                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight),
-                        color: entityNote.IsEffective(Selection) ? (entityNote.IsNegative ? Color.Red : Color.Green) : Color.White);
-                    notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(NOTE_BORDER_CLEARANCE + TEXTOFFSET, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight));
+                    drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2(NOTE_BORDER_CLEARANCE, INFO_WINDOW_TOPLINE - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                    notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
                 }
 
                 #region ALLOC_DISPLAYS
