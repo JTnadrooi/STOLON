@@ -149,9 +149,9 @@ namespace STOLON
                 int topIndex = y * virtualFinal.Width;
                 int bottomIndex = (virtualFinal.Height - y - 1) * virtualFinal.Width;
 
-                Array.Copy(data, topIndex, rowBuffer, 0, virtualFinal.Width);           
-                Array.Copy(data, bottomIndex, data, topIndex, virtualFinal.Width);           
-                Array.Copy(rowBuffer, 0, data, bottomIndex, virtualFinal.Width);              
+                Array.Copy(data, topIndex, rowBuffer, 0, virtualFinal.Width);
+                Array.Copy(data, bottomIndex, data, topIndex, virtualFinal.Width);
+                Array.Copy(rowBuffer, 0, data, bottomIndex, virtualFinal.Width);
             }
 
             _screenshotCache.SetData(data);
@@ -238,28 +238,28 @@ namespace STOLON
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
-        public void DrawLine(Vector2 point1, Vector2 point2, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawLine(Vector2 point1, Vector2 point2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawLine(point1.X, point1.Y, point2.X, point2.X, color, thickness, layerDepth);
-        public void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness = 1f, float layerDepth = 0f)
-            => _spriteBatch.DrawLine(x1, y1, x2, y2, color, thickness, layerDepth);
+        public void DrawLine(float x1, float y1, float x2, float y2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+            => _spriteBatch.DrawLine(x1, y1, x2, y2, color ?? Color.White, thickness, layerDepth);
 
-        public void DrawVerticalLine(Vector2 point1, float amountUp, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawVerticalLine(Vector2 point1, float amountUp, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawVerticalLine(point1.X, point1.Y, amountUp, color, thickness, layerDepth);
-        public void DrawVerticalLine(float x1, float y1, float amountDown, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawVerticalLine(float x1, float y1, float amountDown, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawLine(x1, y1, x1, y1 + amountDown, color, thickness, layerDepth);
 
-        public void DrawHorizontalLine(Vector2 point1, float amountLeft, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawHorizontalLine(Vector2 point1, float amountLeft, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawHorizontalLine(point1.X, point1.Y, amountLeft, color, thickness, layerDepth);
-        public void DrawHorizontalLine(float x1, float y1, float amountLeft, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawHorizontalLine(float x1, float y1, float amountLeft, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawLine(x1, y1, x1 + amountLeft, y1, color, thickness, layerDepth);
 
-        public void DrawLine(Line line, Color color, float thickness = 1f, float layerDepth = 0f)
+        public void DrawLine(Line line, Color color, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => _spriteBatch.DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
 
-        public void DrawRectangle(Rectangle rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
-            => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
-        public void DrawRectangle(RectangleF rectangle, Color color, float thickness = 1f, float layerDepth = 0f)
-            => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
+        public void DrawRectangle(Rectangle rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+            => _spriteBatch.DrawRectangle(rectangle, color ?? Color.White, thickness, layerDepth);
+        //public void DrawRectangle(RectangleF rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        //    => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
         public void DrawDither(Vector2 position, Point dimensions, float multiplierCoefficient, Color? color = null)
             => DrawDither(position, dimensions, (int)(Math.Clamp(multiplierCoefficient, 0.000001f, 0.999999f) * DITHER_FRAME_COUNT), color);
