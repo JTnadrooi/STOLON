@@ -30,8 +30,10 @@ namespace STOLON
 
         public override int GetVirtualAllocation(SelectionInfo info)
         {
-            //return (int)(info.Entries[this.Id].Allocation * (info.IsSelected("deceit") ? 1.2f : 1f));
-            return AllocationHelpers.Start(info, this).ApplyMultiplier(info.IsSelected("deceit"), 1.2f).End();
+            return AllocationHelpers.Start(info, this)
+                .ApplyMultiplier(info.IsSelected("deceit"), 1.2f)
+                .ApplyMultiplier(info.Entries.Count > 3, 0.5f)
+                .End();
         }
 
         public override Computer? Computer => null;
