@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace STOLON
@@ -30,9 +31,10 @@ namespace STOLON
                 return this;
             }
 
-            public int End()
+            public int End() => End(ia => ia.Sum());
+            public int End(Func<int[], int> deltaEval)
             {
-                return _deltas.Sum() + _initialAlloc;
+                return deltaEval(_deltas.ToArray()) + _initialAlloc;
             }
         }
 
