@@ -2,7 +2,6 @@
 using Betwixt;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,6 +68,53 @@ namespace STOLON
         }
     }
 
+    public class EntityNoteEnumerationGraphic : IGraphic
+    {
+        public EntityNoteBase[] EntityNotes { get; set; }
+        public Vector2 Pos { get; }
+        public int TextWidth { get; }
+
+        private EntitySelectGameState _entitySelect;
+        private CachedNoteData[] _cachedNotes;
+
+        private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive);
+
+        private const int NOTE_CLEARANCE = 12;
+        private const int NOTE_BORDER_X_CLEARANCE = 10;
+
+        public EntityNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
+        {
+            EntityNotes = Array.Empty<EntityNoteBase>();
+            Pos = pos;
+            TextWidth = textWidth;
+            _cachedNotes = Array.Empty<CachedNoteData>();
+            _entitySelect = entitySelect;
+        }
+
+        public void Update(int elapsedMilliseconds)
+        {
+            if (EntityNotes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[EntityNotes.Length];
+            for (int i = 0; i < EntityNotes.Length; i++)
+                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(EntityNotes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(), lc, EntityNotes[i].IsActive(_entitySelect.Selection));
+        }
+
+        public void Draw(DrawingContext drawingContext)
+        {
+            int notesClearingUp = 7, noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+
+            for (int i = 0; i < _cachedNotes.Length; i++)
+            {
+                CachedNoteData note = _cachedNotes[i];
+                drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
+                drawingContext.DrawString(STOLON.Fonts.Small, "-", new((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+
+                if (note.IsActive)
+                    drawingContext.DrawRectangle(new((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+
+                notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
+            }
+        }
+    }
 
     public class EntitySelectGameState : GameState
     {
@@ -156,12 +202,15 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
+        private EntityNoteEnumerationGraphic _allocNotes;
+
         private BoardState _boardState;
         private BoardPreview _boardPreview;
         private bool _drawConnectionLine;
         private Line _connectionLine;
 
         public SelectionInfo Selection { get; private set; }
+        private Entity SelectedEntity => _entityDrawDump[_lastSelected].Entity;
 
         #region CONSTANTS
 
@@ -221,6 +270,8 @@ namespace STOLON
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
+
+            _allocNotes = new EntityNoteEnumerationGraphic(this, new Vector2(0, INFO_WINDOW_TOPLINE), TILE_SIZE);
 
             if (SkipArgs != null)
             {
@@ -309,13 +360,15 @@ namespace STOLON
             _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
             _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.Allocation : 0)}%";
             _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.VirtualAllocation : 0)}%";
-
             _entityInfoContainer.Update(elapsedMilliseconds);
 
             // update level info container.
             _lvlInfoContainer.Elements["lvl_name"].Text = "STOLON Test Level";
             _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
             _lvlInfoContainer.Update(elapsedMilliseconds);
+
+            _allocNotes.EntityNotes = SelectedEntity.EntityNotes;
+            _allocNotes.Update(elapsedMilliseconds);
         }
 
         public void AddToSelection(int entityIndex)
@@ -371,8 +424,6 @@ namespace STOLON
                 STOLON.Debug.Success();
             }
 
-
-
             STOLON.Debug.Success();
         }
 
@@ -384,10 +435,8 @@ namespace STOLON
         {
             if (_initDone)
             {
-                Entity selectedEntity = _entityDrawDump[_lastSelected].Entity;
-
                 // draw selected entity preview.
-                drawingContext.DrawEntity(selectedEntity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
+                drawingContext.DrawEntity(SelectedEntity, 512, new Vector2(STOLON.V_WIDTH - 415, 0));
 
                 // draw side black areas.
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
@@ -453,27 +502,7 @@ namespace STOLON
                 //string wrapped = STOLON.Fonts.Small.Wrap(selectedEntity.Description ?? string.Empty, TILE_SIZE * 2 - 20, INFO_WINDOW_TOPLINE - 12, 0, out int lc).ToUpper();
                 //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
 
-                int notesClearingUp = 7;
-                int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
-                const int TEXTOFFSET = 12;
-                const int NOTE_BORDER_CLEARANCE = 10; // distance from text to infowindow border
-                for (int i = 0; i < selectedEntity.EntityNotes.Length; i++)
-                {
-                    EntityNoteBase entityNote = selectedEntity.EntityNotes[i];
-
-                    string wrapped = STOLON.Fonts.Small.Wrap(entityNote.Text, TILE_SIZE - NOTE_BORDER_CLEARANCE * 2 - TEXTOFFSET, int.MaxValue, out int lc).ToUpper();
-                    bool isActive = entityNote.IsActive(Selection);
-                    //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
-                    drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(NOTE_BORDER_CLEARANCE + TEXTOFFSET, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight));
-                    drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2(NOTE_BORDER_CLEARANCE, INFO_WINDOW_TOPLINE - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
-
-                    if (isActive)
-                    {
-                        drawingContext.DrawRectangle(new Rectangle(4, INFO_WINDOW_TOPLINE - notesClearingUp - lc * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TILE_SIZE - 8, lc * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
-                    }
-
-                    notesClearingUp += (lc) * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
-                }
+                drawingContext.Draw(_allocNotes);
 
                 #region ALLOC_DISPLAYS
 
