@@ -18,15 +18,21 @@ namespace STOLON
         Negative,
     }
 
+    public enum EntityNoteDomain
+    {
+        Allocation,
+        Abilities,
+    }
+
     public sealed class EntityNote
     {
-
         public string Text { get; }
         public EntityNotePolarity Polarity { get; }
+        public EntityNoteDomain Domain { get; }
 
         private Func<SelectionInfo, bool> _isActive;
 
-        public EntityNote(string text, Func<SelectionInfo, bool> isActive, EntityNotePolarity polarity = EntityNotePolarity.Neutral)
+        public EntityNote(string text, Func<SelectionInfo, bool> isActive, EntityNoteDomain domain, EntityNotePolarity polarity = EntityNotePolarity.Neutral)
         {
             _isActive = isActive;
             Text = text;
@@ -34,10 +40,19 @@ namespace STOLON
         }
         public bool IsActive(SelectionInfo info) => _isActive(info);
 
-        public static EntityNote GetDependentEntityNote<TOtherEntity>(string text, EntityNotePolarity polarity = EntityNotePolarity.Neutral) where TOtherEntity : Entity
+        public static EntityNote GetDependentEntityNote<TOtherEntity>(string text, EntityNoteDomain domain, EntityNotePolarity polarity = EntityNotePolarity.Neutral) where TOtherEntity : Entity
         {
             string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
-            return new EntityNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), polarity);
+            return new EntityNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), domain, polarity);
+        }
+        public static EntityNoteBuilder Build() => new EntityNoteBuilder();
+    }
+
+    public class EntityNoteBuilder
+    {
+        public EntityNoteBuilder()
+        {
+
         }
     }
 }
