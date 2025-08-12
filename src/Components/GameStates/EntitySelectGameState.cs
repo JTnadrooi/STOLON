@@ -70,7 +70,7 @@ namespace STOLON
 
     public class EntityNoteEnumerationGraphic : IGraphic
     {
-        public EntityNoteBase[] EntityNotes { get; set; }
+        public EntityNote[] EntityNotes { get; set; }
         public Vector2 Pos { get; }
         public int TextWidth { get; }
 
@@ -84,7 +84,7 @@ namespace STOLON
 
         public EntityNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
         {
-            EntityNotes = Array.Empty<EntityNoteBase>();
+            EntityNotes = Array.Empty<EntityNote>();
             Pos = pos;
             TextWidth = textWidth;
             _cachedNotes = Array.Empty<CachedNoteData>();

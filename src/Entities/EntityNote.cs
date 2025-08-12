@@ -11,37 +11,25 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public abstract class EntityNoteBase
+    public sealed class EntityNote
     {
         public string Text { get; }
         public bool IsNegative { get; }
-        public EntityNoteBase(string text, bool isNegative)
+
+        private Func<SelectionInfo, bool> _isActive;
+
+        public EntityNote(string text, Func<SelectionInfo, bool> isActive, bool isNegative)
         {
+            _isActive = isActive;
             Text = text;
             IsNegative = isNegative;
         }
-        public abstract bool IsActive(SelectionInfo info);
-    }
+        public bool IsActive(SelectionInfo info) => _isActive(info);
 
-    public sealed class EntityNote : EntityNoteBase
-    {
-        private Func<SelectionInfo, bool> _isActive;
-
-        public EntityNote(string text, Func<SelectionInfo, bool> isActive, bool isNegative) : base(text, isNegative)
+        public static EntityNote GetDependentEntityNote<TOtherEntity>(string text, bool isNegative) where TOtherEntity : Entity
         {
-            _isActive = isActive;
+            string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
+            return new EntityNote($"When {_entityId} is selected: {text}", i => i.IsSelected(_entityId), isNegative);
         }
-        public override bool IsActive(SelectionInfo info) => _isActive(info);
-    }
-
-    public sealed class DependentEntityNote<TOtherEntity> : EntityNoteBase where TOtherEntity : Entity
-    {
-        private string _entityId;
-        public DependentEntityNote(string text, bool isNegative) : base("When " + STOLON.Environment.GetEntityInstance<TOtherEntity>().Id + " is selected: " + text, isNegative)
-        {
-            _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
-        }
-
-        public override bool IsActive(SelectionInfo info) => info.IsSelected(_entityId);
     }
 }
