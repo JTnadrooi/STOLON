@@ -1,0 +1,58 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+
+namespace STOLON
+{
+    public enum ConditionalNotePolarity
+    {
+        Neutral,
+        Positive,
+        Negative,
+    }
+
+    public enum ConditionalNoteDomain
+    {
+        Allocation,
+        Abilities,
+    }
+
+    public sealed class ConditionalNote
+    {
+        public string Text { get; }
+        public ConditionalNotePolarity Polarity { get; }
+        public ConditionalNoteDomain Domain { get; }
+
+        private Func<SelectionInfo, bool> _isActive;
+
+        public ConditionalNote(string text, Func<SelectionInfo, bool> isActive, ConditionalNoteDomain domain, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
+        {
+            _isActive = isActive;
+            Text = text;
+            Polarity = polarity;
+        }
+        public bool IsActive(SelectionInfo info) => _isActive(info);
+
+        public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNoteDomain domain, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
+        {
+            string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
+            return new ConditionalNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), domain, polarity);
+        }
+        public static ConditionalNoteBuilder Build() => new ConditionalNoteBuilder();
+    }
+
+    public class ConditionalNoteBuilder
+    {
+        public ConditionalNoteBuilder()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

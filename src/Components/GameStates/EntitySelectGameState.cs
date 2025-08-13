@@ -68,9 +68,9 @@ namespace STOLON
         }
     }
 
-    public class EntityNoteEnumerationGraphic : IGraphic
+    public class ConditionalNoteEnumerationGraphic : IGraphic
     {
-        public EntityNote[] EntityNotes { get; set; }
+        public ConditionalNote[] Notes { get; set; }
         public Vector2 Pos { get; }
         public int TextWidth { get; }
 
@@ -82,9 +82,9 @@ namespace STOLON
         private const int NOTE_CLEARANCE = 12;
         private const int NOTE_BORDER_X_CLEARANCE = 10;
 
-        public EntityNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
+        public ConditionalNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
         {
-            EntityNotes = Array.Empty<EntityNote>();
+            Notes = Array.Empty<ConditionalNote>();
             Pos = pos;
             TextWidth = textWidth;
             _cachedNotes = Array.Empty<CachedNoteData>();
@@ -93,9 +93,9 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            if (EntityNotes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[EntityNotes.Length];
-            for (int i = 0; i < EntityNotes.Length; i++)
-                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(EntityNotes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(), lc, EntityNotes[i].IsActive(_entitySelect.Selection));
+            if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
+            for (int i = 0; i < Notes.Length; i++)
+                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(), lc, Notes[i].IsActive(_entitySelect.Selection));
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -202,7 +202,7 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
-        private EntityNoteEnumerationGraphic _allocNotes;
+        private ConditionalNoteEnumerationGraphic _allocNotes;
 
         private BoardState _boardState;
         private BoardPreview _boardPreview;
@@ -271,7 +271,7 @@ namespace STOLON
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
 
-            _allocNotes = new EntityNoteEnumerationGraphic(this, new Vector2(0, INFO_WINDOW_TOPLINE), TILE_SIZE);
+            _allocNotes = new ConditionalNoteEnumerationGraphic(this, new Vector2(0, INFO_WINDOW_TOPLINE), TILE_SIZE);
 
             if (SkipArgs != null)
             {
@@ -367,7 +367,7 @@ namespace STOLON
             _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
             _lvlInfoContainer.Update(elapsedMilliseconds);
 
-            _allocNotes.EntityNotes = SelectedEntity.EntityNotes;
+            _allocNotes.Notes = SelectedEntity.Notes;
             _allocNotes.Update(elapsedMilliseconds);
         }
 
