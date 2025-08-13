@@ -18,21 +18,14 @@ namespace STOLON
         Negative,
     }
 
-    public enum ConditionalNoteDomain
-    {
-        Allocation,
-        Abilities,
-    }
-
     public sealed class ConditionalNote
     {
         public string Text { get; }
         public ConditionalNotePolarity Polarity { get; }
-        public ConditionalNoteDomain Domain { get; }
 
         private Func<SelectionInfo, bool> _isActive;
 
-        public ConditionalNote(string text, Func<SelectionInfo, bool> isActive, ConditionalNoteDomain domain, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
+        public ConditionalNote(string text, Func<SelectionInfo, bool> isActive, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
         {
             _isActive = isActive;
             Text = text;
@@ -40,11 +33,11 @@ namespace STOLON
         }
         public bool IsActive(SelectionInfo info) => _isActive(info);
 
-        public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNoteDomain domain, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
-        {
-            string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
-            return new ConditionalNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), domain, polarity);
-        }
+        //public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
+        //{
+        //    string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
+        //    return new ConditionalNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), domain, polarity);
+        //}
         public static ConditionalNoteBuilder Build() => new ConditionalNoteBuilder();
     }
 

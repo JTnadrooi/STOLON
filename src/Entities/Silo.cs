@@ -22,8 +22,8 @@ namespace STOLON
     {
         public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)),
             [
-                new ConditionalNote("Gains 20% allocation when Deceit is included in the selection.", i => i.IsSelected("deceit"), ConditionalNoteDomain.Allocation, ConditionalNotePolarity.Positive),
-                new ConditionalNote("Loses 50% allocation when more than 3 entities are included in the selection.", i => i.Entries.Count > 3, ConditionalNoteDomain.Allocation, ConditionalNotePolarity.Positive),
+                new ConditionalNote("Gains 20% allocation when Deceit is included in the selection.", i => i.IsSelected("deceit"), ConditionalNotePolarity.Positive),
+                new ConditionalNote("Loses 50% allocation when more than 3 entities are included in the selection.", i => i.Entries.Count > 3, ConditionalNotePolarity.Positive),
             ], "Silo", "Silo 28SHA")
         {
         }
