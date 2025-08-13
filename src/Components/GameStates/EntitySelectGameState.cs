@@ -367,7 +367,7 @@ namespace STOLON
             _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
             _lvlInfoContainer.Update(elapsedMilliseconds);
 
-            _allocNotes.Notes = SelectedEntity.Notes;
+            _allocNotes.Notes = SelectedEntity.AllocationNotes;
             _allocNotes.Update(elapsedMilliseconds);
         }
 
