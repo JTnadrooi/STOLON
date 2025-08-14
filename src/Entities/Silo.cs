@@ -26,7 +26,8 @@ namespace STOLON
                 new ConditionalNote("Loses 50% allocation when more than 3 entities are included in the selection.", i => i.Entries.Count > 3, ConditionalNotePolarity.Positive),
             ],
             [
-                new ConditionalNote("Test abilty bla bla bla blaaaaaaaaaa", i => i.GetAllocation("silo") > 20, ConditionalNotePolarity.Positive),
+                new ConditionalNote("If valloc is above 50%, gain the abilty to decide where the opponent places their marker. You will not be able to win in one of the 3 moves after.", i => i.GetAllocation("silo") > 50, ConditionalNotePolarity.Positive),
+                new ConditionalNote("If valloc is above 20%, gain the abilty to remove oppenent markers from a row, must be normal gravity.", i => i.GetAllocation("silo") > 20, ConditionalNotePolarity.Positive),
 
             ], "Silo", "Silo 28SHA")
         {
