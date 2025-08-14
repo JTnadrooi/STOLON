@@ -53,6 +53,7 @@ namespace STOLON
         //public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
         public int GetAllocation(string id) => Entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
+        public int GetVirtualAllocation(string id) => IsPostAllocation ? (Entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation!.Value : 0) : throw new InvalidOperationException();
 
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>(), false);
     }
