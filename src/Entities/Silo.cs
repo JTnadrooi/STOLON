@@ -22,8 +22,8 @@ namespace STOLON
     {
         public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)),
             [
-                new ConditionalNote("Gains 20% allocation when Deceit is included in the selection.", i => i.IsSelected("deceit"), ConditionalNotePolarity.Positive),
-                new ConditionalNote("Loses 50% allocation when more than 3 entities are included in the selection.", i => i.Entries.Count > 3, ConditionalNotePolarity.Positive),
+                new ConditionalNote("Gains 20% allocation when Deceit is selected.", i => i.IsSelected("deceit"), ConditionalNotePolarity.Positive),
+                new ConditionalNote("Loses 50% allocation when more than 3 entities are selected.", i => i.Entries.Count > 3, ConditionalNotePolarity.Positive),
             ],
             [
                 new ConditionalNote("If valloc is above 50%, gain the abilty to decide where the opponent places their marker. You will not be able to win in one of the 3 moves after.", i => i.GetVirtualAllocation("silo") > 50, ConditionalNotePolarity.Positive),
