@@ -55,7 +55,7 @@ namespace STOLON
         public int GetAllocation(string id) => Entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
         public int GetVirtualAllocation(string id) => IsPostAllocation ? (Entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation!.Value : 0) : throw new InvalidOperationException();
 
-        public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>(), false);
+        public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>(), true);
     }
     public class EntitySelectOrderProvider : IOrderProvider
     {
