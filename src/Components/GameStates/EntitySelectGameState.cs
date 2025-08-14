@@ -11,30 +11,50 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public struct SelectionEntry
+    public readonly struct SelectionEntry
     {
         public Entity Entity { get; }
         public int Allocation { get; }
-        public SelectionEntry(Entity entity, int alloc)
+        //public int VAllocation => _valloc ?? throw new InvalidOperationException("Cannot be accessed at this stage.");
+
+        //private readonly int? _valloc;
+
+        public int? VAllocation { get; }
+        public bool IsPostAllocation => VAllocation.HasValue;
+
+        public SelectionEntry(Entity entity, int alloc, int? valloc = null)
         {
             Entity = entity;
             Allocation = alloc;
+            VAllocation = valloc;
         }
     }
-    public struct SelectionInfo
+    public readonly struct SelectionInfo
     {
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
 
-        public SelectionInfo(SelectionEntry[] entries)
+        public int? TotalVAllocation { get; }
+        public bool IsPostAllocation { get; }
+
+        public SelectionInfo(SelectionEntry[] entries, bool isPostAllocation)
         {
             Entries = entries.ToDictionary(e => e.Entity.Id).AsReadOnly();
+
+            int total = 0;
+            foreach (SelectionEntry e in entries)
+            {
+                if (e.IsPostAllocation != isPostAllocation) throw new Exception("Invalid PostAllocation for entry: " + e);
+                if (isPostAllocation) total += e.VAllocation!.Value;
+            }
+            TotalVAllocation = total == 0 ? null : total;
+            IsPostAllocation = isPostAllocation;
         }
 
         //public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
         public int GetAllocation(string id) => Entries[id].Allocation;
 
-        public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>());
+        public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>(), false);
     }
     public class EntitySelectOrderProvider : IOrderProvider
     {
@@ -401,7 +421,7 @@ namespace STOLON
             int usedSlots = _selection.Where(i => i != -1).Count();
             int secondarySymbolPosOffsetX = TILE_SIZE * 2;
 
-            Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots)).ToArray());
+            Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots)).ToArray(), false);
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
                 STOLON.Debug.Log($">checking slot {slotIndex}..");
