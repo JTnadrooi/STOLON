@@ -52,7 +52,7 @@ namespace STOLON
 
         //public bool IsSelected<TEntity>() where TEntity : Entity => IsSelected(STOLON.Environment.GetEntityInstance<TEntity>().Id);
         public bool IsSelected(string id) => Entries.ContainsKey(id);
-        public int GetAllocation(string id) => Entries[id].Allocation;
+        public int GetAllocation(string id) => Entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
 
         public static SelectionInfo Empty { get; } = new SelectionInfo(Array.Empty<SelectionEntry>(), false);
     }
@@ -223,6 +223,7 @@ namespace STOLON
         private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
 
         private ConditionalNoteEnumerationGraphic _allocNotes;
+        private ConditionalNoteEnumerationGraphic _abilityNotes;
 
         private BoardState _boardState;
         private BoardPreview _boardPreview;
@@ -230,6 +231,7 @@ namespace STOLON
         private Line _connectionLine;
 
         public SelectionInfo Selection { get; private set; }
+
         private Entity SelectedEntity => _entityDrawDump[_lastSelected].Entity;
 
         #region CONSTANTS
@@ -292,6 +294,7 @@ namespace STOLON
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
 
             _allocNotes = new ConditionalNoteEnumerationGraphic(this, new Vector2(0, INFO_WINDOW_TOPLINE), TILE_SIZE);
+            _abilityNotes = new ConditionalNoteEnumerationGraphic(this, new Vector2(TILE_SIZE, INFO_WINDOW_TOPLINE), TILE_SIZE);
 
             if (SkipArgs != null)
             {
@@ -389,6 +392,9 @@ namespace STOLON
 
             _allocNotes.Notes = SelectedEntity.AllocationNotes;
             _allocNotes.Update(elapsedMilliseconds);
+
+            _abilityNotes.Notes = SelectedEntity.AbilityNotes;
+            _abilityNotes.Update(elapsedMilliseconds);
         }
 
         public void AddToSelection(int entityIndex)
@@ -443,7 +449,8 @@ namespace STOLON
                 secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
-
+            Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots, _allocationDataDump[GetSlot(i)]!.Value.VirtualAllocation)).ToArray(), true);
+            Console.WriteLine(Selection);
             STOLON.Debug.Success();
         }
 
@@ -523,6 +530,7 @@ namespace STOLON
                 //drawingContext.DrawString(STOLON.Fonts.Small, wrapped, new Vector2(10, INFO_WINDOW_TOPLINE - lc * STOLON.Fonts.Small.Dimensions.Y - 10));
 
                 drawingContext.Draw(_allocNotes);
+                drawingContext.Draw(_abilityNotes);
 
                 #region ALLOC_DISPLAYS
 
