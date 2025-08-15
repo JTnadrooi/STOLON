@@ -93,7 +93,7 @@ namespace STOLON
         private EntitySelectGameState _entitySelect;
         private CachedNoteData[] _cachedNotes;
 
-        private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive);
+        private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive, Texture2D NoteSign);
 
         private const int NOTE_CLEARANCE = 12;
         private const int NOTE_BORDER_X_CLEARANCE = 10;
@@ -111,7 +111,23 @@ namespace STOLON
         {
             if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
             for (int i = 0; i < Notes.Length; i++)
-                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(), lc, Notes[i].IsActive(_entitySelect.Selection));
+            {
+                bool isActive = Notes[i].IsActive(_entitySelect.Selection);
+                Texture2D noteSign;
+                if (isActive)
+                {
+                    if (Notes[i].Polarity == ConditionalNotePolarity.Positive || Notes[i].Polarity == ConditionalNotePolarity.Neutral)
+                        noteSign = STOLON.Textures["UI\\note_sign_pos_enabled"];
+                    else noteSign = STOLON.Textures["UI\\note_sign_neg_enabled"];
+                }
+                else noteSign = STOLON.Textures["UI\\note_sign_disabled"];
+
+                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
+                    lc,
+                    isActive,
+                    noteSign
+                );
+            }
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -121,11 +137,12 @@ namespace STOLON
             for (int i = 0; i < _cachedNotes.Length; i++)
             {
                 CachedNoteData note = _cachedNotes[i];
-                drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
-                drawingContext.DrawString(STOLON.Fonts.Small, "-", new((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
+                //drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
 
                 if (note.IsActive)
-                    drawingContext.DrawRectangle(new((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+                    drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
 
                 notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
             }
