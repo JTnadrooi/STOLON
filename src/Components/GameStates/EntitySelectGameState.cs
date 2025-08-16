@@ -579,8 +579,8 @@ namespace STOLON
                 drawingContext.Draw(_lvlInfoContainer);
             }
 
-            drawingContext.DrawVerticalLine(_line1x, -10f, 1000f);
-            drawingContext.DrawVerticalLine(_line2x, -10f, 1000f);
+            drawingContext.DrawVerticalLine(_line1x, -10f);
+            drawingContext.DrawVerticalLine(_line2x, -10f);
         }
     }
 }
