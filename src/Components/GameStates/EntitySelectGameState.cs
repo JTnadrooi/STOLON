@@ -483,10 +483,11 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
                 // draw vertical and horizontal layout lines.
-                drawingContext.DrawHorizontalLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * TILE_ROW_AMOUNT);
+                drawingContext.DrawHorizontalLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * 3);
                 drawingContext.DrawVerticalLine(TILE_SIZE, 0, INFO_WINDOW_TOPLINE);
                 drawingContext.DrawVerticalLine(TILE_SIZE * 2, 0, INFO_WINDOW_TOPLINE);
-                drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, INFO_WINDOW_TOPLINE);
+
+                drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, ROSTER_BOTTOM_LINE);
 
                 #region ROSTER
 
@@ -535,7 +536,7 @@ namespace STOLON
 
                 #endregion
 
-                #region INFO_WINDOW
+                #region INFO_WINDOW (basically everything bellow the roster)
 
                 drawingContext.Draw(_entityInfoContainer);
 
