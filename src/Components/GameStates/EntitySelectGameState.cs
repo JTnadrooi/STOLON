@@ -154,7 +154,7 @@ namespace STOLON
     {
         #region SUBSTRUCTS
 
-        private readonly struct EntityDrawData
+        private readonly struct EntityDrawData // for per-frame updates.
         {
             public readonly Vector2 Pos;
             public readonly Rectangle SymbolNotationBox;
@@ -174,7 +174,7 @@ namespace STOLON
         }
         private readonly record struct EntityAllocationData(int Allocation, int VirtualAllocation, Entity Entity);
 
-        private readonly struct EntityDrawAllocationData
+        private readonly struct EntityDrawAllocationData // for selection change updates.
         {
             public readonly Rectangle SymbolNotationRect;
             public readonly Rectangle AllocationRect;
