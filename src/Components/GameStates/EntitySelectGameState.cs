@@ -172,20 +172,7 @@ namespace STOLON
 
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
         }
-
-        private readonly struct EntityAllocationData
-        {
-            public readonly int VirtualAllocation;
-            public readonly int Allocation;
-            public readonly Entity Entity;
-
-            public EntityAllocationData(int allocation, int virtualAllocation, Entity entity)
-            {
-                Allocation = allocation;
-                VirtualAllocation = virtualAllocation;
-                Entity = entity;
-            }
-        }
+        private readonly record struct EntityAllocationData(int Allocation, int VirtualAllocation, Entity Entity);
 
         private readonly struct EntityDrawAllocationData
         {
@@ -195,7 +182,7 @@ namespace STOLON
 
             public EntityDrawAllocationData(int x)
             {
-                Rectangle GetMiniSlot(int h) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * h, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
@@ -551,7 +538,10 @@ namespace STOLON
 
                 for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 {
-                    if (!IsSlotOccupied(slotIndex)) continue;
+                    if (!IsSlotOccupied(slotIndex))
+                    {
+                        continue;
+                    }
 
                     EntityAllocationData allocData = _allocationDataDump[slotIndex]!.Value;
                     EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
