@@ -327,15 +327,19 @@ namespace STOLON
                 _entityDrawDump[entityIndex] = new EntityDrawData(basePos, _entityHoverCoefficients[entityIndex], _entities[entityIndex]);
             }
 
-            for (int slotIndex = 0; slotIndex < _selection.Length; slotIndex++)
+            for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
                 int entityIndex = _selection[slotIndex];
+
+                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * slotIndex);
+
                 if (entityIndex == -1) continue;
                 if (_hoveredIndex == entityIndex || _drawAllocationDataDump[slotIndex]!.Value.SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
                 {
                     _drawConnectionLine = true;
                     _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
                 }
+
             }
 
             #endregion
@@ -392,7 +396,6 @@ namespace STOLON
 
             HashSet<Entity> selectedEntities = _selection.WhereSelect(id => (id != -1 ? _entities[id] : null!, id != -1)).ToHashSet();
             int usedSlots = _selection.Where(i => i != -1).Count();
-            int secondarySymbolPosOffsetX = TILE_SIZE * 2;
 
             Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots)).ToArray(), false);
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
@@ -411,9 +414,6 @@ namespace STOLON
                 _allocationDataDump[slotIndex] = new EntityAllocationData((int)(100f / usedSlots), _entities[_selection[slotIndex]].GetVirtualAllocation(Selection), _entities[_selection[slotIndex]]);
                 STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
 
-                STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");
-                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(secondarySymbolPosOffsetX);
-                secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
             Selection = new SelectionInfo(_selection.Where(i => i != -1).Select(i => new SelectionEntry(_entities[i], 100 / usedSlots, _allocationDataDump[GetSlot(i)]!.Value.VirtualAllocation)).ToArray(), true);
