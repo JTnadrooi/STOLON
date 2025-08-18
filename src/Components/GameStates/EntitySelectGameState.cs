@@ -31,6 +31,7 @@ namespace STOLON
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
         public int? TotalVAllocation { get; }
         public bool IsPostAllocation { get; }
+        public int Count => Entries.Count;
 
         public SelectionInfo(SelectionEntry[] entries, bool isPostAllocation)
         {
@@ -231,6 +232,9 @@ namespace STOLON
         private bool _drawConnectionLine;
         private Line _connectionLine;
 
+        private int _symbolNotationOffsetTarget;
+        private int _symbolNotationOffset;
+
         public SelectionInfo Selection { get; private set; }
 
         private Entity SelectedEntity => _entityDrawDump[_lastSelected].Entity;
@@ -284,6 +288,8 @@ namespace STOLON
             _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
             _boardPreview = _boardState.GetPreview();
 
+            _symbolNotationOffsetTarget = 0;
+
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
@@ -327,6 +333,9 @@ namespace STOLON
             _selectedState.UpdatePositive(_lastSelected, elapsedMilliseconds);
 
             _hoveredIndex = -1;
+
+            _symbolNotationOffsetTarget = (int)((4 - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
+            _symbolNotationOffset = (int)MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
 
             #region TILES
 
