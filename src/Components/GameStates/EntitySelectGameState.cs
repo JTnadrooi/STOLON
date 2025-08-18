@@ -291,9 +291,10 @@ namespace STOLON
 
             _hoveredIndex = -1;
 
-            _symbolNotationOffsetTarget = (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
-            Console.WriteLine(_symbolNotationOffsetTarget + " " + (_symbolNotationOffset - _symbolNotationOffsetTarget));
+            _symbolNotationOffsetTarget = Selection.Count == 0 ? 48 : (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
             _symbolNotationOffset = MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
+            if (Math.Abs(_symbolNotationOffset - _symbolNotationOffsetTarget) < 0.01f) _symbolNotationOffset = _symbolNotationOffsetTarget;
+            Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset);
 
             #region TILES
 
@@ -438,12 +439,6 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(0, 0, _line1x, 1000), Color.Black);
                 drawingContext.DrawArea(new Rectangle(_line2x, 0, STOLON.V_WIDTH - _line2x, 1000), Color.Black);
 
-                // draw vertical and horizontal layout lines.
-                drawingContext.DrawHorizontalLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * 3);
-                drawingContext.DrawVerticalLine(TILE_SIZE, 0, INFO_WINDOW_TOPLINE);
-                drawingContext.DrawVerticalLine(TILE_SIZE * 2, 0, INFO_WINDOW_TOPLINE);
-
-                drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, ROSTER_BOTTOM_LINE);
 
                 #region ROSTER
 
@@ -507,10 +502,8 @@ namespace STOLON
                 int selectedEntityIndex = 0;
                 for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 {
-                    if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
-                    {
-                        continue;
-                    }
+                    //if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
+                    if (!IsSlotOccupied(slotIndex)) continue;
 
                     EntityAllocationData allocData = _allocationDataDump[slotIndex]!.Value;
                     SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
@@ -522,14 +515,21 @@ namespace STOLON
                     drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
                     drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
 
-                    if (allocData.VirtualAllocation > allocData.Allocation)
-                        drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
+                    if (allocData.VirtualAllocation > allocData.Allocation) drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
 
-                    if (_drawConnectionLine)
-                        drawingContext.DrawLine(_connectionLine, Color.White, 2);
+                    if (_drawConnectionLine) drawingContext.DrawLine(_connectionLine, Color.White, 2);
 
                     selectedEntityIndex++;
                 }
+
+                drawingContext.DrawArea(new Rectangle(TILE_SIZE * 2, 0, (int)_symbolNotationOffset, INFO_WINDOW_TOPLINE), Color.White);
+                drawingContext.DrawArea(new Rectangle((int)(TILE_SIZE * 3 - _symbolNotationOffset), 0, (int)_symbolNotationOffset + 1, INFO_WINDOW_TOPLINE), Color.White);
+
+                #endregion
+
+                #region LVL_INFO
+
+                drawingContext.DrawArea(new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, INFO_WINDOW_TOPLINE), Color.Black);
 
                 #endregion
 
@@ -538,6 +538,13 @@ namespace STOLON
                 //drawingContext.DrawVerticalLine(_boardPreview.Pos + new Vector2(1, -STOLON.Textures["UI\\play"].Height), STOLON.Textures["UI\\play"].Height, Color.White, 2);
 
                 #endregion
+
+                // draw vertical and horizontal layout lines.
+                drawingContext.DrawHorizontalLine(0, INFO_WINDOW_TOPLINE, TILE_SIZE * 3);
+                drawingContext.DrawVerticalLine(TILE_SIZE, 0, INFO_WINDOW_TOPLINE);
+                drawingContext.DrawVerticalLine(TILE_SIZE * 2, 0, INFO_WINDOW_TOPLINE);
+
+                drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, ROSTER_BOTTOM_LINE);
 
                 drawingContext.Draw(_lvlInfoContainer);
             }
