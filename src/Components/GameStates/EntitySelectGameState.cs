@@ -132,13 +132,13 @@ namespace STOLON
         }
         private readonly record struct EntityAllocationData(int Allocation, int VirtualAllocation, Entity Entity);
 
-        private readonly struct EntityDrawAllocationData // for selection change updates.
+        private readonly struct SelectedEntityDrawData // for selected entities.
         {
             public readonly Rectangle SymbolNotationRect;
             public readonly Rectangle AllocationRect;
             public readonly Rectangle VirtualAllocationRect;
 
-            public EntityDrawAllocationData(int x)
+            public SelectedEntityDrawData(int x)
             {
                 Rectangle GetMiniSlot(int slotIndex) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
@@ -163,7 +163,7 @@ namespace STOLON
 
         private EntityDrawData[] _entityDrawDump;
         private EntityAllocationData?[] _allocationDataDump;
-        private EntityDrawAllocationData?[] _drawAllocationDataDump;
+        private SelectedEntityDrawData?[] _drawAllocationDataDump;
 
         private int[] _selection;
 
@@ -237,7 +237,7 @@ namespace STOLON
             _lastSelected = new Random().Next(0, _entityCount);
             _entityDrawDump = new EntityDrawData[_entityCount];
             _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
-            _drawAllocationDataDump = new EntityDrawAllocationData?[MAX_SELECTION];
+            _drawAllocationDataDump = new SelectedEntityDrawData?[MAX_SELECTION];
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
@@ -412,7 +412,7 @@ namespace STOLON
                 STOLON.Debug.Log($"<added to allocdump as; " + _allocationDataDump[slotIndex]);
 
                 STOLON.Debug.Log($">creating allocation DRAW data for slot {slotIndex}..");
-                _drawAllocationDataDump[slotIndex] = new EntityDrawAllocationData(secondarySymbolPosOffsetX);
+                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(secondarySymbolPosOffsetX);
                 secondarySymbolPosOffsetX += SYMBOL_NOTATION_SIZE;
                 STOLON.Debug.Success();
             }
@@ -510,7 +510,7 @@ namespace STOLON
                     }
 
                     EntityAllocationData allocData = _allocationDataDump[slotIndex]!.Value;
-                    EntityDrawAllocationData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
+                    SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
 
                     string allocationStr = allocData.Allocation.ToString();
                     string virtualAllocStr = allocData.VirtualAllocation.ToString();
