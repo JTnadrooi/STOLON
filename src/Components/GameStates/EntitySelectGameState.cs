@@ -190,7 +190,7 @@ namespace STOLON
         private Line _connectionLine;
 
         private int _symbolNotationOffsetTarget;
-        private int _symbolNotationOffset;
+        private float _symbolNotationOffset;
 
         public SelectionInfo Selection { get; private set; }
 
@@ -291,8 +291,9 @@ namespace STOLON
 
             _hoveredIndex = -1;
 
-            _symbolNotationOffsetTarget = (int)((4 - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
-            _symbolNotationOffset = (int)MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
+            _symbolNotationOffsetTarget = (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
+            Console.WriteLine(_symbolNotationOffsetTarget + " " + (_symbolNotationOffset - _symbolNotationOffsetTarget));
+            _symbolNotationOffset = MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
 
             #region TILES
 
@@ -327,19 +328,20 @@ namespace STOLON
                 _entityDrawDump[entityIndex] = new EntityDrawData(basePos, _entityHoverCoefficients[entityIndex], _entities[entityIndex]);
             }
 
+            int selectedEntityIndex = 0;
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
                 int entityIndex = _selection[slotIndex];
 
-                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * slotIndex);
-
                 if (entityIndex == -1) continue;
+
+                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset);
                 if (_hoveredIndex == entityIndex || _drawAllocationDataDump[slotIndex]!.Value.SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
                 {
                     _drawConnectionLine = true;
                     _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
                 }
-
+                selectedEntityIndex++;
             }
 
             #endregion
@@ -502,9 +504,10 @@ namespace STOLON
 
                 #region ALLOC_DISPLAYS
 
+                int selectedEntityIndex = 0;
                 for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 {
-                    if (!IsSlotOccupied(slotIndex))
+                    if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
                     {
                         continue;
                     }
@@ -524,6 +527,8 @@ namespace STOLON
 
                     if (_drawConnectionLine)
                         drawingContext.DrawLine(_connectionLine, Color.White, 2);
+
+                    selectedEntityIndex++;
                 }
 
                 #endregion
