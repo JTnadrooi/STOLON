@@ -137,14 +137,17 @@ namespace STOLON
             public readonly Rectangle SymbolNotationRect;
             public readonly Rectangle AllocationRect;
             public readonly Rectangle VirtualAllocationRect;
+            public readonly int EntityIndex;
 
-            public SelectedEntityDrawData(int x)
+            public SelectedEntityDrawData(int x, int entityIndex)
             {
                 Rectangle GetMiniSlot(int slotIndex) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
+
+                EntityIndex = entityIndex;
             }
         }
 
@@ -163,7 +166,7 @@ namespace STOLON
 
         private EntityDrawData[] _entityDrawDump;
         private EntityAllocationData?[] _allocationDataDump;
-        private SelectedEntityDrawData?[] _drawAllocationDataDump;
+        private List<SelectedEntityDrawData> _drawAllocationDataDump;
 
         private int[] _selection;
 
@@ -237,7 +240,7 @@ namespace STOLON
             _lastSelected = new Random().Next(0, _entityCount);
             _entityDrawDump = new EntityDrawData[_entityCount];
             _allocationDataDump = new EntityAllocationData?[MAX_SELECTION];
-            _drawAllocationDataDump = new SelectedEntityDrawData?[MAX_SELECTION];
+            _drawAllocationDataDump = new List<SelectedEntityDrawData>(MAX_SELECTION);
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
@@ -329,6 +332,7 @@ namespace STOLON
                 _entityDrawDump[entityIndex] = new EntityDrawData(basePos, _entityHoverCoefficients[entityIndex], _entities[entityIndex]);
             }
 
+            _drawAllocationDataDump.Clear();
             int selectedEntityIndex = 0;
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
             {
@@ -336,13 +340,17 @@ namespace STOLON
 
                 if (entityIndex == -1) continue;
 
-                _drawAllocationDataDump[slotIndex] = new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset);
-                if (_hoveredIndex == entityIndex || _drawAllocationDataDump[slotIndex]!.Value.SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
-                {
-                    _drawConnectionLine = true;
-                    _connectionLine = new Line(_entityDrawDump[entityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[GetSlot(entityIndex)]!.Value.SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
-                }
+                _drawAllocationDataDump.Add(new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset, entityIndex));
                 selectedEntityIndex++;
+            }
+
+            for (int i = 0; i < _drawAllocationDataDump.Count; i++)
+            {
+                if (_hoveredIndex == _drawAllocationDataDump[i].EntityIndex || _drawAllocationDataDump[i].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
+                {
+                    _connectionLine = new Line(_entityDrawDump[_drawAllocationDataDump[i].EntityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
+                    _drawConnectionLine = true;
+                }
             }
 
             #endregion
@@ -407,7 +415,6 @@ namespace STOLON
                 if (_selection[slotIndex] == -1)
                 {
                     _allocationDataDump[slotIndex] = null;
-                    _drawAllocationDataDump[slotIndex] = null;
                     STOLON.Debug.Log($"<skipped slot {slotIndex}.");
                     continue;
                 }
@@ -500,13 +507,12 @@ namespace STOLON
                 #region ALLOC_DISPLAYS
 
                 int selectedEntityIndex = 0;
-                for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
+                for (int i = 0; i < _drawAllocationDataDump.Count; i++)
                 {
+                    SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[i];
                     //if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
-                    if (!IsSlotOccupied(slotIndex)) continue;
 
-                    EntityAllocationData allocData = _allocationDataDump[slotIndex]!.Value;
-                    SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[slotIndex]!.Value;
+                    EntityAllocationData allocData = _allocationDataDump[GetSlot(drawAllocData.EntityIndex)]!.Value;
 
                     string allocationStr = allocData.Allocation.ToString();
                     string virtualAllocStr = allocData.VirtualAllocation.ToString();
