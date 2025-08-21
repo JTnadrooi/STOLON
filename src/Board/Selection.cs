@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AsitLib;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -33,6 +34,8 @@ namespace STOLON
         private readonly Dictionary<string, SelectionEntry> _entries;
         private readonly List<Entity> _toParseEntries;
 
+        public SelectionEntry this[string id] => Entries[id];
+        public SelectionEntry this[int i] => _entries.ElementAt(i).Value;
 
         public EntitySelection(int maxEntries)
         {
@@ -66,6 +69,11 @@ namespace STOLON
             RecalculateAllocations();
             STOLON.Debug.Success();
         }
+        public bool Contains(string id)
+        {
+            return Entries.ContainsKey(id);
+        }
+        public int GetSlot(string id) => Entries.GetFirstIndexWhere(s => s.Key == id);
         private void RecalculateAllocations()
         {
             STOLON.Debug.Log(">updating allocations..");
