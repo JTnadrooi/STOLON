@@ -23,15 +23,15 @@ namespace STOLON
         public string Text { get; }
         public ConditionalNotePolarity Polarity { get; }
 
-        private Func<SelectionInfo, bool> _isActive;
+        private Func<EntitySelection, bool> _isActive;
 
-        public ConditionalNote(string text, Func<SelectionInfo, bool> isActive, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
+        public ConditionalNote(string text, Func<EntitySelection, bool> isActive, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
         {
             _isActive = isActive;
             Text = text;
             Polarity = polarity;
         }
-        public bool IsActive(SelectionInfo info) => _isActive(info);
+        public bool IsActive(EntitySelection info) => _isActive(info);
 
         //public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
         //{

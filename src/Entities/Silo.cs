@@ -30,7 +30,7 @@ namespace STOLON
                 new ConditionalNote("If valloc is above 20%, gain the abilty to remove oppenent markers from a row, must be normal gravity.", i => i.GetVirtualAllocation("silo") > 20, ConditionalNotePolarity.Positive),
             ], "Silo", "Silo 28SHA")
         { }
-        public override int GetVirtualAllocation(SelectionInfo info)
+        public override int GetVirtualAllocation(EntitySelection info)
         {
             return new AllocationHelperChain(info, this)
                 .ApplyMultiplier(info.IsSelected("deceit"), 1.2f)

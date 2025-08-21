@@ -198,7 +198,7 @@ namespace STOLON
         private int _symbolNotationOffsetTarget;
         private float _symbolNotationOffset;
 
-        public SelectionInfo Selection { get; private set; }
+        public EntitySelection Selection { get; private set; }
 
         private Entity SelectedEntity => _entityDrawDump[_lastSelected].Entity;
 
@@ -271,7 +271,7 @@ namespace STOLON
                 _lastSelected = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _lastSelected;
             }
 
-            Selection = SelectionInfo.Empty;
+            Selection = new EntitySelection(MAX_SELECTION);
 
             STOLON.UI.Textframe.Hide = true;
         }
@@ -319,8 +319,8 @@ namespace STOLON
                     Rectangle addBox = new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - ADD_BOX_SIZE), new Point(32));
 
                     if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (_selection.Contains(entityIndex)) RemoveFromSelection(entityIndex);
-                        else AddToSelection(entityIndex);
+                        if (_selection.Contains(entityIndex)) Selection.Remove(_entities[entityIndex].Id);
+                        else Selection.Add(_entities[entityIndex].Id);
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
                         if (_lastSelected != entityIndex)
@@ -374,42 +374,6 @@ namespace STOLON
 
             _abilityNotes.Notes = SelectedEntity.AbilityNotes;
             _abilityNotes.Update(elapsedMilliseconds);
-        }
-
-        public void AddToSelection(int entityIndex)
-        {
-            STOLON.Debug.Log(">selecting entity " + entityIndex + ".");
-            _selection.Add(entityIndex);
-            UpdateSelection();
-            STOLON.Debug.Success();
-        }
-        public void RemoveFromSelection(int entityIndex)
-        {
-            STOLON.Debug.Log(">deselecting entity " + entityIndex + ".");
-            _selection.Remove(entityIndex);
-            UpdateSelection();
-            STOLON.Debug.Success();
-        }
-        private void UpdateSelection()
-        {
-            STOLON.Debug.Log(">updating allocations (and draw data)..");
-            List<EntityAllocationData> allocationDataDump = new List<EntityAllocationData>(MAX_SELECTION);
-
-            Selection = new SelectionInfo(_selection.Select(i => new SelectionEntry(_entities[i], 100 / _selection.Count)).ToArray(), false);
-            for (int slotIndex = 0; slotIndex < _selection.Count; slotIndex++)
-            {
-                STOLON.Debug.Log($">checking slot {slotIndex}..");
-                STOLON.Debug.Log($"<found {_entities[_selection[slotIndex]]}.");
-
-                STOLON.Debug.Log($">creating allocation data for slot {slotIndex}..");
-                allocationDataDump.Add(new EntityAllocationData((int)(100f / _selection.Count), _entities[_selection[slotIndex]].GetVirtualAllocation(Selection), _entities[_selection[slotIndex]]));
-                STOLON.Debug.Log($"<added to allocdump as; " + allocationDataDump[slotIndex]);
-
-                STOLON.Debug.Success();
-            }
-            Selection = new SelectionInfo(_selection.Select((entityIndex, slotIndex) => new SelectionEntry(_entities[entityIndex], 100 / _selection.Count, allocationDataDump[slotIndex].VirtualAllocation)).ToArray(), true);
-            Console.WriteLine(Selection);
-            STOLON.Debug.Success();
         }
         public int GetSlot(int entityIndex) => _selection.GetFirstIndexWhere(s => s == entityIndex);
         public Vector2 GetBaseTilePos(int i)

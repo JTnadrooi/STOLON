@@ -18,7 +18,7 @@ namespace STOLON
 
         public IReadOnlyList<int> Deltas => _deltas;
 
-        public AllocationHelperChain(SelectionInfo info, Entity entity) : this(info.GetAllocation(entity.Id)) { }
+        public AllocationHelperChain(EntitySelection info, Entity entity) : this(info.GetAllocation(entity.Id)) { }
         public AllocationHelperChain(int initialAlloc)
         {
             _initialAlloc = initialAlloc;
