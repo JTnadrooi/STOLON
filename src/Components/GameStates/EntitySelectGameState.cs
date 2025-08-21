@@ -130,8 +130,6 @@ namespace STOLON
 
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
         }
-        private readonly record struct EntityAllocationData(int Allocation, int VirtualAllocation, Entity Entity);
-
         private readonly struct SelectedEntityDrawData // for selected entities.
         {
             public readonly Rectangle SymbolNotationRect;
@@ -141,14 +139,14 @@ namespace STOLON
             public readonly int Allocation;
             public readonly Entity Entity;
 
-            public SelectedEntityDrawData(EntitySelectGameState gameState, int entityIndex)
+            public SelectedEntityDrawData(EntitySelectGameState gameState, Entity entity)
             {
-                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * entityIndex + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * gameState.Selection.GetSlot(entity.Id) + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
-                Entity = gameState._entities[entityIndex];
+                Entity = entity;
 
                 Allocation = gameState.Selection.GetAllocation(Entity.Id);
                 VirtualAllocation = gameState.Selection.GetVirtualAllocation(Entity.Id);
@@ -170,8 +168,6 @@ namespace STOLON
 
         private EntityDrawData[] _entityDrawDump;
         private List<SelectedEntityDrawData> _drawAllocationDataDump;
-
-        private List<int> _selection;
 
         private float[] _entityHoverCoefficients;
         private float _currentEntitySelectedCoefficient;
@@ -247,7 +243,6 @@ namespace STOLON
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
-            _selection = new List<int>(MAX_SELECTION);
             _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
             _boardPreview = _boardState.GetPreview();
 
@@ -300,7 +295,7 @@ namespace STOLON
             _symbolNotationOffsetTarget = Selection.Count == 0 ? 48 : (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
             _symbolNotationOffset = MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
             if (Math.Abs(_symbolNotationOffset - _symbolNotationOffsetTarget) < 0.01f) _symbolNotationOffset = _symbolNotationOffsetTarget;
-            Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset + " " + Selection.Count + " " + _selection.Count);
+            Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset + " " + Selection.Count);
 
             #region TILES
 
@@ -319,7 +314,7 @@ namespace STOLON
                     Rectangle addBox = new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - ADD_BOX_SIZE), new Point(32));
 
                     if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (_selection.Contains(entityIndex)) Selection.Remove(_entities[entityIndex].Id);
+                        if (Selection.Contains(_entities[entityIndex].Id)) Selection.Remove(_entities[entityIndex].Id);
                         else Selection.Add(_entities[entityIndex].Id);
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
@@ -336,18 +331,18 @@ namespace STOLON
             }
 
             _drawAllocationDataDump.Clear();
-            for (int slotIndex = 0; slotIndex < _selection.Count; slotIndex++)
+            for (int slotIndex = 0; slotIndex < Selection.Count; slotIndex++)
             {
-                _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, _selection[slotIndex]));
+                _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, Selection[slotIndex].Entity));
             }
 
-            for (int i = 0; i < _entities.Length; i++)
+            for (int i = 0; i < Selection.Count; i++)
             {
-                //if (_hoveredIndex == i || _drawAllocationDataDump[GetSlot(i)].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
-                //{
-                //    _connectionLine = new Line(_entityDrawDump[_drawAllocationDataDump[i].Entity].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
-                //    _drawConnectionLine = true;
-                //}
+                if (_entities[_hoveredIndex].Id == Selection[i].Entity.Id || _drawAllocationDataDump[i].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
+                {
+                    _connectionLine = new Line(_entityDrawDump[i].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
+                    _drawConnectionLine = true;
+                }
             }
 
             #endregion
@@ -375,7 +370,6 @@ namespace STOLON
             _abilityNotes.Notes = SelectedEntity.AbilityNotes;
             _abilityNotes.Update(elapsedMilliseconds);
         }
-        public int GetSlot(int entityIndex) => _selection.GetFirstIndexWhere(s => s == entityIndex);
         public Vector2 GetBaseTilePos(int i)
             => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos :
                 _posCache[i] = new Vector2((i % TILE_ROW_AMOUNT) * TILE_SIZE, (TILE_COLUMN_AMOUNT - 1 - i / TILE_ROW_AMOUNT) * TILE_SIZE + (STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE - TILE_SIZE * TILE_COLUMN_AMOUNT));
@@ -408,7 +402,7 @@ namespace STOLON
                         drawingContext.DrawEntity(ddc.Entity.Profile, TILE_SIZE, ddc.Pos, drawMode: EntityDrawMode.WithBackground);
 
                         bool isHovered = (_hoveredIndex == tileIndex);
-                        bool isSelected = _selection.Contains(tileIndex);
+                        bool isSelected = Selection.Contains(ddc.Entity.Id);
 
                         if (isHovered)
                         {
@@ -418,7 +412,7 @@ namespace STOLON
 
                         if (isSelected)
                         {
-                            int selectedIndex = _selection.GetFirstIndexWhere(x => tileIndex == x);
+                            int selectedIndex = Selection.GetSlot(ddc.Entity.Id);
                             drawingContext.Draw(STOLON.Textures[$"UI\\selected_{selectedIndex + 1}-overlay"], ddc.Pos);
                             if (isHovered) drawingContext.Draw(STOLON.Textures["UI\\selected_remove-overlay"], ddc.Pos);
                         }
