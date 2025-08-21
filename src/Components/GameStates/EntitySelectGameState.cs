@@ -363,8 +363,8 @@ namespace STOLON
             _entityInfoContainer.Position = new Vector2((_currentEntitySelectedCoefficient - 1) * 200, INFO_WINDOW_TOPLINE);
 
             _entityInfoContainer.Elements["extended_name"].Text = _entityDrawDump[_lastSelected].FullerName;
-            _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.Allocation : 0)}%";
-            _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(IsInSelection(_lastSelected) ? _allocationDataDump[GetSlot(_lastSelected)]!.Value.VirtualAllocation : 0)}%";
+            _entityInfoContainer.Elements["alloc"].Text = $"(alloc) {(Selection.GetAllocation(_entities[_lastSelected].Id))}%";
+            _entityInfoContainer.Elements["v_alloc"].Text = $"(valloc) {(Selection.GetVirtualAllocation(_entities[_lastSelected].Id))}%";
             _entityInfoContainer.Update(elapsedMilliseconds);
 
             // update level info container.
