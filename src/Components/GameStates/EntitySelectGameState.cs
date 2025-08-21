@@ -137,9 +137,9 @@ namespace STOLON
             public readonly Rectangle SymbolNotationRect;
             public readonly Rectangle AllocationRect;
             public readonly Rectangle VirtualAllocationRect;
-            public readonly int EntityIndex;
+            public readonly Entity Entity;
 
-            public SelectedEntityDrawData(int x, int entityIndex)
+            public SelectedEntityDrawData(int x, Entity entity)
             {
                 Rectangle GetMiniSlot(int slotIndex) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
@@ -147,7 +147,7 @@ namespace STOLON
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
 
-                EntityIndex = entityIndex;
+                Entity = entity;
             }
         }
 
@@ -340,17 +340,17 @@ namespace STOLON
 
                 if (entityIndex == -1) continue;
 
-                _drawAllocationDataDump.Add(new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset, entityIndex));
+                _drawAllocationDataDump.Add(new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset, _entities[entityIndex]));
                 selectedEntityIndex++;
             }
 
-            for (int i = 0; i < _drawAllocationDataDump.Count; i++)
+            for (int i = 0; i < _entities.Length; i++)
             {
-                if (_hoveredIndex == _drawAllocationDataDump[i].EntityIndex || _drawAllocationDataDump[i].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
-                {
-                    _connectionLine = new Line(_entityDrawDump[_drawAllocationDataDump[i].EntityIndex].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
-                    _drawConnectionLine = true;
-                }
+                //if (_hoveredIndex == i || _drawAllocationDataDump[GetSlot(i)].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
+                //{
+                //    _connectionLine = new Line(_entityDrawDump[_drawAllocationDataDump[i].Entity].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
+                //    _drawConnectionLine = true;
+                //}
             }
 
             #endregion
@@ -512,7 +512,7 @@ namespace STOLON
                     SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[i];
                     //if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
 
-                    EntityAllocationData allocData = _allocationDataDump[GetSlot(drawAllocData.EntityIndex)]!.Value;
+                    EntityAllocationData allocData = _allocationDataDump[GetSlot(drawAllocData.Entity)]!.Value;
 
                     string allocationStr = allocData.Allocation.ToString();
                     string virtualAllocStr = allocData.VirtualAllocation.ToString();
