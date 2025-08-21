@@ -338,9 +338,9 @@ namespace STOLON
 
             for (int i = 0; i < Selection.Count; i++)
             {
-                if (_entities[_hoveredIndex].Id == Selection[i].Entity.Id || _drawAllocationDataDump[i].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos))
+                if (_hoveredIndex != -1 && (_entities[_hoveredIndex].Id == Selection[i].Entity.Id || _drawAllocationDataDump[i].SymbolNotationRect.Contains(STOLON.Input.VirtualMousePos)))
                 {
-                    _connectionLine = new Line(_entityDrawDump[i].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
+                    _connectionLine = new Line(_entityDrawDump[_entities.GetFirstIndexWhere(e => e == Selection[i].Entity)].Pos.ToPoint() + new Point(TILE_SIZE / 2, 0), _drawAllocationDataDump[i].SymbolNotationRect.Location + new Point(SYMBOL_NOTATION_SIZE / 2, SYMBOL_NOTATION_SIZE));
                     _drawConnectionLine = true;
                 }
             }
