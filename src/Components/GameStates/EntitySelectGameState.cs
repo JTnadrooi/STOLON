@@ -137,17 +137,21 @@ namespace STOLON
             public readonly Rectangle SymbolNotationRect;
             public readonly Rectangle AllocationRect;
             public readonly Rectangle VirtualAllocationRect;
+            public readonly int VirtualAllocation;
+            public readonly int Allocation;
             public readonly Entity Entity;
 
-            public SelectedEntityDrawData(int x, Entity entity)
+            public SelectedEntityDrawData(EntitySelectGameState gameState, int entityIndex)
             {
-                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(x, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * entityIndex + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
+                Entity = gameState._entities[entityIndex];
 
-                Entity = entity;
+                Allocation = gameState.Selection.GetAllocation(Entity.Id);
+                VirtualAllocation = gameState.Selection.GetVirtualAllocation(Entity.Id);
             }
         }
 
@@ -297,7 +301,7 @@ namespace STOLON
             _symbolNotationOffsetTarget = Selection.Count == 0 ? 48 : (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
             _symbolNotationOffset = MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
             if (Math.Abs(_symbolNotationOffset - _symbolNotationOffsetTarget) < 0.01f) _symbolNotationOffset = _symbolNotationOffsetTarget;
-            Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset);
+            Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset + " " + Selection.Count);
 
             #region TILES
 
@@ -340,7 +344,7 @@ namespace STOLON
 
                 if (entityIndex == -1) continue;
 
-                _drawAllocationDataDump.Add(new SelectedEntityDrawData(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * selectedEntityIndex + (int)_symbolNotationOffset, _entities[entityIndex]));
+                _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, entityIndex));
                 selectedEntityIndex++;
             }
 
@@ -512,16 +516,14 @@ namespace STOLON
                     SelectedEntityDrawData drawAllocData = _drawAllocationDataDump[i];
                     //if (!IsSlotOccupied(slotIndex) || (selectedEntityIndex > 2 && (int)_symbolNotationOffset != 0))
 
-                    EntityAllocationData allocData = _allocationDataDump[GetSlot(drawAllocData.Entity)]!.Value;
+                    string allocationStr = drawAllocData.Allocation.ToString();
+                    string virtualAllocStr = drawAllocData.VirtualAllocation.ToString();
 
-                    string allocationStr = allocData.Allocation.ToString();
-                    string virtualAllocStr = allocData.VirtualAllocation.ToString();
-
-                    drawingContext.DrawSymbolNotation(allocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
+                    drawingContext.DrawSymbolNotation(drawAllocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
                     drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
                     drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
 
-                    if (allocData.VirtualAllocation > allocData.Allocation) drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
+                    if (drawAllocData.VirtualAllocation > drawAllocData.Allocation) drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], drawAllocData.VirtualAllocationRect);
 
                     if (_drawConnectionLine) drawingContext.DrawLine(_connectionLine, Color.White, 2);
 
