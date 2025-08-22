@@ -22,7 +22,7 @@ namespace STOLON
     {
         public SiloEntity() : base("silo", "Silo", "Sl", new EntityProfile("silo", new Point(245, 180)),
             [
-                new ConditionalNote("Gains 20% valloc when Deceit is selected.", i => i.IsSelected("deceit"), ConditionalNotePolarity.Positive),
+                new ConditionalNote("Gains 20% valloc when Deceit is selected.", i => i.Contains("deceit"), ConditionalNotePolarity.Positive),
                 new ConditionalNote("Loses 50% valloc when more than 3 entities are selected.", i => i.Entries.Count > 3, ConditionalNotePolarity.Positive),
             ],
             [
@@ -33,7 +33,7 @@ namespace STOLON
         public override int GetVirtualAllocation(EntitySelection info)
         {
             return new AllocationHelperChain(info, this)
-                .ApplyMultiplier(info.IsSelected("deceit"), 1.2f)
+                .ApplyMultiplier(info.Contains("deceit"), 1.2f)
                 .ApplyMultiplier(info.Entries.Count > 3, 0.5f)
                 .End();
         }

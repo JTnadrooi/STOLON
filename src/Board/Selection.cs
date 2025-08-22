@@ -80,20 +80,23 @@ namespace STOLON
 
             IsPostAllocation = false;
             _entries.Clear();
-            for (int i = 0; i < _toParseEntries.Count; i++)
+            for (int i = 0; i < _toParseEntries.Count; i++) // create source without virtual values.
                 _entries.Add(_toParseEntries[i].Id, new SelectionEntry(_toParseEntries[i], 100 / _toParseEntries.Count));
 
+            Stack<SelectionEntry> _entryBuffer = new Stack<SelectionEntry>(MaxEntries);
+            for (int i = 0; i < _toParseEntries.Count; i++) // create _entryBuffer with virtual values. (using _entries referenced in GetVirtualAllocation())
+                _entryBuffer.Push(new SelectionEntry(_toParseEntries[i], 100 / _toParseEntries.Count, _toParseEntries[i].GetVirtualAllocation(this)));
+
             _entries.Clear();
-            for (int i = 0; i < _toParseEntries.Count; i++)
-                _entries.Add(_toParseEntries[i].Id, new SelectionEntry(_toParseEntries[i], 100 / _toParseEntries.Count, _toParseEntries[i].GetVirtualAllocation(this)));
+            for (int i = 0; i < _toParseEntries.Count; i++) // make buffer the new source without ref change.
+                _entries.Add(_entryBuffer.Peek().Entity.Id, _entryBuffer.Pop());
+
             IsPostAllocation = true;
 
             STOLON.Debug.Success();
         }
-
-        public bool IsSelected(string id) => Entries.ContainsKey(id);
-        public int GetAllocation(string id) => Entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
-        public int GetVirtualAllocation(string id) => IsPostAllocation ? (Entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation!.Value : 0) : throw new InvalidOperationException();
+        public int GetAllocation(string id) => _entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : -2;
+        public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation!.Value : -1) : throw new InvalidOperationException();
 
         public override string ToString() => $"IsPostAllocation: {IsPostAllocation}, TotalVAllocation: {(IsPostAllocation ? TotalVAllocation : "<n/a>")}, Entries: [{string.Join(", ", Entries.Values.Select(e => e.ToString()))}]";
     }
