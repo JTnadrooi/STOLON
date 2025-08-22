@@ -140,16 +140,19 @@ namespace STOLON
             public readonly string SymbolNotation;
 
             public SelectedEntityDrawData(EntitySelectGameState gameState, Entity entity)
+                : this(gameState, gameState.Selection.GetSlot(entity.Id), entity.SymbolNotation, gameState.Selection.GetAllocation(entity.Id), gameState.Selection.GetVirtualAllocation(entity.Id))
+            { }
+            public SelectedEntityDrawData(EntitySelectGameState gameState, int slotIndex, string symbolNotation, int alloc, int valloc)
             {
-                Rectangle GetMiniSlot(int slotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * gameState.Selection.GetSlot(entity.Id) + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * slotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
+                Rectangle GetMiniSlot(int ySlotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * slotIndex + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * ySlotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
-                SymbolNotation = entity.SymbolNotation;
+                SymbolNotation = symbolNotation;
 
-                Allocation = gameState.Selection.GetAllocation(entity.Id);
-                VirtualAllocation = gameState.Selection.GetVirtualAllocation(entity.Id);
+                Allocation = alloc;
+                VirtualAllocation = valloc;
             }
         }
 
