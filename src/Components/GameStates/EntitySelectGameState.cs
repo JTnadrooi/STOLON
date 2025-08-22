@@ -295,9 +295,9 @@ namespace STOLON
 
             _hoveredIndex = -1;
 
-            _symbolNotationOffsetTarget = Selection.Count == 0 ? 48 : (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
+            _symbolNotationOffsetTarget = (int)((MAX_SELECTION - Selection.Count) * SYMBOL_NOTATION_SIZE * 0.5f);
             _symbolNotationOffset = MathHelper.Lerp(_symbolNotationOffset, _symbolNotationOffsetTarget, 0.1f);
-            if (Math.Abs(_symbolNotationOffset - _symbolNotationOffsetTarget) < 0.01f) _symbolNotationOffset = _symbolNotationOffsetTarget;
+            if (Math.Abs(_symbolNotationOffset - _symbolNotationOffsetTarget) < (Selection.Count > 0 ? 0.1f : 1f)) _symbolNotationOffset = _symbolNotationOffsetTarget;
             //Console.WriteLine(_symbolNotationOffsetTarget + " " + _symbolNotationOffset + " " + Selection.Count);
 
             #region TILES
