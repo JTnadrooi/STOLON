@@ -137,7 +137,7 @@ namespace STOLON
             public readonly Rectangle VirtualAllocationRect;
             public readonly int VirtualAllocation;
             public readonly int Allocation;
-            public readonly Entity Entity;
+            public readonly string SymbolNotation;
 
             public SelectedEntityDrawData(EntitySelectGameState gameState, Entity entity)
             {
@@ -146,10 +146,10 @@ namespace STOLON
                 SymbolNotationRect = GetMiniSlot(0);
                 AllocationRect = GetMiniSlot(1);
                 VirtualAllocationRect = GetMiniSlot(2);
-                Entity = entity;
+                SymbolNotation = entity.SymbolNotation;
 
-                Allocation = gameState.Selection.GetAllocation(Entity.Id);
-                VirtualAllocation = gameState.Selection.GetVirtualAllocation(Entity.Id);
+                Allocation = gameState.Selection.GetAllocation(entity.Id);
+                VirtualAllocation = gameState.Selection.GetVirtualAllocation(entity.Id);
             }
         }
 
@@ -454,7 +454,7 @@ namespace STOLON
                     string allocationStr = drawAllocData.Allocation.ToString();
                     string virtualAllocStr = drawAllocData.VirtualAllocation.ToString();
 
-                    drawingContext.DrawSymbolNotation(drawAllocData.Entity.SymbolNotation, drawAllocData.SymbolNotationRect);
+                    drawingContext.DrawSymbolNotation(drawAllocData.SymbolNotation, drawAllocData.SymbolNotationRect);
                     drawingContext.DrawString(STOLON.Fonts.Medium, allocationStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(allocationStr).ToPoint(), drawAllocData.AllocationRect));
                     drawingContext.DrawString(STOLON.Fonts.Medium, virtualAllocStr, Centering.Center(STOLON.Fonts.Medium.FastMeasure(virtualAllocStr).ToPoint(), drawAllocData.VirtualAllocationRect));
 
