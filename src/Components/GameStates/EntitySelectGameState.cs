@@ -334,10 +334,9 @@ namespace STOLON
             }
 
             _drawAllocationDataDump.Clear();
-            for (int slotIndex = 0; slotIndex < Selection.Count; slotIndex++)
-            {
-                _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, Selection[slotIndex].Entity));
-            }
+            for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
+                if (slotIndex < Selection.Count) _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, Selection[slotIndex].Entity));
+                else _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, slotIndex, "?", 15, 15));
 
             for (int i = 0; i < Selection.Count; i++)
             {
