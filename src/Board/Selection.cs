@@ -12,21 +12,25 @@ namespace STOLON
     {
         public Entity Entity { get; }
         public int Allocation { get; }
-        public int? VAllocation { get; }
-        public bool IsPostAllocation => VAllocation.HasValue;
+        public int VAllocation => IsPostAllocation ? _valloc : throw new InvalidOperationException();
+        public bool IsPostAllocation { get; }
+
+        private readonly int _valloc;
 
         public SelectionEntry(Entity entity, int alloc, int? valloc = null)
         {
             Entity = entity;
             Allocation = alloc;
-            VAllocation = valloc;
+            IsPostAllocation = valloc.HasValue;
+            _valloc = valloc ?? -1;
         }
         public override string ToString() => $"Entity: {Entity.Id}, Allocation: {Allocation}, VAllocation: {(IsPostAllocation ? VAllocation : "<n/a>")}";
     }
+
     public class EntitySelection
     {
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
-        public int? TotalVAllocation => IsPostAllocation ? _totalVAllocation : throw new InvalidOperationException();
+        public int TotalVAllocation => IsPostAllocation ? _totalVAllocation : throw new InvalidOperationException();
         public bool IsPostAllocation { get; private set; }
         public int Count => Entries.Count;
         public int MaxEntries { get; }
@@ -85,14 +89,12 @@ namespace STOLON
 
             IsPostAllocation = true;
 
-            int total = 0;
-            foreach (SelectionEntry e in _entries.Values) total += (e.VAllocation ?? 0);
-            _totalVAllocation = total;
+            _totalVAllocation = _entries.Sum(e => e.Value.VAllocation);
 
             STOLON.Debug.Success();
         }
         public int GetAllocation(string id) => _entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : -2;
-        public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation!.Value : -1) : throw new InvalidOperationException();
+        public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation : -1) : throw new InvalidOperationException();
 
         public override string ToString() => $"IsPostAllocation: {IsPostAllocation}, TotalVAllocation: {(IsPostAllocation ? TotalVAllocation : "<n/a>")}, Entries: [{string.Join(", ", Entries.Values.Select(e => e.ToString()))}]";
     }
