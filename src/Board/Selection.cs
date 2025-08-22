@@ -26,13 +26,14 @@ namespace STOLON
     public class EntitySelection
     {
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
-        public int? TotalVAllocation { get; }
+        public int? TotalVAllocation => IsPostAllocation ? _totalVAllocation : throw new InvalidOperationException();
         public bool IsPostAllocation { get; private set; }
         public int Count => Entries.Count;
         public int MaxEntries { get; }
 
         private readonly Dictionary<string, SelectionEntry> _entries;
         private readonly List<Entity> _toParseEntries;
+        private int _totalVAllocation;
 
         public SelectionEntry this[string id] => Entries[id];
         public SelectionEntry this[int i] => _entries.ElementAt(i).Value;
@@ -42,18 +43,9 @@ namespace STOLON
             _entries = new Dictionary<string, SelectionEntry>(maxEntries);
             Entries = _entries.AsReadOnly();
             _toParseEntries = new List<Entity>(maxEntries);
-
-            TotalVAllocation = 0;
+            _totalVAllocation = 0;
             IsPostAllocation = true;
             MaxEntries = maxEntries;
-            //int total = 0;
-            //foreach (SelectionEntry e in _entries.Values)
-            //{
-            //    if (e.IsPostAllocation != isPostAllocation) throw new Exception("Invalid PostAllocation for entry: " + e);
-            //    if (isPostAllocation) total += e.VAllocation!.Value;
-            //}
-            //TotalVAllocation = total == 0 ? null : total;
-            //IsPostAllocation = isPostAllocation;
         }
         public void Add(string id)
         {
@@ -92,6 +84,10 @@ namespace STOLON
                 _entries.Add(_entryBuffer.Peek().Entity.Id, _entryBuffer.Pop());
 
             IsPostAllocation = true;
+
+            int total = 0;
+            foreach (SelectionEntry e in _entries.Values) total += (e.VAllocation ?? 0);
+            _totalVAllocation = total;
 
             STOLON.Debug.Success();
         }
