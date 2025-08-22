@@ -41,7 +41,7 @@ namespace STOLON
         {
             _entries = new Dictionary<string, SelectionEntry>(maxEntries);
             Entries = _entries.AsReadOnly();
-            _toParseEntries = new List<Entity>(4);
+            _toParseEntries = new List<Entity>(maxEntries);
 
             TotalVAllocation = 0;
             IsPostAllocation = true;
