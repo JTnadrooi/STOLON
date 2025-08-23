@@ -177,7 +177,7 @@ namespace STOLON
         }
         public void AfterMove()
         {
-            STOLON.Audio.Play(STOLON.Audio.Library["select4"]);
+            STOLON.Audio.Play(STOLON.Audio.Library["select_4"]);
         }
         public bool Listen()
         {

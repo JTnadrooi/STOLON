@@ -203,7 +203,7 @@ namespace STOLON
 
         public void Initialize(OverlayEngine overlayer, params object?[] args)
         {
-            STOLON.Audio.Play(STOLON.Audio.Library["randomize4"]);
+            STOLON.Audio.Play(STOLON.Audio.Library["randomize_4"]);
         }
 
         public void ResetTexture()

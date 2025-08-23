@@ -65,7 +65,7 @@ namespace STOLON
             Order = order;
             ParentId = parentId;
             DrawArguments = drawArgs;
-            ClickSound = clickSound ?? STOLON.Audio.Library["select3"];
+            ClickSound = clickSound ?? STOLON.Audio.Library["select_3"];
             Skip = false;
         }
         public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null) => GetBounds(pos, padding, padding, margin, margin, out textPos, font);
