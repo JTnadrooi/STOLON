@@ -1,17 +1,17 @@
-﻿using NAudio.Wave.SampleProviders;
+﻿using AsitLib;
+using NAudio.Mixer;
+using NAudio.Utils;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using NAudio.Utils;
-using System.Collections.ObjectModel;
-using AsitLib;
-
-using NAudio.Mixer;
-using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 
 
@@ -95,13 +95,22 @@ namespace STOLON
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
             Library = new Dictionary<string, CachedAudio>();
+
             STOLON.Debug.Log(">loading audio");
-            foreach (string filePath in Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories))
+
+            string[] files = Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories);
+            object _logLock = new object();
+            ConcurrentDictionary<string, CachedAudio> tempLibrary = new ConcurrentDictionary<string, CachedAudio>();
+
+            Parallel.ForEach(files, filePath =>
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
-                Library.Add(fileName, new CachedAudio(filePath, fileName));
-                STOLON.Debug.Log("loaded audio with id: " + fileName);
-            }
+                tempLibrary[fileName] = new CachedAudio(filePath, fileName);
+                lock (_logLock) STOLON.Debug.Log("loaded audio with id: " + fileName);
+            });
+
+            foreach (var kvp in tempLibrary) Library.Add(kvp.Key, kvp.Value);
+
             STOLON.Debug.Success();
 
             _masterMixer = new MixingSampleProvider(waveFormat);
