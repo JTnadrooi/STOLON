@@ -51,19 +51,31 @@ namespace STOLON
             IsPostAllocation = true;
             MaxEntries = maxEntries;
         }
-        public void Add(string id)
+        public bool Add(string id)
         {
             STOLON.Debug.Log(">selecting entity " + id + ".");
+            if (Contains(id))
+            {
+                STOLON.Debug.Fail();
+                return false;
+            }
             _toParseEntries.Add(STOLON.Environment.Entities[id]);
             RecalculateAllocations();
             STOLON.Debug.Success();
+            return true;
         }
-        public void Remove(string id)
+        public bool Remove(string id)
         {
             STOLON.Debug.Log(">deselecting entity " + id + ".");
+            if (!Contains(id))
+            {
+                STOLON.Debug.Fail();
+                return false;
+            }
             _toParseEntries.Remove(STOLON.Environment.Entities[id]);
             RecalculateAllocations();
             STOLON.Debug.Success();
+            return true;
         }
         public bool Contains(string id)
         {
