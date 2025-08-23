@@ -196,6 +196,7 @@ namespace STOLON
 
         private int _symbolNotationOffsetTarget;
         private float _symbolNotationOffset;
+        private (string sn, int alloc, int valloc)? _ghostSelectedEntityDrawDataTemplate; // hmmm
 
         public EntitySelection Selection { get; private set; }
 
@@ -306,6 +307,7 @@ namespace STOLON
             {
                 Vector2 basePos = GetBaseTilePos(entityIndex);
                 Rectangle entityRect = new Rectangle(basePos.ToPoint(), new Point(128));
+                string entityId = _entities[entityIndex].Id;
 
                 bool isHovered = entityRect.Contains(STOLON.Input.VirtualMousePos);
                 _entityHoverCoefficients[entityIndex] = MathHelper.Lerp(_entityHoverCoefficients[entityIndex], isHovered ? 1 : 0, isHovered ? HOVER_INTENSITY : HOVER_INTENSITY / 5);
@@ -317,8 +319,16 @@ namespace STOLON
                     Rectangle addBox = new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - ADD_BOX_SIZE), new Point(32));
 
                     if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
-                        if (Selection.Contains(_entities[entityIndex].Id)) Selection.Remove(_entities[entityIndex].Id);
-                        else Selection.Add(_entities[entityIndex].Id);
+                        if (Selection.Contains(entityId))
+                        {
+                            _ghostSelectedEntityDrawDataTemplate = (_entities[entityIndex].SymbolNotation, Selection[entityId].Allocation, Selection[entityId].VAllocation);
+                            Selection.Remove(entityId);
+                        }
+                        else
+                        {
+                            _ghostSelectedEntityDrawDataTemplate = null;
+                            Selection.Add(entityId);
+                        }
                     else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
                     {
                         if (_lastSelected != entityIndex)
@@ -336,7 +346,8 @@ namespace STOLON
             _drawAllocationDataDump.Clear();
             for (int slotIndex = 0; slotIndex < MAX_SELECTION; slotIndex++)
                 if (slotIndex < Selection.Count) _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, Selection[slotIndex].Entity));
-                else _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, slotIndex, "?", 15, 15));
+                else if (_ghostSelectedEntityDrawDataTemplate.HasValue)
+                    _drawAllocationDataDump.Add(new SelectedEntityDrawData(this, slotIndex, _ghostSelectedEntityDrawDataTemplate.Value.sn, _ghostSelectedEntityDrawDataTemplate.Value.alloc, _ghostSelectedEntityDrawDataTemplate.Value.valloc));
 
             for (int i = 0; i < Selection.Count; i++)
             {
