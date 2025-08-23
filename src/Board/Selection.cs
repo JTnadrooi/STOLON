@@ -40,7 +40,7 @@ namespace STOLON
         private int _totalVAllocation;
 
         public SelectionEntry this[string id] => Entries[id];
-        public SelectionEntry this[int i] => _entries.ElementAt(i).Value;
+        public SelectionEntry this[int i] => _entries[_toParseEntries[i].Id];
 
         public EntitySelection(int maxEntries)
         {
@@ -69,7 +69,7 @@ namespace STOLON
         {
             return Entries.ContainsKey(id);
         }
-        public int GetSlot(string id) => Entries.GetFirstIndexWhere(s => s.Key == id);
+        public int GetSlot(string id) => _toParseEntries.GetFirstIndexWhere(e => e.Id == id);
         private void RecalculateAllocations()
         {
             STOLON.Debug.Log(">updating allocations..");
