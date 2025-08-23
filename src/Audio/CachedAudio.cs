@@ -44,15 +44,16 @@ namespace STOLON
         public WaveFormat WaveFormat { get; private set; }
         public CachedAudio(string audioFileName, string id)
         {
-            this.Id = id;
+            Id = id;
             using var audioFileReader = new AudioFileReader(audioFileName);
             WaveFormat = audioFileReader.WaveFormat;
-            List<float> wholeFile = new List<float>((int)(audioFileReader.Length / 4));
-            float[] readBuffer = new float[audioFileReader.WaveFormat.SampleRate * audioFileReader.WaveFormat.Channels];
+
+            int totalSamples = (int)(audioFileReader.Length / sizeof(float));
+            AudioData = new float[totalSamples];
+
+            int offset = 0;
             int samplesRead;
-            while ((samplesRead = audioFileReader.Read(readBuffer, 0, readBuffer.Length)) > 0)
-                wholeFile.AddRange(readBuffer.Take(samplesRead));
-            AudioData = wholeFile.ToArray();
+            while ((samplesRead = audioFileReader.Read(AudioData, offset, totalSamples - offset)) > 0) offset += samplesRead;
         }
         public CachedAudioSampleProvider GetAsSampleProvider() => new CachedAudioSampleProvider(this);
     }
