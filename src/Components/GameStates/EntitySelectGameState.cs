@@ -111,7 +111,7 @@ namespace STOLON
             }
 
             _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
-            _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 20, TILE_SIZE) + new Vector2(Pos.X, 0);
+            _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -131,6 +131,8 @@ namespace STOLON
 
                 notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
             }
+
+            drawingContext.Draw(STOLON.Textures["UI\\dotted_line-128"], new Vector2(Pos.X, STOLON.Fonts.Small.CoreFont.LineHeight + 20 - 1));
 
             drawingContext.DrawString(STOLON.Fonts.Small, _counterStr, _counterPos);
         }
