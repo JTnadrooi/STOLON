@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using static STOLON.EntitySelectGameState;
 using Point = Microsoft.Xna.Framework.Point;
 
@@ -52,6 +53,9 @@ namespace STOLON
         private EntitySelectGameState _entitySelect;
         private CachedNoteData[] _cachedNotes;
 
+        private string _counterStr;
+        private Vector2 _counterPos;
+
         private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive, Texture2D NoteSign);
 
         private const int NOTE_CLEARANCE = 12;
@@ -62,24 +66,42 @@ namespace STOLON
             Notes = Array.Empty<ConditionalNote>();
             Pos = pos;
             TextWidth = textWidth;
+            _counterStr = string.Empty;
             _cachedNotes = Array.Empty<CachedNoteData>();
             _entitySelect = entitySelect;
         }
 
         public void Update(int elapsedMilliseconds)
         {
+
+
+            int activePosCount = 0;
+            int activeNegCount = 0;
+            int totalPosCount = 0;
+            int totalNegCount = 0;
+
+
             if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
             for (int i = 0; i < Notes.Length; i++)
             {
                 bool isActive = Notes[i].IsActive(_entitySelect.Selection);
-                Texture2D noteSign;
-                if (isActive)
+                void Count(ref int active, ref int total)
                 {
-                    if (Notes[i].Polarity == ConditionalNotePolarity.Positive || Notes[i].Polarity == ConditionalNotePolarity.Neutral)
-                        noteSign = STOLON.Textures["UI\\note_sign_pos_enabled"];
-                    else noteSign = STOLON.Textures["UI\\note_sign_neg_enabled"];
+                    if (isActive) active++;
+                    total++;
                 }
+                Texture2D noteSign;
+                var note = Notes[i];
+                bool isPosOrNeutral = note.IsPositiveOrNeutral;
+
+                if (isActive)
+                    noteSign = STOLON.Textures[
+                        isPosOrNeutral ? "UI\\note_sign_pos_enabled" : "UI\\note_sign_neg_enabled"
+                    ];
                 else noteSign = STOLON.Textures["UI\\note_sign_disabled"];
+
+                if (isPosOrNeutral) Count(ref activePosCount, ref totalPosCount);
+                else Count(ref activeNegCount, ref totalNegCount);
 
                 _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
                     lc,
@@ -87,11 +109,15 @@ namespace STOLON
                     noteSign
                 );
             }
+
+            _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
+            _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 20, TILE_SIZE) + new Vector2(Pos.X, 0);
         }
 
         public void Draw(DrawingContext drawingContext)
         {
-            int notesClearingUp = 7, noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+            int notesClearingUp = 7;
+            int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
 
             for (int i = 0; i < _cachedNotes.Length; i++)
             {
@@ -105,6 +131,8 @@ namespace STOLON
 
                 notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
             }
+
+            drawingContext.DrawString(STOLON.Fonts.Small, _counterStr, _counterPos);
         }
     }
 
