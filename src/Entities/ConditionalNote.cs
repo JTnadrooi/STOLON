@@ -11,17 +11,20 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
+    [Flags]
     public enum ConditionalNotePolarity
     {
-        Neutral,
-        Positive,
-        Negative,
+        Neutral = 0,
+        Positive = 1,
+        Negative = 2,
     }
 
     public sealed class ConditionalNote
     {
         public string Text { get; }
         public ConditionalNotePolarity Polarity { get; }
+        public bool IsPositiveOrNeutral => (Polarity & (ConditionalNotePolarity.Neutral | ConditionalNotePolarity.Positive)) != 0;
+        public bool IsNegative => Polarity == ConditionalNotePolarity.Negative;
 
         private Func<EntitySelection, bool> _isActive;
 
