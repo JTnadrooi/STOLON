@@ -73,13 +73,10 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-
-
             int activePosCount = 0;
             int activeNegCount = 0;
             int totalPosCount = 0;
             int totalNegCount = 0;
-
 
             if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
             for (int i = 0; i < Notes.Length; i++)
@@ -508,8 +505,14 @@ namespace STOLON
                     selectedEntityIndex++;
                 }
 
-                drawingContext.DrawArea(new Rectangle(TILE_SIZE * 2, 0, (int)_symbolNotationOffset, INFO_WINDOW_TOPLINE), Color.White);
-                drawingContext.DrawArea(new Rectangle((int)(TILE_SIZE * 3 - _symbolNotationOffset), 0, (int)_symbolNotationOffset + 1, INFO_WINDOW_TOPLINE), Color.White);
+                int deltaVAlloc = Selection.TotalVAllocation - 100;
+                string deltaVAllocStr = deltaVAlloc >= 0 ? "+" + deltaVAlloc : deltaVAlloc.ToString();
+                Vector2 deltaVAllocPos = new Vector2(TILE_SIZE * 2, 0) + Centering.CenterX((int)STOLON.Fonts.Medium.FastMeasure(deltaVAllocStr).X, 10, TILE_SIZE);
+                drawingContext.DrawString(STOLON.Fonts.Medium, deltaVAllocStr, deltaVAllocPos);
+                //if (deltaVAlloc > 0) drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], deltaVAllocPos);
+
+                drawingContext.DrawArea(new Rectangle(TILE_SIZE * 2, 0, (int)_symbolNotationOffset, INFO_WINDOW_TOPLINE), Color.White); // curtain 1.
+                drawingContext.DrawArea(new Rectangle((int)(TILE_SIZE * 3 - _symbolNotationOffset), 0, (int)_symbolNotationOffset + 1, INFO_WINDOW_TOPLINE), Color.White); // curtain 2.
 
                 #endregion
 
