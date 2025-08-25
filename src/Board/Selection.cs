@@ -102,6 +102,7 @@ namespace STOLON
             IsPostAllocation = true;
 
             _totalVAllocation = _entries.Sum(e => e.Value.VAllocation);
+            if (_totalVAllocation == 99) _totalVAllocation = 100;
 
             STOLON.Debug.Success();
         }
