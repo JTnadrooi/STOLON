@@ -509,6 +509,7 @@ namespace STOLON
                 string deltaVAllocStr = deltaVAlloc >= 0 ? "+" + deltaVAlloc : deltaVAlloc.ToString();
                 Vector2 deltaVAllocPos = new Vector2(TILE_SIZE * 2, 0) + Centering.CenterX((int)STOLON.Fonts.Medium.FastMeasure(deltaVAllocStr).X, 10, TILE_SIZE);
                 drawingContext.DrawString(STOLON.Fonts.Medium, deltaVAllocStr, deltaVAllocPos);
+                drawingContext.Draw(STOLON.Textures["UI\\dotted_line-128"], new Vector2(TILE_SIZE * 2, STOLON.Fonts.Small.CoreFont.LineHeight + 20 - 1));
                 //if (deltaVAlloc > 0) drawingContext.Draw(STOLON.Textures["UI\\valloc_inc"], deltaVAllocPos);
 
                 drawingContext.DrawArea(new Rectangle(TILE_SIZE * 2, 0, (int)_symbolNotationOffset, INFO_WINDOW_TOPLINE), Color.White); // curtain 1.
