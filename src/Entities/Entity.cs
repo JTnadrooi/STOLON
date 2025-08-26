@@ -80,17 +80,24 @@ namespace STOLON
         public ConditionalNote[] AbilityNotes { get; }
         public ConditionalNote[] AllocationNotes { get; }
 
-        public Entity(string id, string name, string symbolNotation, EntityProfile profile, ConditionalNote[]? allocationNotes = null, ConditionalNote[]? abilityNotes = null, string? description = null, string? fullName = null)
+        public Entity(string id, string name, string symbolNotation, string? description = null, string? fullName = null)
         {
             Id = id;
             Name = name;
             SymbolNotation = symbolNotation;
-            Profile = profile ?? new EntityProfile(id);
             FullName = fullName ?? name;
             Description = description ?? string.Empty;
-            AllocationNotes = allocationNotes ?? Array.Empty<ConditionalNote>();
-            AbilityNotes = abilityNotes ?? Array.Empty<ConditionalNote>();
+
+            Profile = ResolveProfile();
+            (AllocationNotes, AbilityNotes) = ResolveNotes();
         }
+
+        protected virtual EntityProfile ResolveProfile()
+            => new EntityProfile(Id);
+
+        protected virtual (ConditionalNote[] allocationNotes, ConditionalNote[] abilityNotes) ResolveNotes()
+            => (Array.Empty<ConditionalNote>(), Array.Empty<ConditionalNote>());
+
         /// <summary>
         /// Get the <see cref="Player"/> of this <see cref="Entity"/>.
         /// </summary>

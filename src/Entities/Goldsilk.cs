@@ -27,10 +27,12 @@ namespace STOLON
 
         private GoldsilkComputer _computer;
 
-        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl", EntityProfile.GetDebug("goldsilk"))
+        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl")
         {
             _computer = new GoldsilkComputer(this);
         }
+        protected override EntityProfile ResolveProfile()
+            => EntityProfile.GetDebug("goldsilk");
     }
     /// <summary>
     /// The computer <see cref="GoldsilkEntity"/> uses to play.
