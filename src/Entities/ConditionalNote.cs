@@ -36,7 +36,7 @@ namespace STOLON
             Polarity = polarity;
             Source = source;
         }
-        public bool IsActive(EntitySelection info) => _isActive(info);
+        public bool IsActive(EntitySelection info) => _isActive(info) && info.Contains(Source.Id);
 
         //public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
         //{
