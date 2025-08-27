@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    [Flags]
     public enum EntityDrawMode
     {
         None = 0,
