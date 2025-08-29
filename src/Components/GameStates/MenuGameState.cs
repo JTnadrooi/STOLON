@@ -17,20 +17,17 @@ using static STOLON.UIElement;
 
 namespace STOLON
 {
-    /// <summary>
-    /// The <see cref="IOrderProvider"/> that orders the main menu.
-    /// </summary> 
-    public class MenuOrderProvider : IOrderProvider
+    public class MenuOrderContainer : OrderContainer
     {
         private Font2D _font;
         private bool _capitalize = true;
         private Vector2 _origin;
-        public MenuOrderProvider()
+        public MenuOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
         {
             _font = STOLON.Fonts.Medium;
         }
-        public void PrepareOrdering(Vector2 origin) => _origin = origin;
-        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
+        public override void PrepareOrdering(Vector2 origin, int elementCount) => _origin = origin;
+        public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + _origin.Y,
@@ -99,7 +96,7 @@ namespace STOLON
 
         private Point[] _ditherTexturePositions;
 
-        private OrderContainer<MenuOrderProvider> _mainOrderContainer;
+        private OrderContainer _mainOrderContainer;
 
         private Tweener<float> _logoEaseTweener;
         private Tweener<float> _removeTweener;
@@ -137,7 +134,7 @@ namespace STOLON
 
             _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
 
-            _mainOrderContainer = new OrderContainer<MenuOrderProvider>(new MenuOrderProvider(), [
+            _mainOrderContainer = new MenuOrderContainer([
                 new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: STOLON.Audio["exit_3"]),
                 new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: STOLON.Audio["coin_4"]),
                 new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: STOLON.Audio["coin_4"]),
@@ -148,7 +145,7 @@ namespace STOLON
                 new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: STOLON.Audio["exit_3"]),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
                 new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
-            ], Vector2.Zero);
+            ]);
 
             //switch (_skipTo)
             //{

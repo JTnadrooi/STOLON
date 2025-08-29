@@ -8,10 +8,9 @@ using static STOLON.UIElement;
 
 namespace STOLON
 {
-    public class OrderContainer<TOrderProvider> : IGraphic where TOrderProvider : IOrderProvider
+    public abstract class OrderContainer : IGraphic
     {
         public Vector2 Position { get; set; }
-        public TOrderProvider OrderProvider { get; }
         public UIPath Path { get; protected set; }
 
         public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
@@ -25,12 +24,11 @@ namespace STOLON
         private readonly Dictionary<string, UIElement> _elementMap;
         private readonly HashSet<string> _parents;
 
-        public OrderContainer(TOrderProvider orderProvider, IEnumerable<UIElement> elements, Vector2 position, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        public OrderContainer(IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
         {
             List<UIElement> tempElements = new List<UIElement>(elements);
 
-            OrderProvider = orderProvider;
-            Position = position;
+            Position = position ?? Vector2.Zero;
 
             _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.ParentId == e.Id)).Select(e => e.Id));
             foreach (string id in _parents) tempElements.Add(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
@@ -40,6 +38,30 @@ namespace STOLON
             _updateDump = updateData ?? STOLON.UI.UpdateDump;
             _elementMap = _elements.ToDictionary(e => e.Id);
             Path = path ?? GetSelfPath(UIElement.TOP_ID);
+        }
+
+        public virtual void PrepareOrdering(Vector2 origin, int elementCount) { }
+        public abstract UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
+        public void AfterOrdering() { }
+
+        protected void Order(UIElement[] uIElements, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
+            Vector2 uiOrgin, bool isMouseRelevant = true)
+        {
+            int orderIndex = 0;
+            updateDump.Clear();
+            if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
+
+            PrepareOrdering(uiOrgin, uIElements.Count(e => !e.Skip));
+            for (int i = 0; i < uIElements.Length; i++)
+            {
+                UIElement element = uIElements[i];
+                if (element.Skip || element.ParentId != Path.DestinationId) continue;
+
+                UIElementDrawData drawData = GetDrawData(element, orderIndex++, out bool isHovered);
+                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
+                drawDump[i] = drawData;
+            }
+            AfterOrdering();
         }
 
         public UIPath GetSelfPath(string id)
@@ -67,7 +89,7 @@ namespace STOLON
         {
             for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
             _updateDump.Clear();
-            UIOrdering.Order(_elements, Path, _drawDump, _updateDump, Position, OrderProvider);
+            Order(_elements, _drawDump, _updateDump, Position);
             foreach (UIElementUpdateData data in _updateDump.Values)
                 if (data.IsClicked)
                 {

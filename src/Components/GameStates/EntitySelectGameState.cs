@@ -12,7 +12,7 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public class EntitySelectOrderProvider : IOrderProvider
+    public class EntitySelectOrderContainer : OrderContainer
     {
         private Font2D _font;
         private Vector2 _origin;
@@ -22,19 +22,19 @@ namespace STOLON
         private const int PADDING_X = 8;
         private const int PADDING_Y = 4;
 
-        public EntitySelectOrderProvider()
+        public EntitySelectOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
         {
             _font = STOLON.Fonts.Medium;
             _leftSpace = 0;
         }
 
-        public void PrepareOrdering(Vector2 origin, int elementCount)
+        public override void PrepareOrdering(Vector2 origin, int elementCount)
         {
             _origin = origin;
             _leftSpace = 0;
         }
 
-        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
+        public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
             Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
@@ -210,8 +210,8 @@ namespace STOLON
         private readonly Dictionary<int, Vector2> _posCache;
         private readonly Entity[] _entities;
 
-        private OrderContainer<EntitySelectOrderProvider> _entityInfoContainer;
-        private OrderContainer<EntitySelectOrderProvider> _lvlInfoContainer;
+        private OrderContainer _entityInfoContainer;
+        private OrderContainer _lvlInfoContainer;
 
         private ConditionalNoteEnumerationGraphic _allocNotes;
         private ConditionalNoteEnumerationGraphic _abilityNotes;
@@ -280,12 +280,12 @@ namespace STOLON
 
             _symbolNotationOffset = _symbolNotationOffsetTarget = TILE_SIZE / 2;
 
-            _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
+            _entityInfoContainer = new EntitySelectOrderContainer([
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("v_alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
-            _lvlInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
+            _lvlInfoContainer = new EntitySelectOrderContainer([
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));

@@ -11,43 +11,10 @@ namespace STOLON
 {
 
     /// <summary>
-    /// A class to allow objects to state a way of ordering <see cref="UIElement"/> objects.
-    /// </summary>
-    public interface IOrderProvider
-    {
-        public void PrepareOrdering(Vector2 origin, int elementCount) { }
-        public UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
-        public void AfterOrdering() { }
-    }
-
-    /// <summary>
     /// Provides methods for ordering <see cref="UIElement"/> objects. (Casting them to <see cref="UIElementDrawData"/> or/and <see cref="UIElementUpdateData"/>.
     /// </summary>
     public static class UIOrdering
     {
-        public static void Order(UIElement[] uIElements, UIPath path, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
-            Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
-        {
-            Order(uIElements, path.DestinationId, drawDump, updateDump, uiOrgin, orderProvider, isMouseRelevant);
-        }
-        public static void Order(UIElement[] uIElements, string parentId, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
-            Vector2 uiOrgin, IOrderProvider orderProvider, bool isMouseRelevant = true)
-        {
-            int orderIndex = 0;
-            updateDump.Clear();
-            if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
 
-            orderProvider.PrepareOrdering(uiOrgin, uIElements.Count(e => !e.Skip));
-            for (int i = 0; i < uIElements.Length; i++)
-            {
-                UIElement element = uIElements[i];
-                if (element.Skip || element.ParentId != parentId) continue;
-
-                UIElementDrawData drawData = orderProvider.GetDrawData(element, orderIndex++, out bool isHovered);
-                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
-                drawDump[i] = drawData;
-            }
-            orderProvider.AfterOrdering();
-        }
     }
 }
