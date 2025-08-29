@@ -75,7 +75,7 @@ namespace STOLON
         public UIPath GetSelfPath(string id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            if (id == UIElement.TOP_ID) return new UIPath([UIElement.TOP_ID]);
+            if (id == UIElement.TOP_ID) return UIPath.TopPath;
 
             HashSet<string> visited = new HashSet<string>(StringComparer.Ordinal);
             Stack<string> stack = new Stack<string>();

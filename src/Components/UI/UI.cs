@@ -89,6 +89,8 @@ namespace STOLON
         public override string ToString() => "{" + _segments.ToJoinedString(">") + "}";
         public override int GetHashCode() => _segments.ToJoinedString(string.Empty).GetHashCode();
         public override bool Equals([NotNullWhen(true)] object? obj) => obj.GetHashCode() == GetHashCode();
+
+        public static UIPath TopPath { get; } = new UIPath([UIElement.TOP_ID]);
     }
 
 }
