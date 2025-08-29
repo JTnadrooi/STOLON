@@ -241,7 +241,7 @@ namespace STOLON
 
         public static T[] Scan<T>() where T : class
         {
-            Debug.Log($"called assembly scan for type \"{typeof(T).FullName}\".");
+            Debug.Log($"called assembly scan for type '{typeof(T).FullName}\".");
             return Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => typeof(T).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
                 .Select(t => (Activator.CreateInstance(t) as T)!).ToArray();

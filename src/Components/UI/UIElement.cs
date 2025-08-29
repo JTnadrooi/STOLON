@@ -138,7 +138,7 @@ namespace STOLON
             Hide = hide;
             DrawBackground = drawBg;
         }
-        public override string ToString() => $"UIElementDrawData {{ Id: \"{Source}\", Text: \"{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
+        public override string ToString() => $"UIElementDrawData {{ Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
 
         public static UIElementDrawData Empty = new UIElementDrawData(null, string.Empty, STOLON.Fonts.Medium, UIElementType.Ignore, default, default, false, true);
     }

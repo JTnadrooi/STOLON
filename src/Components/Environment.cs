@@ -62,7 +62,7 @@ namespace STOLON
             Entity[] entities = STOLON.Scan<Entity>();
             foreach (Entity entity in entities)
             {
-                STOLON.Debug.Log($"found entity with id \"{entity.Id}\" and name \"{entity.Name}\".");
+                STOLON.Debug.Log($"found entity with id '{entity.Id}\" and name '{entity.Name}\".");
                 RegisterEntity(entity);
             }
             STOLON.Debug.Success();

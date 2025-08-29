@@ -33,7 +33,7 @@ namespace STOLON
             IOverlay[] overlays = STOLON.Scan<IOverlay>();
             foreach (IOverlay overlay in overlays)
             {
-                STOLON.Debug.Log($"found overlay with id \"{overlay.Id}\".");
+                STOLON.Debug.Log($"found overlay with id '{overlay.Id}\".");
                 AddOverlay(overlay);
             }
             STOLON.Debug.Success();

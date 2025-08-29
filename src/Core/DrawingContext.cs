@@ -61,7 +61,7 @@ namespace STOLON
             STOLON.Debug.Log(">searching for effects");
             foreach (GameEffect effect in tempEffects)
             {
-                STOLON.Debug.Log($"found effect with name \"{effect.Effect.Name}\".");
+                STOLON.Debug.Log($"found effect with name '{effect.Effect.Name}'.");
                 _effects.Add(effect.Effect.Name["Effects\\".Length..], effect);
             }
             STOLON.Debug.Success();
@@ -97,22 +97,22 @@ namespace STOLON
         {
             if (!_effects[name].Enabled)
             {
-                STOLON.Debug.Log($"effect \"{name}\" already disabled.");
+                STOLON.Debug.Log($"effect '{name}' already disabled.");
                 return;
             }
             _effects[name].Enabled = false;
-            STOLON.Debug.Log($"disabled effect with name \"{name}\".");
+            STOLON.Debug.Log($"disabled effect with name '{name}'.");
         }
         public bool IsEnabled(string name) => _effects[name].Enabled;
         public void EnableEffect(string name)
         {
             if (_effects[name].Enabled)
             {
-                STOLON.Debug.Log($"effect \"{name}\" already enabled.");
+                STOLON.Debug.Log($"effect '{name}' already enabled.");
                 return;
             }
             _effects[name].Enabled = true;
-            STOLON.Debug.Log($"enabled effect with name \"{name}\".");
+            STOLON.Debug.Log($"enabled effect with name '{name}'.");
         }
 
         public void Screenshot()

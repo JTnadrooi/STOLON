@@ -57,7 +57,7 @@ namespace STOLON
             string[] files = Directory.GetFiles(contentManager.RootDirectory, "*", SearchOption.AllDirectories);
             if (files.Length == 0) throw new Exception("No initial content found.");
 
-            STOLON.Debug.Log($">loading data with basePath: \"{basePath}\" for type {this.GetType().Name}.");
+            STOLON.Debug.Log($">loading data with basePath: '{basePath}\" for type {this.GetType().Name}.");
 
             foreach (string file in files)
             {
