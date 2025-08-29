@@ -44,25 +44,6 @@ namespace STOLON
         public abstract UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
         public void AfterOrdering() { }
 
-        protected void Order(UIElement[] uIElements, UIElementDrawData[] drawDump, IDictionary<string, UIElementUpdateData> updateDump,
-            Vector2 uiOrgin, bool isMouseRelevant = true)
-        {
-            int orderIndex = 0;
-            updateDump.Clear();
-            if (drawDump.Length != uIElements.Length) throw new ArgumentException("Invalid dump size.");
-
-            PrepareOrdering(uiOrgin, uIElements.Count(e => !e.Skip));
-            for (int i = 0; i < uIElements.Length; i++)
-            {
-                UIElement element = uIElements[i];
-                if (element.Skip || element.ParentId != Path.DestinationId) continue;
-
-                UIElementDrawData drawData = GetDrawData(element, orderIndex++, out bool isHovered);
-                updateDump[element.Id] = new UIElementUpdateData(isHovered && isMouseRelevant, element);
-                drawDump[i] = drawData;
-            }
-            AfterOrdering();
-        }
 
         public UIPath GetSelfPath(string id)
         {
@@ -88,8 +69,25 @@ namespace STOLON
         public virtual void Update(int elapsedMilliseconds)
         {
             for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
+
             _updateDump.Clear();
-            Order(_elements, _drawDump, _updateDump, Position);
+
+            int orderIndex = 0;
+            if (_drawDump.Length != _elements.Length) throw new ArgumentException("Invalid dump size.");
+
+            PrepareOrdering(Position, _elements.Count(e => !e.Skip));
+            for (int i = 0; i < _elements.Length; i++)
+            {
+                UIElement element = _elements[i];
+                if (element.Skip || element.ParentId != Path.DestinationId)
+                    continue;
+
+                UIElementDrawData drawData = GetDrawData(element, orderIndex++, out bool isHovered);
+                _updateDump[element.Id] = new UIElementUpdateData(isHovered, element);
+                _drawDump[i] = drawData;
+            }
+            AfterOrdering();
+
             foreach (UIElementUpdateData data in _updateDump.Values)
                 if (data.IsClicked)
                 {
@@ -97,9 +95,11 @@ namespace STOLON
                         Path = GetParentPath(data.Source.Id.Substring("_back_".Length));
                     else if (_parents.Contains(data.Source.Id))
                         Path = GetSelfPath(data.Source.Id);
+
                     STOLON.Debug.Log("element clicked: " + data.Source.Id);
                 }
         }
+
 
         public virtual void Draw(DrawingContext drawingContext)
         {
