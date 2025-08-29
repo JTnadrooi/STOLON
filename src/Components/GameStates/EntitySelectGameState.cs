@@ -277,7 +277,8 @@ namespace STOLON
             _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
             _boardPreview = _boardState.GetPreview();
 
-            _symbolNotationOffsetTarget = 0;
+
+            _symbolNotationOffset = _symbolNotationOffsetTarget = TILE_SIZE / 2;
 
             _entityInfoContainer = new OrderContainer<EntitySelectOrderProvider>(new EntitySelectOrderProvider(), [
                 new UIElement("extended_name", UIElement.TOP_ID, null, UIElementType.Ignore),
