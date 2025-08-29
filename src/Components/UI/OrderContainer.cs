@@ -5,107 +5,181 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static STOLON.UIElement;
+using System.Collections.ObjectModel;
 
 namespace STOLON
 {
+
     public abstract class OrderContainer : IGraphic
     {
+        private const string BackPrefix = "_back_";
+
         public Vector2 Position { get; set; }
         public UIPath Path { get; protected set; }
 
-        public IDictionary<string, UIElementUpdateData> UpdateData => _updateDump;
+        public IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateDataView;
         public IReadOnlyDictionary<string, UIElement> Elements => _elementMap;
         public IReadOnlySet<string> Parents => _parents;
+
         public UIElementUpdateData this[string elementId] => UpdateData[elementId];
 
         private readonly UIElement[] _elements;
         private readonly UIElementDrawData[] _drawDump;
-        private readonly IDictionary<string, UIElementUpdateData> _updateDump;
+        private readonly Dictionary<string, UIElementUpdateData> _updateDump;
+        private readonly IReadOnlyDictionary<string, UIElementUpdateData> _updateDataView;
         private readonly Dictionary<string, UIElement> _elementMap;
         private readonly HashSet<string> _parents;
+        private readonly List<int> _visibleIndices;
 
-        public OrderContainer(IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        protected OrderContainer(IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
         {
-            List<UIElement> tempElements = new List<UIElement>(elements);
+            if (elements == null) throw new ArgumentNullException(nameof(elements));
+
+            List<UIElement> baseElements = new List<UIElement>();
+            HashSet<string> idSet = new HashSet<string>();
+
+            foreach (UIElement element in elements)
+            {
+                baseElements.Add(element);
+                idSet.Add(element.Id);
+            }
+
+            _parents = new HashSet<string>(StringComparer.Ordinal);
+
+            for (int i = 0; i < baseElements.Count; i++)
+                if (baseElements[i].ParentId != UIElement.TOP_ID && idSet.Contains(baseElements[i].ParentId))
+                    _parents.Add(baseElements[i].ParentId);
+
+            foreach (string parentId in _parents) baseElements.Add(new UIElement(BackPrefix + parentId, parentId, "Back", UIElementType.Listen));
+
+            _elements = baseElements.ToArray();
+            _drawDump = new UIElementDrawData[_elements.Length];
+            _visibleIndices = new List<int>(_elements.Length);
+
+            _updateDump = updateData?.ToDictionary() ?? new Dictionary<string, UIElementUpdateData>(_elements.Length);
+
+            _updateDataView = new ReadOnlyDictionary<string, UIElementUpdateData>(_updateDump);
+
+            _elementMap = new Dictionary<string, UIElement>(_elements.Length, StringComparer.Ordinal);
+            for (int i = 0; i < _elements.Length; i++) _elementMap[_elements[i].Id] = _elements[i];
 
             Position = position ?? Vector2.Zero;
-
-            _parents = new HashSet<string>(tempElements.Where(e => tempElements.Any(e2 => e2.ParentId == e.Id)).Select(e => e.Id));
-            foreach (string id in _parents) tempElements.Add(new UIElement("_back_" + id, id, "Back", UIElementType.Listen));
-            _elements = tempElements.ToArray();
-
-            _drawDump = new UIElementDrawData[_elements.Length];
-            _updateDump = updateData ?? STOLON.UI.UpdateDump;
-            _elementMap = _elements.ToDictionary(e => e.Id);
             Path = path ?? GetSelfPath(UIElement.TOP_ID);
         }
 
-        public virtual void PrepareOrdering(Vector2 origin, int elementCount) { }
-        public abstract UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered);
-        public void AfterOrdering() { }
-
+        public virtual void PrepareOrdering(Vector2 origin, int visibleElementCount) { }
+        public abstract UIElementDrawData GetDrawData(UIElement element, int orderIndex, out bool isHovered);
+        public virtual void AfterOrdering() { }
+        protected virtual void OnPathChanged(UIPath previous, UIPath current) { }
 
         public UIPath GetSelfPath(string id)
         {
+            if (id == null) throw new ArgumentNullException(nameof(id));
             if (id == UIElement.TOP_ID) return new UIPath([UIElement.TOP_ID]);
 
+            HashSet<string> visited = new HashSet<string>(StringComparer.Ordinal);
             Stack<string> stack = new Stack<string>();
             string currentId = id;
 
             while (true)
             {
+                if (!visited.Add(currentId)) throw new InvalidOperationException($"Cycle detected while resolving path for '{id}'.");
                 stack.Push(currentId);
-                if (!_elementMap.TryGetValue(currentId, out var element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
+                if (!_elementMap.TryGetValue(currentId, out UIElement? element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
+
                 if (element.ParentId == UIElement.TOP_ID)
                 {
                     stack.Push(UIElement.TOP_ID);
                     break;
                 }
+
                 currentId = element.ParentId;
             }
+
             return new UIPath(stack);
         }
-        public UIPath GetParentPath(string id) => id == UIElement.TOP_ID ? throw new InvalidOperationException("Id equal to UIElement.TOP_ID") : new UIPath(GetSelfPath(id).Segments[..^1].ToArray());
-        public virtual void Update(int elapsedMilliseconds)
+        public UIPath GetParentPath(string id)
         {
-            for (int i = 0; i < _drawDump.Length; i++) _drawDump[i] = UIElementDrawData.Empty;
+            if (id == UIElement.TOP_ID) throw new InvalidOperationException("Id equal to UIElement.TOP_ID has no parent.");
 
-            _updateDump.Clear();
+            ReadOnlySpan<string> segments = GetSelfPath(id).Segments;
 
-            int orderIndex = 0;
-            if (_drawDump.Length != _elements.Length) throw new ArgumentException("Invalid dump size.");
+            if (segments.Length <= 1) throw new InvalidOperationException($"Element '{id}' has no parent path.");
 
-            PrepareOrdering(Position, _elements.Count(e => !e.Skip));
-            for (int i = 0; i < _elements.Length; i++)
-            {
-                UIElement element = _elements[i];
-                if (element.Skip || element.ParentId != Path.DestinationId)
-                    continue;
+            string[] parentSegments = new string[segments.Length - 1];
+            segments.Slice(0, segments.Length - 1).CopyTo(parentSegments);
 
-                UIElementDrawData drawData = GetDrawData(element, orderIndex++, out bool isHovered);
-                _updateDump[element.Id] = new UIElementUpdateData(isHovered, element);
-                _drawDump[i] = drawData;
-            }
-            AfterOrdering();
-
-            foreach (UIElementUpdateData data in _updateDump.Values)
-                if (data.IsClicked)
-                {
-                    if (data.Source.Id.StartsWith("_back_"))
-                        Path = GetParentPath(data.Source.Id.Substring("_back_".Length));
-                    else if (_parents.Contains(data.Source.Id))
-                        Path = GetSelfPath(data.Source.Id);
-
-                    STOLON.Debug.Log("element clicked: " + data.Source.Id);
-                }
+            return new UIPath(parentSegments);
         }
 
+        public bool TryGetUpdate(string elementId, out UIElementUpdateData data) => _updateDump.TryGetValue(elementId, out data);
+
+        public virtual void Update(int elapsedMilliseconds)
+        {
+            Array.Clear(_drawDump, 0, _drawDump.Length);
+            _updateDump.Clear();
+            _visibleIndices.Clear();
+
+            string current = Path.DestinationId;
+
+            for (int i = 0; i < _elements.Length; i++)
+                if (!_elements[i].Skip && _elements[i].ParentId == current)
+                    _visibleIndices.Add(i);
+
+            PrepareOrdering(Position, _visibleIndices.Count);
+
+            int orderIndex = 0;
+            for (int i = 0; i < _visibleIndices.Count; i++)
+            {
+                int idx = _visibleIndices[i];
+                UIElement element = _elements[idx];
+                _drawDump[idx] = GetDrawData(element, orderIndex++, out bool isHovered);
+
+                _updateDump[element.Id] = new UIElementUpdateData(isHovered, element);
+            }
+
+            AfterOrdering();
+
+            // Pick top-most clicked
+            string? clickedId = null;
+            for (int v = _visibleIndices.Count - 1; v >= 0; v--)
+            {
+                int idx = _visibleIndices[v];
+                string id = _elements[idx].Id;
+
+                if (_updateDump.TryGetValue(id, out UIElementUpdateData data) && data.IsClicked)
+                {
+                    clickedId = id;
+                    break;
+                }
+            }
+
+            if (clickedId != null)
+            {
+                UIPath oldPath = Path;
+
+                if (clickedId.Length > BackPrefix.Length &&
+                    clickedId.StartsWith(BackPrefix, StringComparison.Ordinal))
+                    Path = GetParentPath(clickedId.Substring(BackPrefix.Length));
+                else if (_parents.Contains(clickedId))
+                    Path = GetSelfPath(clickedId);
+
+                if (!ReferenceEquals(oldPath, Path))
+                {
+                    STOLON.Debug.Log("element clicked: " + clickedId);
+                    OnPathChanged(oldPath, Path);
+                }
+            }
+        }
 
         public virtual void Draw(DrawingContext drawingContext)
         {
-            foreach (UIElementDrawData elementDrawData in _drawDump)
-                if (elementDrawData.Source == null) continue;
-                else drawingContext.DrawElement(elementDrawData);
+            for (int i = 0; i < _drawDump.Length; i++)
+            {
+                UIElementDrawData drawData = _drawDump[i];
+                if (drawData.Source != null) drawingContext.DrawElement(drawData);
+            }
         }
     }
+
 }
