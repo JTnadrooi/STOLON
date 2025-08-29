@@ -211,7 +211,7 @@ namespace STOLON
         private readonly Entity[] _entities;
 
         private OrderContainer _entityInfoContainer;
-        private OrderContainer _lvlInfoContainer;
+        private OrderContainer _gamestateInfoContainer;
 
         private ConditionalNoteEnumerationGraphic _allocNotes;
         private ConditionalNoteEnumerationGraphic _abilityNotes;
@@ -285,7 +285,7 @@ namespace STOLON
                 new UIElement("alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("v_alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
-            _lvlInfoContainer = new EntitySelectOrderContainer([
+            _gamestateInfoContainer = new EntitySelectOrderContainer([
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
@@ -401,9 +401,9 @@ namespace STOLON
             _entityInfoContainer.Update(elapsedMilliseconds);
 
             // update level info container.
-            _lvlInfoContainer.Elements["lvl_name"].Text = "STOLON Test Level";
-            _lvlInfoContainer.Elements["lvl_diff"].Text = "Difficulty 1";
-            _lvlInfoContainer.Update(elapsedMilliseconds);
+            _gamestateInfoContainer.Elements["lvl_name"].Text = "Entity Selection";
+            _gamestateInfoContainer.Elements["lvl_diff"].Text = "MAX: " + MAX_SELECTION;
+            _gamestateInfoContainer.Update(elapsedMilliseconds);
 
             _allocNotes.Notes = SelectedEntity.AllocationNotes;
             _allocNotes.Update(elapsedMilliseconds);
@@ -537,7 +537,7 @@ namespace STOLON
 
                 drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, ROSTER_BOTTOM_LINE);
 
-                drawingContext.Draw(_lvlInfoContainer);
+                drawingContext.Draw(_gamestateInfoContainer);
             }
 
             drawingContext.DrawVerticalLine(_line1x, -10f);
