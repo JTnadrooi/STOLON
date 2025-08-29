@@ -74,7 +74,7 @@ namespace STOLON
         }
     }
 
-    public struct UIPath : IEnumerable<string>
+    public readonly struct UIPath : IEnumerable<string>
     {
         public string TopId => _segments[0];
         public string ParentId => _segments[^1];
