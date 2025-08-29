@@ -64,7 +64,7 @@ namespace STOLON
             for (int i = 0; i < _elements.Length; i++) _elementMap[_elements[i].Id] = _elements[i];
 
             Position = position ?? Vector2.Zero;
-            Path = path ?? GetSelfPath(UIElement.TOP_ID);
+            Path = path ?? UIPath.TopPath;
         }
 
         public virtual void PrepareOrdering(Vector2 origin, int visibleElementCount) { }
@@ -157,11 +157,8 @@ namespace STOLON
             {
                 UIPath oldPath = Path;
 
-                if (clickedId.Length > BACK_PREFIX.Length &&
-                    clickedId.StartsWith(BACK_PREFIX, StringComparison.Ordinal))
-                    Path = GetParentPath(clickedId.Substring(BACK_PREFIX.Length));
-                else if (_parents.Contains(clickedId))
-                    Path = GetSelfPath(clickedId);
+                if (clickedId.Length > BACK_PREFIX.Length && clickedId.StartsWith(BACK_PREFIX)) Path = GetParentPath(clickedId.Substring(BACK_PREFIX.Length));
+                else if (_parents.Contains(clickedId)) Path = GetSelfPath(clickedId);
 
                 if (!ReferenceEquals(oldPath, Path))
                 {
@@ -174,10 +171,7 @@ namespace STOLON
         public virtual void Draw(DrawingContext drawingContext)
         {
             for (int i = 0; i < _drawDump.Length; i++)
-            {
-                UIElementDrawData drawData = _drawDump[i];
-                if (drawData.Source != null) drawingContext.DrawElement(drawData);
-            }
+                if (_drawDump[i].Source != null) drawingContext.DrawElement(_drawDump[i]);
         }
     }
 
