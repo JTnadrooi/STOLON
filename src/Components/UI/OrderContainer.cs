@@ -12,7 +12,7 @@ namespace STOLON
 
     public abstract class OrderContainer : IGraphic
     {
-        private const string BackPrefix = "_back_";
+        private const string BACK_PREFIX = "_back_";
 
         public Vector2 Position { get; set; }
         public UIPath Path { get; protected set; }
@@ -50,7 +50,7 @@ namespace STOLON
                 if (baseElements[i].ParentId != UIElement.TOP_ID && idSet.Contains(baseElements[i].ParentId))
                     _parents.Add(baseElements[i].ParentId);
 
-            foreach (string parentId in _parents) baseElements.Add(new UIElement(BackPrefix + parentId, parentId, "Back", UIElementType.Listen));
+            foreach (string parentId in _parents) baseElements.Add(new UIElement(BACK_PREFIX + parentId, parentId, "Back", UIElementType.Listen));
 
             _elements = baseElements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
@@ -140,7 +140,6 @@ namespace STOLON
 
             AfterOrdering();
 
-            // Pick top-most clicked
             string? clickedId = null;
             for (int v = _visibleIndices.Count - 1; v >= 0; v--)
             {
@@ -158,9 +157,9 @@ namespace STOLON
             {
                 UIPath oldPath = Path;
 
-                if (clickedId.Length > BackPrefix.Length &&
-                    clickedId.StartsWith(BackPrefix, StringComparison.Ordinal))
-                    Path = GetParentPath(clickedId.Substring(BackPrefix.Length));
+                if (clickedId.Length > BACK_PREFIX.Length &&
+                    clickedId.StartsWith(BACK_PREFIX, StringComparison.Ordinal))
+                    Path = GetParentPath(clickedId.Substring(BACK_PREFIX.Length));
                 else if (_parents.Contains(clickedId))
                     Path = GetSelfPath(clickedId);
 
