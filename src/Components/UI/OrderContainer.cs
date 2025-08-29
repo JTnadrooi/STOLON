@@ -44,7 +44,7 @@ namespace STOLON
                 idSet.Add(element.Id);
             }
 
-            _parents = new HashSet<string>(StringComparer.Ordinal);
+            _parents = new HashSet<string>();
 
             for (int i = 0; i < baseElements.Count; i++)
                 if (baseElements[i].ParentId != UIElement.TOP_ID && idSet.Contains(baseElements[i].ParentId))
@@ -60,7 +60,7 @@ namespace STOLON
 
             _updateDataView = new ReadOnlyDictionary<string, UIElementUpdateData>(_updateDump);
 
-            _elementMap = new Dictionary<string, UIElement>(_elements.Length, StringComparer.Ordinal);
+            _elementMap = new Dictionary<string, UIElement>(_elements.Length);
             for (int i = 0; i < _elements.Length; i++) _elementMap[_elements[i].Id] = _elements[i];
 
             Position = position ?? Vector2.Zero;
