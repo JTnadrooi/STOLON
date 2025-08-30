@@ -40,6 +40,10 @@ namespace STOLON
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
 
+        private bool _spritebatchStarted;
+        private bool _scissorEnabled;
+
+        //RasterizerState _scissorRasterizerState;
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
 
@@ -48,6 +52,7 @@ namespace STOLON
             STOLON.Debug.Log(">[s]initialising drawing context");
             _spriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _graphics = STOLON.Instance.GraphicsDevice;
+            //_scissorRasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
             _vrt1 = GetVirtual();
             _vrt2 = GetVirtual();
@@ -74,13 +79,6 @@ namespace STOLON
 
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
-
-        public void BeginScene()
-        {
-            _graphics.SetRenderTarget(_vrt1);
-            _graphics.Clear(STOLON.Instance.Color2);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
-        }
 
         public void UpdateResolution()
         {
@@ -114,6 +112,8 @@ namespace STOLON
             _effects[name].Enabled = true;
             STOLON.Debug.Log($"enabled effect with name '{name}'.");
         }
+
+        #region SCREENSHOT
 
         public void Screenshot()
         {
@@ -165,6 +165,17 @@ namespace STOLON
             return path;
         }
 
+        #endregion
+
+        #region SCENE_START_END
+
+        public void BeginScene()
+        {
+            _graphics.SetRenderTarget(_vrt1);
+            _graphics.Clear(STOLON.Instance.Color2);
+            BeginBatch();
+        }
+
         public void EndScene()
         {
             _spriteBatch.End();
@@ -209,6 +220,8 @@ namespace STOLON
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
 
+            _spritebatchStarted = false;
+
             if (_screenshotPending)
             {
                 ScreenshotFrom(finalVTarget);
@@ -216,7 +229,51 @@ namespace STOLON
             }
         }
 
-        public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically; // to test still..
+        #endregion
+
+        public void EndBatch()
+        {
+            _spriteBatch.End();
+            _spritebatchStarted = false;
+        }
+
+        public void BeginBatch(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Matrix? transformMatrix = null)
+        {
+            //if (_spritebatchStarted) _spriteBatch.End();
+            _spriteBatch.Begin(sortMode, blendState, samplerState ?? SamplerState.PointClamp, depthStencilState, rasterizerState, null, transformMatrix);
+            _spritebatchStarted = true;
+        }
+        private readonly RasterizerState _scissorRasterizerState = new RasterizerState
+        {
+            CullMode = CullMode.None,
+            ScissorTestEnable = true
+        };
+
+        private readonly RasterizerState _defaultRasterizerState = new RasterizerState
+        {
+            CullMode = CullMode.None,
+            ScissorTestEnable = false
+        };
+        public void SetScissorArea(Rectangle? newArea)
+        {
+            if (!_scissorEnabled && newArea == null) return;
+
+            EndBatch();
+
+            if (newArea == null)
+            {
+                _spriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+                BeginBatch(rasterizerState: _defaultRasterizerState);
+                _scissorEnabled = false;
+            }
+            else
+            {
+                _spriteBatch.GraphicsDevice.ScissorRectangle = newArea.Value;
+                BeginBatch(rasterizerState: _scissorRasterizerState);
+                _scissorEnabled = true;
+            }
+        }
+        public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
 
         #region DRAW_FUNCTIONS
 
@@ -291,7 +348,6 @@ namespace STOLON
         //    DrawRectangle(bounds, color ?? Color.White, lineWidth);
         //    DrawString(font, text, calcPos, color: color, effects: effects, layerDepth: layerDepth);
         //}
-
 
         protected virtual void Dispose(bool disposing)
         {
