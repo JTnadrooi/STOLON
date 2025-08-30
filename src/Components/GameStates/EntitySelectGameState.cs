@@ -4,9 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using static STOLON.EntitySelectGameState;
 using Point = Microsoft.Xna.Framework.Point;
 
@@ -42,6 +40,22 @@ namespace STOLON
 
             isHovered = false;
             return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
+        }
+    }
+    public class BoardsGraphic : IGraphic
+    {
+        public readonly record struct BoardTemplate(string Id, Tile[,] Tiles);
+
+        public BoardTemplate[] Boards { get; }
+
+        public BoardsGraphic()
+        {
+            Boards = [];
+        }
+
+        public void Draw(DrawingContext drawingContext)
+        {
+            drawingContext.DrawArea(STOLON.Instance.GetVirtualBounds(), Color.Aqua);
         }
     }
     public class ConditionalNoteEnumerationGraphic : IGraphic
@@ -215,6 +229,7 @@ namespace STOLON
 
         private ConditionalNoteEnumerationGraphic _allocNotes;
         private ConditionalNoteEnumerationGraphic _abilityNotes;
+        private BoardsGraphic _boardsGraphic;
 
         private BoardState _boardState;
         private BoardPreview _boardPreview;
@@ -271,6 +286,8 @@ namespace STOLON
             _entityDrawDump = new EntityDrawData[_entityCount];
 
             _drawAllocationDataDump = new List<SelectedEntityDrawData>(MAX_SELECTION);
+
+            _boardsGraphic = new BoardsGraphic();
 
             _hoveredState = new TimedState<int>();
             _selectedState = new TimedState<int>();
@@ -524,6 +541,7 @@ namespace STOLON
 
                 #endregion
 
+                drawingContext.Draw(_boardsGraphic);
                 //drawingContext.Draw(_boardPreview);
                 //drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
                 //drawingContext.DrawVerticalLine(_boardPreview.Pos + new Vector2(1, -STOLON.Textures["UI\\play"].Height), STOLON.Textures["UI\\play"].Height, Color.White, 2);
