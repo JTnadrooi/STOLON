@@ -540,8 +540,9 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, INFO_WINDOW_TOPLINE), Color.Black);
 
                 #endregion
-
+                drawingContext.SetScissorArea(new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE));
                 drawingContext.Draw(_boardsGraphic);
+                drawingContext.ResetScissorArea();
                 //drawingContext.Draw(_boardPreview);
                 //drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
                 //drawingContext.DrawVerticalLine(_boardPreview.Pos + new Vector2(1, -STOLON.Textures["UI\\play"].Height), STOLON.Textures["UI\\play"].Height, Color.White, 2);
