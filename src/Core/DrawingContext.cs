@@ -254,24 +254,23 @@ namespace STOLON
             CullMode = CullMode.None,
             ScissorTestEnable = false
         };
-        public void SetScissorArea(Rectangle? newArea)
+        public void ResetScissorArea()
         {
-            if (!_scissorEnabled && newArea == null) return;
+            if (!_scissorEnabled) return;
 
             EndBatch();
 
-            if (newArea == null)
-            {
-                _spriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
-                BeginBatch(rasterizerState: _defaultRasterizerState);
-                _scissorEnabled = false;
-            }
-            else
-            {
-                _spriteBatch.GraphicsDevice.ScissorRectangle = newArea.Value;
-                BeginBatch(rasterizerState: _scissorRasterizerState);
-                _scissorEnabled = true;
-            }
+            _spriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+            BeginBatch(rasterizerState: _defaultRasterizerState);
+            _scissorEnabled = false;
+        }
+        public void SetScissorArea(Rectangle newArea)
+        {
+            EndBatch();
+
+            _spriteBatch.GraphicsDevice.ScissorRectangle = newArea;
+            BeginBatch(rasterizerState: _scissorRasterizerState);
+            _scissorEnabled = true;
         }
         public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
 
