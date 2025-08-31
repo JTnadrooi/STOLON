@@ -1,5 +1,8 @@
+> [!WARNING]
+> This is the PRE-0.051 README. There are major differences between _v0.051_ and _v0.050_. For more info read the [main README](../README.md).
+
 <p align="center">
-<img src="media/fax_icon_wide_3d-export.png" alt="StolonHeaderImg">
+<img src="fax_icon_wide_3d-export.png" alt="StolonHeaderImg">
 </p>
 
 <h1 align="center">STOLON</h1>
