@@ -16,16 +16,16 @@
 
 # Screenshots
 
-<img src="media/Screenshot1.png" alt="Menu">
+<img src="50_1.png" alt="img">
 The menu.
 
-<img src="media/Screenshot2.png" alt="Menu">
+<img src="50_2.png" alt="img">
 The board, top 4 layers have inverted gravity applied to them.
 
-<img src="media/Screenshot3.png" alt="Menu">
+<img src="50_3.png" alt="img">
 The board once more.
 
-<img src="media/Screenshot4.png" alt="Menu">
+<img src="50_4.png" alt="img">
 The transition screen after four connected are found.
 
 # Install
