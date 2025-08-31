@@ -45,19 +45,75 @@ namespace STOLON
     public class BoardsGraphic : IGraphic
     {
         public readonly record struct BoardTemplate(string Id, Tile[,] Tiles);
+        public readonly record struct OptionDrawData(string Id, Tile[,] Tiles, Rectangle Bounds);
 
         public BoardTemplate[] Boards { get; }
+
+        private OptionDrawData[] _optionDraws;
+        private Vector2 _pos;
+
+        private const int OPTION_SPACING = 10;
+        private const int OPTION_TILE_SIZE = TILE_SIZE;
+
+        private float _scrollOffset;
+        private float _targetScroll;
+        private const float SCROLL_SPEED = 0.6f;
+        private const float LERP_FACTOR = 0.15f;
 
         public BoardsGraphic()
         {
             Boards = [];
+            _optionDraws = new OptionDrawData[3];
+            _pos = new Vector2(TILE_SIZE * 3, 0);
+            _scrollOffset = 0;
+            _targetScroll = 0;
+        }
+
+        public void Update(int elapsedMilliseconds)
+        {
+            _targetScroll -= STOLON.Input.MouseScrollDelta * SCROLL_SPEED;
+
+            int contentWidth = _optionDraws.Length * (OPTION_TILE_SIZE + OPTION_SPACING);
+            int viewportWidth = TILE_SIZE * 2;
+            int maxScroll = Math.Max(0, contentWidth - viewportWidth);
+            _targetScroll = Math.Clamp(_targetScroll, 0, maxScroll);
+
+            _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LERP_FACTOR);
+
+            for (int i = 0; i < _optionDraws.Length; i++)
+            {
+                _optionDraws[i] = new OptionDrawData(
+                    i.ToString(),
+                    new Tile[0, 0],
+                    new Rectangle(
+                        (int)(_pos.X + i * (OPTION_TILE_SIZE + OPTION_SPACING) - _scrollOffset),
+                        (int)_pos.Y + ROSTER_BOTTOM_LINE - TILE_SIZE - BOXED_TEXT_DIV_CLEARANCE / 2,
+                        OPTION_TILE_SIZE,
+                        OPTION_TILE_SIZE
+                    )
+                );
+            }
         }
 
         public void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawArea(STOLON.Instance.GetVirtualBounds(), Color.Aqua);
+            Rectangle viewport = new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE);
+            drawingContext.SetScissorArea(viewport);
+
+            for (int i = 0; i < _optionDraws.Length; i++)
+            {
+                if (viewport.Intersects(_optionDraws[i].Bounds))
+                {
+                    drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
+                    drawingContext.DrawString(STOLON.Fonts.Medium, i.ToString(), _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX((int)STOLON.Fonts.Medium.FastMeasure(i.ToString()).X, -STOLON.Fonts.Medium.CoreFont.LineHeight, TILE_SIZE));
+                }
+            }
+
+            drawingContext.ResetScissorArea();
         }
     }
+
+
     public class ConditionalNoteEnumerationGraphic : IGraphic
     {
         public ConditionalNote[] Notes { get; set; }
@@ -427,6 +483,8 @@ namespace STOLON
 
             _abilityNotes.Notes = SelectedEntity.AbilityNotes;
             _abilityNotes.Update(elapsedMilliseconds);
+
+            _boardsGraphic.Update(elapsedMilliseconds);
         }
         public Vector2 GetBaseTilePos(int i)
             => _posCache.TryGetValue(i, out Vector2 cachedPos) ? cachedPos :
@@ -540,12 +598,11 @@ namespace STOLON
                 drawingContext.DrawArea(new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, INFO_WINDOW_TOPLINE), Color.Black);
 
                 #endregion
-                drawingContext.SetScissorArea(new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE));
-                drawingContext.Draw(_boardsGraphic);
-                drawingContext.ResetScissorArea();
                 //drawingContext.Draw(_boardPreview);
                 //drawingContext.Draw(STOLON.Textures["UI\\play"], _boardPreview.Pos + new Vector2(0, -STOLON.Textures["UI\\play"].Height));
                 //drawingContext.DrawVerticalLine(_boardPreview.Pos + new Vector2(1, -STOLON.Textures["UI\\play"].Height), STOLON.Textures["UI\\play"].Height, Color.White, 2);
+
+                drawingContext.Draw(_boardsGraphic);
 
                 #endregion
 
