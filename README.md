@@ -11,65 +11,18 @@
 <a href="https://discord.gg/qmuWrqbDG2"><img src="https://dcbadge.vercel.app/api/server/qmuWrqbDG2?style=flat" /></a>
 </p>
 
-> [!NOTE]
-> For planned features see the [STOLON Discord Server](https://discord.gg/qmuWrqbDG2).
+The game is currently undergoing a major update: doubled resolution, multiple levels, new computer opponents, and the debut of the next STOLON cornerstone; _Abnormal Tiles_.
 
-# Screenshots
+## Screenshots (v0.051)
 
-<img src="media/Screenshot1.png" alt="Menu">
-The menu.
+Keep in mind that due to the large changes between `v0.050` and `v0.051`, the game currently looks rather empty and much of the UI information is still missing. Even so, these screenshots should give you a good impression of the overall style.
 
-<img src="media/Screenshot2.png" alt="Menu">
-The board, top 4 layers have inverted gravity applied to them.
+<img src="media/51_menu.png" alt="Menu">
 
-<img src="media/Screenshot3.png" alt="Menu">
-The board once more.
+The _main menu_.
 
-<img src="media/Screenshot4.png" alt="Menu">
-The transition screen after four connected are found.
+<img src="media/51_chars.png" alt="Menu">
 
-# Install
+The _character select_.
 
-Download the newest release from ["Releases"](https://github.com/JTnadrooi/Stolon/releases/) or the [STOLON Discord Server](https://discord.gg/qmuWrqbDG2) and extract the **STOLON.zip** file. There an .exe will be found which will run the game.
-
-> [!IMPORTANT]
-> Without .Net8 the game will not start and immidiatelly close.
-
-# Game Info
-
-## Controls
-
-| Key             | Action                 |
-| --------------- | ---------------------- |
-| F               | Go full-screen         |
-| Left Mouse      | Place marker / Zoom in |
-| Right Mouse     | Zoom out / Drag camera |
-| Shift           | Zoom in                |
-| Shift + W/A/S/D | Move camera            |
-
-## Buttons (In Board)
-
-| Button         | Action                                      |
-| -------------- | ------------------------------------------- |
-| Exit game      | Exit game                                   |
-| Go full-screen | Go full-screen                              |
-| Restart        | Clear board / Restart                       |
-| Search         | Search the board for four connected markers |
-| Undo move      | Undo's a move                               |
-| End move       | Skips a move                                |
-
-# Special thanks
-
-| Entity     | For                                                                                       |
-| ---------- | ----------------------------------------------------------------------------------------- |
-| Keescasual | Coming up with a lot of the future ideas. Without him, this game probably wouldn't exist. |
-| LandronSC  | Providing constructive feedback.                                                          |
-| yukiyo     | Providing constructive feedback, especially with the entity/character designs!            |
-| Voxuuu     | Utmost critical feedback.                                                                 |
-
-_And thank you for playing :D_
-
-## P.S
-
-> [!NOTE]
-> When the itch.io page is up, this will have more info about the technical side of the game (making it mostly directed to modders.)
+Images for the rest of the gamestates can be found in the [(pre 0.051) README](media\README_old.md)
