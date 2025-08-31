@@ -42,6 +42,11 @@ namespace STOLON
         public KeyboardState CurrentKeyboard { get; internal set; }
         public KeyboardState PreviousKeyboard { get; internal set; }
         public Vector2 VirtualMousePos => Vector2.Transform(CurrentMouse.Position.ToVector2(), STOLON.DrawingContext.InvertYMatrix) / STOLON.Instance.ScreenScale;
+        public int MouseScrollValue => CurrentMouse.ScrollWheelValue;
+        /// <summary>
+        /// Change in scroll value since the last frame (positive = scrolled up, negative = down).
+        /// </summary>
+        public int MouseScrollDelta => CurrentMouse.ScrollWheelValue - PreviousMouse.ScrollWheelValue;
         public bool IsPressed(MouseButton button) => IsPressed(CurrentMouse, button);
         private bool IsPressed(MouseState state, MouseButton button) => button switch
         {
