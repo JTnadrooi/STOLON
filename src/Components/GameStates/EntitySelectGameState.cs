@@ -57,8 +57,9 @@ namespace STOLON
 
         private float _scrollOffset;
         private float _targetScroll;
-        private const float SCROLL_SPEED = 0.6f;
         private const float LERP_FACTOR = 0.15f;
+
+        private int _selectedIndex;
 
         public BoardsGraphic()
         {
@@ -67,19 +68,20 @@ namespace STOLON
             _pos = new Vector2(TILE_SIZE * 3, 0);
             _scrollOffset = 0;
             _targetScroll = 0;
+            _selectedIndex = 0;
         }
 
         public void Update(int elapsedMilliseconds)
         {
-            _targetScroll -= STOLON.Input.MouseScrollDelta * SCROLL_SPEED;
+            int scrollDelta = Math.Sign(STOLON.Input.MouseScrollDelta);
+            if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
 
-            int contentWidth = _optionDraws.Length * (OPTION_TILE_SIZE + OPTION_SPACING);
-            int viewportWidth = TILE_SIZE * 2;
-            int maxScroll = Math.Max(0, contentWidth - viewportWidth);
-            _targetScroll = Math.Clamp(_targetScroll, 0, maxScroll);
+            float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
+            float optionCenter = _pos.X + _selectedIndex * (OPTION_TILE_SIZE + OPTION_SPACING) + OPTION_TILE_SIZE / 2f;
+
+            _targetScroll = optionCenter - viewportCenter;
 
             _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LERP_FACTOR);
-
             for (int i = 0; i < _optionDraws.Length; i++)
             {
                 _optionDraws[i] = new OptionDrawData(
@@ -101,13 +103,18 @@ namespace STOLON
             drawingContext.SetScissorArea(viewport);
 
             for (int i = 0; i < _optionDraws.Length; i++)
-            {
                 if (viewport.Intersects(_optionDraws[i].Bounds))
                 {
                     drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
-                    drawingContext.DrawString(STOLON.Fonts.Medium, i.ToString(), _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX((int)STOLON.Fonts.Medium.FastMeasure(i.ToString()).X, -STOLON.Fonts.Medium.CoreFont.LineHeight, TILE_SIZE));
+                    drawingContext.DrawString(STOLON.Fonts.Medium,
+                        i.ToString(),
+                        _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
+                            (int)STOLON.Fonts.Medium.FastMeasure(i.ToString()).X,
+                            -STOLON.Fonts.Medium.CoreFont.LineHeight,
+                            TILE_SIZE
+                        )
+                    );
                 }
-            }
 
             drawingContext.ResetScissorArea();
         }
