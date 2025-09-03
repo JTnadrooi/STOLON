@@ -138,8 +138,6 @@ namespace STOLON
                 _updateDump[element.Id] = new UIElementUpdateData(isHovered, element);
             }
 
-            AfterOrdering();
-
             string? clickedId = null;
             for (int v = _visibleIndices.Count - 1; v >= 0; v--)
             {
@@ -166,6 +164,8 @@ namespace STOLON
                     OnPathChanged(oldPath, Path);
                 }
             }
+
+            AfterOrdering();
         }
 
         public virtual void Draw(DrawingContext drawingContext)
