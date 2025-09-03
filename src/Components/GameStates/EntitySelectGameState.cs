@@ -2,6 +2,7 @@
 using Betwixt;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +61,7 @@ namespace STOLON
         private const float LERP_FACTOR = 0.15f;
 
         private int _selectedIndex;
+        private Rectangle _viewport;
 
         public BoardsGraphic()
         {
@@ -69,6 +71,7 @@ namespace STOLON
             _scrollOffset = 0;
             _targetScroll = 0;
             _selectedIndex = 0;
+            _viewport = new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE);
         }
 
         public void Update(int elapsedMilliseconds)
@@ -94,16 +97,20 @@ namespace STOLON
                         OPTION_TILE_SIZE
                     )
                 );
+
+                if (STOLON.Input.IsClicked(GameInput.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
+                {
+                    _selectedIndex = i;
+                }
             }
         }
 
         public void Draw(DrawingContext drawingContext)
         {
-            Rectangle viewport = new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE);
-            drawingContext.SetScissorArea(viewport);
+            drawingContext.SetScissorArea(_viewport);
 
             for (int i = 0; i < _optionDraws.Length; i++)
-                if (viewport.Intersects(_optionDraws[i].Bounds))
+                if (_viewport.Intersects(_optionDraws[i].Bounds))
                 {
                     drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
                     drawingContext.DrawString(STOLON.Fonts.Medium,
