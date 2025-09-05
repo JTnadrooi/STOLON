@@ -318,11 +318,14 @@ namespace STOLON
         public static Vector2 Get(Texture2D texture) => Get(texture.Bounds);
 
         public static void OnPixel(ref Vector2 pos) => pos = pos.ToPoint().ToVector2();
+
+        //public static void DrawStringCenterX(this DrawingContext context, Font2D font, string text, Rectangle bounds, Vector2 positionOffset, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        //    => context.DrawString(font, text, bounds.Location.ToVector2() + Centering.CenterX((int)STOLON.Fonts.Medium.FastMeasure(text).X, 0, bounds.Width, scale), new Vector2(scale), rotation, origin, color, effects, layerDepth);
     }
-    public struct Line
+    public readonly struct Line
     {
-        public Point Start { get; private set; }
-        public Point End { get; private set; }
+        public Point Start { get; }
+        public Point End { get; }
         public Line(Point start, Point end)
         {
             Start = start;
