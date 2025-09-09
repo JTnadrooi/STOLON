@@ -11,217 +11,234 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public class EntitySelectOrderContainer : OrderContainer
+    public class EntitySelectGameState : GameState
     {
-        private Font2D _font;
-        private Vector2 _origin;
-
-        private int _leftSpace;
-
-        private const int PADDING_X = 8;
-        private const int PADDING_Y = 4;
-
-        public EntitySelectOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
+        public class EntitySelectOrderContainer : OrderContainer
         {
-            _font = STOLON.Fonts.Medium;
-            _leftSpace = 0;
-        }
+            private Font2D _font;
+            private Vector2 _origin;
 
-        public override void PrepareOrdering(Vector2 origin, int elementCount)
-        {
-            _origin = origin;
-            _leftSpace = 0;
-        }
+            private int _leftSpace;
 
-        public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
-        {
-            Vector2 pos = _origin + new Vector2(_leftSpace, 0);
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
-            _leftSpace += bounds.Width + 5;
+            private const int PADDING_X = 8;
+            private const int PADDING_Y = 4;
 
-            isHovered = false;
-            return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
-        }
-    }
-    public class BoardsGraphic : IGraphic
-    {
-        public readonly record struct BoardTemplate(string Id, Tile[,] Tiles);
-        public readonly record struct OptionDrawData(string Id, Tile[,] Tiles, Rectangle Bounds);
-
-        public BoardTemplate[] Boards { get; }
-
-        private OptionDrawData[] _optionDraws;
-        private Vector2 _pos;
-
-        private const int OPTION_SPACING = 10;
-        private const int OPTION_TILE_SIZE = TILE_SIZE;
-
-        private float _scrollOffset;
-        private float _targetScroll;
-        private const float LERP_FACTOR = 0.15f;
-
-        private int _selectedIndex;
-        private Rectangle _viewport;
-
-        public BoardsGraphic()
-        {
-            Boards = [];
-            _optionDraws = new OptionDrawData[3];
-            _pos = new Vector2(TILE_SIZE * 3, 0);
-            _scrollOffset = 0;
-            _targetScroll = 0;
-            _selectedIndex = 0;
-            _viewport = new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE);
-        }
-
-        public void Update(int elapsedMilliseconds)
-        {
-            int scrollDelta = Math.Sign(STOLON.Input.MouseScrollDelta);
-            if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
-
-            float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
-            float optionCenter = _pos.X + _selectedIndex * (OPTION_TILE_SIZE + OPTION_SPACING) + OPTION_TILE_SIZE / 2f;
-
-            _targetScroll = optionCenter - viewportCenter;
-
-            _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LERP_FACTOR);
-            for (int i = 0; i < _optionDraws.Length; i++)
+            public EntitySelectOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
             {
-                _optionDraws[i] = new OptionDrawData(
-                    i.ToString(),
-                    new Tile[0, 0],
-                    new Rectangle(
-                        (int)(_pos.X + i * (OPTION_TILE_SIZE + OPTION_SPACING) - _scrollOffset),
-                        (int)_pos.Y + ROSTER_BOTTOM_LINE - TILE_SIZE - BOXED_TEXT_DIV_CLEARANCE / 2,
-                        OPTION_TILE_SIZE,
-                        OPTION_TILE_SIZE
-                    )
-                );
+                _font = STOLON.Fonts.Medium;
+                _leftSpace = 0;
+            }
 
-                if (STOLON.Input.IsClicked(GameInput.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
-                {
-                    _selectedIndex = i;
-                }
+            public override void PrepareOrdering(Vector2 origin, int elementCount)
+            {
+                _origin = origin;
+                _leftSpace = 0;
+            }
+
+            public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
+            {
+                Vector2 pos = _origin + new Vector2(_leftSpace, 0);
+                Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(BOXED_TEXT_DIV_CLEARANCE / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
+                _leftSpace += bounds.Width + 5;
+
+                isHovered = false;
+                return new UIElementDrawData(element, element.Text.ToUpper(), _font, element.Type, textPos.ToVector2(), bounds, true, false, true);
             }
         }
 
-        public void Draw(DrawingContext drawingContext)
+        public class ConditionalNoteEnumerationGraphic : IGraphic
         {
-            drawingContext.SetScissorArea(_viewport);
+            public ConditionalNote[] Notes { get; set; }
+            public Vector2 Pos { get; }
+            public int TextWidth { get; }
 
-            for (int i = 0; i < _optionDraws.Length; i++)
-                if (_viewport.Intersects(_optionDraws[i].Bounds))
+            private EntitySelectGameState _entitySelect;
+            private CachedNoteData[] _cachedNotes;
+
+            private string _counterStr;
+            private Vector2 _counterPos;
+
+            private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive, Texture2D NoteSign);
+
+            private const int NOTE_CLEARANCE = 12;
+            private const int NOTE_BORDER_X_CLEARANCE = 10;
+
+            public ConditionalNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
+            {
+                Notes = Array.Empty<ConditionalNote>();
+                Pos = pos;
+                TextWidth = textWidth;
+                _counterStr = string.Empty;
+                _cachedNotes = Array.Empty<CachedNoteData>();
+                _entitySelect = entitySelect;
+            }
+
+            public void Update(int elapsedMilliseconds)
+            {
+                int activePosCount = 0;
+                int activeNegCount = 0;
+                int totalPosCount = 0;
+                int totalNegCount = 0;
+
+                if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
+                for (int i = 0; i < Notes.Length; i++)
                 {
-                    drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
-                    drawingContext.DrawString(STOLON.Fonts.Medium,
-                        i.ToString(),
-                        _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
-                            (int)STOLON.Fonts.Medium.FastMeasure(i.ToString()).X,
-                            -STOLON.Fonts.Medium.CoreFont.LineHeight,
-                            TILE_SIZE
-                        )
+                    bool isActive = Notes[i].IsActive(_entitySelect.Selection);
+                    void Count(ref int active, ref int total)
+                    {
+                        if (isActive) active++;
+                        total++;
+                    }
+                    Texture2D noteSign;
+                    var note = Notes[i];
+                    bool isPosOrNeutral = note.IsPositiveOrNeutral;
+
+                    if (isActive)
+                        noteSign = STOLON.Textures[
+                            isPosOrNeutral ? "UI\\note_sign_pos_enabled" : "UI\\note_sign_neg_enabled"
+                        ];
+                    else noteSign = STOLON.Textures["UI\\note_sign_disabled"];
+
+                    if (isPosOrNeutral) Count(ref activePosCount, ref totalPosCount);
+                    else Count(ref activeNegCount, ref totalNegCount);
+
+                    _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
+                        lc,
+                        isActive,
+                        noteSign
                     );
                 }
 
-            drawingContext.ResetScissorArea();
-        }
-    }
+                _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
+                _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
+            }
 
-
-    public class ConditionalNoteEnumerationGraphic : IGraphic
-    {
-        public ConditionalNote[] Notes { get; set; }
-        public Vector2 Pos { get; }
-        public int TextWidth { get; }
-
-        private EntitySelectGameState _entitySelect;
-        private CachedNoteData[] _cachedNotes;
-
-        private string _counterStr;
-        private Vector2 _counterPos;
-
-        private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive, Texture2D NoteSign);
-
-        private const int NOTE_CLEARANCE = 12;
-        private const int NOTE_BORDER_X_CLEARANCE = 10;
-
-        public ConditionalNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
-        {
-            Notes = Array.Empty<ConditionalNote>();
-            Pos = pos;
-            TextWidth = textWidth;
-            _counterStr = string.Empty;
-            _cachedNotes = Array.Empty<CachedNoteData>();
-            _entitySelect = entitySelect;
-        }
-
-        public void Update(int elapsedMilliseconds)
-        {
-            int activePosCount = 0;
-            int activeNegCount = 0;
-            int totalPosCount = 0;
-            int totalNegCount = 0;
-
-            if (Notes.Length != _cachedNotes.Length) _cachedNotes = new CachedNoteData[Notes.Length];
-            for (int i = 0; i < Notes.Length; i++)
+            public void Draw(DrawingContext drawingContext)
             {
-                bool isActive = Notes[i].IsActive(_entitySelect.Selection);
-                void Count(ref int active, ref int total)
+                int notesClearingUp = 7;
+                int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+
+                for (int i = 0; i < _cachedNotes.Length; i++)
                 {
-                    if (isActive) active++;
-                    total++;
+                    CachedNoteData note = _cachedNotes[i];
+                    drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
+                    //drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                    drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+
+                    if (note.IsActive)
+                        drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+
+                    notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
                 }
-                Texture2D noteSign;
-                var note = Notes[i];
-                bool isPosOrNeutral = note.IsPositiveOrNeutral;
 
-                if (isActive)
-                    noteSign = STOLON.Textures[
-                        isPosOrNeutral ? "UI\\note_sign_pos_enabled" : "UI\\note_sign_neg_enabled"
-                    ];
-                else noteSign = STOLON.Textures["UI\\note_sign_disabled"];
+                drawingContext.Draw(STOLON.Textures["UI\\dotted_line-128"], new Vector2(Pos.X, STOLON.Fonts.Small.CoreFont.LineHeight + 20 - 1));
 
-                if (isPosOrNeutral) Count(ref activePosCount, ref totalPosCount);
-                else Count(ref activeNegCount, ref totalNegCount);
-
-                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
-                    lc,
-                    isActive,
-                    noteSign
-                );
+                drawingContext.DrawString(STOLON.Fonts.Small, _counterStr, _counterPos);
             }
-
-            _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
-            _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
         }
 
-        public void Draw(DrawingContext drawingContext)
+        public class BoardsGraphic : IGraphic
         {
-            int notesClearingUp = 7;
-            int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
-
-            for (int i = 0; i < _cachedNotes.Length; i++)
+            public readonly record struct BoardTemplate(string Name, string Description, Texture2D Texture)
             {
-                CachedNoteData note = _cachedNotes[i];
-                drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
-                //drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
-                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                public static BoardTemplate Empty { get; } = new BoardTemplate("[REDACTED]", "[REDACTED]", STOLON.Textures["UI\\profile_question-128"]);
+            }
+            public readonly record struct OptionDrawData(string Title, string Description, Texture2D Texture, Rectangle Bounds);
 
-                if (note.IsActive)
-                    drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+            public BoardTemplate[] Boards { get; }
 
-                notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
+            private OptionDrawData[] _optionDraws;
+            private Vector2 _pos;
+
+            private const int OPTION_SPACING = 10;
+            private const int OPTION_TILE_SIZE = TILE_SIZE;
+            private const int DIV_LINE_LENGHT = 100;
+
+            private float _scrollOffset;
+            private float _targetScroll;
+            private const float LERP_FACTOR = 0.15f;
+
+            private int _selectedIndex;
+            private Rectangle _viewport;
+
+            public BoardsGraphic()
+            {
+                Boards = [
+                    new BoardTemplate("STAGE", "STOLON test level.", STOLON.Textures["UI\\profile_question-128"]),
+                    BoardTemplate.Empty,
+                    BoardTemplate.Empty,
+                ];
+                _optionDraws = new OptionDrawData[Boards.Length];
+                _pos = new Vector2(TILE_SIZE * 3, 0);
+                _scrollOffset = 0;
+                _targetScroll = 0;
+                _selectedIndex = 0;
+                _viewport = new Rectangle(TILE_SIZE * 3, 0, TILE_SIZE * 2, ROSTER_BOTTOM_LINE);
             }
 
-            drawingContext.Draw(STOLON.Textures["UI\\dotted_line-128"], new Vector2(Pos.X, STOLON.Fonts.Small.CoreFont.LineHeight + 20 - 1));
+            public void Update(int elapsedMilliseconds)
+            {
+                int scrollDelta = Math.Sign(STOLON.Input.MouseScrollDelta);
+                if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
 
-            drawingContext.DrawString(STOLON.Fonts.Small, _counterStr, _counterPos);
+                float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
+                float optionCenter = _pos.X + _selectedIndex * (OPTION_TILE_SIZE + OPTION_SPACING) + OPTION_TILE_SIZE / 2f;
+
+                _targetScroll = optionCenter - viewportCenter;
+
+                _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LERP_FACTOR);
+                for (int i = 0; i < Boards.Length; i++)
+                {
+                    _optionDraws[i] = new OptionDrawData(
+                        Boards[i].Name,
+                        Boards[i].Description,
+                        Boards[i].Texture,
+                        new Rectangle(
+                            (int)(_pos.X + i * (OPTION_TILE_SIZE + OPTION_SPACING) - _scrollOffset),
+                            (int)_pos.Y + ROSTER_BOTTOM_LINE - TILE_SIZE - BOXED_TEXT_DIV_CLEARANCE / 2,
+                            OPTION_TILE_SIZE,
+                            OPTION_TILE_SIZE
+                        )
+                    );
+
+                    if (STOLON.Input.IsClicked(GameInput.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
+                    {
+                        _selectedIndex = i;
+                    }
+                }
+            }
+
+            public void Draw(DrawingContext drawingContext)
+            {
+                drawingContext.SetScissorArea(_viewport);
+
+                for (int i = 0; i < _optionDraws.Length; i++)
+                    if (_viewport.Intersects(_optionDraws[i].Bounds))
+                    {
+                        drawingContext.Draw(_optionDraws[i].Texture, _optionDraws[i].Bounds.Location.ToVector2());
+                        drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
+                        drawingContext.DrawString(STOLON.Fonts.Medium,
+                            _optionDraws[i].Title.ToString().ToUpper(),
+                            _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
+                                (int)STOLON.Fonts.Medium.FastMeasure(_optionDraws[i].Title).X,
+                                -STOLON.Fonts.Medium.CoreFont.LineHeight,
+                                TILE_SIZE
+                            )
+                        );
+                        drawingContext.DrawHorizontalLine(_optionDraws[i].Bounds.Location.ToVector2() + new Vector2((TILE_SIZE - DIV_LINE_LENGHT) / 2f, -STOLON.Fonts.Medium.CoreFont.LineHeight), DIV_LINE_LENGHT, thickness: 1);
+                        drawingContext.DrawString(STOLON.Fonts.Small,
+                            _optionDraws[i].Description.ToUpper(),
+                            _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
+                                (int)STOLON.Fonts.Small.FastMeasure(_optionDraws[i].Description).X,
+                                -STOLON.Fonts.Medium.CoreFont.LineHeight * 2,
+                                TILE_SIZE
+                            )
+                        );
+                    }
+
+                drawingContext.ResetScissorArea();
+            }
         }
-    }
-
-    public class EntitySelectGameState : GameState
-    {
-        #region SUBSTRUCTS
 
         private readonly struct EntityDrawData // for per-frame updates.
         {
@@ -241,6 +258,7 @@ namespace STOLON
 
             public bool IsHovered() => new Rectangle(Pos.ToPoint(), new Point(128)).Contains(STOLON.Input.VirtualMousePos);
         }
+
         private readonly struct SelectedEntityDrawData // for selected entities.
         {
             public readonly Rectangle SymbolNotationRect;
@@ -266,8 +284,6 @@ namespace STOLON
                 VirtualAllocation = valloc;
             }
         }
-
-        #endregion
 
         private Texture2D _tileTexture;
         private MenuGameState _menuGameState;
