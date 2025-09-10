@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "MAIN",
+    "Projects": [
+      {
+        "Path": "src\\STOLON\\STOLON.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\STOLON.Installer\\STOLON.Installer.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

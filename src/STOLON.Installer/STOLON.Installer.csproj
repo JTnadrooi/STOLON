@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsitLib">
-      <HintPath>..\src\Assets\AsitLib.dll</HintPath>
+      <HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

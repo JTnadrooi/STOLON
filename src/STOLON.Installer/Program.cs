@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AsitLib.Debug;
 
-namespace STOLONInstaller
+namespace STOLON.Installer
 {
     public class Program
     {
