@@ -7,7 +7,7 @@
         "Action": "Start"
       },
       {
-        "Path": "src\\STOLON.Installer\\STOLON.Installer.csproj",
+        "Path": "src\\STOLON.Installer\\STOLON.Cmd.csproj",
         "Action": "Start"
       }
     ]

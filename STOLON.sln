@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "STOLON", "src\STOLON\STOLON.csproj", "{A543C1D8-45A5-4D5C-855D-4D91E215CE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STOLON.Installer", "src\STOLON.Installer\STOLON.Installer.csproj", "{AA5E9825-64E2-4C5E-AB43-4DA12E403D75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STOLON.Cmd", "STOLON.Cmd\STOLON.Cmd.csproj", "{3097C071-14C2-41A3-A754-0717C2D223C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{A543C1D8-45A5-4D5C-855D-4D91E215CE17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A543C1D8-45A5-4D5C-855D-4D91E215CE17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A543C1D8-45A5-4D5C-855D-4D91E215CE17}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA5E9825-64E2-4C5E-AB43-4DA12E403D75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA5E9825-64E2-4C5E-AB43-4DA12E403D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA5E9825-64E2-4C5E-AB43-4DA12E403D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA5E9825-64E2-4C5E-AB43-4DA12E403D75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3097C071-14C2-41A3-A754-0717C2D223C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3097C071-14C2-41A3-A754-0717C2D223C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3097C071-14C2-41A3-A754-0717C2D223C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3097C071-14C2-41A3-A754-0717C2D223C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
