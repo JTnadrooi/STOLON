@@ -46,11 +46,11 @@ namespace STOLON.Installer
 
             Debug.Log(">creating handler.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
-            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
+            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(ICommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (var providerType in commandProviderTypes)
             {
-                CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
+                ICommandProvider providerInstance = (ICommandProvider)Activator.CreateInstance(providerType)!;
                 List<MethodInfo> commandMethods = providerType.GetMethods().Where(m => m.GetCustomAttribute<CommandAttribute>() != null).ToList();
                 foreach (MethodInfo method in commandMethods)
                 {
@@ -109,15 +109,20 @@ namespace STOLON.Installer
         }
     }
 
-    public record class CommandInfo(string Id, MethodInfo MethodInfo, CommandProvider Source)
+    public record class CommandInfo(string Id, MethodInfo MethodInfo, ICommandProvider Source)
     {
         public override string ToString() => $"CommandInfo(Id: {Id}, Method: {MethodInfo}, Source: {Source?.ToString()})";
     }
 
     public sealed class CommandAttribute : Attribute { }
-    public abstract class CommandProvider { }
-    public sealed class StolonCommandProvider : CommandProvider
+    public interface ICommandProvider
     {
+        public string Id { get; }
+    }
+    public sealed class StolonCommandProvider : ICommandProvider
+    {
+        public string Id => "_STOLON_";
+
         [Command]
         public void Add(int a, int b) => Console.WriteLine(a + b);
         //[Command]
