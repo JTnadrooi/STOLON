@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace STOLON.Installer
             Debug = new DebugStream(header: "STOLON.CMD");
 
             Debug.Log(">creating handler.");
-            List<CommandInfo> commandInfos = new List<CommandInfo>();
+            Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (var providerType in commandProviderTypes)
@@ -52,15 +53,20 @@ namespace STOLON.Installer
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
                 List<MethodInfo> commandMethods = providerType.GetMethods().Where(m => m.GetCustomAttribute<CommandAttribute>() != null).ToList();
                 foreach (MethodInfo method in commandMethods)
-                    commandInfos.Add(new CommandInfo(
-                        method.Name.ToLower(),
+                {
+                    string id = method.Name.ToLower();
+                    if (commandInfos.ContainsKey(id))
+                        throw new InvalidOperationException($"Command with '{id}' is already registered. Overloads are not supported.");
+                    commandInfos.Add(id, new CommandInfo(
+                        id,
                         method,
                         providerInstance
                     ));
+                }
             }
             Debug.Log($"<found {commandInfos.Count} commands.");
 
-            Commands = commandInfos.ToFrozenDictionary(item => item.Id);
+            Commands = commandInfos.ToFrozenDictionary();
 
             Debug.Log($"<command handler created succesfully.");
             Console.WriteLine(Commands.ToJoinedString(",\n"));
