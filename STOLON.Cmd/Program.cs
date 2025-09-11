@@ -46,11 +46,11 @@ namespace STOLON.Installer
 
             Debug.Log(">creating handler.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
-            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(ICommandProvider)) && !t.IsAbstract).ToList();
+            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (var providerType in commandProviderTypes)
             {
-                ICommandProvider providerInstance = (ICommandProvider)Activator.CreateInstance(providerType)!;
+                CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
                 List<MethodInfo> commandMethods = providerType.GetMethods().Where(m => m.GetCustomAttribute<CommandAttribute>() != null).ToList();
                 foreach (MethodInfo method in commandMethods)
                 {
@@ -109,19 +109,23 @@ namespace STOLON.Installer
         }
     }
 
-    public record class CommandInfo(string Id, MethodInfo MethodInfo, ICommandProvider Source)
+    public record class CommandInfo(string Id, MethodInfo MethodInfo, CommandProvider Source)
     {
         public override string ToString() => $"CommandInfo(Id: {Id}, Method: {MethodInfo}, Source: {Source?.ToString()})";
     }
 
     public sealed class CommandAttribute : Attribute { }
-    public interface ICommandProvider
+    public abstract class CommandProvider
     {
         public string Id { get; }
+
+        public CommandProvider(string id) => Id = id;
+
+        public override string ToString() => $"CommandProvider(Id: {Id})";
     }
-    public sealed class StolonCommandProvider : ICommandProvider
+    public sealed class StolonCommandProvider : CommandProvider
     {
-        public string Id => "_STOLON_";
+        public StolonCommandProvider() : base("_STOLON_") { }
 
         [Command]
         public void Add(int a, int b) => Console.WriteLine(a + b);
@@ -129,5 +133,6 @@ namespace STOLON.Installer
         //public int Add(int a, int b, int c) => a + b + c;
         [Command]
         public void Greet(string name) => Console.WriteLine($"Hello, {name}!");
+
     }
 }
