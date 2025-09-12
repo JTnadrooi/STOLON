@@ -8,9 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Reference Include="AsitLib">
-			<HintPath>..\src\STOLON\Assets\AsitLib.dll</HintPath>
-		</Reference>
+	  <Reference Include="AsitLib">
+	    <HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

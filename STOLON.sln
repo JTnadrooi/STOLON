@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "STOLON", "src\STOLON\STOLON.csproj", "{A543C1D8-45A5-4D5C-855D-4D91E215CE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STOLON.Cmd", "STOLON.Cmd\STOLON.Cmd.csproj", "{3097C071-14C2-41A3-A754-0717C2D223C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STOLON.Cmd", "src\STOLON.Cmd\STOLON.Cmd.csproj", "{3097C071-14C2-41A3-A754-0717C2D223C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
