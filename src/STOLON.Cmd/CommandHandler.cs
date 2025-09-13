@@ -1,5 +1,6 @@
 ﻿using AsitLib;
 using AsitLib.Debug;
+using STOLON.Cmd;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -68,15 +69,9 @@ namespace STOLON.Installer
             if (!Commands.TryGetValue(args[0].ToLower(), out CommandInfo? command)) throw new InvalidOperationException($"Command '{args[0]}' not found.");
             Debug.Log($"found command with id/alias: '{args[0].ToLower()}'.");
 
-            string[] parameters = args.Skip(1).ToArray();
-
-            ParameterInfo[] methodParams = command.MethodInfo.GetParameters().ToArray();
-            object[] methodArguments = new object[methodParams.Length];
-
-            for (int i = 0; i < methodParams.Length; i++) methodArguments[i] = Convert.ChangeType(parameters[i], methodParams[i].ParameterType);
-
-            Debug.Log($"executing with arguments: {string.Join(", ", methodArguments)}");
-            command.MethodInfo.Invoke(command.Source, methodArguments);
+            object?[] cmdArgs = CommandHelpers.ParseArguments(args[1..], command.MethodInfo.GetParameters());
+            Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
+            command.MethodInfo.Invoke(command.Source, cmdArgs);
         }
 
         protected virtual void Dispose(bool disposing)
