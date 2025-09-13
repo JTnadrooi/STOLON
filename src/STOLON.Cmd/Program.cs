@@ -40,29 +40,38 @@ namespace STOLON.Installer
         public FrozenDictionary<string, CommandInfo> Commands { get; }
         public DebugStream Debug { get; }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        public static CommandHandler Instance { get; private set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
         public CommandHandler()
         {
             Debug = new DebugStream(header: "STOLON.CMD");
+            Instance = this;
 
             Debug.Log(">creating handler.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
-            foreach (var providerType in commandProviderTypes)
+            foreach (Type providerType in commandProviderTypes)
             {
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
-                List<MethodInfo> commandMethods = providerType.GetMethods().Where(m => m.GetCustomAttribute<CommandAttribute>() != null).ToList();
-                foreach (MethodInfo method in commandMethods)
-                {
-                    string id = method.Name.ToLower();
-                    if (commandInfos.ContainsKey(id))
-                        throw new InvalidOperationException($"Command with '{id}' is already registered. Overloads are not supported.");
-                    commandInfos.Add(id, new CommandInfo(
-                        id,
-                        method,
-                        providerInstance
-                    ));
-                }
+
+                MethodInfo[] commandMethods = providerType.GetMethods();
+                foreach (MethodInfo methodInfo in commandMethods)
+                    if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
+                    {
+                        List<string> ids = new List<string>() { attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower() };
+                        if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
+                        string[] idArray = ids.ToArray();
+                        for (int i = 0; i < idArray.Length; i++)
+                        {
+                            string alias = idArray[i];
+                            if (commandInfos.ContainsKey(alias))
+                                throw new InvalidOperationException($"Command with '{alias}' is already registered. Overloads are not supported.");
+                            else commandInfos.Add(alias, new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance));
+                        }
+                    }
             }
             Debug.Log($"<found {commandInfos.Count} commands.");
 
@@ -77,7 +86,7 @@ namespace STOLON.Installer
             if (args.Length == 0) throw new InvalidOperationException("Cannot execute any command without arguments. One must be for the command name itself.");
 
             if (!Commands.TryGetValue(args[0].ToLower(), out CommandInfo? command)) throw new InvalidOperationException($"Command '{args[0]}' not found.");
-            Debug.Log($"found command with id: '{command.Id}'.");
+            Debug.Log($"found command with id/alias: '{args[0].ToLower()}'.");
 
             string[] parameters = args.Skip(1).ToArray();
 
@@ -109,30 +118,42 @@ namespace STOLON.Installer
         }
     }
 
-    public record class CommandInfo(string Id, MethodInfo MethodInfo, CommandProvider Source)
+    public class CommandInfo
     {
-        public override string ToString() => $"CommandInfo(Id: {Id}, Method: {MethodInfo}, Source: {Source?.ToString()})";
+        public string[] Ids { get; }
+        public string Id => Ids[0];
+        public string Description { get; }
+        public MethodInfo MethodInfo { get; }
+        public CommandProvider Source { get; }
+
+        public CommandInfo(string[] ids, string description, MethodInfo methodInfo, CommandProvider source)
+        {
+            Ids = ids;
+            Description = description;
+            MethodInfo = methodInfo;
+            Source = source;
+        }
+
+        public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Source?.ToString()})";
     }
 
-    public sealed class CommandAttribute : Attribute { }
+    public sealed class CommandAttribute : Attribute
+    {
+        public string? IdOverride { get; }
+        public string[]? Aliases { get; }
+        public string Description { get; }
+        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null)
+        {
+            IdOverride = idOverride;
+            Description = description;
+            Aliases = aliases;
+        }
+    }
+
     public abstract class CommandProvider
     {
         public string Id { get; }
-
         public CommandProvider(string id) => Id = id;
-
         public override string ToString() => $"CommandProvider(Id: {Id})";
-    }
-    public sealed class StolonCommandProvider : CommandProvider
-    {
-        public StolonCommandProvider() : base("_STOLON_") { }
-
-        [Command]
-        public void Add(int a, int b) => Console.WriteLine(a + b);
-        //[Command]
-        //public int Add(int a, int b, int c) => a + b + c;
-        [Command]
-        public void Greet(string name) => Console.WriteLine($"Hello, {name}!");
-
     }
 }
