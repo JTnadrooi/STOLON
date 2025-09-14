@@ -7,13 +7,13 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    public struct Option
+    public struct OptionInfo
     {
         public string Id { get; }
         public string LongId { get; }
         public string Description { get; }
 
-        public Option(string id, string longId, string description)
+        public OptionInfo(string id, string longId, string description)
         {
             Id = id;
             LongId = longId;
@@ -25,6 +25,6 @@ namespace STOLON.CLI
     {
         public void PreCommand(ArgumentsInfo arguments);
         public void PostCommand();
-        public Option[] GetOptions();
+        public OptionInfo[] GetOptionInfos();
     }
 }
