@@ -9,12 +9,6 @@ using static STOLON.Cmd.CommandHelpers;
 
 namespace STOLON.Cmd
 {
-    public interface IOptionHandler
-    {
-        public void PreCommand(ArgumentsInfo arguments);
-        public void PostCommand();
-    }
-
     public class VerboseOptionHandler : IOptionHandler
     {
         private bool _initialVerboseState;

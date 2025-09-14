@@ -137,11 +137,4 @@ namespace STOLON.Installer
             Aliases = aliases;
         }
     }
-
-    public abstract class CommandProvider
-    {
-        public string Id { get; }
-        public CommandProvider(string id) => Id = id;
-        public override string ToString() => $"CommandProvider(Id: {Id})";
-    }
 }

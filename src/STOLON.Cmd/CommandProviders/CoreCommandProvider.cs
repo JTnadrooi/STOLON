@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace STOLON.Cmd
 {
-    public class TestCommandProvider : CommandProvider
+    public class CoreCommandProvider : CommandProvider
     {
-        public TestCommandProvider() : base("_STOLON_") { }
+        public CoreCommandProvider() : base("_STOLON_") { }
 
         [Command("Adds two values.", aliases: ["plus"])]
         public void Add(int a, int b = 0) => Console.WriteLine(a + b);
