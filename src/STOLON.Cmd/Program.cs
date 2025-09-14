@@ -18,7 +18,7 @@ namespace STOLON.Installer
     {
         public static void Main(string[] args)
         {
-            using CommandHandler cmdHandler = new CommandHandler();
+            using CommandHandler cmdHandler = new CommandHandler(args.Contains("-s"));
 
             if (args.Length == 0)
             {
@@ -27,7 +27,14 @@ namespace STOLON.Installer
                 {
                     Console.Write("> ");
                     string[] newArgs = CommandHelpers.SplitArgs(Console.ReadLine()!);
-                    CommandHandler.Instance.Execute(newArgs);
+                    try
+                    {
+                        CommandHandler.Instance.Execute(newArgs);
+                    }
+                    catch (Exception e)
+                    {
+                        CommandHandler.Instance.Debug.Log("command failed: " + e.Message);
+                    }
                 }
             }
             else CommandHandler.Instance.Execute(args);

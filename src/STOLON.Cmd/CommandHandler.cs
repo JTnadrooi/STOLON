@@ -26,10 +26,14 @@ namespace STOLON.Installer
         public static CommandHandler Instance { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-        public CommandHandler()
+        private bool _initialSilentState;
+
+        public CommandHandler(bool silent)
         {
-            Debug = new DebugStream(header: "STOLON.CMD");
+            Debug = new DebugStream(header: "STOLON.CMD") { Silent = silent };
             Instance = this;
+
+            _initialSilentState = silent;
 
             Debug.Log(">creating handler.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
@@ -67,11 +71,21 @@ namespace STOLON.Installer
         public void Execute(ArgumentsInfo arguments)
         {
             if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
+
+            if (arguments.Options.Contains("-s"))
+            {
+                Debug.Silent = true;
+            }
+
             Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
 
             object?[] cmdArgs = CommandHelpers.ParseArguments(arguments.Args, command.MethodInfo.GetParameters());
             Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
+            Debug.Log($"executing with options: {string.Join(", ", arguments.Options)}");
+
             command.MethodInfo.Invoke(command.Source, cmdArgs);
+
+            Debug.Silent = _initialSilentState;
         }
 
         protected virtual void Dispose(bool disposing)

@@ -39,6 +39,6 @@ namespace STOLON.Cmd
         public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Options);
 
         public static ArgumentsInfo RefineArguments(string[] args)
-            => new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), args.Where(s => s.StartsWith('-')).ToHashSet());
+            => new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), args.Skip(1).Where(s => s.StartsWith('-')).ToHashSet());
     }
 }
