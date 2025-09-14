@@ -10,7 +10,7 @@ namespace STOLON.Installer
 
         public static void Main(string[] args)
         {
-            using CommandHandler cmdHandler = new CommandHandler(args.Contains("-s"));
+            using CommandHandler cmdHandler = new CommandHandler(args.Contains("-v"));
 
             if (args.Length == 0)
             {

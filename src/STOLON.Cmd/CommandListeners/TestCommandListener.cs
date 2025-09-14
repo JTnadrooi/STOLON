@@ -11,27 +11,27 @@ namespace STOLON.Cmd
 {
     public interface IOptionHandler
     {
-        public void HandleOption(ArgumentsInfo arguments);
-        public void RestoreInitialState();
+        public void PreCommand(ArgumentsInfo arguments);
+        public void PostCommand();
     }
 
-    public class SilentOptionHandler : IOptionHandler
+    public class VerboseOptionHandler : IOptionHandler
     {
-        private bool _initialSilentState;
+        private bool _initialVerboseState;
 
-        public SilentOptionHandler(bool initialSilentState)
+        public VerboseOptionHandler()
         {
-            _initialSilentState = initialSilentState;
+            _initialVerboseState = CommandHandler.Instance.Debug.Silent;
         }
 
-        public void HandleOption(ArgumentsInfo arguments)
+        public void PreCommand(ArgumentsInfo arguments)
         {
-            if (arguments.Options.Contains("-s")) CommandHandler.Instance.Debug.Silent = true;
+            if (arguments.Options.Contains("-v")) CommandHandler.Instance.Debug.Silent = false;
         }
 
-        public void RestoreInitialState()
+        public void PostCommand()
         {
-            CommandHandler.Instance.Debug.Silent = _initialSilentState;
+            CommandHandler.Instance.Debug.Silent = _initialVerboseState;
         }
     }
 
