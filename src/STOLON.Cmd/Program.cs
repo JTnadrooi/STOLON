@@ -1,5 +1,6 @@
 ﻿using AsitLib;
 using AsitLib.Debug;
+using STOLON.Cmd;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace STOLON.Installer
                 while (true)
                 {
                     Console.Write("> ");
-                    string[] newArgs = Console.ReadLine()?.Trim().Split(" ") ?? throw new Exception();
+                    string[] newArgs = CommandHelpers.SplitArgs(Console.ReadLine()!);
                     CommandHandler.Instance.Execute(newArgs);
                 }
             }
