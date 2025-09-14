@@ -6,11 +6,12 @@ namespace STOLON.Installer
 {
     public static class Program
     {
+        public const bool ALWAYS_VERBOSE = true;
         public const bool DEBUG_MODE = false;
 
         public static void Main(string[] args)
         {
-            using CommandHandler cmdHandler = new CommandHandler(args.Contains("-v"));
+            using CommandHandler cmdHandler = new CommandHandler(ALWAYS_VERBOSE || args.Contains("-v"));
 
             if (args.Length == 0)
             {
