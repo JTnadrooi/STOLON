@@ -72,10 +72,12 @@ namespace STOLON.Installer
         {
             if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
 
-            if (arguments.Options.Contains("-s"))
+            List<IOptionHandler> optionHandlers = new List<IOptionHandler>()
             {
-                Debug.Silent = true;
-            }
+                new SilentOptionHandler(_initialSilentState),
+            };
+
+            foreach (IOptionHandler optionHandler in optionHandlers) optionHandler.HandleOption(arguments);
 
             Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
 
@@ -85,7 +87,7 @@ namespace STOLON.Installer
 
             command.MethodInfo.Invoke(command.Source, cmdArgs);
 
-            Debug.Silent = _initialSilentState;
+            foreach (IOptionHandler optionHandler in optionHandlers) optionHandler.RestoreInitialState();
         }
 
         protected virtual void Dispose(bool disposing)
