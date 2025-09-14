@@ -14,10 +14,18 @@ namespace STOLON.Cmd
         //public static (object?[] cmdArgs, string[] generalArgs) ParseArguments(string args, ParameterInfo[] expected) => ParseArguments(SplitArgs(args), )
         public static object?[] ParseArguments(string[] args, ParameterInfo[] expected)
         {
-            object[] methodArguments = new object[args.Length];
-            for (int i = 0; i < args.Length; i++) methodArguments[i] = Convert.ChangeType(args[i], expected[i].ParameterType);
+            object?[] methodArguments = new object?[expected.Length];
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (i < args.Length) methodArguments[i] = Convert.ChangeType(args[i], expected[i].ParameterType);
+                else if (expected[i].HasDefaultValue) methodArguments[i] = expected[i].DefaultValue;
+                else throw new ArgumentException($"Missing argument for parameter {expected[i].Name}.");
+            }
+
             return methodArguments;
         }
+
         public static string[] SplitArgs(string str)
         {
             var matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim());

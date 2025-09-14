@@ -12,7 +12,7 @@ namespace STOLON.Cmd
         public TestCommandProvider() : base("_STOLON_") { }
 
         [Command("Adds two values.", aliases: ["plus"])]
-        public void Add(int a, int b) => Console.WriteLine(a + b);
+        public void Add(int a, int b = 0) => Console.WriteLine(a + b);
         //[Command]
         //public int Add(int a, int b, int c) => a + b + c;
         [Command("Greets someone with the specified name.")]
