@@ -27,6 +27,11 @@ namespace STOLON.CLI
         {
             CommandHandler.Instance.Debug.Silent = _initialVerboseState;
         }
+
+        public Option[] GetOptions()
+            => [
+                new Option("v", "verbose", "enabled logging"),
+            ];
     }
 
 }
