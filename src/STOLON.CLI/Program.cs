@@ -1,8 +1,8 @@
 ﻿using AsitLib;
-using STOLON.Cmd;
+using STOLON.CLI;
 #pragma warning disable CS0162 // Unreachable code detected
 
-namespace STOLON.Installer
+namespace STOLON.CLI
 {
     public static class Program
     {

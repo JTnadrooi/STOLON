@@ -1,11 +1,11 @@
-﻿using STOLON.Installer;
+﻿using STOLON.CLI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STOLON.Cmd
+namespace STOLON.CLI
 {
     public class CoreCommandProvider : CommandProvider
     {

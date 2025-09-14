@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STOLON.Cmd
+namespace STOLON.CLI
 {
     public abstract class CommandProvider
     {

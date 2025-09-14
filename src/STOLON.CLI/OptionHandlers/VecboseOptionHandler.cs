@@ -1,13 +1,13 @@
-﻿using STOLON.Installer;
+﻿using STOLON.CLI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static STOLON.Cmd.CommandHelpers;
+using static STOLON.CLI.CommandHelpers;
 
-namespace STOLON.Cmd
+namespace STOLON.CLI
 {
     public class VerboseOptionHandler : IOptionHandler
     {

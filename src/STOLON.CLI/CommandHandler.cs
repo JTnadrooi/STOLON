@@ -1,6 +1,6 @@
 ﻿using AsitLib;
 using AsitLib.Debug;
-using STOLON.Cmd;
+using STOLON.CLI;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -11,9 +11,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using static STOLON.Cmd.CommandHelpers;
+using static STOLON.CLI.CommandHelpers;
 
-namespace STOLON.Installer
+namespace STOLON.CLI
 {
     public class CommandHandler : IDisposable
     {
