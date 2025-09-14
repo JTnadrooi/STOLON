@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using STOLON.Installer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,23 +29,16 @@ namespace STOLON.Cmd
 
         public static string[] SplitArgs(string str)
         {
-            var matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim());
-
-            var args = new List<string>();
-
+            MatchCollection matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim());
+            List<string> args = new List<string>();
             foreach (Match match in matches)
-            {
-                var quotedArg = match.Groups[1].Value;
-                var regularArg = match.Groups[2].Value;
-
-                var arg = !string.IsNullOrEmpty(quotedArg) ? quotedArg : regularArg;
-                args.Add(arg);
-            }
-
+                args.Add(!string.IsNullOrEmpty(match.Groups[1].Value) ? match.Groups[1].Value : match.Groups[2].Value);
             return args.ToArray();
         }
 
-        public static string[] GetTags(string[] args)
-            => args.Where(s => s.StartsWith('-')).ToArray();
+        public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Options);
+
+        public static ArgumentsInfo RefineArguments(string[] args)
+            => new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), args.Where(s => s.StartsWith('-')).ToHashSet());
     }
 }

@@ -16,7 +16,6 @@ namespace STOLON.Cmd
         //[Command]
         //public int Add(int a, int b, int c) => a + b + c;
         [Command("Greets someone with the specified name.")]
-        public void Greet(string name) => Console.WriteLine($"Hello, {name}!");
-
+        public void Greet(string name, bool loud = false) => Console.WriteLine($"Hello, {(loud ? name.ToUpper() : name)}!");
     }
 }

@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static STOLON.Cmd.CommandHelpers;
 
 namespace STOLON.Installer
 {
@@ -62,14 +63,13 @@ namespace STOLON.Installer
             Console.WriteLine(Commands.ToJoinedString(",\n"));
         }
 
-        public void Execute(string[] args)
+        public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
+        public void Execute(ArgumentsInfo arguments)
         {
-            if (args.Length == 0) throw new InvalidOperationException("Cannot execute any command without arguments. One must be for the command name itself.");
+            if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
+            Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
 
-            if (!Commands.TryGetValue(args[0].ToLower(), out CommandInfo? command)) throw new InvalidOperationException($"Command '{args[0]}' not found.");
-            Debug.Log($"found command with id/alias: '{args[0].ToLower()}'.");
-
-            object?[] cmdArgs = CommandHelpers.ParseArguments(args[1..], command.MethodInfo.GetParameters());
+            object?[] cmdArgs = CommandHelpers.ParseArguments(arguments.Args, command.MethodInfo.GetParameters());
             Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
             command.MethodInfo.Invoke(command.Source, cmdArgs);
         }
