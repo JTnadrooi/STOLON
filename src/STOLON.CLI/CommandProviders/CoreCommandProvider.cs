@@ -17,5 +17,7 @@ namespace STOLON.CLI
         //public int Add(int a, int b, int c) => a + b + c;
         [Command("Greets someone with the specified name.")]
         public void Greet(string name, bool loud = false) => Console.WriteLine($"Hello, {(loud ? name.ToUpper() : name)}!");
+        [Command("Prints the cli version.")]
+        public void Version() => Console.WriteLine(CLI.VersionString);
     }
 }

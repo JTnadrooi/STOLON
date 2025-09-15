@@ -12,6 +12,10 @@
 		<Reference Include="AsitLib">
 			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
 		</Reference>
+		<SLBuildAssets Include="Assets\**\*.*" />
 	</ItemGroup>
 
+	<Target Name="DepositAssets" AfterTargets="Build">
+		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
 </Project>
