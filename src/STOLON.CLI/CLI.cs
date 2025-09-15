@@ -33,7 +33,7 @@ namespace STOLON.CLI
             VersionString = File.ReadAllText(".cli-version");
             Instance = this;
 
-            Debug.Log(">creating handler.");
+            Debug.Log(">creating cli.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
@@ -61,7 +61,7 @@ namespace STOLON.CLI
 
             Commands = commandInfos.ToFrozenDictionary();
 
-            Debug.Log($"<command handler created succesfully.");
+            Debug.Log($"<cli created succesfully.");
             Console.WriteLine(Commands.ToJoinedString(",\n"));
         }
 
