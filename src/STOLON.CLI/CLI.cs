@@ -21,15 +21,17 @@ namespace STOLON.CLI
 
         public FrozenDictionary<string, CommandInfo> Commands { get; }
         public DebugStream Debug { get; }
+        public CLIConfig Config { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public static CLI Instance { get; private set; }
         public static string VersionString { get; internal set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-        public CLI(bool verbose)
+        public CLI(string[] args)
         {
-            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !verbose };
+            Config = new CLIConfig();
+            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GetBool("always_verbose", false) || args.Contains("-v")) };
             VersionString = File.ReadAllText(".cli-version");
             Instance = this;
 

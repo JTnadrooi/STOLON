@@ -6,12 +6,9 @@ namespace STOLON.CLI
 {
     public static class Program
     {
-        public const bool ALWAYS_VERBOSE = true;
-        public const bool DEBUG_MODE = false;
-
         public static void Main(string[] args)
         {
-            using CLI cli = new CLI(ALWAYS_VERBOSE || args.Contains("-v"));
+            using CLI cli = new CLI(args);
 
             if (args.Length == 0)
             {
@@ -20,17 +17,17 @@ namespace STOLON.CLI
                 {
                     Console.Write("> ");
                     string[] newArgs = CommandHelpers.SplitArgs(Console.ReadLine()!);
-                    if (DEBUG_MODE)
-                        CLI.Instance.Execute(newArgs);
-                    else
+                    if (cli.Config.GetBool("catch_errors", true))
                         try
                         {
                             CLI.Instance.Execute(newArgs);
                         }
                         catch (Exception e)
                         {
-                            CLI.Instance.Debug.Log("command failed: " + e.Message);
+                            Console.WriteLine("command failed: " + e.Message);
                         }
+                    else
+                        CLI.Instance.Execute(newArgs);
                 }
             }
             else CLI.Instance.Execute(args);
