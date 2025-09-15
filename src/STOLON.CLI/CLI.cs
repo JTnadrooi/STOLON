@@ -15,7 +15,7 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    public class CommandHandler : IDisposable
+    public class CLI : IDisposable
     {
         private bool disposedValue;
 
@@ -23,11 +23,11 @@ namespace STOLON.CLI
         public DebugStream Debug { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public static CommandHandler Instance { get; private set; }
+        public static CLI Instance { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 
-        public CommandHandler(bool verbose)
+        public CLI(bool verbose)
         {
             Debug = new DebugStream(header: "STOLON.CMD") { Silent = !verbose };
             Instance = this;

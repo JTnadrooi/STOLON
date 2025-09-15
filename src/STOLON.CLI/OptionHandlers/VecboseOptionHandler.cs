@@ -15,17 +15,17 @@ namespace STOLON.CLI
 
         public VerboseOptionHandler()
         {
-            _initialVerboseState = CommandHandler.Instance.Debug.Silent;
+            _initialVerboseState = CLI.Instance.Debug.Silent;
         }
 
         public void PreCommand(ArgumentsInfo arguments)
         {
-            if (arguments.Options.Contains("-v")) CommandHandler.Instance.Debug.Silent = false;
+            if (arguments.Options.Contains("-v")) CLI.Instance.Debug.Silent = false;
         }
 
         public void PostCommand()
         {
-            CommandHandler.Instance.Debug.Silent = _initialVerboseState;
+            CLI.Instance.Debug.Silent = _initialVerboseState;
         }
 
         public OptionInfo[] GetOptionInfos()
