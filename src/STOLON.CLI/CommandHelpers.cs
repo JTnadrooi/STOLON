@@ -29,6 +29,7 @@ namespace STOLON.CLI
 
         public static string[] SplitArgs(string str)
         {
+            str = Regex.Replace(str, @"(?<!\\)#.*", string.Empty);
             MatchCollection matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim());
             List<string> args = new List<string>();
             foreach (Match match in matches)
