@@ -37,15 +37,19 @@ namespace STOLON.CLI
         private delegate bool TryParseHandler<T>(string input, out T result);
         private bool TryParseBool(string input, out bool result)
         {
-            bool failed = false;
-            result = input.ToLowerInvariant().Trim() switch
+            switch (input.ToLowerInvariant().Trim())
             {
-                "true" or "1" or "yes" or "on" => true,
-                "false" or "0" or "no" or "off" => false,
-                _ => failed = true
-            };
-            if (failed) result = default;
-            return failed;
+                case "true" or "1" or "yes" or "on":
+                    result = true;
+                    return true;
+                case "false" or "0" or "no" or "off":
+                    result = false;
+                    return true;
+                default:
+                    result = default;
+                    return false;
+            }
         }
+
     }
 }

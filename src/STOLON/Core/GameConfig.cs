@@ -39,7 +39,6 @@ namespace STOLON
             STOLON.Debug.Success();
             STOLON.Debug.Log(">managing overrides");
 
-
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
