@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Content;
 using System.Reflection;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
 
 
 
@@ -147,6 +148,7 @@ namespace STOLON
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
             STOLON.Environment = _environment = new GameEnvironment();
+            STOLON.VersionString = File.ReadAllText(".version");
             _environment.Initialize();
 
             if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableEffect("crt");
@@ -207,7 +209,7 @@ namespace STOLON
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext);
-            _drawingContext.DrawString(STOLON.Fonts.Small, "ver: " + VERSION_STRING, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure("ver: " + VERSION_STRING).X / 2, 500));
+            _drawingContext.DrawString(STOLON.Fonts.Small, VersionString, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure(VersionString).X / 2, 500));
             _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
             _drawingContext.EndScene();
@@ -230,7 +232,7 @@ namespace STOLON
         public static GameConfig Config { get; internal set; }
         public static DrawingContext DrawingContext { get; internal set; }
         public static TaskHeap Tasks { get; internal set; }
-        public const string VERSION_STRING = "0.051 (Open Alpha)";
+        public static string VersionString { get; internal set; }
         public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
         public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;
         public const int ASPECT_RATIO_X = 16;
