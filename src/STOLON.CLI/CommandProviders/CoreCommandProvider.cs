@@ -26,7 +26,7 @@ namespace STOLON.CLI
             Console.WriteLine("Available commands:");
             foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values)
             {
-                Console.WriteLine($"{cmd.Id} {cmd.MethodInfo.GetParameters()
+                Console.WriteLine($"{cmd.Id}{(cmd.Ids.Count > 1 ? $"[{cmd.Ids.ToArray()[1..].ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
             }
