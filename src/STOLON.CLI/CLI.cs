@@ -72,12 +72,14 @@ namespace STOLON.CLI
         {
             if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
 
-            List<IOptionHandler> optionHandlers = new List<IOptionHandler>()
+            List<OptionHandler> optionHandlers = new List<OptionHandler>()
             {
                 new VerboseOptionHandler(),
             };
 
-            foreach (IOptionHandler optionHandler in optionHandlers) optionHandler.PreCommand(arguments);
+            foreach (OptionHandler optionHandler in optionHandlers)
+                if (optionHandler.ShouldListen(arguments))
+                    optionHandler.PreCommand(arguments);
 
             Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
 
@@ -87,7 +89,9 @@ namespace STOLON.CLI
 
             command.MethodInfo.Invoke(command.Source, cmdArgs);
 
-            foreach (IOptionHandler optionHandler in optionHandlers) optionHandler.PostCommand();
+            foreach (OptionHandler optionHandler in optionHandlers)
+                if (optionHandler.ShouldListen(arguments))
+                    optionHandler.PostCommand();
         }
 
         protected virtual void Dispose(bool disposing)

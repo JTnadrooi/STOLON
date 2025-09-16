@@ -9,29 +9,23 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    public class VerboseOptionHandler : IOptionHandler
+    public class VerboseOptionHandler : OptionHandler
     {
         private bool _initialVerboseState;
 
-        public VerboseOptionHandler()
+        public VerboseOptionHandler() : base("verbose", "Enable verbose logging.", "v")
         {
             _initialVerboseState = CLI.Instance.Debug.Silent;
         }
 
-        public void PreCommand(ArgumentsInfo arguments)
+        public override void PreCommand(ArgumentsInfo arguments)
         {
-            if (arguments.Options.Contains("-v")) CLI.Instance.Debug.Silent = false;
+            CLI.Instance.Debug.Silent = false;
         }
 
-        public void PostCommand()
+        public override void PostCommand()
         {
             CLI.Instance.Debug.Silent = _initialVerboseState;
         }
-
-        public OptionInfo[] GetOptionInfos()
-            => [
-                new OptionInfo("v", "verbose", "enabled logging"),
-            ];
     }
-
 }
