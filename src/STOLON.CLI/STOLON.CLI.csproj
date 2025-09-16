@@ -12,7 +12,7 @@
 		<Reference Include="AsitLib">
 			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
 		</Reference>
-		<SLBuildAssets Include="Assets\**\*.*" />
+		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" />
 	</ItemGroup>
 
 	<ItemGroup>
