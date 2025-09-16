@@ -23,12 +23,12 @@ namespace STOLON.CLI
         [Command("Displays help.", aliases: ["?", "h"])]
         public void Help(string? commandName = null)
         {
-            Console.WriteLine("Avalible ommands:");
-            foreach (CommandInfo cmd in CLI.Instance.Commands.Values)
+            Console.WriteLine("Available commands:");
+            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values)
             {
                 Console.WriteLine($"{cmd.Id} {cmd.MethodInfo.GetParameters()
-                    .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue.ToString()})") : string.Empty)}").ToJoinedString(" ")}" +
-                    $" # {cmd.Description}");
+                    .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
+                    $"# {cmd.Description}");
             }
         }
     }

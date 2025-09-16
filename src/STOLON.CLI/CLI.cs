@@ -20,6 +20,7 @@ namespace STOLON.CLI
         private bool disposedValue;
 
         public FrozenDictionary<string, CommandInfo> Commands { get; }
+        public FrozenDictionary<string, CommandInfo> UniqueCommands { get; }
         public DebugStream Debug { get; }
         public CLIConfig Config { get; }
 
@@ -31,12 +32,13 @@ namespace STOLON.CLI
         public CLI(string[] args)
         {
             Config = new CLIConfig();
-            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GetBool("always_verbose", false) || args.Contains("-v")) };
+            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GetBool("CLI.always_verbose", false) || args.Contains("-v")) };
             VersionString = File.ReadAllText(".cli-version");
             Instance = this;
 
             Debug.Log(">creating cli.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
+            Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (Type providerType in commandProviderTypes)
@@ -50,21 +52,24 @@ namespace STOLON.CLI
                         List<string> ids = new List<string>() { attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower() };
                         if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
                         string[] idArray = ids.ToArray();
+                        CommandInfo info = new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance);
+                        uniqueCommandInfos.Add(info.Id, info);
                         for (int i = 0; i < idArray.Length; i++)
                         {
                             string alias = idArray[i];
                             if (commandInfos.ContainsKey(alias))
                                 throw new InvalidOperationException($"Command with '{alias}' is already registered. Overloads are not supported.");
-                            else commandInfos.Add(alias, new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance));
+                            else commandInfos.Add(alias, info);
                         }
                     }
             }
             Debug.Log($"<found {commandInfos.Count} commands.");
 
             Commands = commandInfos.ToFrozenDictionary();
+            UniqueCommands = uniqueCommandInfos.ToFrozenDictionary();
 
             Debug.Log($"<cli created succesfully.");
-            Console.WriteLine(Commands.ToJoinedString(",\n"));
+            Console.WriteLine(UniqueCommands.ToJoinedString(",\n"));
         }
 
         public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
@@ -115,15 +120,16 @@ namespace STOLON.CLI
 
     public class CommandInfo
     {
-        public string[] Ids { get; }
-        public string Id => Ids[0];
+        public HashSet<string> Ids { get; }
+        public string Id { get; }
         public string Description { get; }
         public MethodInfo MethodInfo { get; }
         public CommandProvider Source { get; }
 
         public CommandInfo(string[] ids, string description, MethodInfo methodInfo, CommandProvider source)
         {
-            Ids = ids;
+            Ids = ids.ToHashSet();
+            Id = ids[0];
             Description = description;
             MethodInfo = methodInfo;
             Source = source;

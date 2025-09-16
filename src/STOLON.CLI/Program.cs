@@ -17,7 +17,7 @@ namespace STOLON.CLI
                 {
                     Console.Write("> ");
                     string[] newArgs = CommandHelpers.SplitArgs(Console.ReadLine()!);
-                    if (cli.Config.GetBool("catch_errors", true))
+                    if (cli.Config.GetBool("CLI.catch_errors", true))
                         try
                         {
                             CLI.Instance.Execute(newArgs);
