@@ -1,4 +1,5 @@
-﻿using STOLON.CLI;
+﻿using AsitLib;
+using STOLON.CLI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,16 @@ namespace STOLON.CLI
         public void Greet(string name, bool loud = false) => Console.WriteLine($"Hello, {(loud ? name.ToUpper() : name)}!");
         [Command("Prints the cli version.")]
         public void Version() => Console.WriteLine(CLI.VersionString);
+        [Command("Displays help.", aliases: ["?", "h"])]
+        public void Help(string? commandName = null)
+        {
+            Console.WriteLine("Avalible ommands:");
+            foreach (CommandInfo cmd in CLI.Instance.Commands.Values)
+            {
+                Console.WriteLine($"{cmd.Id} {cmd.MethodInfo.GetParameters()
+                    .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue.ToString()})") : string.Empty)}").ToJoinedString(" ")}" +
+                    $" # {cmd.Description}");
+            }
+        }
     }
 }
