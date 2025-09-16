@@ -16,7 +16,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="ini-parser" Version="2.5.2" />
+		<PackageReference Include="ini-parser" Version="2.5.2">
+			<NoWarn>NU1701</NoWarn>
+		</PackageReference>
 	</ItemGroup>
 
 	<Target Name="DepositAssets" AfterTargets="Build">
