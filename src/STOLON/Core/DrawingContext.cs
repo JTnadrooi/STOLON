@@ -35,6 +35,7 @@ namespace STOLON
         /// Note everything drawn to this will be inverted. Please use the extension methods or call <see cref="InvertY(SpriteEffects)"/> on the input <see cref="SpriteEffects"/> enum.
         /// </summary>
         public SpriteBatch SpriteBatch => _spriteBatch;
+        public bool SpriteBatchStarted => _spritebatchStarted;
 
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
