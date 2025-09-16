@@ -2,6 +2,7 @@
 using STOLON.CLI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace STOLON.CLI
 
         [Command("Adds two values.", aliases: ["plus"])]
         public void Add(int a, int b = 0) => Console.WriteLine(a + b);
+        [Command("Counts to a number.")]
+        public void Count([Range(0, 10)] int target) => Console.WriteLine(Enumerable.Range(1, target).ToJoinedString(", "));
         //[Command]
         //public int Add(int a, int b, int c) => a + b + c;
         [Command("Greets someone with the specified name.")]

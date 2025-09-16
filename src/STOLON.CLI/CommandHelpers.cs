@@ -2,6 +2,7 @@
 using STOLON.CLI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,11 +16,25 @@ namespace STOLON.CLI
         //public static (object?[] cmdArgs, string[] generalArgs) ParseArguments(string args, ParameterInfo[] expected) => ParseArguments(SplitArgs(args), )
         public static object?[] ParseArguments(string[] args, ParameterInfo[] expected)
         {
+            void ValidateArgument(object? argument, ParameterInfo parameter)
+            {
+                IEnumerable<ValidationAttribute> validationAttributes = parameter.GetCustomAttributes<ValidationAttribute>();
+                foreach (ValidationAttribute attribute in validationAttributes)
+                {
+                    ValidationResult? result = attribute.GetValidationResult(argument, new ValidationContext(argument!) { MemberName = parameter.Name });
+                    if (result != ValidationResult.Success) throw new ArgumentException($"Argument '{parameter.Name}' is invalid: {result.ErrorMessage}");
+                }
+            }
+
             object?[] methodArguments = new object?[expected.Length];
 
             for (int i = 0; i < expected.Length; i++)
             {
-                if (i < args.Length) methodArguments[i] = Convert.ChangeType(args[i], expected[i].ParameterType);
+                if (i < args.Length)
+                {
+                    methodArguments[i] = Convert.ChangeType(args[i], expected[i].ParameterType);
+                    ValidateArgument(methodArguments[i], expected[i]);
+                }
                 else if (expected[i].HasDefaultValue) methodArguments[i] = expected[i].DefaultValue;
                 else throw new ArgumentException($"Missing argument for parameter {expected[i].Name}.");
             }
