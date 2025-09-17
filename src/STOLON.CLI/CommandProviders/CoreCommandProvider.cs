@@ -3,6 +3,7 @@ using STOLON.CLI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +38,18 @@ namespace STOLON.CLI
             }
 
             Console.WriteLine("Available commands:");
-            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values) WriteCommand(cmd);
+            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values.OrderBy(c => c.Id)) WriteCommand(cmd);
+        }
+        [Command("Opens the folder where the executable is located.", aliases: ["dir", "directory"])]
+        public void Folder()
+        {
+            Console.WriteLine("Opening STOLON main directory..");
+            Process.Start(Environment.OSVersion.Platform switch
+            {
+                PlatformID.Win32NT => "explorer.exe",
+                PlatformID.Unix => "xdg-open",
+                _ => "open"
+            }, AppDomain.CurrentDomain.BaseDirectory);
         }
     }
 }
