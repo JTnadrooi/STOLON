@@ -121,6 +121,7 @@ namespace STOLON.CLI
     public class CommandInfo
     {
         public HashSet<string> Ids { get; }
+        public bool HasAliases => Ids.Count > 1;
         public string Id { get; }
         public string Description { get; }
         public MethodInfo MethodInfo { get; }

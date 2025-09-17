@@ -26,7 +26,7 @@ namespace STOLON.CLI
         [Command("Displays help.", aliases: ["?", "h"])]
         public void Help(string? commandName = null)
         {
-            void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.Ids.Count > 1 ? $"[{cmd.Ids.ToArray()[1..].ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
+            void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
 
