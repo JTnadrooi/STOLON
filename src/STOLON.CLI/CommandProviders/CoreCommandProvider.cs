@@ -26,13 +26,18 @@ namespace STOLON.CLI
         [Command("Displays help.", aliases: ["?", "h"])]
         public void Help(string? commandName = null)
         {
-            Console.WriteLine("Available commands:");
-            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values)
-            {
-                Console.WriteLine($"{cmd.Id}{(cmd.Ids.Count > 1 ? $"[{cmd.Ids.ToArray()[1..].ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
+            void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.Ids.Count > 1 ? $"[{cmd.Ids.ToArray()[1..].ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
+
+            if (commandName != null)
+            {
+                WriteCommand(CLI.Instance.Commands[commandName]);
+                return;
             }
+
+            Console.WriteLine("Available commands:");
+            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values) WriteCommand(cmd);
         }
     }
 }
