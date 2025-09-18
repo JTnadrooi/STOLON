@@ -52,7 +52,7 @@ namespace STOLON.CLI
             return args.ToArray();
         }
 
-        public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Options);
+        public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Flags);
 
         public static ArgumentsInfo RefineArguments(string[] args)
         {

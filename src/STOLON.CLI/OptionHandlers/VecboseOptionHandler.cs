@@ -9,11 +9,11 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    public class VerboseOptionHandler : OptionHandler
+    public class VerboseFlagHandler : FlagHandler
     {
         private bool _initialVerboseState;
 
-        public VerboseOptionHandler() : base("verbose", "Enable verbose logging.", "v")
+        public VerboseFlagHandler() : base("verbose", "Enable verbose logging.", "v")
         {
             _initialVerboseState = CLI.Instance.Debug.Silent;
         }

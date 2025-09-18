@@ -21,7 +21,7 @@ namespace STOLON.CLI
     //    }
     //}
 
-    public abstract class OptionHandler
+    public abstract class FlagHandler
     {
         public string? ShortId { get; }
         public string LongId { get; }
@@ -30,7 +30,7 @@ namespace STOLON.CLI
         private string? _shortIdFull;
         private string _longIdFull;
 
-        public OptionHandler(string longId, string description, string? shortId = null)
+        public FlagHandler(string longId, string description, string? shortId = null)
         {
             ShortId = shortId;
             LongId = longId;
@@ -42,6 +42,6 @@ namespace STOLON.CLI
         public virtual void PreCommand(ArgumentsInfo arguments) { }
         public virtual void PostCommand() { }
 
-        public bool ShouldListen(ArgumentsInfo args) => (_shortIdFull != null ? args.Options.Contains(_shortIdFull) : false) || args.Options.Contains(_longIdFull);
+        public bool ShouldListen(ArgumentsInfo args) => (_shortIdFull != null ? args.Flags.Contains(_shortIdFull) : false) || args.Flags.Contains(_longIdFull);
     }
 }
