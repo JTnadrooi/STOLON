@@ -49,7 +49,7 @@ namespace STOLON.CLI
                 foreach (MethodInfo methodInfo in commandMethods)
                     if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
                     {
-                        List<string> ids = new List<string>() { attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower() };
+                        List<string> ids = new List<string>() { (attribute.UseProviderNamespace ? (providerInstance.Id + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower()) };
                         if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
                         string[] idArray = ids.ToArray();
                         CommandInfo info = new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance);
@@ -144,11 +144,13 @@ namespace STOLON.CLI
         public string? IdOverride { get; }
         public string[]? Aliases { get; }
         public string Description { get; }
-        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null)
+        public bool UseProviderNamespace { get; }
+        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool useProviderNamespace = true)
         {
             IdOverride = idOverride;
             Description = description;
             Aliases = aliases;
+            UseProviderNamespace = useProviderNamespace;
         }
     }
 }
