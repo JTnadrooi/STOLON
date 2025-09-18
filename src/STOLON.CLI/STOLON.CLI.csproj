@@ -21,6 +21,10 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="..\STOLON\Assets\**\*.*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
