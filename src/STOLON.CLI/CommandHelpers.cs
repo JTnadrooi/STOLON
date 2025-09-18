@@ -32,7 +32,7 @@ namespace STOLON.CLI
             {
                 if (i < args.Length)
                 {
-                    methodArguments[i] = Convert.ChangeType(args[i], expected[i].ParameterType);
+                    methodArguments[i] = (args[i] == "|" && expected[i].HasDefaultValue) ? expected[i].DefaultValue : Convert.ChangeType(args[i], expected[i].ParameterType);
                     ValidateArgument(methodArguments[i], expected[i]);
                 }
                 else if (expected[i].HasDefaultValue) methodArguments[i] = expected[i].DefaultValue;
