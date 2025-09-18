@@ -1,4 +1,5 @@
-﻿using IniParser.Model;
+﻿using AsitLib;
+using IniParser.Model;
 using IniParser.Parser;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,10 @@ namespace STOLON.CLI
             string path = @"user.ini";
             _parser = new IniDataParser();
             _data = _parser.Parse(File.ReadAllText(path));
+            GlobalFlags = GetString("CLI.global_flags").Split(",").ToHashSet();
+            Console.WriteLine(GlobalFlags.Contains("v"));
         }
+        public HashSet<string> GlobalFlags { get; }
         public float GetFloat(string key, float? defaultValue = null) => TryGetParsedValue(key, float.TryParse, defaultValue);
         public int GetInt(string key, int? defaultValue = null) => TryGetParsedValue(key, int.TryParse, defaultValue);
         public double GetDouble(string key, double? defaultValue = null) => TryGetParsedValue(key, double.TryParse, defaultValue);

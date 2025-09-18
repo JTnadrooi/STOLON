@@ -55,6 +55,11 @@ namespace STOLON.CLI
         public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Options);
 
         public static ArgumentsInfo RefineArguments(string[] args)
-            => new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), args.Skip(1).Where(s => s.StartsWith('-')).ToHashSet());
+        {
+            HashSet<string> merged = new HashSet<string>(CLI.Instance.Config.GlobalFlags);
+            foreach (var arg in args.Skip(1))
+                if (arg.StartsWith('-')) merged.Add(arg[1..]);
+            return new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), merged);
+        }
     }
 }

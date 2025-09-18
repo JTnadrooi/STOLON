@@ -32,7 +32,7 @@ namespace STOLON.CLI
         public CLI(string[] args)
         {
             Config = new CLIConfig();
-            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GetBool("CLI.always_verbose", false) || args.Contains("-v")) };
+            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GlobalFlags.Contains("v") || args.Contains("-v")) };
             VersionString = File.ReadAllText(".cli-version");
             Instance = this;
 
