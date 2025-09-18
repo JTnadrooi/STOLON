@@ -32,7 +32,7 @@ namespace STOLON.CLI
             {
                 if (i < args.Length)
                 {
-                    methodArguments[i] = (args[i] == "|" && expected[i].HasDefaultValue) ? expected[i].DefaultValue : Convert.ChangeType(args[i], expected[i].ParameterType);
+                    methodArguments[i] = (args[i] == "_" && expected[i].HasDefaultValue) ? expected[i].DefaultValue : Convert.ChangeType(args[i], expected[i].ParameterType);
                     ValidateArgument(methodArguments[i], expected[i]);
                 }
                 else if (expected[i].HasDefaultValue) methodArguments[i] = expected[i].DefaultValue;
@@ -45,7 +45,7 @@ namespace STOLON.CLI
         public static string[] SplitArgs(string str)
         {
             //str = Regex.Replace(str, @"(?<!\\)#.*", string.Empty);
-            MatchCollection matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim());
+            MatchCollection matches = new Regex(@"(?:\""(.*?)\"")|(\S+)").Matches(str.Trim()); // handles args between 
             List<string> args = new List<string>();
             foreach (Match match in matches)
                 args.Add(!string.IsNullOrEmpty(match.Groups[1].Value) ? match.Groups[1].Value : match.Groups[2].Value);
@@ -57,9 +57,15 @@ namespace STOLON.CLI
         public static ArgumentsInfo RefineArguments(string[] args)
         {
             HashSet<string> merged = new HashSet<string>(CLI.Instance.Config.GlobalFlags);
-            foreach (var arg in args.Skip(1))
-                if (arg.StartsWith('-')) merged.Add(arg[1..]);
-            return new ArgumentsInfo(args[0].ToLower(), args.Skip(1).Where(s => !s.StartsWith('-')).ToArray(), merged);
+            List<string> positionalArgs = new List<string>();
+            bool afterSeparator = false;
+            for (int i = 1; i < args.Length; i++)
+                if (afterSeparator) positionalArgs.Add(args[i]);
+                else if (args[i] == "--") afterSeparator = true;
+                else if (args[i].StartsWith("--")) merged.Add(args[i][2..]);
+                else if (args[i].StartsWith("-")) merged.Add(args[i][1..]);
+                else positionalArgs.Add(args[i]);
+            return new ArgumentsInfo(args[0].ToLower(), positionalArgs.ToArray(), merged);
         }
     }
 }

@@ -24,18 +24,15 @@ namespace STOLON.CLI
         public void Greet(string? name = null, bool loud = false, bool ahoy = false)
         {
             string greeting = string.IsNullOrEmpty(name) ? "Greeting" : (ahoy ? "Ahoy" : "Hello");
-            string finalName = name ?? string.Empty;  // Default to empty if name is null
+            string finalName = name ?? string.Empty;
 
-            // Apply loudness to both the greeting and name
             if (loud)
             {
                 greeting = greeting.ToUpper();
                 finalName = finalName.ToUpper();
             }
 
-            // Avoid "Greeting, !" if no name
             string namePart = string.IsNullOrEmpty(finalName) ? string.Empty : $" {finalName}";
-
             Console.WriteLine($"{greeting}{namePart}!");
         }
 
