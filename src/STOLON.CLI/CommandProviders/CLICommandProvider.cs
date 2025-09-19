@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
-    public class CoreCommandProvider : CommandProvider
+    public class CLICommandProvider : CommandProvider
     {
-        public CoreCommandProvider() : base("core") { }
+        public CLICommandProvider() : base("cli") { }
 
         [Command("Adds two values.", aliases: ["plus"], useProviderNamespace: false)]
         public void Add(int a, int b = 0) => Console.WriteLine(a + b);
@@ -37,7 +37,7 @@ namespace STOLON.CLI
         }
 
 
-        [Command("Prints the cli version.", useProviderNamespace: false)]
+        [Command("Prints the cli version.")]
         public void Version() => Console.WriteLine(CLI.VersionString);
         [Command("Displays help.", aliases: ["?", "h"], useProviderNamespace: false)]
         public void Help(string? commandName = null)
@@ -55,8 +55,8 @@ namespace STOLON.CLI
             Console.WriteLine("Available commands:");
             foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values.OrderBy(c => c.Id)) WriteCommand(cmd);
         }
-        [Command("Opens the folder where the executable is located.", aliases: ["dir", "directory"], useProviderNamespace: false)]
-        public void Folder()
+        [Command("Opens the folder where the executable is located.", idOverride: "dir", useProviderNamespace: false)]
+        public void Directory()
         {
             Console.WriteLine("Opening STOLON main directory..");
             Process.Start(Environment.OSVersion.Platform switch
