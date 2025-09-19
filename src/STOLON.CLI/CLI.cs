@@ -22,6 +22,8 @@ namespace STOLON.CLI
         public FrozenDictionary<string, CommandInfo> Commands { get; }
         public FrozenDictionary<string, CommandInfo> UniqueCommands { get; }
         public FrozenDictionary<string, CommandProvider> Providers { get; }
+        public FrozenDictionary<string, FlagHandler> FlagHandlers { get; }
+
         public DebugStream Debug { get; }
         public CLIConfig Config { get; }
 
@@ -41,6 +43,10 @@ namespace STOLON.CLI
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
             Dictionary<string, CommandProvider> providers = new Dictionary<string, CommandProvider>();
             Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
+            FlagHandlers = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
+                .Select(fht => (FlagHandler)Activator.CreateInstance(fht)!)
+                .ToFrozenDictionary(fh => fh.LongId);
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (Type providerType in commandProviderTypes)
@@ -81,12 +87,7 @@ namespace STOLON.CLI
         {
             if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
 
-            List<FlagHandler> flagHandlers = new List<FlagHandler>()
-            {
-                new VerboseFlagHandler(),
-            };
-
-            foreach (FlagHandler flagHandler in flagHandlers)
+            foreach (FlagHandler flagHandler in FlagHandlers.Values)
                 if (flagHandler.ShouldListen(arguments))
                     flagHandler.PreCommand(arguments);
 
@@ -98,7 +99,7 @@ namespace STOLON.CLI
 
             command.MethodInfo.Invoke(command.Source, cmdArgs);
 
-            foreach (FlagHandler flagHandler in flagHandlers)
+            foreach (FlagHandler flagHandler in FlagHandlers.Values)
                 if (flagHandler.ShouldListen(arguments))
                     flagHandler.PostCommand();
         }

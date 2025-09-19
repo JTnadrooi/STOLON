@@ -13,21 +13,15 @@ namespace STOLON.CLI
         public string LongId { get; }
         public string Description { get; }
 
-        private string? _shortIdFull;
-        private string _longIdFull;
-
         public FlagHandler(string longId, string description, string? shortId = null)
         {
             ShortId = shortId;
             LongId = longId;
             Description = description;
-
-            _shortIdFull = shortId != null ? ("-" + shortId) : null;
-            _longIdFull = "--" + longId;
         }
         public virtual void PreCommand(ArgumentsInfo arguments) { }
         public virtual void PostCommand() { }
 
-        public bool ShouldListen(ArgumentsInfo args) => (_shortIdFull == null ? false : args.Flags.Contains(_shortIdFull)) || args.Flags.Contains(_longIdFull);
+        public bool ShouldListen(ArgumentsInfo args) => (ShortId == null ? false : args.Flags.Contains(ShortId)) || args.Flags.Contains(LongId);
     }
 }
