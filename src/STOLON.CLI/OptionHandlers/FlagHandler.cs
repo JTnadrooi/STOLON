@@ -7,20 +7,6 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    //public struct OptionInfo
-    //{
-    //    public string Id { get; }
-    //    public string LongId { get; }
-    //    public string Description { get; }
-
-    //    public OptionInfo(string id, string longId, string description)
-    //    {
-    //        Id = id;
-    //        LongId = longId;
-    //        Description = description;
-    //    }
-    //}
-
     public abstract class FlagHandler
     {
         public string? ShortId { get; }
@@ -42,6 +28,6 @@ namespace STOLON.CLI
         public virtual void PreCommand(ArgumentsInfo arguments) { }
         public virtual void PostCommand() { }
 
-        public bool ShouldListen(ArgumentsInfo args) => (_shortIdFull != null ? args.Flags.Contains(_shortIdFull) : false) || args.Flags.Contains(_longIdFull);
+        public bool ShouldListen(ArgumentsInfo args) => (_shortIdFull == null ? false : args.Flags.Contains(_shortIdFull)) || args.Flags.Contains(_longIdFull);
     }
 }
