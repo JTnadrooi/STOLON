@@ -19,7 +19,6 @@ namespace STOLON.CLI
             _parser = new IniDataParser();
             _data = _parser.Parse(File.ReadAllText(path));
             GlobalFlags = GetString("CLI.global_flags").Split(",").ToHashSet();
-            Console.WriteLine(GlobalFlags.Contains("v"));
         }
         public HashSet<string> GlobalFlags { get; }
         public float GetFloat(string key, float? defaultValue = null) => TryGetParsedValue(key, float.TryParse, defaultValue);

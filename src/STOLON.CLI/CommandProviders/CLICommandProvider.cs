@@ -40,31 +40,34 @@ namespace STOLON.CLI
         [Command("Prints the cli version.")]
         public void Version() => Console.WriteLine(CLI.VersionString);
         [Command("Displays help.", aliases: ["?", "h"], useProviderNamespace: false)]
-        public void Help(string? commandName = null)
+        public void Help(string? filter = null)
         {
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
+            IEnumerable<CommandInfo> toPrint;
 
-            if (commandName != null)
+            if (filter == null) toPrint = CLI.Instance.UniqueCommands.Values.OrderBy(c => c.Id);
+            else if (filter.EndsWith("\\"))
             {
-                WriteCommand(CLI.Instance.Commands[commandName]);
-                return;
+                string providerId = filter[..^1];
+                if (!CLI.Instance.Providers.ContainsKey(providerId)) throw new InvalidOperationException($"No CommandProvider with id '{providerId}' found.");
+                toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Source.Id == providerId);
             }
+            else toPrint = [CLI.Instance.Commands[filter]];
 
-            Console.WriteLine("Available commands:");
-            foreach (CommandInfo cmd in CLI.Instance.UniqueCommands.Values.OrderBy(c => c.Id)) WriteCommand(cmd);
+            foreach (CommandInfo cmd in toPrint) WriteCommand(cmd);
         }
         [Command("Opens the folder where the executable is located.", idOverride: "dir", useProviderNamespace: false)]
         public void Directory()
         {
-            Console.WriteLine("Opening STOLON main directory..");
             Process.Start(Environment.OSVersion.Platform switch
             {
                 PlatformID.Win32NT => "explorer.exe",
                 PlatformID.Unix => "xdg-open",
                 _ => "open"
             }, AppDomain.CurrentDomain.BaseDirectory);
+            Console.WriteLine("Opened STOLON main directory.");
         }
     }
 }

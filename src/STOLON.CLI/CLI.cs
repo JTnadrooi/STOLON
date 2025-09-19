@@ -21,6 +21,7 @@ namespace STOLON.CLI
 
         public FrozenDictionary<string, CommandInfo> Commands { get; }
         public FrozenDictionary<string, CommandInfo> UniqueCommands { get; }
+        public FrozenDictionary<string, CommandProvider> Providers { get; }
         public DebugStream Debug { get; }
         public CLIConfig Config { get; }
 
@@ -38,12 +39,14 @@ namespace STOLON.CLI
 
             Debug.Log(">creating cli.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
+            Dictionary<string, CommandProvider> providers = new Dictionary<string, CommandProvider>();
             Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
             List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (Type providerType in commandProviderTypes)
             {
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
+                providers.Add(providerInstance.Id, providerInstance);
 
                 MethodInfo[] commandMethods = providerType.GetMethods();
                 foreach (MethodInfo methodInfo in commandMethods)
@@ -67,9 +70,10 @@ namespace STOLON.CLI
 
             Commands = commandInfos.ToFrozenDictionary();
             UniqueCommands = uniqueCommandInfos.ToFrozenDictionary();
+            Providers = providers.ToFrozenDictionary();
 
             Debug.Log($"<cli created succesfully.");
-            Console.WriteLine(UniqueCommands.ToJoinedString(",\n"));
+            //Console.WriteLine(UniqueCommands.ToJoinedString(",\n"));
         }
 
         public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
