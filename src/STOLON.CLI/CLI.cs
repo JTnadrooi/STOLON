@@ -58,7 +58,10 @@ namespace STOLON.CLI
                 foreach (MethodInfo methodInfo in commandMethods)
                     if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
                     {
-                        List<string> ids = new List<string>() { (attribute.UseProviderNamespace ? (providerInstance.Id + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower()) };
+                        string cmdId;
+                        if (methodInfo.Name == "_M") cmdId = providerInstance.Id;
+                        else cmdId = (attribute.UseProviderNamespace ? (providerInstance.Id + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
+                        List<string> ids = new List<string>() { cmdId };
                         if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
                         string[] idArray = ids.ToArray();
                         CommandInfo info = new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance);
