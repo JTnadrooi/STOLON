@@ -13,11 +13,27 @@ namespace STOLON.CLI
         {
 
         }
-        [Command("Open the folder where STOLON is located.", inheritNamespace: false)]
+        [Command("Start STOLON.", inheritNamespace: false)]
         public void Start()
         {
-            Process.Start("STOLON.exe");
-            Console.WriteLine("Started STOLON.");
+            using Process p = Process.Start("STOLON.exe");
+            Console.WriteLine($"Started STOLON as '{p.ProcessName}'.");
+        }
+        [Command("Exit STOLON", inheritNamespace: false)]
+        public void Exit()
+        {
+            Process[] processes = Process.GetProcessesByName("STOLON");
+            if (processes.Length > 0)
+                foreach (Process process in processes)
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                        process.WaitForExit();
+                        Console.WriteLine($"STOLON process with PID {process.Id} has been terminated.");
+                    }
+                }
+            else Console.WriteLine("No running STOLON processes found.");
         }
     }
 }
