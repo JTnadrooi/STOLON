@@ -8,8 +8,8 @@ namespace STOLON.CLI
 {
     public abstract class CommandProvider
     {
-        public string Id { get; }
-        public CommandProvider(string id) => Id = id;
-        public override string ToString() => $"CommandProvider(Id: {Id})";
+        public string Namespace { get; }
+        public CommandProvider(string @namespace) => Namespace = @namespace;
+        public override string ToString() => $"CommandProvider(Id: {Namespace})";
     }
 }

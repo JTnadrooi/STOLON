@@ -13,7 +13,7 @@ namespace STOLON.CLI
         {
 
         }
-        [Command("Open the folder where STOLON is located.", useProviderNamespace: false)]
+        [Command("Open the folder where STOLON is located.", inheritNamespace: false)]
         public void Start()
         {
             Process.Start("STOLON.exe");

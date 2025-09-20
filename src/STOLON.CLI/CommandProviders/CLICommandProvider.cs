@@ -15,7 +15,7 @@ namespace STOLON.CLI
         public CLICommandProvider() : base("cli") { }
         [Command("Print the cli version.")]
         public void Version() => Console.WriteLine(CLI.VersionString);
-        [Command("Display help.", aliases: ["?", "h"], useProviderNamespace: false)]
+        [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false)]
         public void Help(string? filter = null)
         {
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
@@ -28,7 +28,7 @@ namespace STOLON.CLI
             {
                 string providerId = filter[..^1];
                 if (!CLI.Instance.Providers.ContainsKey(providerId)) throw new InvalidOperationException($"No CommandProvider with id '{providerId}' found.");
-                toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Source.Id == providerId);
+                toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Source.Namespace == providerId);
             }
             else toPrint = [CLI.Instance.Commands[filter]];
 

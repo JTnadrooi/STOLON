@@ -52,15 +52,15 @@ namespace STOLON.CLI
             foreach (Type providerType in commandProviderTypes)
             {
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
-                providers.Add(providerInstance.Id, providerInstance);
+                providers.Add(providerInstance.Namespace, providerInstance);
 
                 MethodInfo[] commandMethods = providerType.GetMethods();
                 foreach (MethodInfo methodInfo in commandMethods)
                     if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
                     {
                         string cmdId;
-                        if (methodInfo.Name == "_M") cmdId = providerInstance.Id;
-                        else cmdId = (attribute.UseProviderNamespace ? (providerInstance.Id + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
+                        if (methodInfo.Name == "_M") cmdId = providerInstance.Namespace;
+                        else cmdId = (attribute.InheritNamespace ? (providerInstance.Namespace + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
                         List<string> ids = new List<string>() { cmdId };
                         if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
                         string[] idArray = ids.ToArray();
@@ -152,13 +152,13 @@ namespace STOLON.CLI
         public string? IdOverride { get; }
         public string[]? Aliases { get; }
         public string Description { get; }
-        public bool UseProviderNamespace { get; }
-        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool useProviderNamespace = true)
+        public bool InheritNamespace { get; }
+        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool inheritNamespace = true)
         {
             IdOverride = idOverride;
             Description = description;
             Aliases = aliases;
-            UseProviderNamespace = useProviderNamespace;
+            InheritNamespace = inheritNamespace;
         }
     }
 }
