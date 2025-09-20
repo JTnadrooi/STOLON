@@ -35,16 +35,5 @@ namespace STOLON.CLI
 
             foreach (CommandInfo cmd in toPrint) WriteCommand(cmd);
         }
-        [Command("Opens the folder where the executable is located.", idOverride: "dir", useProviderNamespace: false)]
-        public void Directory()
-        {
-            Process.Start(Environment.OSVersion.Platform switch
-            {
-                PlatformID.Win32NT => "explorer.exe",
-                PlatformID.Unix => "xdg-open",
-                _ => "open"
-            }, AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine("Opened STOLON main directory.");
-        }
     }
 }
