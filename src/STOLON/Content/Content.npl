@@ -1,7 +1,7 @@
 {
   "root": "",
   "references": [
-    "../../../build/Debug/MonoGame.Extended.Content.Pipeline.dll"
+    //"../../../build/Debug/MonoGame.Extended.Content.Pipeline.dll" // fonts load fine without this for reasons unknown.
   ],
   "content": {
     "textures": {
