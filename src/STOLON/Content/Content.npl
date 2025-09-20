@@ -1,7 +1,7 @@
 {
   "root": "",
   "references": [
-    "..\\pipeline-references\\MonoGame.Extended.Content.Pipeline.dll"
+    "../../../build/Debug/MonoGame.Extended.Content.Pipeline.dll"
   ],
   "content": {
     "textures": {
