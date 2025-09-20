@@ -12,7 +12,7 @@
 		<Reference Include="AsitLib">
 			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
 		</Reference>
-		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" />
+		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,11 +20,9 @@
 			<NoWarn>NU1701</NoWarn>
 		</PackageReference>
 	</ItemGroup>
-
 	<ItemGroup>
-		<None Include="..\STOLON\Assets\**\*.*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+		<None Include="..\STOLON\Assets\**\*.*"  Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
-
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
