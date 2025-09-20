@@ -8,6 +8,10 @@
 		<BaseOutputPath>..\..\build</BaseOutputPath>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<Reference Include="AsitLib">
 			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>

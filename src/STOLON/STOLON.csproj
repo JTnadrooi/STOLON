@@ -7,15 +7,22 @@
 		<TieredCompilation>false</TieredCompilation>
 		<BaseOutputPath>..\..\build</BaseOutputPath>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
 	<PropertyGroup>
 		<MonoGameExtendedPipelineReferencePath>$(MSBuildThisFileDirectory)pipeline-references</MonoGameExtendedPipelineReferencePath>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
+
 	<ItemGroup>
 		<Compile Remove="Content\bin\**" />
 		<Compile Remove="Content\obj\**" />
@@ -24,19 +31,23 @@
 		<None Remove="Content\bin\**" />
 		<None Remove="Content\obj\**" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<Reference Include="AsitLib">
 			<HintPath>./Assets/AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
+
 	<ItemGroup>
 		<None Remove="Icon.ico" />
 		<None Remove="Icon.bmp" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<EmbeddedResource Include="Icon.ico" />
 		<EmbeddedResource Include="Icon.bmp" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Betwixt" Version="1.4.1">
 			<NoWarn>NU1701</NoWarn>
@@ -52,9 +63,11 @@
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="Nopipeline.Task" Version="2.3.0" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<SLBuildAssets Include="Assets\**\*.*"  Exclude="..\STOLON\Assets\**\.gitkeep" />
+		<SLBuildAssets Include="Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep" />
 	</ItemGroup>
+
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
