@@ -21,7 +21,7 @@ namespace STOLON.CLI
         [Command("Open the folder where STOLON is located.")]
         public void Open()
         {
-            Process.Start(Environment.OSVersion.Platform switch
+            using Process p = Process.Start(Environment.OSVersion.Platform switch
             {
                 PlatformID.Win32NT => "explorer.exe",
                 PlatformID.Unix => "xdg-open",
