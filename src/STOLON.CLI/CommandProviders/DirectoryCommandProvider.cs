@@ -13,12 +13,12 @@ namespace STOLON.CLI
         {
 
         }
-        [Command("Prints the folder where STOLON is located.")]
+        [Command("Print the folder where STOLON is located.")]
         public void _M()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
         }
-        [Command("Opens the folder where STOLON is located.")]
+        [Command("Open the folder where STOLON is located.")]
         public void Open()
         {
             Process.Start(Environment.OSVersion.Platform switch

@@ -13,9 +13,9 @@ namespace STOLON.CLI
     public class CLICommandProvider : CommandProvider
     {
         public CLICommandProvider() : base("cli") { }
-        [Command("Prints the cli version.")]
+        [Command("Print the cli version.")]
         public void Version() => Console.WriteLine(CLI.VersionString);
-        [Command("Displays help.", aliases: ["?", "h"], useProviderNamespace: false)]
+        [Command("Display help.", aliases: ["?", "h"], useProviderNamespace: false)]
         public void Help(string? filter = null)
         {
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
@@ -34,7 +34,7 @@ namespace STOLON.CLI
 
             foreach (CommandInfo cmd in toPrint) WriteCommand(cmd);
         }
-        [Command("Exits the program.")]
+        [Command("Exit the program.")]
         public void Exit() => Environment.Exit(0);
         [Command("Bump the .cli-version to .version.")]
         public void Bump()

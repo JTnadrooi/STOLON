@@ -14,7 +14,7 @@ namespace STOLON.CLI
         private TextWriter? originalOut;
         private TextWriter? originalErr;
 
-        public SilentFlagHandler() : base("silent", "Silences stdout.", "s")
+        public SilentFlagHandler() : base("silent", "Silence stdout.", "s")
         {
             originalOut = null;
             originalErr = null;
