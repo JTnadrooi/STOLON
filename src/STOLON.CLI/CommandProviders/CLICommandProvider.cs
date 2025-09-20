@@ -14,7 +14,7 @@ namespace STOLON.CLI
     {
         public CLICommandProvider() : base("cli") { }
         [Command("Print the cli version.")]
-        public void Version() => Console.WriteLine(CLI.VersionString);
+        public void Version() => Console.WriteLine(File.ReadAllText(".cli-version"));
         [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false)]
         public void Help(string? filter = null)
         {

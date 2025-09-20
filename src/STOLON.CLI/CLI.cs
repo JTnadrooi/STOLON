@@ -29,14 +29,13 @@ namespace STOLON.CLI
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public static CLI Instance { get; private set; }
-        public static string VersionString { get; internal set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         public CLI(string[] args)
         {
             Config = new CLIConfig();
             Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GlobalFlags.Contains("v") || args.Contains("-v")) };
-            VersionString = File.ReadAllText(".cli-version");
+
             Instance = this;
 
             Debug.Log(">creating cli.");

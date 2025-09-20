@@ -9,17 +9,14 @@ namespace STOLON.CLI
 {
     public class GameCommandProvider : CommandProvider
     {
-        public GameCommandProvider() : base("sl")
-        {
-
-        }
-        [Command("Start STOLON.", inheritNamespace: false)]
+        public GameCommandProvider() : base("sl") { }
+        [Command("Start STOLON.")]
         public void Start()
         {
             using Process p = Process.Start("STOLON.exe");
             Console.WriteLine($"Started STOLON as '{p.ProcessName}'.");
         }
-        [Command("Exit STOLON", inheritNamespace: false)]
+        [Command("Exit STOLON.")]
         public void Exit()
         {
             Process[] processes = Process.GetProcessesByName("STOLON");
@@ -35,5 +32,7 @@ namespace STOLON.CLI
                 }
             else Console.WriteLine("No running STOLON processes found.");
         }
+        [Command("Print the STOLON version.")]
+        public void Version() => Console.WriteLine(File.ReadAllText(".version"));
     }
 }
