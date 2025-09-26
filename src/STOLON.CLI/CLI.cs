@@ -146,6 +146,7 @@ namespace STOLON.CLI
         public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Source?.ToString()})";
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class CommandAttribute : Attribute
     {
         public string? IdOverride { get; }
