@@ -13,26 +13,34 @@ namespace STOLON.CLI
 {
     public static class CommandHelpers
     {
-        //public static (object?[] cmdArgs, string[] generalArgs) ParseArguments(string args, ParameterInfo[] expected) => ParseArguments(SplitArgs(args), )
+        public static void ValidateArgument(object? argument, ParameterInfo parameter)
+        {
+            IEnumerable<ValidationAttribute> validationAttributes = parameter.GetCustomAttributes<ValidationAttribute>();
+            foreach (ValidationAttribute attribute in validationAttributes)
+            {
+                ValidationResult? result = attribute.GetValidationResult(argument, new ValidationContext(argument!) { MemberName = parameter.Name });
+                if (result != ValidationResult.Success) throw new ArgumentException($"Argument '{parameter.Name}' is invalid: {result.ErrorMessage}");
+            }
+        }
+
+        public static object? ParseArgument(object? value, Type conversionType)
+        {
+            if (value == null) return null;
+            if (conversionType.IsEnum)
+                if (value is string s) return Enum.Parse(conversionType, s.Split('.')[^1], ignoreCase: true);
+                else return Enum.ToObject(conversionType, value);
+            return Convert.ChangeType(value, conversionType);
+        }
+
         public static object?[] ParseArguments(string[] args, ParameterInfo[] expected)
         {
-            void ValidateArgument(object? argument, ParameterInfo parameter)
-            {
-                IEnumerable<ValidationAttribute> validationAttributes = parameter.GetCustomAttributes<ValidationAttribute>();
-                foreach (ValidationAttribute attribute in validationAttributes)
-                {
-                    ValidationResult? result = attribute.GetValidationResult(argument, new ValidationContext(argument!) { MemberName = parameter.Name });
-                    if (result != ValidationResult.Success) throw new ArgumentException($"Argument '{parameter.Name}' is invalid: {result.ErrorMessage}");
-                }
-            }
-
             object?[] methodArguments = new object?[expected.Length];
 
             for (int i = 0; i < expected.Length; i++)
             {
                 if (i < args.Length)
                 {
-                    methodArguments[i] = (args[i] == "_" && expected[i].HasDefaultValue) ? expected[i].DefaultValue : Convert.ChangeType(args[i], expected[i].ParameterType);
+                    methodArguments[i] = (args[i] == "_" && expected[i].HasDefaultValue) ? expected[i].DefaultValue : ParseArgument(args[i], expected[i].ParameterType);
                     ValidateArgument(methodArguments[i], expected[i]);
                 }
                 else if (expected[i].HasDefaultValue) methodArguments[i] = expected[i].DefaultValue;
