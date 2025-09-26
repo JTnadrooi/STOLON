@@ -16,18 +16,17 @@ namespace STOLON.CLI
                 while (true)
                 {
                     Console.Write("> ");
-                    string[] newArgs = CommandHelpers.SplitArgs(Console.ReadLine()!);
                     if (cli.Config.GetBool("CLI.catch_errors", true))
                         try
                         {
-                            CLI.Instance.Execute(newArgs);
+                            CLI.Instance.Execute(Console.ReadLine()!);
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine("command failed: " + e.Message);
                         }
                     else
-                        CLI.Instance.Execute(newArgs);
+                        CLI.Instance.Execute(Console.ReadLine()!);
                 }
             }
             else CLI.Instance.Execute(args);

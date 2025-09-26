@@ -83,7 +83,7 @@ namespace STOLON.CLI
             Debug.Log($"<cli created succesfully.");
             //Console.WriteLine(UniqueCommands.ToJoinedString(",\n"));
         }
-
+        public void Execute(string str) => Execute(CommandHelpers.SplitArgs(str));
         public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
         public void Execute(ArgumentsInfo arguments)
         {
