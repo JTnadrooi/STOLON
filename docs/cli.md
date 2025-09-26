@@ -22,7 +22,7 @@ Arguments can be passed to commands by appending them after the command identifi
 2
 ```
 
-> [!WARN]
+> [!WARNING]
 > If an argument starts with a dash (e.g., `-2`), specify it after a `--` to > prevent it from being treated as a flag:
 >
 > ```cs
@@ -95,12 +95,10 @@ You can also explicitly force the default value to be used by using an underscor
 ```
 
 > [!WARNING]
-> In addition to values starting with a minus (`-`), the following parameter values have specific restrictions.
+> In addition to values starting with a hyphen (`-`), the following parameter values have specific restrictions.
 >
 > -   `--` can only be used after a previous `--`.
 > -   `_` is invalid and cannot be used.
-
-This makes the warning clearer and easier to follow. Let me know if you'd like to adjust any further details!
 
 ## All commands
 
