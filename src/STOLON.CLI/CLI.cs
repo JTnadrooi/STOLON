@@ -106,6 +106,12 @@ namespace STOLON.CLI
                     flagHandler.PostCommand();
         }
 
+        public void Exit(int exitCode = 0)
+        {
+            Dispose();
+            Environment.Exit(exitCode);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
