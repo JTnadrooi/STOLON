@@ -13,7 +13,7 @@ namespace STOLON.CLI
         {
 
         }
-        [Command("Print the folder where STOLON is located.")]
+        [Command("Print the folder where STOLON is located.", isReadOnly: true)]
         public void _M()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);

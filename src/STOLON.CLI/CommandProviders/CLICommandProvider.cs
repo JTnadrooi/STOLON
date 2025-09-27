@@ -13,9 +13,9 @@ namespace STOLON.CLI
     public class CLICommandProvider : CommandProvider
     {
         public CLICommandProvider() : base("cli") { }
-        [Command("Print the cli version.")]
+        [Command("Print the cli version.", isReadOnly: true)]
         public void Version() => Console.WriteLine(File.ReadAllText(".cli-version"));
-        [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false)]
+        [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, isReadOnly: true)]
         public void Help(string? filter = null)
         {
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()

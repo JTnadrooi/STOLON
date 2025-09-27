@@ -15,7 +15,7 @@ namespace STOLON.CLI
 
         }
 
-        [Command("Print repository link.")]
+        [Command("Print repository link.", isReadOnly: true)]
         public void _M()
         {
             Console.WriteLine("https://github.com/JTnadrooi/STOLON.git");

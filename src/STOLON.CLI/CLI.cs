@@ -159,12 +159,14 @@ namespace STOLON.CLI
         public string[]? Aliases { get; }
         public string Description { get; }
         public bool InheritNamespace { get; }
-        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool inheritNamespace = true)
+        public bool IsReadOnly { get; }
+        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool inheritNamespace = true, bool isReadOnly = false)
         {
             IdOverride = idOverride;
             Description = description;
             Aliases = aliases;
             InheritNamespace = inheritNamespace;
+            IsReadOnly = isReadOnly;
         }
     }
 }
