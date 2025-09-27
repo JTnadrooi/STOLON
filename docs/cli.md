@@ -7,7 +7,7 @@ The main documentation for the _STOLON.CLI_.
 To invoke a command, simply type its identifier in the console:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > ping
 pong!
 ```
@@ -17,7 +17,7 @@ pong!
 Arguments can be passed to commands by appending them after the command identifier seperated by spaces:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > add 1 1
 2
 ```
@@ -26,7 +26,7 @@ Arguments can be passed to commands by appending them after the command identifi
 > If an argument starts with a dash (e.g., `-2`), specify it after a `--` to > prevent it from being treated as a flag:
 >
 > ```cs
-> [STOLON.CLI]
+> ^[STOLON.CLI]
 > > add 1 -- -2
 > -1
 > ```
@@ -34,7 +34,7 @@ Arguments can be passed to commands by appending them after the command identifi
 If an argument contains spaces, enclose it in quotes to pass it as a single argument:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > greet "JT, JTnadrooi"
 Hello JT, JTnadrooi!
 ```
@@ -42,7 +42,7 @@ Hello JT, JTnadrooi!
 Without quotes, the arguments will be treated separately:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > greet JT, JTnadrooi
 Hello JT,!
 ```
@@ -56,7 +56,7 @@ Flags are passed using their full name, preceded by `--`:
 <sub>_(Logs collapsed for sake of conciseness)_</sub>
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > add 1 1 --verbose
 /..LOG DATA../
 2
@@ -65,7 +65,7 @@ Flags are passed using their full name, preceded by `--`:
 Some flags support shorthand versions, note the single minus instead of two:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > add 1 1 -v
 /..LOG DATA../
 2
@@ -81,7 +81,7 @@ Some flags support shorthand versions, note the single minus instead of two:
 Default variables are automatically filled in when omitted. Note this fictional `multiply` command accepts two values, the first one of which defaults to `2` while the second parameter defaults to `5`:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > multiply 5
 25
 ```
@@ -89,7 +89,7 @@ Default variables are automatically filled in when omitted. Note this fictional 
 You can also explicitly force the default value to be used by using an underscore (`_`). In the following example the first parameter defaults to 2:
 
 ```cs
-[STOLON.CLI]
+^[STOLON.CLI]
 > multiply _ 2
 4
 ```
