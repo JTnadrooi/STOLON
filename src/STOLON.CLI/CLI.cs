@@ -34,7 +34,7 @@ namespace STOLON.CLI
         public CLI(string[] args)
         {
             Config = new CLIConfig();
-            Debug = new DebugStream(header: "STOLON.CMD") { Silent = !(Config.GlobalFlags.Contains("v") || args.Contains("-v")) };
+            Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(Config.GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             Instance = this;
 
