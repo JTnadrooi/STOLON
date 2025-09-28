@@ -85,28 +85,28 @@ namespace STOLON
             _rt1 = GetDesired(newRes);
             _rt2.Dispose();
             _rt2 = GetDesired(newRes);
-            foreach (Shader effect in _shaders.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
+            foreach (Shader effect in _shaders.Values.Where(e => !e.IsVirtual)) effect.UpdateResolution(newRes);
             STOLON.Debug.Log($"updated fx pipeline res.");
         }
         public void DisableShader(string name)
         {
-            if (!_shaders[name].Enabled)
+            if (!_shaders[name].IsEnabled)
             {
                 STOLON.Debug.Log($"effect '{name}' already disabled.");
                 return;
             }
-            _shaders[name].Enabled = false;
+            _shaders[name].IsEnabled = false;
             STOLON.Debug.Log($"disabled effect with name '{name}'.");
         }
-        public bool IsEnabled(string name) => _shaders[name].Enabled;
+        public bool IsEnabled(string name) => _shaders[name].IsEnabled;
         public void EnableShader(string name)
         {
-            if (_shaders[name].Enabled)
+            if (_shaders[name].IsEnabled)
             {
                 STOLON.Debug.Log($"effect '{name}' already enabled.");
                 return;
             }
-            _shaders[name].Enabled = true;
+            _shaders[name].IsEnabled = true;
             STOLON.Debug.Log($"enabled effect with name '{name}'.");
         }
 
@@ -179,7 +179,7 @@ namespace STOLON
 
             RenderTarget2D finalVTarget = _vrt1;
 
-            foreach (Shader shader in _shaders.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
+            foreach (Shader shader in _shaders.Values.Where(e => e.IsVirtual && e.IsEnabled)) // apply virtual effects.
             {
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -199,7 +199,7 @@ namespace STOLON
 
             RenderTarget2D finalTarget = _rt1;
 
-            foreach (Shader shader in _shaders.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
+            foreach (Shader shader in _shaders.Values.Where(e => !e.IsVirtual && e.IsEnabled)) // apply normal effects.
             {
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
