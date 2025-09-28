@@ -151,7 +151,7 @@ namespace STOLON
             STOLON.VersionString = File.ReadAllText(".version");
             _environment.Initialize();
 
-            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableEffect("crt");
+            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableShader("crt");
 
             Debug.Success();
 

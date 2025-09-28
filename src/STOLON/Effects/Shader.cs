@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace STOLON
 {
-    public abstract class GameEffect
+    public abstract class Shader
     {
         private bool _enabled = true;
         public virtual bool Enabled { get => _enabled; set => _enabled = value; }
@@ -21,11 +21,11 @@ namespace STOLON
         public virtual void UpdateResolution(Point newDesiredRes) { }
     }
 
-    public class StolonReplaceColorEffect : GameEffect
+    public class StolonReplaceColorShader : Shader
     {
         public override Effect Effect { get; }
         public override bool Virtual => true;
-        public StolonReplaceColorEffect()
+        public StolonReplaceColorShader()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("Effects\\apply_palette");
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
@@ -36,11 +36,11 @@ namespace STOLON
         public override void UpdateResolution(Point newDesiredRes) { }
     }
 
-    public class CRTEffect : GameEffect
+    public class CRTShader : Shader
     {
         public override Effect Effect { get; }
         public override bool Virtual => false;
-        public CRTEffect()
+        public CRTShader()
         {
             Effect = STOLON.Instance.Content.Load<Effect>("Effects\\crt");
             Effect.Parameters["brightboost"].SetValue(0.92f);

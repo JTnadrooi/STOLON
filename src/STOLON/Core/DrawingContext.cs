@@ -1,16 +1,12 @@
-﻿using DiscordRPC;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STOLON
 {
@@ -20,7 +16,7 @@ namespace STOLON
 
         private readonly GraphicsDevice _graphics;
         private readonly SpriteBatch _spriteBatch;
-        private readonly Dictionary<string, GameEffect> _effects;
+        private readonly Dictionary<string, Shader> _shaders;
 
         private RenderTarget2D _vrt1;
         private RenderTarget2D _vrt2;
@@ -29,7 +25,7 @@ namespace STOLON
 
         private Matrix _invertYMatrix;
 
-        public ReadOnlyDictionary<string, GameEffect> Effects => _effects.AsReadOnly();
+        public ReadOnlyDictionary<string, Shader> Shaders => _shaders.AsReadOnly();
         public Matrix InvertYMatrix => _invertYMatrix;
         /// <summary>
         /// Note everything drawn to this will be inverted. Please use the extension methods or call <see cref="InvertY(SpriteEffects)"/> on the input <see cref="SpriteEffects"/> enum.
@@ -62,13 +58,13 @@ namespace STOLON
 
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
 
-            _effects = new Dictionary<string, GameEffect>();
-            GameEffect[] tempEffects = STOLON.Scan<GameEffect>();
+            _shaders = new Dictionary<string, Shader>();
+            Shader[] tempShaders = STOLON.Scan<Shader>();
             STOLON.Debug.Log(">searching for effects");
-            foreach (GameEffect effect in tempEffects)
+            foreach (Shader shader in tempShaders)
             {
-                STOLON.Debug.Log($"found effect with name '{effect.Effect.Name}'.");
-                _effects.Add(effect.Effect.Name["Effects\\".Length..], effect);
+                STOLON.Debug.Log($"found effect with name '{shader.Effect.Name}'.");
+                _shaders.Add(shader.Effect.Name["Effects\\".Length..], shader);
             }
             STOLON.Debug.Success();
 
@@ -89,28 +85,28 @@ namespace STOLON
             _rt1 = GetDesired(newRes);
             _rt2.Dispose();
             _rt2 = GetDesired(newRes);
-            foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
+            foreach (Shader effect in _shaders.Values.Where(e => !e.Virtual)) effect.UpdateResolution(newRes);
             STOLON.Debug.Log($"updated fx pipeline res.");
         }
-        public void DisableEffect(string name)
+        public void DisableShader(string name)
         {
-            if (!_effects[name].Enabled)
+            if (!_shaders[name].Enabled)
             {
                 STOLON.Debug.Log($"effect '{name}' already disabled.");
                 return;
             }
-            _effects[name].Enabled = false;
+            _shaders[name].Enabled = false;
             STOLON.Debug.Log($"disabled effect with name '{name}'.");
         }
-        public bool IsEnabled(string name) => _effects[name].Enabled;
-        public void EnableEffect(string name)
+        public bool IsEnabled(string name) => _shaders[name].Enabled;
+        public void EnableShader(string name)
         {
-            if (_effects[name].Enabled)
+            if (_shaders[name].Enabled)
             {
                 STOLON.Debug.Log($"effect '{name}' already enabled.");
                 return;
             }
-            _effects[name].Enabled = true;
+            _shaders[name].Enabled = true;
             STOLON.Debug.Log($"enabled effect with name '{name}'.");
         }
 
@@ -183,12 +179,12 @@ namespace STOLON
 
             RenderTarget2D finalVTarget = _vrt1;
 
-            foreach (GameEffect effect in _effects.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
+            foreach (Shader shader in _shaders.Values.Where(e => e.Virtual && e.Enabled)) // apply virtual effects.
             {
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Effect);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 _spriteBatch.Draw(_vrt1, Vector2.Zero, Color.White);
                 _spriteBatch.End();
 
@@ -203,12 +199,12 @@ namespace STOLON
 
             RenderTarget2D finalTarget = _rt1;
 
-            foreach (GameEffect effect in _effects.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
+            foreach (Shader shader in _shaders.Values.Where(e => !e.Virtual && e.Enabled)) // apply normal effects.
             {
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect.Effect);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 _spriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
                 _spriteBatch.End();
 
@@ -358,7 +354,7 @@ namespace STOLON
                 _vrt2.Dispose();
                 _rt1.Dispose();
                 _rt2.Dispose();
-                foreach (GameEffect effect in _effects.Values) (effect as IDisposable)?.Dispose();
+                foreach (Shader shader in _shaders.Values) (shader as IDisposable)?.Dispose();
                 _disposedValue = true;
             }
         }
