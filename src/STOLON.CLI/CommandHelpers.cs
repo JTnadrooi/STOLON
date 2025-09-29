@@ -64,7 +64,7 @@ namespace STOLON.CLI
 
         public static ArgumentsInfo RefineArguments(string[] args)
         {
-            HashSet<string> merged = new HashSet<string>(CLI.Instance.Config.GlobalFlags);
+            HashSet<string> merged = new HashSet<string>(CLI.Instance.GlobalFlags);
             List<string> positionalArgs = new List<string>();
             bool afterSeparator = false;
             for (int i = 1; i < args.Length; i++)

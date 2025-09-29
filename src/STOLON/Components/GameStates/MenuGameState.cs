@@ -129,8 +129,8 @@ namespace STOLON
 
             _depthPath = new List<UIElement>();
 
-            _showSplashtexts = STOLON.Config.GetBool("Graphics.splashtexts_show");
-            _showEntityProfiles = STOLON.Config.GetBool("Graphics.entities_show_on_menu");
+            _showSplashtexts = STOLON.Config.GetBool("graphics.splashtexts_show");
+            _showEntityProfiles = STOLON.Config.GetBool("graphics.entities_show_on_menu");
 
             _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
 

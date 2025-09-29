@@ -25,7 +25,9 @@ namespace STOLON.CLI
         public FrozenDictionary<string, FlagHandler> FlagHandlers { get; }
 
         public DebugStream Debug { get; }
-        public CLIConfig Config { get; }
+        public Configuration Config { get; }
+
+        public HashSet<string> GlobalFlags { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public static CLI Instance { get; private set; }
@@ -33,8 +35,9 @@ namespace STOLON.CLI
 
         public CLI(string[] args)
         {
-            Config = new CLIConfig();
-            Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(Config.GlobalFlags.Contains("v") || args.Contains("-v")) };
+            Config = new Configuration();
+            GlobalFlags = Config.GetValue<string[]>("cli.global_flags").ToHashSet();
+            STOLON.Debug = Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             Instance = this;
 

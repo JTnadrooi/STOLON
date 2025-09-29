@@ -63,9 +63,9 @@ namespace STOLON
 
         static GameStateHelpers()
         {
-            SkipTo = STOLON.Config.GetString("Debug.skip_to");
-            SkipAnimation = STOLON.Config.GetBool("Debug.skip_gamestage_animation");
-            SkipArgs = STOLON.Config.GetString("Debug.skip_to_parameters")[1..^1].Split(",").Select(s => s.Trim()).ToArray().AsReadOnly();
+            SkipTo = STOLON.Config.GetString("debug.skip.target");
+            SkipAnimation = STOLON.Config.GetBool("debug.skip.skip_gamestage_animation");
+            SkipArgs = STOLON.Config.GetValue<string[]>("debug.skip.parameters").AsReadOnly();
         }
     }
     public class GameStateManager

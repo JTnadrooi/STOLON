@@ -16,7 +16,7 @@ namespace STOLON.CLI
                 while (true)
                 {
                     Console.Write("> ");
-                    if (cli.Config.GetBool("CLI.catch_errors", true))
+                    if (cli.Config.GetBool("cli.catch_errors", true))
                         try
                         {
                             CLI.Instance.Execute(Console.ReadLine()!);

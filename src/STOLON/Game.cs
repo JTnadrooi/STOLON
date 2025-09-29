@@ -140,7 +140,7 @@ namespace STOLON
             ];
             STOLON.Debug.Log("palette set.");
 
-            STOLON.Config = new GameConfig();
+            STOLON.Config = new Configuration();
             STOLON.Audio = new AudioEngine();
             STOLON.Textures = _textures = new Texture2DCollection(Content);
             STOLON.Fonts = _fonts = new Font2DCollection(Content);
@@ -151,11 +151,11 @@ namespace STOLON
             STOLON.VersionString = File.ReadAllText(".version");
             _environment.Initialize();
 
-            if (!STOLON.Config.GetBool("Graphics.crt_enable")) _drawingContext.DisableShader("crt");
+            if (!STOLON.Config.GetBool("graphics.crt.enable")) _drawingContext.DisableShader("crt");
 
             Debug.Success();
 
-            bool silenceConsole = !STOLON.Config.GetBool("Debug.log_enable");
+            bool silenceConsole = !STOLON.Config.GetBool("debug.log.enable");
             if (silenceConsole) STOLON.Debug.Log("console will be silenced.");
             STOLON.Debug.Silent = silenceConsole;
 
@@ -224,12 +224,12 @@ namespace STOLON
         public static Texture2DCollection Textures { get; private set; }
         public static Font2DCollection Fonts { get; private set; }
         public static AudioEngine Audio { get; private set; }
-        public static DebugStream Debug { get; private set; }
+        public static DebugStream Debug { get; set; }
         public static GameEnvironment Environment { get; private set; }
         public static GameInput Input { get; private set; }
         public static GameStateManager StateManager { get; internal set; }
         public static Interface UI { get; internal set; }
-        public static GameConfig Config { get; internal set; }
+        public static Configuration Config { get; internal set; }
         public static DrawingContext DrawingContext { get; internal set; }
         public static TaskHeap Tasks { get; internal set; }
         public static string VersionString { get; internal set; }

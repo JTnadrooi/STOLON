@@ -16,16 +16,13 @@
 		<Reference Include="AsitLib">
 			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
 		</Reference>
-		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep"/>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="ini-parser" Version="2.5.2">
-			<NoWarn>NU1701</NoWarn>
-		</PackageReference>
+		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\STOLON\Assets\**\*.*"  Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+		<None Include="..\STOLON\Assets\**\*.*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\STOLON\STOLON.csproj" />
 	</ItemGroup>
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />

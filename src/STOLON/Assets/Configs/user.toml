@@ -1,0 +1,38 @@
+[audio]
+enable = true
+stereo = true
+
+[audio.vol]
+fx = 0.05
+ost = 0.05
+master = 1.0
+
+[debug]
+
+[debug.console]
+enable = true  # wip
+theme = "default"  # wip
+
+[debug.log]
+enable = true  # wip
+style = "default"  # wip
+
+[debug.skip]
+enable = true
+target = "entity_select"        # allowed values: entity_select | main_menu
+skip_gamestage_animation = true
+parameters = ["silo"]           # wip
+
+[graphics]
+theme = "default"             # wip
+entities_show_on_menu = false # not fully implemented / wip
+splashtexts_show = true
+fullscreen = false  # wip
+resolution = { w = 1, h = 1 }  # wip
+
+[graphics.crt]
+enable = true
+
+[cli]
+catch_errors = false
+global_flags = []
