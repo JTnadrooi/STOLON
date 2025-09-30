@@ -24,15 +24,14 @@ namespace STOLON.CLI
         public FrozenDictionary<string, CommandProvider> Providers { get; }
         public FrozenDictionary<string, FlagHandler> FlagHandlers { get; }
 
-        public DebugStream Debug { get; }
         public Configuration Config { get; }
 
         public HashSet<string> GlobalFlags { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public static CLI Instance { get; private set; }
+        public static DebugStream Debug { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-
         public CLI(string[] args)
         {
             Config = new Configuration();

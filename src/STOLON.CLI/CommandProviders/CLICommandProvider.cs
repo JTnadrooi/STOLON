@@ -41,7 +41,7 @@ namespace STOLON.CLI
         {
             string slVer = File.ReadAllText(".version");
             File.WriteAllText(".cli-version", slVer);
-            Console.WriteLine($"Bumped .cli-version to {slVer}.");
+            CLI.Debug.Log($"bumped .cli-version to {slVer}.");
         }
     }
 }

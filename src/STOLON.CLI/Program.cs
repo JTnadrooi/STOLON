@@ -12,7 +12,7 @@ namespace STOLON.CLI
 
             if (args.Length == 0)
             {
-                CLI.Instance.Debug.Log("no startup arguments given, awaiting arguments.");
+                CLI.Debug.Log("no startup arguments given, awaiting arguments.");
                 while (true)
                 {
                     Console.Write("> ");

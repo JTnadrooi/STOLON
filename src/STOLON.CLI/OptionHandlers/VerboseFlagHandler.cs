@@ -15,17 +15,17 @@ namespace STOLON.CLI
 
         public VerboseFlagHandler() : base("verbose", "Enable verbose logging.", "v")
         {
-            _initialVerboseState = CLI.Instance.Debug.Silent;
+            _initialVerboseState = CLI.Debug.Silent;
         }
 
         public override void PreCommand(ArgumentsInfo arguments)
         {
-            CLI.Instance.Debug.Silent = false;
+            CLI.Debug.Silent = false;
         }
 
         public override void PostCommand()
         {
-            CLI.Instance.Debug.Silent = _initialVerboseState;
+            CLI.Debug.Silent = _initialVerboseState;
         }
     }
 }

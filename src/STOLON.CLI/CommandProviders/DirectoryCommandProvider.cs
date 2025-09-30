@@ -22,7 +22,7 @@ namespace STOLON.CLI
                 PlatformID.Unix => "xdg-open",
                 _ => "open"
             }, AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine("Opened STOLON directory.");
+            CLI.Debug.Log("Opened STOLON directory.");
         }
 
         [Command("Print the path to folder where STOLON is located.", isReadOnly: true)]

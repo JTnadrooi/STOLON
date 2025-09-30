@@ -14,7 +14,7 @@ namespace STOLON.CLI
         public void Start()
         {
             using Process p = Process.Start("STOLON.exe");
-            Console.WriteLine($"Started STOLON as '{p.ProcessName}'.");
+            CLI.Debug.Log($"started STOLON as '{p.ProcessName}'.");
         }
         [Command("Exit STOLON.")]
         public void Exit()
@@ -27,7 +27,7 @@ namespace STOLON.CLI
                     {
                         process.Kill();
                         process.WaitForExit();
-                        Console.WriteLine($"STOLON process with PID {process.Id} has been terminated.");
+                        CLI.Debug.Log($"STOLON process with PID {process.Id} has been terminated.");
                     }
                 }
             else Console.WriteLine("No running STOLON processes found.");
