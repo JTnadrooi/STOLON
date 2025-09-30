@@ -1,9 +1,11 @@
-﻿using System;
+﻿using AsitLib;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tomlyn.Model;
 
 namespace STOLON.CLI
 {
@@ -24,6 +26,18 @@ namespace STOLON.CLI
         public void Path()
         {
             Console.WriteLine(System.IO.Path.GetFullPath(_userIniPath));
+        }
+
+        [Command("Print the value of a key.", isReadOnly: true)]
+        public void Get(string key)
+        {
+            string Represent(object o)
+            {
+                if (o is TomlArray tomlArray) return $"[{tomlArray.ToJoinedString(", ")}]";
+                if (o is TomlTable tomlTable) return $"[{tomlTable.ToJoinedString(", ")}]";
+                return o.ToString()!;
+            }
+            Console.WriteLine(Represent(CLI.Instance.Config.GetValue(key)));
         }
     }
 }
