@@ -13,13 +13,8 @@ namespace STOLON.CLI
         {
 
         }
-        [Command("Print the folder where STOLON is located.", isReadOnly: true)]
-        public void _M()
-        {
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
-        }
         [Command("Open the folder where STOLON is located.")]
-        public void Open()
+        public void _M()
         {
             using Process p = Process.Start(Environment.OSVersion.Platform switch
             {
@@ -28,6 +23,12 @@ namespace STOLON.CLI
                 _ => "open"
             }, AppDomain.CurrentDomain.BaseDirectory);
             Console.WriteLine("Opened STOLON directory.");
+        }
+
+        [Command("Print the path to folder where STOLON is located.", isReadOnly: true)]
+        public void Path()
+        {
+            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
         }
     }
 }
