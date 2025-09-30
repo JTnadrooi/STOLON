@@ -81,8 +81,8 @@ namespace STOLON
                 {"graphics.entities_show_on_menu", true},
                 {"graphics.splashtexts_show", true},
                 {"graphics.fullscreen", false},
-                {"graphics.resolution.w", 1920},
-                {"graphics.resolution.h", 1080},
+                {"graphics.res.w", 1920},
+                {"graphics.res.h", 1080},
                 {"graphics.crt.enable", true},
 
                 {"cli.catch_errors", true},

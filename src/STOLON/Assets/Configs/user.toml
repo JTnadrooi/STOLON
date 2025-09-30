@@ -28,7 +28,7 @@ theme = "default"             # wip
 entities_show_on_menu = false # not fully implemented / wip
 splashtexts_show = true
 fullscreen = false            # wip
-resolution = { w = 1, h = 1 } # wip
+res = { w = 1, h = 1 } # wip
 
 [graphics.crt]
 enable = true
