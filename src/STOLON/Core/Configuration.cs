@@ -1,4 +1,6 @@
 ﻿using AsitLib;
+using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -6,34 +8,64 @@ using System.IO;
 using System.Linq;
 using Tomlyn;
 using Tomlyn.Model;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace STOLON
 {
     public class Configuration
     {
-        private struct Entry
-        {
-            public string Path;
-            public object Value;
-            public Entry(string path, object? value, object defaultValue) // boxing galore
-            {
-                Path = path;
-                Value = value ?? defaultValue;
-            }
-        }
+        public readonly record struct Entry(string Path, object DefaultValue);
         private TomlTable _model;
-        private FrozenDictionary<string, object> _defaults;
+        public FrozenDictionary<string, Entry> Entries { get; }
         public Configuration() // no debug printing svp!
         {
+
+            int ForKeys(Action<string, object?> forKeys, TomlTable? table = null, string prefix = "")
+            {
+                table = table ?? _model;
+                int count = 0;
+
+                foreach (string key in table.Keys)
+                {
+                    string fullKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}.{key}";
+                    object? value = table[key];
+
+                    if (value is TomlTable subTable) count += ForKeys(forKeys, subTable, fullKey);
+                    else
+                    {
+                        forKeys(fullKey, value);
+                        count++;
+                    }
+                }
+
+                return count;
+            }
+
+            bool IsSameOrConvertible(object? value, Type expectedType)
+            {
+                if (value == null) return false;
+                if (expectedType.IsAssignableFrom(value.GetType())) return true;
+                try
+                {
+                    Convert.ChangeType(value, expectedType);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
             string path = @"Configs\user.toml";
 
             _model = Toml.ToModel(File.ReadAllText(path));
-            _defaults = new Dictionary<string, object>{
+            Dictionary<string, object> defaults = new Dictionary<string, object>{
                 {"audio.enable", true},
                 {"audio.stereo", true},
                 {"audio.vol.fx", 0.5},
                 {"audio.vol.ost", 1.0},
                 {"audio.vol.master", 1.0},
+
                 {"debug.console.enable", true},
                 {"debug.console.theme", "default"},
                 {"debug.log.enable", true},
@@ -41,6 +73,8 @@ namespace STOLON
                 {"debug.skip.enable", true},
                 {"debug.skip.target", "main_menu"},
                 {"debug.skip.skip_gamestage_animation", true},
+                {"debug.skip.parameters", Array.Empty<string>()},
+
                 {"graphics.theme", "default"},
                 {"graphics.entities_show_on_menu", true},
                 {"graphics.splashtexts_show", true},
@@ -48,28 +82,30 @@ namespace STOLON
                 {"graphics.resolution.w", 1920},
                 {"graphics.resolution.h", 1080},
                 {"graphics.crt.enable", true},
+
                 {"cli.catch_errors", true},
                 {"cli.global_flags", Array.Empty<string>()},
                 {"cli.enable_global_flags_on_startup_arguments", true}
                 //{"___", true},
-            }.ToFrozenDictionary();
+            };
 
-            void PrintKeys(TomlTable table, string prefix = "")
+            int filekeyCount = ForKeys((k, v) =>
             {
-                foreach (string key in table.Keys)
+                if (!defaults.TryGetValue(k, out object? defaultValue)) throw new Exception($"Unexpected key '{k}' found.");
+                if (v is TomlArray tomlArray)
                 {
-                    string fullKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}.{key}";
-                    object? value = table[key];
-
-                    string typeName = value?.GetType().ToString() ?? "null";
-
-                    Console.WriteLine($"{fullKey} ({typeName})");
-
-                    if (value is TomlTable subTable)
-                        PrintKeys(subTable, fullKey);
+                    Type elemType = ((Array)defaultValue).GetType().GetElementType()!;
+                    for (int i = 0; i < tomlArray.Count; i++)
+                        if (!IsSameOrConvertible(tomlArray[i], elemType))
+                            throw new Exception($"Type mismatch in '{k}[{i}]'. Expected {elemType}, got {tomlArray[i]?.GetType()}");
                 }
-            }
-            //PrintKeys(_model);
+                else if (!IsSameOrConvertible(v, defaultValue.GetType())) throw new Exception($"Type mismatch for '{k}'. Expected {defaultValue.GetType()}, got {v?.GetType()}.");
+            });
+            //ForKeys((k, v) => Console.WriteLine($"{k} ({v?.GetType().ToString() ?? "null"})"));
+
+            //if (filekeyCount != defaults.Count) throw new Exception($"Key count mismatch. File has {filekeyCount}, expected {defaults.Count}.");
+
+            Entries = defaults.Select(d => new KeyValuePair<string, Entry>(d.Key, new Entry(d.Key, d.Value))).ToFrozenDictionary();
         }
         public float GetFloat(string path) => GetValue<float>(path);
         public int GetInt(string path) => GetValue<int>(path);
@@ -98,7 +134,7 @@ namespace STOLON
 
             foreach (string segment in segments)
                 if (currentValue is TomlTable table && table.ContainsKey(segment)) currentValue = table[segment];
-                else return (T)_defaults[path];
+                else return (T)Entries[path].DefaultValue;
             //else throw new KeyNotFoundException($"Key '{segment}' not found.");
             if (currentValue == null) throw new InvalidCastException($"Cannot convert value at '{path}' to type {typeof(T)}.");
 
