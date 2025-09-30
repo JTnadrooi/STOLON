@@ -59,7 +59,6 @@ namespace STOLON
                 }
             }
 
-
             _model = Toml.ToModel(File.ReadAllText(PATH));
             Dictionary<string, object> defaults = new Dictionary<string, object>{
                 {"audio.enable", true},
@@ -131,6 +130,7 @@ namespace STOLON
                         return (T)(object)array;
                     }
                     else throw new InvalidCastException($"Cannot convert value at '{key}' to array type {typeof(T)}.");
+                if (currentValue is TomlTable) throw new InvalidCastException($"Cannot get table '{key}' as any value.");
                 if (typeof(T) == typeof(object)) return (T)currentValue;
                 return (T)Convert.ChangeType(currentValue, typeof(T));
             }
