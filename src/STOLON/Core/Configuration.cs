@@ -15,11 +15,14 @@ namespace STOLON
     public class Configuration
     {
         public readonly record struct Entry(string Path, object DefaultValue);
-        private TomlTable _model;
+
         public FrozenDictionary<string, Entry> Entries { get; }
+
+        private TomlTable _model;
+        private const string PATH = @"Configs\user.toml";
+
         public Configuration() // no debug printing svp!
         {
-
             int ForKeys(Action<string, object?> forKeys, TomlTable? table = null, string prefix = "")
             {
                 table = table ?? _model;
@@ -56,9 +59,8 @@ namespace STOLON
                 }
             }
 
-            string path = @"Configs\user.toml";
 
-            _model = Toml.ToModel(File.ReadAllText(path));
+            _model = Toml.ToModel(File.ReadAllText(PATH));
             Dictionary<string, object> defaults = new Dictionary<string, object>{
                 {"audio.enable", true},
                 {"audio.stereo", true},
@@ -107,12 +109,16 @@ namespace STOLON
 
             Entries = defaults.Select(d => new KeyValuePair<string, Entry>(d.Key, new Entry(d.Key, d.Value))).ToFrozenDictionary();
         }
-        public float GetFloat(string path) => GetValue<float>(path);
-        public int GetInt(string path) => GetValue<int>(path);
-        public double GetDouble(string path) => GetValue<double>(path);
-        public bool GetBool(string path) => GetValue<bool>(path);
-        public string GetString(string path) => GetValue<string>(path);
-        public T GetValue<T>(string path)
+        public float GetFloat(string key) => GetValue<float>(key);
+        public int GetInt(string key) => GetValue<int>(key);
+        public int GetByte(string key) => GetValue<byte>(key);
+        public double GetDouble(string key) => GetValue<double>(key);
+        public bool GetBool(string key) => GetValue<bool>(key);
+        public string GetString(string key) => GetValue<string>(key);
+        public char GetChar(string key) => GetValue<char>(key);
+        public object GetValue(string key) => GetValue<object>(key);
+        public T[] GetArray<T>(string key) => GetValue<T[]>(key);
+        public T GetValue<T>(string key)
         {
             T ParseToType(object currentValue)
             {
@@ -124,19 +130,19 @@ namespace STOLON
                         for (int i = 0; i < tomlArray.Count; i++) array.SetValue(Convert.ChangeType(tomlArray[i], elementType), i);
                         return (T)(object)array;
                     }
-                    else throw new InvalidCastException($"Cannot convert value at '{path}' to array type {typeof(T)}.");
+                    else throw new InvalidCastException($"Cannot convert value at '{key}' to array type {typeof(T)}.");
                 if (typeof(T) == typeof(object)) return (T)currentValue;
                 return (T)Convert.ChangeType(currentValue, typeof(T));
             }
 
-            string[] segments = path.Split('.');
+            string[] segments = key.Split('.');
             object? currentValue = _model;
 
             foreach (string segment in segments)
                 if (currentValue is TomlTable table && table.ContainsKey(segment)) currentValue = table[segment];
-                else return (T)Entries[path].DefaultValue;
+                else return (T)Entries[key].DefaultValue;
             //else throw new KeyNotFoundException($"Key '{segment}' not found.");
-            if (currentValue == null) throw new InvalidCastException($"Cannot convert value at '{path}' to type {typeof(T)}.");
+            if (currentValue == null) throw new InvalidCastException($"Cannot convert value at '{key}' to type {typeof(T)}.");
 
             return ParseToType(currentValue);
         }
