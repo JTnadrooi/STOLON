@@ -1,6 +1,6 @@
 [audio]
-enable = true
-stereo = true
+enable = true # wip
+stereo = true # wip
 
 [audio.vol]
 fx = 0.05
@@ -10,12 +10,12 @@ master = 1.0
 [debug]
 
 [debug.console]
-enable = true  # wip
-theme = "default"  # wip
+enable = true     # wip
+theme = "default" # wip
 
 [debug.log]
-enable = true  # wip
-style = "default"  # wip
+enable = true     # wip
+style = "default" # wip
 
 [debug.skip]
 enable = true
@@ -27,8 +27,8 @@ parameters = ["silo"]           # wip
 theme = "default"             # wip
 entities_show_on_menu = false # not fully implemented / wip
 splashtexts_show = true
-fullscreen = false  # wip
-resolution = { w = 1, h = 1 }  # wip
+fullscreen = false            # wip
+resolution = { w = 1, h = 1 } # wip
 
 [graphics.crt]
 enable = true
@@ -36,3 +36,4 @@ enable = true
 [cli]
 catch_errors = false
 global_flags = []
+enable_global_flags_on_startup_arguments = true # wip

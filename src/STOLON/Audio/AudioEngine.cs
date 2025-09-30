@@ -136,9 +136,9 @@ namespace STOLON
             _outputDevice.Init(_masterVolumeSampleProvider);
             _outputDevice.Play();
             STOLON.Debug.Log(">getting config values");
-            FxVolume = STOLON.Config.GetFloat("audio.vol.fx", 0.5f);
-            OstVolume = STOLON.Config.GetFloat("audio.vol.ost", 1f);
-            MasterVolume = STOLON.Config.GetFloat("audio.vol.master", 1f);
+            FxVolume = STOLON.Config.GetFloat("audio.vol.fx");
+            OstVolume = STOLON.Config.GetFloat("audio.vol.ost");
+            MasterVolume = STOLON.Config.GetFloat("audio.vol.master");
             STOLON.Debug.Log($"found as: Fx={FxVolume}, OST={OstVolume}, Master={MasterVolume}");
             STOLON.Debug.Success();
             STOLON.Debug.Success();
