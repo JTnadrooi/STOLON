@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,20 @@ namespace STOLON.CLI
         public void Reset(string key)
         {
             CLI.Instance.Config.Reset(key);
+        }
+
+        [Command("Reset a specific key.", isReadOnly: true)]
+        public void Keys()
+        {
+            string Format(string key, object value, object defaultValue) => $"Key = {key}, Value = {value ?? "null"}, DefaultValue = {defaultValue ?? "null"}";
+            foreach (KeyValuePair<string, object> kvp in CLI.Instance.Config.TomlValues)
+            {
+                Console.WriteLine(kvp.Value switch
+                {
+                    TomlArray a => Format(kvp.Key, $"[{a.ToJoinedString(", ")}]", ((Array)CLI.Instance.Config.Defaults[kvp.Key])),
+                    _ => Format(kvp.Key, kvp.Value, CLI.Instance.Config.Defaults[kvp.Key]),
+                });
+            }
         }
     }
 }
