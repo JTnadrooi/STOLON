@@ -28,7 +28,8 @@ theme = "default"             # wip
 entities_show_on_menu = false # not fully implemented / wip
 splashtexts_show = true
 fullscreen = false            # wip
-res = { w = 1, h = 1 } # wip
+res_w = 1   # wip
+res_h = 1   # wip
 
 [graphics.crt]
 enable = true
@@ -36,4 +37,4 @@ enable = true
 [cli]
 catch_errors = false
 global_flags = []
-enable_global_flags_on_startup_arguments = true # wip
+global_flags_on_startup_arguments = [] # wip, if empty uses global flags
