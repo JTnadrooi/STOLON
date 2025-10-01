@@ -35,7 +35,7 @@ namespace STOLON.CLI
         public CLI(string[] args)
         {
             Config = new Configuration();
-            GlobalFlags = Config.GetValue<string[]>("cli.global_flags").ToHashSet();
+            GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
             STOLON.Debug = Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             Instance = this;

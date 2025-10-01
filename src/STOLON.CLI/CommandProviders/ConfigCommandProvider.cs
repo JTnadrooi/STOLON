@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,7 +38,19 @@ namespace STOLON.CLI
                 if (o is TomlTable tomlTable) return $"[{tomlTable.ToJoinedString(", ")}]";
                 return o.ToString()!;
             }
-            Console.WriteLine(Represent(CLI.Instance.Config.GetValue(key)));
+            Console.WriteLine(Represent(CLI.Instance.Config.Get(key)));
+        }
+
+        [Command("Set the value of a key.")]
+        public void Set(string key, string value)
+        {
+            CLI.Instance.Config.Set(key, value);
+        }
+
+        [Command("Reset a specific key.")]
+        public void Reset(string key)
+        {
+            CLI.Instance.Config.Reset(key);
         }
     }
 }

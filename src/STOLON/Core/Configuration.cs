@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Tomlyn;
@@ -14,7 +15,7 @@ namespace STOLON
 {
     public class Configuration
     {
-        public readonly record struct Entry(string Path, object DefaultValue);
+        public readonly record struct Entry(string Key, object DefaultValue);
 
         public FrozenDictionary<string, Entry> Entries { get; }
 
@@ -104,20 +105,18 @@ namespace STOLON
             });
             //ForKeys((k, v) => Console.WriteLine($"{k} ({v?.GetType().ToString() ?? "null"})"));
 
-            //if (filekeyCount != defaults.Count) throw new Exception($"Key count mismatch. File has {filekeyCount}, expected {defaults.Count}.");
-
             Entries = defaults.Select(d => new KeyValuePair<string, Entry>(d.Key, new Entry(d.Key, d.Value))).ToFrozenDictionary();
         }
-        public float GetFloat(string key) => GetValue<float>(key);
-        public int GetInt(string key) => GetValue<int>(key);
-        public int GetByte(string key) => GetValue<byte>(key);
-        public double GetDouble(string key) => GetValue<double>(key);
-        public bool GetBool(string key) => GetValue<bool>(key);
-        public string GetString(string key) => GetValue<string>(key);
-        public char GetChar(string key) => GetValue<char>(key);
-        public object GetValue(string key) => GetValue<object>(key);
-        public T[] GetArray<T>(string key) => GetValue<T[]>(key);
-        public T GetValue<T>(string key)
+        public float GetFloat(string key) => Get<float>(key);
+        public int GetInt(string key) => Get<int>(key);
+        public int GetByte(string key) => Get<byte>(key);
+        public double GetDouble(string key) => Get<double>(key);
+        public bool GetBool(string key) => Get<bool>(key);
+        public string GetString(string key) => Get<string>(key);
+        public char GetChar(string key) => Get<char>(key);
+        public T[] GetArray<T>(string key) => Get<T[]>(key);
+        public object Get(string key) => Get<object>(key);
+        public T Get<T>(string key)
         {
             T ParseToType(object currentValue)
             {
@@ -135,10 +134,9 @@ namespace STOLON
                 return (T)Convert.ChangeType(currentValue, typeof(T));
             }
 
-            string[] segments = key.Split('.');
             object? currentValue = _model;
 
-            foreach (string segment in segments)
+            foreach (string segment in key.Split('.'))
                 if (currentValue is TomlTable table && table.ContainsKey(segment)) currentValue = table[segment];
                 else return (T)Entries[key].DefaultValue;
             //else throw new KeyNotFoundException($"Key '{segment}' not found.");
@@ -146,5 +144,24 @@ namespace STOLON
 
             return ParseToType(currentValue);
         }
+
+        public void Set(string key, object value)
+        {
+            object? current = _model;
+            var parts = key.Split('.');
+
+            for (int i = 0; i < parts.Length; i++)
+                if (current is TomlTable t)
+                    if (i == parts.Length - 1) t[parts[i]] = value!;
+                    else if (t.ContainsKey(parts[i])) current = t[parts[i]];
+                    else throw new KeyNotFoundException($"Key '{parts[i]}' not found.");
+                else throw new KeyNotFoundException($"Key '{parts[i]}' not found (not a TomlTable).");
+
+            File.WriteAllText(PATH, Toml.FromModel(_model));
+
+            //Console.WriteLine(Toml.FromModel(_model));
+        }
+
+        public void Reset(string key) => Set(key, Entries[key].DefaultValue);
     }
 }
