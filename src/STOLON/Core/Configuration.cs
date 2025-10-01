@@ -9,58 +9,23 @@ using System.IO;
 using System.Linq;
 using Tomlyn;
 using Tomlyn.Model;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace STOLON
 {
-    public class Configuration
+    public sealed class Configuration
     {
-        public readonly record struct Entry(string Key, object DefaultValue);
-
-        public FrozenDictionary<string, Entry> Entries { get; }
+        public FrozenDictionary<string, object> Defaults { get; }
 
         private TomlTable _model;
+        public FrozenDictionary<string, object> TomlValues { get; private set; }
         private const string PATH = @"Configs\user.toml";
 
-        public Configuration() // no debug printing svp!
+        public Configuration() // no debug printing!
         {
-            int ForKeys(Action<string, object?> forKeys, TomlTable? table = null, string prefix = "")
-            {
-                table = table ?? _model;
-                int count = 0;
-
-                foreach (string key in table.Keys)
-                {
-                    string fullKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}.{key}";
-                    object? value = table[key];
-
-                    if (value is TomlTable subTable) count += ForKeys(forKeys, subTable, fullKey);
-                    else
-                    {
-                        forKeys(fullKey, value);
-                        count++;
-                    }
-                }
-
-                return count;
-            }
-
-            bool IsSameOrConvertible(object? value, Type expectedType)
-            {
-                if (value == null) return false;
-                if (expectedType.IsAssignableFrom(value.GetType())) return true;
-                try
-                {
-                    Convert.ChangeType(value, expectedType);
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
 
             _model = Toml.ToModel(File.ReadAllText(PATH));
+            TomlValues = GetTomlKeys(_model);
+
             Dictionary<string, object> defaults = new Dictionary<string, object>{
                 {"audio.enable", true},
                 {"audio.stereo", true},
@@ -87,25 +52,43 @@ namespace STOLON
 
                 {"cli.catch_errors", true},
                 {"cli.global_flags", Array.Empty<string>()},
-                {"cli.enable_global_flags_on_startup_arguments", true}
+                {"cli.global_flags_on_startup_arguments", Array.Empty<string>()}
                 //{"___", true},
             };
 
-            int filekeyCount = ForKeys((k, v) =>
-            {
-                if (!defaults.TryGetValue(k, out object? defaultValue)) throw new Exception($"Unexpected key '{k}' found.");
-                if (v is TomlArray tomlArray)
-                {
-                    Type elemType = ((Array)defaultValue).GetType().GetElementType()!;
-                    for (int i = 0; i < tomlArray.Count; i++)
-                        if (!IsSameOrConvertible(tomlArray[i], elemType))
-                            throw new Exception($"Type mismatch in '{k}[{i}]'. Expected {elemType}, got {tomlArray[i]?.GetType()}");
-                }
-                else if (!IsSameOrConvertible(v, defaultValue.GetType())) throw new Exception($"Type mismatch for '{k}'. Expected {defaultValue.GetType()}, got {v?.GetType()}.");
-            });
-            //ForKeys((k, v) => Console.WriteLine($"{k} ({v?.GetType().ToString() ?? "null"})"));
+            Defaults = defaults.ToFrozenDictionary();
+            Validate();
+        }
 
-            Entries = defaults.Select(d => new KeyValuePair<string, Entry>(d.Key, new Entry(d.Key, d.Value))).ToFrozenDictionary();
+        private FrozenDictionary<string, object> GetTomlKeys(TomlTable table, string prefix = "")
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+
+            foreach (string key in table.Keys)
+            {
+                string fullKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}.{key}";
+                object value = table[key];
+
+                if (value is TomlTable subTable) foreach (KeyValuePair<string, object> kvp in GetTomlKeys(subTable, fullKey)) result.Add(kvp.Key, kvp.Value);
+                else result.Add(fullKey, value);
+            }
+
+            return result.ToFrozenDictionary();
+        }
+
+        bool IsSameOrConvertible(object? value, Type expectedType)
+        {
+            if (value == null) return false;
+            if (expectedType.IsAssignableFrom(value.GetType())) return true;
+            try
+            {
+                Convert.ChangeType(value, expectedType);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
         public float GetFloat(string key) => Get<float>(key);
         public int GetInt(string key) => Get<int>(key);
@@ -118,10 +101,10 @@ namespace STOLON
         public object Get(string key) => Get<object>(key);
         public T Get<T>(string key)
         {
-            T ParseToType(object currentValue)
+            T TomlParseToType(object value)
             {
                 if (typeof(T).IsArray)
-                    if (currentValue is TomlArray tomlArray)
+                    if (value is TomlArray tomlArray)
                     {
                         Type elementType = typeof(T).GetElementType()!;
                         Array array = Array.CreateInstance(elementType, tomlArray.Count);
@@ -129,20 +112,12 @@ namespace STOLON
                         return (T)(object)array;
                     }
                     else throw new InvalidCastException($"Cannot convert value at '{key}' to array type {typeof(T)}.");
-                if (currentValue is TomlTable) throw new InvalidCastException($"Cannot get table '{key}' as any value.");
-                if (typeof(T) == typeof(object)) return (T)currentValue;
-                return (T)Convert.ChangeType(currentValue, typeof(T));
+                if (value is TomlTable) throw new InvalidCastException($"Cannot get table '{key}' as any value.");
+                if (typeof(T) == typeof(object)) return (T)value;
+                return (T)Convert.ChangeType(value, typeof(T));
             }
 
-            object? currentValue = _model;
-
-            foreach (string segment in key.Split('.'))
-                if (currentValue is TomlTable table && table.ContainsKey(segment)) currentValue = table[segment];
-                else return (T)Entries[key].DefaultValue;
-            //else throw new KeyNotFoundException($"Key '{segment}' not found.");
-            if (currentValue == null) throw new InvalidCastException($"Cannot convert value at '{key}' to type {typeof(T)}.");
-
-            return ParseToType(currentValue);
+            return TomlParseToType(TomlValues[key]);
         }
 
         public void Set(string key, object value)
@@ -155,13 +130,48 @@ namespace STOLON
                     if (i == parts.Length - 1) t[parts[i]] = value!;
                     else if (t.ContainsKey(parts[i])) current = t[parts[i]];
                     else throw new KeyNotFoundException($"Key '{parts[i]}' not found.");
-                else throw new KeyNotFoundException($"Key '{parts[i]}' not found (not a TomlTable).");
+                else throw new KeyNotFoundException($"Key '{parts[i]}' not found (a segment is not a TomlTable).");
 
             File.WriteAllText(PATH, Toml.FromModel(_model));
-
             //Console.WriteLine(Toml.FromModel(_model));
         }
 
-        public void Reset(string key) => Set(key, Entries[key].DefaultValue);
+        public void Reload()
+        {
+            TomlValues = GetTomlKeys(_model);
+        }
+
+        public void Validate()
+        {
+            bool IsSameOrConvertible(object? value, Type expectedType)
+            {
+                if (value == null) return false;
+                if (expectedType.IsAssignableFrom(value.GetType())) return true;
+                try
+                {
+                    Convert.ChangeType(value, expectedType);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            foreach (KeyValuePair<string, object> kvp in TomlValues)
+            {
+                if (!Defaults.TryGetValue(kvp.Key, out object? defaultValue)) throw new Exception($"Unexpected key '{kvp.Key}' found.");
+                if (kvp.Value is TomlArray tomlArray)
+                {
+                    Type elemType = ((Array)defaultValue).GetType().GetElementType()!;
+                    for (int i = 0; i < tomlArray.Count; i++)
+                        if (!IsSameOrConvertible(tomlArray[i], elemType))
+                            throw new Exception($"Type mismatch in '{kvp.Key}[{i}]'. Expected {elemType}, got {tomlArray[i]?.GetType()}");
+                }
+                else if (!IsSameOrConvertible(kvp.Value, defaultValue.GetType())) throw new Exception($"Type mismatch for '{kvp.Key}'. Expected {defaultValue.GetType()}, got {kvp.Value?.GetType()}.");
+            }
+        }
+
+        public void Reset(string key) => Set(key, Defaults[key]);
     }
 }
