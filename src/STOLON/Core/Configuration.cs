@@ -101,24 +101,34 @@ namespace STOLON
         public object Get(string key) => Get<object>(key);
         public T Get<T>(string key)
         {
-            T TomlParseToType(object value)
+            try
             {
-                if (typeof(T).IsArray)
-                    if (value is TomlArray tomlArray)
+                return TomlParseToType<T>(TomlValues[key]);
+            }
+            catch (InvalidCastException e)
+            {
+                throw new InvalidOperationException($"Get key value for key {key} failed; " + e.Message);
+            }
+        }
+
+        public T TomlParseToType<T>(object value)
+        {
+            switch (value)
+            {
+                case TomlArray tomlArray:
+                    if (typeof(T).IsArray)
                     {
                         Type elementType = typeof(T).GetElementType()!;
                         Array array = Array.CreateInstance(elementType, tomlArray.Count);
                         for (int i = 0; i < tomlArray.Count; i++) array.SetValue(Convert.ChangeType(tomlArray[i], elementType), i);
                         return (T)(object)array;
                     }
-                    else throw new InvalidCastException($"Cannot convert value at '{key}' to array type {typeof(T)}.");
-                if (value is TomlTable) throw new InvalidCastException($"Cannot get table '{key}' as any value.");
-                if (typeof(T) == typeof(object)) return (T)value;
-                return (T)Convert.ChangeType(value, typeof(T));
+                    else throw new InvalidCastException($"Cannot convert value to array type {typeof(T)}.");
+                case TomlTable: throw new InvalidCastException($"Cannot get table as any value.");
+                default: return (T)Convert.ChangeType(value, typeof(T));
             }
-
-            return TomlParseToType(TomlValues[key]);
         }
+
 
         public void Set(string key, object value)
         {
