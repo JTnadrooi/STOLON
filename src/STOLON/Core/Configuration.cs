@@ -24,7 +24,7 @@ namespace STOLON
         {
 
             _model = Toml.ToModel(File.ReadAllText(PATH));
-            TomlValues = GetTomlKeys(_model);
+            TomlValues = GetTomlValues(_model);
 
             Dictionary<string, object> defaults = new Dictionary<string, object>{
                 {"audio.enable", true},
@@ -60,7 +60,7 @@ namespace STOLON
             Validate();
         }
 
-        private FrozenDictionary<string, object> GetTomlKeys(TomlTable table, string prefix = "")
+        private FrozenDictionary<string, object> GetTomlValues(TomlTable table, string prefix = "")
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
 
@@ -69,7 +69,7 @@ namespace STOLON
                 string fullKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}.{key}";
                 object value = table[key];
 
-                if (value is TomlTable subTable) foreach (KeyValuePair<string, object> kvp in GetTomlKeys(subTable, fullKey)) result.Add(kvp.Key, kvp.Value);
+                if (value is TomlTable subTable) foreach (KeyValuePair<string, object> kvp in GetTomlValues(subTable, fullKey)) result.Add(kvp.Key, kvp.Value);
                 else result.Add(fullKey, value);
             }
 
@@ -143,12 +143,13 @@ namespace STOLON
                 else throw new KeyNotFoundException($"Key '{parts[i]}' not found (a segment is not a TomlTable).");
 
             File.WriteAllText(PATH, Toml.FromModel(_model));
+            TomlValues = GetTomlValues(_model);
             //Console.WriteLine(Toml.FromModel(_model));
         }
 
         public void Reload()
         {
-            TomlValues = GetTomlKeys(_model);
+            TomlValues = GetTomlValues(_model);
         }
 
         public void Validate()
