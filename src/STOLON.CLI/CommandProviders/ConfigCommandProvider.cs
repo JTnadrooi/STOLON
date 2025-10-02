@@ -62,7 +62,7 @@ namespace STOLON.CLI
             {
                 Console.WriteLine(kvp.Value switch
                 {
-                    TomlArray a => Format(kvp.Key, $"[{a.ToJoinedString(", ")}]", ((Array)CLI.Instance.Config.Defaults[kvp.Key])),
+                    TomlArray a => Format(kvp.Key, $"[{a.ToJoinedString(", ")}]", $"[{((Array)CLI.Instance.Config.Defaults[kvp.Key]).Cast<object>().ToJoinedString(", ")}]"),
                     _ => Format(kvp.Key, kvp.Value, CLI.Instance.Config.Defaults[kvp.Key]),
                 });
             }
