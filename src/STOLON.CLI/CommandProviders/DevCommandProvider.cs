@@ -11,9 +11,7 @@ namespace STOLON.CLI.CommandProviders
     {
         public const string BUILD_INFO_DIRECTORY = "_BUILDINFO";
 
-        public DevCommandProvider() : base("dev")
-        {
-        }
+        public DevCommandProvider() : base("dev") { }
 
         private void ThrowIfNotDev()
         {
@@ -36,6 +34,34 @@ namespace STOLON.CLI.CommandProviders
             {
                 CLI.Debug.Log("User is not a dev: " + e.Message + ".");
                 Console.WriteLine(false);
+            }
+        }
+
+        public class SourceCommandProvider : CommandProvider
+        {
+            private const string SOURCE_PATH = "./../../src";
+
+            public SourceCommandProvider() : base("src")
+            {
+
+            }
+
+            [Command($"Prints a value indicating if the {BUILD_INFO_DIRECTORY} directory is found and valid.")]
+            public void _M()
+            {
+                using Process p = Process.Start(Environment.OSVersion.Platform switch
+                {
+                    PlatformID.Win32NT => "explorer.exe",
+                    PlatformID.Unix => "xdg-open",
+                    _ => "open"
+                }, System.IO.Path.GetFullPath(SOURCE_PATH));
+                CLI.Debug.Log("Opened source directory.");
+            }
+
+            [Command($"Prints a value indicating if the {BUILD_INFO_DIRECTORY} directory is found and valid.")]
+            public void Path()
+            {
+                Console.WriteLine(System.IO.Path.GetFullPath(SOURCE_PATH));
             }
         }
     }
