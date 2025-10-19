@@ -139,7 +139,7 @@ namespace STOLON.CLI
             {
                 if (disposing)
                 {
-
+                    foreach (CommandProvider cmdp in Providers.Values) (cmdp as IDisposable)?.Dispose();
                 }
                 disposedValue = true;
             }
