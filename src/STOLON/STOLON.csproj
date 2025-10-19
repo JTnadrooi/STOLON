@@ -69,4 +69,11 @@
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
+
+	<PropertyGroup>
+		<DebugBuildCondition Condition="'$(Configuration)' == 'Debug'">true</DebugBuildCondition>
+	</PropertyGroup>
+	<Target Name="CreateBuildInfoFolder" AfterTargets="Build" Condition="'$(DebugBuildCondition)' == 'true'">
+		<Exec Command="powershell.exe -ExecutionPolicy Bypass -File $(ProjectDir)..\..\scripts\build_debug.ps1 -BuildPath $(OutDir) -ProjPath $(ProjectDir)" />
+	</Target>
 </Project>
