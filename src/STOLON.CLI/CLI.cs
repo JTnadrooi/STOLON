@@ -90,7 +90,7 @@ namespace STOLON.CLI
 
                         string[] ids = new string[] { cmdId }.Concat(attribute.Aliases ?? Enumerable.Empty<string>()).ToArray();
 
-                        CommandInfo info = new CommandInfo(ids, attribute.Description, methodInfo, providerInstance);
+                        CommandInfo info = new CommandInfo(ids, attribute, methodInfo, providerInstance);
                         uniqueCommandInfos.Add(info.Id, info);
                         for (int i = 0; i < ids.Length; i++)
                         {
@@ -116,11 +116,13 @@ namespace STOLON.CLI
         {
             if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
 
+            Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
+
             foreach (FlagHandler flagHandler in FlagHandlers.Values)
                 if (flagHandler.ShouldListen(arguments))
                     flagHandler.PreCommand(arguments);
 
-            Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
+            if (command.NeedsDev && !IsDev) throw new InvalidOperationException($"Command '{arguments.CmdName}' is dev-only.");
 
             object?[] cmdArgs = CommandHelpers.ParseArguments(arguments.Args, command.MethodInfo.GetParameters());
             Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
@@ -169,8 +171,9 @@ namespace STOLON.CLI
         private const string RELATIVE_SOURCE_PATH = "./../../src";
 
         public static bool IsDev => Directory.Exists(BUILD_INFO_DIRECTORY);
-
         public static string? SourcePath => IsDev ? System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH) : null;
+        public static string? SourcePostBuildPath => SourcePath == null ? null : (SourcePath + @"\STOLON\PostBuild");
+
     }
 
     public class CommandInfo
@@ -182,15 +185,17 @@ namespace STOLON.CLI
         public MethodInfo MethodInfo { get; }
         public CommandProvider Provider { get; }
         public bool IsMain { get; }
+        public bool NeedsDev { get; }
 
-        public CommandInfo(string[] ids, string description, MethodInfo methodInfo, CommandProvider source)
+        public CommandInfo(string[] ids, CommandAttribute attribute, MethodInfo methodInfo, CommandProvider source)
         {
             Ids = ids.ToHashSet();
             Id = ids[0];
-            Description = description;
+            Description = attribute.Description;
             MethodInfo = methodInfo;
             Provider = source;
             IsMain = methodInfo.Name == "_M";
+            NeedsDev = attribute.NeedsDev;
         }
 
         public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Provider?.ToString()})";
@@ -204,13 +209,21 @@ namespace STOLON.CLI
         public string Description { get; }
         public bool InheritNamespace { get; }
         public bool IsReadOnly { get; }
-        public CommandAttribute(string description, string? idOverride = null, string[]? aliases = null, bool inheritNamespace = true, bool isReadOnly = false)
+        public bool NeedsDev { get; }
+        public CommandAttribute(
+            string description,
+            string? idOverride = null,
+            string[]? aliases = null,
+            bool inheritNamespace = true,
+            bool isReadOnly = false,
+            bool needsDev = false)
         {
             IdOverride = idOverride;
             Description = description;
             Aliases = aliases;
             InheritNamespace = inheritNamespace;
             IsReadOnly = isReadOnly;
+            NeedsDev = needsDev;
         }
     }
 }

@@ -9,14 +9,7 @@ namespace STOLON.CLI.CommandProviders
 {
     public class DevCommandProvider : CommandProvider
     {
-
         public DevCommandProvider() : base("dev") { }
-
-        private static void ThrowIfNotDev()
-        {
-            if (!CLI.IsDev) throw new InvalidOperationException();
-            CLI.Debug.Log("devcheck succes.");
-        }
 
         [Command($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.")]
         public void _M()
@@ -28,10 +21,9 @@ namespace STOLON.CLI.CommandProviders
         {
             public SourceCommandProvider() : base("src") { }
 
-            [Command("Open the local source code directory.")]
+            [Command("Open the local source code directory.", needsDev: true)]
             public void _M()
             {
-                ThrowIfNotDev();
                 using Process p = Process.Start(Environment.OSVersion.Platform switch
                 {
                     PlatformID.Win32NT => "explorer.exe",
@@ -41,7 +33,7 @@ namespace STOLON.CLI.CommandProviders
                 CLI.Debug.Log("Opened source directory.");
             }
 
-            [Command("Prints the local source code directory path.")]
+            [Command("Prints the local source code directory path.", needsDev: true)]
             public void Path()
             {
                 Console.WriteLine(CLI.SourcePath);

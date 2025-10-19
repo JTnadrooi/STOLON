@@ -38,7 +38,10 @@ namespace STOLON.CLI
         [Command("Print the STOLON version.")]
         public void Version() => Console.WriteLine(File.ReadAllText(".version"));
 
-        [Command("Set the STOLON version.", "set-version")]
-        public void SetVersion() => File.ReadAllText(".version");
+        [Command("Set the STOLON version.", "set-version", needsDev: true)]
+        public void SetVersion()
+        {
+            File.ReadAllText(".version");
+        }
     }
 }
