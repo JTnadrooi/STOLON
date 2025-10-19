@@ -21,9 +21,16 @@ namespace STOLON.CLI
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
+            void WriteProvider(CommandProvider provider) => Console.WriteLine($"{provider.FullNamespace}{(provider.IsNested ? $"[{provider.Namespace}]" : string.Empty)} # {CLI.Instance.Commands.Values.Where(cmd => cmd.Source == provider).Count()} commands.");
+
             IEnumerable<CommandInfo> toPrint;
 
             if (filter == null) toPrint = CLI.Instance.UniqueCommands.Values.OrderBy(c => c.Id);
+            else if (filter == "\\")
+            {
+                foreach (CommandProvider provider in CLI.Instance.Providers.Values) WriteProvider(provider);
+                return;
+            }
             else if (filter.EndsWith("\\"))
             {
                 string providerId = filter[..^1];
