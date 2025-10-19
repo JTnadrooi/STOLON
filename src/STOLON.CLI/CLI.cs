@@ -55,7 +55,10 @@ namespace STOLON.CLI
                     .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
                     .Select(fht => (FlagHandler)Activator.CreateInstance(fht)!)
                     .ToFrozenDictionary(fh => fh.LongId);
-            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).OrderBy(t => GetNestedClassDepth(t)).ToList();
+            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract)
+                .OrderBy(t => GetNestedClassDepth(t))
+                .ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (Type providerType in commandProviderTypes)
             {
@@ -79,17 +82,19 @@ namespace STOLON.CLI
                 foreach (MethodInfo methodInfo in commandMethods)
                     if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
                     {
+                        if (methodInfo.ReturnType != typeof(void)) throw new InvalidOperationException("Commands must have a void return type.");
+
                         string cmdId;
                         if (methodInfo.Name == "_M") cmdId = providerInstance.FullNamespace;
                         else cmdId = (attribute.InheritNamespace ? (providerInstance.FullNamespace + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
-                        List<string> ids = new List<string>() { cmdId };
-                        if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
-                        string[] idArray = ids.ToArray();
-                        CommandInfo info = new CommandInfo(idArray, attribute.Description, methodInfo, providerInstance);
+
+                        string[] ids = new string[] { cmdId }.Concat(attribute.Aliases ?? Enumerable.Empty<string>()).ToArray();
+
+                        CommandInfo info = new CommandInfo(ids, attribute.Description, methodInfo, providerInstance);
                         uniqueCommandInfos.Add(info.Id, info);
-                        for (int i = 0; i < idArray.Length; i++)
+                        for (int i = 0; i < ids.Length; i++)
                         {
-                            string alias = idArray[i];
+                            string alias = ids[i];
                             if (commandInfos.ContainsKey(alias))
                                 throw new InvalidOperationException($"Command with '{alias}' is already registered. Overloads are not supported.");
                             else commandInfos.Add(alias, info);
