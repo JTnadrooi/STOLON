@@ -13,8 +13,10 @@ namespace STOLON.CLI
     public class CLICommandProvider : CommandProvider
     {
         public CLICommandProvider() : base("cli") { }
+
         [Command("Print the cli version.", isReadOnly: true)]
-        public void Version() => Console.WriteLine(File.ReadAllText(".cli-version"));
+        public void Version() => Console.WriteLine(CLI.Version);
+
         [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, isReadOnly: true)]
         public void Help(string? filter = null)
         {
@@ -41,14 +43,29 @@ namespace STOLON.CLI
 
             foreach (CommandInfo cmd in toPrint) WriteCommand(cmd);
         }
+
         [Command("Exit the program.")]
         public void Exit() => Environment.Exit(0);
+
         [Command("Bump the .cli-version to .version.", needsDev: true)]
         public void Bump()
         {
             string slVer = File.ReadAllText(Path.Combine(CLI.SourcePostBuildPath!, ".version"));
             File.WriteAllText(Path.Combine(CLI.SourcePostBuildPath!, ".cli-version"), slVer);
             CLI.Debug.Log($"bumped .cli-version to {slVer}.");
+        }
+
+        [Command("Display info about the STOLON.CLI.", isReadOnly: true)]
+        public void Info()
+        {
+            Console.WriteLine($"{CLI.Instance.UniqueCommands.Count} commands loaded from {CLI.Instance.Providers.Count} Command Providers.");
+            Console.WriteLine($"Is_Dev={CLI.IsDev}");
+            Console.WriteLine($"CLI_Version={CLI.Version}");
+            Console.WriteLine($"STOLON_Version={CLI.GameVersion}");
+            //if (CLI.IsDev)
+            //{
+            //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
+            //}
         }
     }
 }
