@@ -165,6 +165,7 @@ namespace STOLON.CLI
         public string Description { get; }
         public MethodInfo MethodInfo { get; }
         public CommandProvider Source { get; }
+        public bool IsMain { get; }
 
         public CommandInfo(string[] ids, string description, MethodInfo methodInfo, CommandProvider source)
         {
@@ -173,6 +174,7 @@ namespace STOLON.CLI
             Description = description;
             MethodInfo = methodInfo;
             Source = source;
+            IsMain = methodInfo.Name == "_M";
         }
 
         public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Source?.ToString()})";
