@@ -42,7 +42,8 @@ namespace STOLON.CLI
 
             Debug.Log(">creating cli.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
-            Dictionary<string, CommandProvider> providers = new Dictionary<string, CommandProvider>();
+            Dictionary<string, CommandProvider> unnestedProviders = new Dictionary<string, CommandProvider>();
+            Dictionary<string, CommandProvider> nestedProviders = new Dictionary<string, CommandProvider>();
             Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
             FlagHandlers = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
@@ -53,7 +54,9 @@ namespace STOLON.CLI
             foreach (Type providerType in commandProviderTypes)
             {
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
-                providers.Add(providerInstance.Namespace, providerInstance);
+                string toAddNamespace = providerInstance.Namespace;
+
+                unnestedProviders.Add(providerInstance.Namespace, providerInstance);
 
                 MethodInfo[] commandMethods = providerType.GetMethods();
                 foreach (MethodInfo methodInfo in commandMethods)
@@ -78,12 +81,28 @@ namespace STOLON.CLI
             }
             Debug.Log($"<found {commandInfos.Count} commands.");
 
+            foreach (KeyValuePair<string, CommandProvider> kvp in unnestedProviders)
+            {
+                string ResolveNamespaceRecusive(string ns, CommandProvider current)
+                {
+                    Type? nestedIn = current.GetType().DeclaringType;
+                    if (nestedIn == null) return ns;
+                    if (nestedIn.BaseType != typeof(CommandProvider)) throw new InvalidOperationException($"Nested provider '{current.GetType()}' is declared inside '{nestedIn}', which does not inherit from CommandProvider.");
+
+                    CommandProvider cmdp = unnestedProviders.Values.Where(v => v.GetType() == nestedIn).First();
+
+                    return ResolveNamespaceRecusive(cmdp.Namespace + "-" + ns, cmdp);
+                }
+
+                nestedProviders.Add(ResolveNamespaceRecusive(kvp.Key, kvp.Value), kvp.Value);
+            }
+
             Commands = commandInfos.ToFrozenDictionary();
             UniqueCommands = uniqueCommandInfos.ToFrozenDictionary();
-            Providers = providers.ToFrozenDictionary();
+            Providers = nestedProviders.ToFrozenDictionary();
 
             Debug.Log($"<cli created succesfully.");
-            //Console.WriteLine(UniqueCommands.ToJoinedString(",\n"));
+            //Console.WriteLine(nestedProviders.ToJoinedString(",\n"));
         }
         public void Execute(string str) => Execute(CommandHelpers.SplitArgs(str));
         public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
