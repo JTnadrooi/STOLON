@@ -9,11 +9,9 @@ namespace STOLON.CLI
 {
     public class DirectoryCommandProvider : CommandProvider
     {
-        public DirectoryCommandProvider() : base("dir")
-        {
+        public DirectoryCommandProvider() : base("dir") { }
 
-        }
-        [Command("Open the folder where STOLON is located.")]
+        [Command("Open the directory where STOLON is located.")]
         public void _M()
         {
             using Process p = Process.Start(Environment.OSVersion.Platform switch
@@ -25,7 +23,7 @@ namespace STOLON.CLI
             CLI.Debug.Log("Opened STOLON directory.");
         }
 
-        [Command("Print the path to folder where STOLON is located.", isReadOnly: true)]
+        [Command("Print the path of the directory where STOLON is located.", isReadOnly: true)]
         public void Path()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
