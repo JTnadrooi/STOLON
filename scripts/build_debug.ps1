@@ -1,3 +1,6 @@
+# runs when building in Debug Mode. 
+# sometimes runs multiple times for the different projects.
+
 Param(
     [Parameter(Mandatory)]
     $BuildPath,
@@ -13,6 +16,7 @@ $csprojName = Split-Path $ProjPath -Leaf
 
 Write-Output "running from $csprojName";
 
+# create the _BUILDINFO directory if it doesn't exist already.
 if (-not (Test-Path $buildInfoDir)) {
     Write-Output "creating folder at $buildInfoDir.";
     New-Item -ItemType Directory -Path $buildInfoDir | Out-Null;
