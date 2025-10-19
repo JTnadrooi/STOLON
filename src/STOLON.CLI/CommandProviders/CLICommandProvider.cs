@@ -21,7 +21,7 @@ namespace STOLON.CLI
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()
                     .Select(p => $"{p.ParameterType.Name.ToLower()}:{p.Name.ToLower()}{(p.HasDefaultValue ? ($"(default_value:{p.DefaultValue?.ToString() ?? "NULL"}) ") : " ")}").ToJoinedString("")}" +
                     $"# {cmd.Description}");
-            void WriteProvider(CommandProvider provider) => Console.WriteLine($"{provider.FullNamespace}{(provider.IsNested ? $"[{provider.Namespace}]" : string.Empty)} # {CLI.Instance.Commands.Values.Where(cmd => cmd.Source == provider).Count()} commands.");
+            void WriteProvider(CommandProvider provider) => Console.WriteLine($"{provider.FullNamespace}{(provider.IsNested ? $"[{provider.Namespace}]" : string.Empty)} # {CLI.Instance.Commands.Values.Where(cmd => cmd.Provider == provider).Count()} commands.");
 
             IEnumerable<CommandInfo> toPrint;
 
@@ -35,7 +35,7 @@ namespace STOLON.CLI
             {
                 string providerId = filter[..^1];
                 if (!CLI.Instance.Providers.ContainsKey(providerId)) throw new InvalidOperationException($"No CommandProvider with id '{providerId}' found.");
-                toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Source.Namespace == providerId);
+                toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Provider.Namespace == providerId);
             }
             else toPrint = [CLI.Instance.Commands[filter]];
 

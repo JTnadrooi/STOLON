@@ -125,7 +125,7 @@ namespace STOLON.CLI
             Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
             Debug.Log($"executing with options: {string.Join(", ", arguments.Flags)}");
 
-            command.MethodInfo.Invoke(command.Source, cmdArgs);
+            command.MethodInfo.Invoke(command.Provider, cmdArgs);
 
             foreach (FlagHandler flagHandler in FlagHandlers.Values)
                 if (flagHandler.ShouldListen(arguments))
@@ -164,7 +164,7 @@ namespace STOLON.CLI
         public string Id { get; }
         public string Description { get; }
         public MethodInfo MethodInfo { get; }
-        public CommandProvider Source { get; }
+        public CommandProvider Provider { get; }
         public bool IsMain { get; }
 
         public CommandInfo(string[] ids, string description, MethodInfo methodInfo, CommandProvider source)
@@ -173,11 +173,11 @@ namespace STOLON.CLI
             Id = ids[0];
             Description = description;
             MethodInfo = methodInfo;
-            Source = source;
+            Provider = source;
             IsMain = methodInfo.Name == "_M";
         }
 
-        public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Source?.ToString()})";
+        public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Provider?.ToString()})";
     }
 
     [AttributeUsage(AttributeTargets.Method)]
