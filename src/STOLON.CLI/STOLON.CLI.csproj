@@ -14,15 +14,15 @@
 
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>..\STOLON\Assets\AsitLib.dll</HintPath>
+			<HintPath>..\STOLON\PostBuild\AsitLib.dll</HintPath>
 		</Reference>
-		<SLBuildAssets Include="..\STOLON\Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep" />
+		<SLBuildAssets Include="..\STOLON\PostBuild\**\*.*" Exclude="..\STOLON\PostBuild\**\.gitkeep" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\STOLON\Assets\**\*.*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+		<None Include="..\STOLON\PostBuild\**\*.*" Link="PostBuild\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\STOLON\STOLON.csproj" />
+		<ProjectReference Include="..\STOLON\STOLON.csproj" />
 	</ItemGroup>
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />

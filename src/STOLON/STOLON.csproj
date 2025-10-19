@@ -16,11 +16,11 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
 		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<MonoGameExtendedPipelineReferencePath>$(MSBuildThisFileDirectory)pipeline-references</MonoGameExtendedPipelineReferencePath>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>./Assets/AsitLib.dll</HintPath>
+			<HintPath>./PostBuild/AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -63,7 +63,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<SLBuildAssets Include="Assets\**\*.*" Exclude="..\STOLON\Assets\**\.gitkeep" />
+		<SLBuildAssets Include="PostBuild\**\*.*" Exclude="..\STOLON\PostBuild\**\.gitkeep" />
 	</ItemGroup>
 
 	<Target Name="DepositAssets" AfterTargets="Build">
