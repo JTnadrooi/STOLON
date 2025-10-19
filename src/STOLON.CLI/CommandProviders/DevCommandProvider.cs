@@ -41,12 +41,9 @@ namespace STOLON.CLI.CommandProviders
         {
             private const string SOURCE_PATH = "./../../src";
 
-            public SourceCommandProvider() : base("src")
-            {
+            public SourceCommandProvider() : base("src") { }
 
-            }
-
-            [Command($"Prints a value indicating if the {BUILD_INFO_DIRECTORY} directory is found and valid.")]
+            [Command("Open the local source code directory.")]
             public void _M()
             {
                 using Process p = Process.Start(Environment.OSVersion.Platform switch
@@ -58,7 +55,7 @@ namespace STOLON.CLI.CommandProviders
                 CLI.Debug.Log("Opened source directory.");
             }
 
-            [Command($"Prints a value indicating if the {BUILD_INFO_DIRECTORY} directory is found and valid.")]
+            [Command("Prints the local source code directory path.")]
             public void Path()
             {
                 Console.WriteLine(System.IO.Path.GetFullPath(SOURCE_PATH));
