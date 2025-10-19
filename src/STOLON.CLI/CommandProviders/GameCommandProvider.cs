@@ -36,7 +36,7 @@ namespace STOLON.CLI
         }
 
         [Command("Print the STOLON version.")]
-        public void Version() => Console.WriteLine(File.ReadAllText(".version"));
+        public void Version() => Console.WriteLine(CLI.GameVersion);
 
         [Command("Set the STOLON version.", "version-set", needsDev: true)]
         public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourcePostBuildPath!, ".version"), newVer);
