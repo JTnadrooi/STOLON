@@ -9,56 +9,42 @@ namespace STOLON.CLI.CommandProviders
 {
     public class DevCommandProvider : CommandProvider
     {
-        public const string BUILD_INFO_DIRECTORY = "_BUILDINFO";
 
         public DevCommandProvider() : base("dev") { }
 
-        private void ThrowIfNotDev()
+        private static void ThrowIfNotDev()
         {
-            if (!Directory.Exists(BUILD_INFO_DIRECTORY))
-            {
-                throw new InvalidOperationException();
-            }
+            if (!CLI.IsDev) throw new InvalidOperationException();
             CLI.Debug.Log("devcheck succes.");
         }
 
-        [Command($"Prints a value indicating if the {BUILD_INFO_DIRECTORY} directory is found and valid.")]
+        [Command($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.")]
         public void _M()
         {
-            try
-            {
-                ThrowIfNotDev();
-                Console.WriteLine(true);
-            }
-            catch (InvalidOperationException e)
-            {
-                CLI.Debug.Log("User is not a dev: " + e.Message + ".");
-                Console.WriteLine(false);
-            }
+            Console.WriteLine(CLI.IsDev);
         }
 
         public class SourceCommandProvider : CommandProvider
         {
-            private const string SOURCE_PATH = "./../../src";
-
             public SourceCommandProvider() : base("src") { }
 
             [Command("Open the local source code directory.")]
             public void _M()
             {
+                ThrowIfNotDev();
                 using Process p = Process.Start(Environment.OSVersion.Platform switch
                 {
                     PlatformID.Win32NT => "explorer.exe",
                     PlatformID.Unix => "xdg-open",
                     _ => "open"
-                }, System.IO.Path.GetFullPath(SOURCE_PATH));
+                }, CLI.SourcePath!);
                 CLI.Debug.Log("Opened source directory.");
             }
 
             [Command("Prints the local source code directory path.")]
             public void Path()
             {
-                Console.WriteLine(System.IO.Path.GetFullPath(SOURCE_PATH));
+                Console.WriteLine(CLI.SourcePath);
             }
         }
     }
