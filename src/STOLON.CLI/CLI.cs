@@ -15,7 +15,7 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    public class CLI : IDisposable
+    public sealed class CLI : IDisposable
     {
         private bool disposedValue;
 
@@ -28,10 +28,6 @@ namespace STOLON.CLI
 
         public HashSet<string> GlobalFlags { get; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public static CLI Instance { get; private set; }
-        public static DebugStream Debug { get; private set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public CLI(string[] args)
         {
             static int GetNestedClassDepth(Type type)
@@ -138,7 +134,7 @@ namespace STOLON.CLI
             Environment.Exit(exitCode);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -155,6 +151,14 @@ namespace STOLON.CLI
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        public static CLI Instance { get; private set; }
+        public static DebugStream Debug { get; private set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+        public static TProvider GetProvider<TProvider>() where TProvider : CommandProvider
+            => (TProvider)CLI.Instance.Providers.Values.First(p => p.GetType() == typeof(TProvider));
     }
 
     public class CommandInfo
