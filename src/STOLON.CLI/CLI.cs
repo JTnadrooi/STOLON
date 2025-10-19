@@ -34,6 +34,17 @@ namespace STOLON.CLI
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public CLI(string[] args)
         {
+            static int GetNestedClassDepth(Type type)
+            {
+                int depth = 0;
+                while (type.DeclaringType != null)
+                {
+                    depth++;
+                    type = type.DeclaringType;
+                }
+                return depth;
+            }
+
             Config = new Configuration();
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
             STOLON.Debug = Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
@@ -42,29 +53,39 @@ namespace STOLON.CLI
 
             Debug.Log(">creating cli.");
             Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
-            Dictionary<string, CommandProvider> unnestedProviders = new Dictionary<string, CommandProvider>();
             Dictionary<string, CommandProvider> nestedProviders = new Dictionary<string, CommandProvider>();
             Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
             FlagHandlers = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
-                .Select(fht => (FlagHandler)Activator.CreateInstance(fht)!)
-                .ToFrozenDictionary(fh => fh.LongId);
-            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).ToList();
+                    .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
+                    .Select(fht => (FlagHandler)Activator.CreateInstance(fht)!)
+                    .ToFrozenDictionary(fh => fh.LongId);
+            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract).OrderBy(t => GetNestedClassDepth(t)).ToList();
             Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
             foreach (Type providerType in commandProviderTypes)
             {
                 CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
-                string toAddNamespace = providerInstance.Namespace;
 
-                unnestedProviders.Add(providerInstance.Namespace, providerInstance);
+                string ResolveNamespaceRecusive(string ns, CommandProvider current)
+                {
+                    Type? nestedIn = current.GetType().DeclaringType;
+                    if (nestedIn == null) return ns;
+                    if (nestedIn.BaseType != typeof(CommandProvider)) throw new InvalidOperationException($"Nested provider '{current.GetType()}' is declared inside '{nestedIn}', which does not inherit from CommandProvider.");
+
+                    CommandProvider cmdp = nestedProviders.Values.Where(v => v.GetType() == nestedIn).First();
+
+                    return ResolveNamespaceRecusive(cmdp.Namespace + "-" + ns, cmdp);
+                }
+                providerInstance.FullNamespace = ResolveNamespaceRecusive(providerInstance.Namespace, providerInstance);
+
+                nestedProviders.Add(providerInstance.FullNamespace, providerInstance);
 
                 MethodInfo[] commandMethods = providerType.GetMethods();
                 foreach (MethodInfo methodInfo in commandMethods)
                     if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
                     {
                         string cmdId;
-                        if (methodInfo.Name == "_M") cmdId = providerInstance.Namespace;
-                        else cmdId = (attribute.InheritNamespace ? (providerInstance.Namespace + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
+                        if (methodInfo.Name == "_M") cmdId = providerInstance.FullNamespace;
+                        else cmdId = (attribute.InheritNamespace ? (providerInstance.FullNamespace + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
                         List<string> ids = new List<string>() { cmdId };
                         if (attribute.Aliases != null) ids.AddRange(attribute.Aliases);
                         string[] idArray = ids.ToArray();
@@ -80,22 +101,6 @@ namespace STOLON.CLI
                     }
             }
             Debug.Log($"<found {commandInfos.Count} commands.");
-
-            foreach (KeyValuePair<string, CommandProvider> kvp in unnestedProviders)
-            {
-                string ResolveNamespaceRecusive(string ns, CommandProvider current)
-                {
-                    Type? nestedIn = current.GetType().DeclaringType;
-                    if (nestedIn == null) return ns;
-                    if (nestedIn.BaseType != typeof(CommandProvider)) throw new InvalidOperationException($"Nested provider '{current.GetType()}' is declared inside '{nestedIn}', which does not inherit from CommandProvider.");
-
-                    CommandProvider cmdp = unnestedProviders.Values.Where(v => v.GetType() == nestedIn).First();
-
-                    return ResolveNamespaceRecusive(cmdp.Namespace + "-" + ns, cmdp);
-                }
-
-                nestedProviders.Add(ResolveNamespaceRecusive(kvp.Key, kvp.Value), kvp.Value);
-            }
 
             Commands = commandInfos.ToFrozenDictionary();
             UniqueCommands = uniqueCommandInfos.ToFrozenDictionary();
