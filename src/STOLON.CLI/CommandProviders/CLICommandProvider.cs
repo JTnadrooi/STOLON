@@ -14,6 +14,20 @@ namespace STOLON.CLI
     {
         public CLICommandProvider() : base("cli") { }
 
+        [Command("Display info about the STOLON.CLI.", isReadOnly: true)]
+        public void _M()
+        {
+            Console.WriteLine($"Command_Count={CLI.Instance.UniqueCommands.Count}");
+            Console.WriteLine($"Provider_Count={CLI.Instance.Providers.Count}");
+            Console.WriteLine($"Is_Dev={CLI.IsDev}");
+            Console.WriteLine($"CLI_Version={CLI.Version}");
+            Console.WriteLine($"STOLON_Version={STOLON.Version}");
+            //if (CLI.IsDev)
+            //{
+            //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
+            //}
+        }
+
         [Command("Print the cli version.", isReadOnly: true)]
         public void Version() => Console.WriteLine(CLI.Version);
 
@@ -53,20 +67,6 @@ namespace STOLON.CLI
             string slVer = File.ReadAllText(Path.Combine(CLI.SourcePostBuildPath!, ".version"));
             File.WriteAllText(Path.Combine(CLI.SourcePostBuildPath!, ".cli-version"), slVer);
             CLI.Debug.Log($"bumped .cli-version to {slVer}.");
-        }
-
-        [Command("Display info about the STOLON.CLI.", isReadOnly: true)]
-        public void Info()
-        {
-            Console.WriteLine($"Command_Count={CLI.Instance.UniqueCommands.Count}");
-            Console.WriteLine($"Provider_Count={CLI.Instance.Providers.Count}");
-            Console.WriteLine($"Is_Dev={CLI.IsDev}");
-            Console.WriteLine($"CLI_Version={CLI.Version}");
-            Console.WriteLine($"STOLON_Version={STOLON.Version}");
-            //if (CLI.IsDev)
-            //{
-            //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
-            //}
         }
     }
 }
