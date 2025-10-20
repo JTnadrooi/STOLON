@@ -174,14 +174,12 @@ namespace STOLON.CLI
         public static string? SourcePath => IsDev ? System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH) : null;
         public static string? SourcePostBuildPath => SourcePath == null ? null : (SourcePath + @"\STOLON\PostBuild");
         public static string Version { get; }
-        public static string GameVersion { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         static CLI()
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
             Version = File.ReadAllText(".cli-version");
-            GameVersion = File.ReadAllText(".version");
         }
     }
 

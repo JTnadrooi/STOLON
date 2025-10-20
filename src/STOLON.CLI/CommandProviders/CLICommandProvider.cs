@@ -58,10 +58,11 @@ namespace STOLON.CLI
         [Command("Display info about the STOLON.CLI.", isReadOnly: true)]
         public void Info()
         {
-            Console.WriteLine($"{CLI.Instance.UniqueCommands.Count} commands loaded from {CLI.Instance.Providers.Count} Command Providers.");
+            Console.WriteLine($"Command_Count={CLI.Instance.UniqueCommands.Count}");
+            Console.WriteLine($"Provider_Count={CLI.Instance.Providers.Count}");
             Console.WriteLine($"Is_Dev={CLI.IsDev}");
             Console.WriteLine($"CLI_Version={CLI.Version}");
-            Console.WriteLine($"STOLON_Version={CLI.GameVersion}");
+            Console.WriteLine($"STOLON_Version={STOLON.Version}");
             //if (CLI.IsDev)
             //{
             //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
