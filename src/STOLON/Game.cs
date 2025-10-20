@@ -53,6 +53,8 @@ namespace STOLON
 #pragma warning restore CS8618
         {
             Instance = this;
+            IsInitiated = true;
+
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -219,7 +221,7 @@ namespace STOLON
     public partial class STOLON
     {
 #nullable disable
-        public static bool IsInitiated => Instance != null;
+        public static bool IsInitiated { get; private set; }
 
         #region INSTANCE
 
