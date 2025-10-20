@@ -167,7 +167,7 @@ namespace STOLON.CLI
         public static TProvider GetProvider<TProvider>() where TProvider : CommandProvider
             => (TProvider)CLI.Instance.Providers.Values.First(p => p.GetType() == typeof(TProvider));
 
-        public const string BUILD_INFO_DIRECTORY = "_BUILDINFO";
+        public const string BUILD_INFO_DIRECTORY = ".buildinfo";
         private const string RELATIVE_SOURCE_PATH = "./../../src";
 
         public static bool IsDev => Directory.Exists(BUILD_INFO_DIRECTORY);
