@@ -148,7 +148,6 @@ namespace STOLON
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
             STOLON.Environment = _environment = new GameEnvironment();
-            STOLON.VersionString = File.ReadAllText(".version");
             _environment.Initialize();
 
             if (!STOLON.Config.GetBool("graphics.crt.enable")) _drawingContext.DisableShader("crt");
@@ -209,7 +208,7 @@ namespace STOLON
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext);
-            _drawingContext.DrawString(STOLON.Fonts.Small, VersionString, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure(VersionString).X / 2, 500));
+            _drawingContext.DrawString(STOLON.Fonts.Small, Version, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure(Version).X / 2, 500));
             _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
             _drawingContext.EndScene();
@@ -219,27 +218,58 @@ namespace STOLON
     }
     public partial class STOLON
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public static STOLON Instance { get; private set; }
-        public static Texture2DCollection Textures { get; private set; }
-        public static Font2DCollection Fonts { get; private set; }
-        public static AudioEngine Audio { get; private set; }
-        public static DebugStream Debug { get; set; }
-        public static GameEnvironment Environment { get; private set; }
-        public static GameInput Input { get; private set; }
-        public static GameStateManager StateManager { get; internal set; }
-        public static Interface UI { get; internal set; }
-        public static Configuration Config { get; internal set; }
-        public static DrawingContext DrawingContext { get; internal set; }
-        public static TaskHeap Tasks { get; internal set; }
-        public static string VersionString { get; internal set; }
+#nullable disable
+        public static bool IsInitiated => Instance != null;
+
+        #region INSTANCE
+
+        private static T ThrowIfNotInitiated<T>(T value) => IsInitiated ? value : throw new InvalidOperationException("Instance is not initiated.");
+
+        private static class BackingFields
+        {
+            public static Texture2DCollection _textures;
+            public static Font2DCollection _fonts;
+            public static AudioEngine _audio;
+            public static DebugStream _debug;
+            public static GameEnvironment _environment;
+            public static GameInput _input;
+            public static GameStateManager _stateManager;
+            public static Interface _ui;
+            public static Configuration _config;
+            public static DrawingContext _drawingContext;
+            public static TaskHeap _tasks;
+            public static STOLON _instance;
+        }
+
+        public static STOLON Instance { get => ThrowIfNotInitiated(BackingFields._instance); private set => BackingFields._instance = value; }
+        public static Texture2DCollection Textures { get => ThrowIfNotInitiated(BackingFields._textures); set => BackingFields._textures = value; }
+        public static Font2DCollection Fonts { get => ThrowIfNotInitiated(BackingFields._fonts); private set => BackingFields._fonts = value; }
+        public static AudioEngine Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
+        public static DebugStream Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
+        public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
+        public static GameInput Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
+        public static GameStateManager StateManager { get => BackingFields._stateManager; internal set => BackingFields._stateManager = value; }
+        public static Interface UI { get => BackingFields._ui; internal set => BackingFields._ui = value; }
+        public static Configuration Config { get => BackingFields._config; internal set => BackingFields._config = value; }
+        public static DrawingContext DrawingContext { get => BackingFields._drawingContext; internal set => BackingFields._drawingContext = value; }
+        public static TaskHeap Tasks { get => BackingFields._tasks; internal set => BackingFields._tasks = value; }
+
+        #endregion
+#nullable enable
+
+        public static string Version { get; }
+
         public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
         public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;
         public const int ASPECT_RATIO_X = 16;
         public const int ASPECT_RATIO_Y = 9;
         public const int VIRTUAL_MODIFIER = 57;
         public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / (float)ASPECT_RATIO_Y;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        static STOLON()
+        {
+            Version = File.ReadAllText(".version");
+        }
 
         public static T[] Scan<T>() where T : class
         {
