@@ -36,6 +36,13 @@
         "mgcb-editor-mac"
       ],
       "rollForward": false
+    },
+    "dotnet-mgfxc": {
+      "version": "3.8.4",
+      "commands": [
+        "mgfxc"
+      ],
+      "rollForward": false
     }
   }
 }

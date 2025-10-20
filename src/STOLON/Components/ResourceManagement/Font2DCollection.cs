@@ -29,7 +29,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace STOLON
 {
-    public class Font2DCollection : ResourceCollection<Font2D>
+    public class Font2DCollection : ContentCollection<Font2D>
     {
         public const string BASE_PATH = "Fonts";
         public Font2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>

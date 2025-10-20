@@ -30,13 +30,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace STOLON
 {
-    public interface IResourceCollection<TContent> : IDisposable, IReadOnlyDictionary<string, TContent>
-    {
-        public ContentManager ContentManager { get; }
-        public TContent GetReference(string path);
-        public void UnloadContent();
-    }
-    public abstract class ResourceCollection<TContent> : IResourceCollection<TContent>
+    public abstract class ContentCollection<TContent> : IEnumerable<TContent>
     {
         protected readonly Dictionary<string, TContent> dictionary = new Dictionary<string, TContent>();
         private bool _disposedValue;
@@ -51,7 +45,7 @@ namespace STOLON
 
         public const bool SILENT = false;
 
-        public ResourceCollection(ContentManager contentManager, Func<string, object> loader, string basePath)
+        public ContentCollection(ContentManager contentManager, Func<string, object> loader, string basePath)
         {
             BasePath = basePath;
             string[] files = Directory.GetFiles(contentManager.RootDirectory, "*", SearchOption.AllDirectories);
@@ -97,8 +91,6 @@ namespace STOLON
 
         public bool ContainsKey(string key) => dictionary.ContainsKey(key);
         public bool TryGetValue(string key, [MaybeNullWhen(false)] out TContent value) => dictionary.TryGetValue(key, out value);
-        public IEnumerator<KeyValuePair<string, TContent>> GetEnumerator() => dictionary.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         protected virtual void Dispose(bool disposing)
         {
@@ -109,12 +101,22 @@ namespace STOLON
             }
         }
 
-        ~ResourceCollection() => Dispose(disposing: false);
+        ~ContentCollection() => Dispose(disposing: false);
 
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        IEnumerator<TContent> IEnumerable<TContent>.GetEnumerator()
+        {
+            return Values.GetEnumerator();
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable)Values).GetEnumerator();
         }
     }
 }

@@ -31,7 +31,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace STOLON
 {
-    public class Texture2DCollection : ResourceCollection<Texture2D>
+    public class Texture2DCollection : ContentCollection<Texture2D>
     {
         private readonly Texture2D _pixel;
 
