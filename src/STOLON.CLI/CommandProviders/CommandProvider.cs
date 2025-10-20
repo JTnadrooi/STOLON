@@ -16,6 +16,6 @@ namespace STOLON.CLI
             Namespace = @namespace;
             FullNamespace = @namespace;
         }
-        public override string ToString() => $"CommandProvider(Id: {Namespace})";
+        public override string ToString() => $"{{Namespace: {FullNamespace}, IsNested: {IsNested}}}";
     }
 }
