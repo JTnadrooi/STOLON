@@ -1,0 +1,7 @@
+author = "JTnadrooi"
+name = "Base"
+id = "base"
+version = "INHERIT"
+description = "The base mod. STOLON can run without but no content will be available."
+contact = "JTnadrooi on Discord"
+dependencies = []
