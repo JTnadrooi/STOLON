@@ -13,14 +13,12 @@ namespace STOLON
     /// </summary>
     public class Font2D // yeah i know 3d fonts are rare but they do exist (and I want the naming to be inline with Texture2D)
     {
-        public string Name { get; }
         public BitmapFont CoreFont { get; }
         public float Scale { get; }
         public Vector2 Dimensions { get; }
         public const char BASE_CHAR = 'A';
-        public Font2D(string name, BitmapFont spriteFont, float scale = 1)
+        public Font2D(BitmapFont spriteFont, float scale = 1)
         {
-            Name = name;
             CoreFont = spriteFont;
             Scale = scale;
             Dimensions = new Vector2(CoreFont.GetGlyphs(BASE_CHAR.ToString()).First().Character.XAdvance * scale, CoreFont.LineHeight * scale);
@@ -82,7 +80,7 @@ namespace STOLON
             return sb.ToString();
         }
 
-        public override string ToString() => Name + " (Scale: " + Scale + ", Dimensions: " + Dimensions + ")";
+        public override string ToString() => $"{{Scale: {Scale}, Dimensions: {Dimensions}}}";
         public static implicit operator BitmapFont(Font2D font) => font.CoreFont;
     }
 
