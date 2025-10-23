@@ -1,67 +1,67 @@
-﻿using Microsoft.Xna.Framework;
+﻿using AsitLib;
+using AsitLib.Collections;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
-using System.Linq;
-using System.Collections.Generic;
+using MonoGame.Extended.Content;
 using System;
-using System.Runtime.Versioning;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Pipes;
+using System.Linq;
 using System.Reflection.Metadata;
-using AsitLib;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Security.AccessControl;
 using System.Windows;
 using System.Xml.Linq;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Collections;
-using AsitLib.Collections;
-using System.Diagnostics.CodeAnalysis;
-
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Color = Microsoft.Xna.Framework.Color;
+using Math = System.Math;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Math = System.Math;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using System.IO;
-using MonoGame.Extended.Content;
-using Microsoft.Xna.Framework.Content;
-
-
-
 
 namespace STOLON
 {
-    public class Texture2DCollection : ContentCollection<Texture2D>
+    public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>
     {
-        private readonly Texture2D _pixel;
+        public override string[] GetFiles() => Directory.GetFiles("Textures", "*.png", SearchOption.AllDirectories);
 
-        public Texture2D Pixel => _pixel;
+        public override string GetId(string file) => file["Textures\\".Length..^".png".Length];
 
-        public Texture2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
+        public override Texture2D LoadFile(string file)
         {
-            try
-            {
-                Texture2D texture = contentManager.Load<Texture2D>(toLoad);
-                if (debug)
-                {
-                    Color[] data = new Color[texture.Width * texture.Height];
-                    texture.GetData(data);
-                }
-                return texture;
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }, "Textures")
-        {
-            _pixel = new Texture2D(contentManager.GetGraphicsDevice(), 1, 1);
-            ((Texture2D)_pixel).SetData([Color.White]);
+            using FileStream fileStream = new FileStream(file, FileMode.Open);
+            return Texture2D.FromStream(STOLON.Instance.GraphicsDevice, fileStream);
         }
-        public override void UnloadContent()
+    }
+
+    public class Texture2DCollection : ResourceCollection<Texture2D>
+    {
+        private Texture2D? _pixel;
+
+        public Texture2D Pixel => _pixel ?? throw new Exception();
+
+        public Texture2DCollection() : base(new Texture2DResourceLoader())
+        {
+        }
+
+        public override void LoadResources()
+        {
+            _pixel = new Texture2D(STOLON.Instance.Content.GetGraphicsDevice(), 1, 1);
+            ((Texture2D)_pixel).SetData([Color.White]);
+            base.LoadResources();
+        }
+
+        public override void UnloadResources()
         {
             _pixel.Dispose();
-            base.UnloadContent();
+            base.UnloadResources();
         }
     }
 }

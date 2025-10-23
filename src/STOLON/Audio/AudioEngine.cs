@@ -91,7 +91,7 @@ namespace STOLON
         /// </summary>
         public AudioEngine()
         {
-            STOLON.Debug.Log(">initating audioengine");
+            STOLON.Debug.Log(">initiating AudioEngine");
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
             Library = new Dictionary<string, CachedAudio>();
@@ -106,7 +106,7 @@ namespace STOLON
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 tempLibrary[fileName] = new CachedAudio(filePath, fileName);
-                lock (_logLock) STOLON.Debug.Log("loaded audio with id: " + fileName);
+                //lock (_logLock) STOLON.Debug.Log("loaded audio with id: " + fileName);
             });
 
             foreach (var kvp in tempLibrary) Library.Add(kvp.Key, kvp.Value);

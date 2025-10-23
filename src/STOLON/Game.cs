@@ -144,7 +144,8 @@ namespace STOLON
 
             STOLON.Config = new Configuration();
             STOLON.Audio = new AudioEngine();
-            STOLON.Textures = _textures = new Texture2DCollection(Content);
+
+            STOLON.Textures = _textures = ResourceCollection<Texture2D>.LoadCollection<Texture2DCollection>();
             STOLON.Fonts = _fonts = new Font2DCollection(Content);
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new GameInput();
@@ -154,11 +155,13 @@ namespace STOLON
 
             if (!STOLON.Config.GetBool("graphics.crt.enable")) _drawingContext.DisableShader("crt");
 
-            Debug.Success();
 
             bool silenceConsole = !STOLON.Config.GetBool("debug.log.enable");
             if (silenceConsole) STOLON.Debug.Log("console will be silenced.");
             STOLON.Debug.Silent = silenceConsole;
+
+            Debug.Success();
+            //throw new Exception();
 
             base.LoadContent();
         }
@@ -166,7 +169,7 @@ namespace STOLON
         {
             Audio.Dispose();
             MediaPlayer.Stop();
-            Textures.UnloadContent();
+            Textures.UnloadResources();
             Fonts.UnloadContent();
             base.UnloadContent();
         }
