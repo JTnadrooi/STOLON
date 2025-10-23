@@ -30,13 +30,13 @@ namespace STOLON
 {
     public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>
     {
-        public override string[] GetFiles() => Directory.GetFiles("Textures", "*.png", SearchOption.AllDirectories);
+        public override string[] GetItems() => Directory.GetFiles("Textures", "*.png", SearchOption.AllDirectories);
 
-        public override string GetId(string file) => file["Textures\\".Length..^".png".Length];
+        public override string GetId(string item) => item["Textures\\".Length..^".png".Length];
 
-        public override Texture2D LoadFile(string file)
+        public override Texture2D LoadItem(string item)
         {
-            using FileStream fileStream = new FileStream(file, FileMode.Open);
+            using FileStream fileStream = new FileStream(item, FileMode.Open);
             return Texture2D.FromStream(STOLON.Instance.GraphicsDevice, fileStream);
         }
     }
@@ -47,13 +47,11 @@ namespace STOLON
 
         public Texture2D Pixel => _pixel ?? throw new Exception();
 
-        public Texture2DCollection() : base(new Texture2DResourceLoader())
-        {
-        }
+        public Texture2DCollection() : base(new Texture2DResourceLoader()) { }
 
         public override void LoadResources()
         {
-            _pixel = new Texture2D(STOLON.Instance.Content.GetGraphicsDevice(), 1, 1);
+            _pixel = new Texture2D(STOLON.Instance.GraphicsDevice, 1, 1);
             ((Texture2D)_pixel).SetData([Color.White]);
             base.LoadResources();
         }
