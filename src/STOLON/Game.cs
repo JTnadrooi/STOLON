@@ -146,7 +146,7 @@ namespace STOLON
             STOLON.Audio = new AudioEngine();
 
             STOLON.Textures = _textures = ResourceCollection.LoadCollection<Texture2DCollection>();
-            STOLON.Fonts = _fonts = new Font2DCollection(Content);
+            STOLON.Fonts = _fonts = ResourceCollection.LoadCollection<Font2DCollection>();
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
@@ -170,7 +170,7 @@ namespace STOLON
             Audio.Dispose();
             MediaPlayer.Stop();
             Textures.UnloadResources();
-            Fonts.UnloadContent();
+            Fonts.UnloadResources();
             base.UnloadContent();
         }
         protected override void Update(GameTime gameTime)

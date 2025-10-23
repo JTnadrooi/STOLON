@@ -29,24 +29,24 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace STOLON
 {
-    public class Font2DCollection : ContentCollection<Font2D>
+    public class Font2DResourceLoader : SequentialResourceLoader<Font2D>
     {
-        public const string BASE_PATH = "Fonts";
-        public Font2DCollection(ContentManager contentManager, bool debug = false) : base(contentManager, (toLoad) =>
+        public override string[] GetFiles() => Directory.GetFiles("Fonts", "*.fnt", SearchOption.AllDirectories);
+
+        public override string GetId(string file) => file["Fonts\\".Length..^".fnt".Length];
+
+        public override Font2D LoadFile(string file)
         {
-            try
-            {
-                //BitmapFont font = BitmapFont.FromFile(STOLON.Instance.GraphicsDevice, toLoad + ".fnt");
-                BitmapFont font = contentManager.Load<BitmapFont>(toLoad);
-                return new Font2D(toLoad, font);
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }, BASE_PATH)
-        { }
+            using FileStream fileStream = new FileStream(file, FileMode.Open);
+            return BitmapFont.FromStream(STOLON.Instance.GraphicsDevice, fileStream, file);
+        }
+    }
+
+    public class Font2DCollection : ResourceCollection<Font2D>
+    {
         public Font2D Small => this["smollerMono"];
         public Font2D Medium => this["pixeloid"];
+
+        public Font2DCollection() : base(new Font2DResourceLoader()) { }
     }
 }
