@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +19,50 @@ namespace STOLON
     public interface IResourceLoader<TContent>
     {
         public FrozenDictionary<string, TContent> GetResources();
+    }
+
+    public abstract class ParallelResourceLoader<TContent> : IResourceLoader<TContent>
+    {
+        public abstract TContent LoadFile(string file);
+        public abstract string[] GetFiles();
+        public abstract string GetId(string file);
+
+        private readonly bool _multicore;
+        private readonly ConcurrentDictionary<string, TContent> _resources;
+
+        public ParallelResourceLoader(bool multicore = true)
+        {
+            _multicore = multicore;
+            _resources = new ConcurrentDictionary<string, TContent>();
+        }
+
+        public FrozenDictionary<string, TContent> GetResources()
+        {
+            STOLON.Debug.Log($">[s]loading data of type '{typeof(TContent).Name}' in parallel.");
+            STOLON.Debug.Log($">getting files..");
+
+            string[] files = GetFiles();
+            foreach (string file in files)
+            {
+                STOLON.Debug.Log("found file: " + file);
+            }
+
+            STOLON.Debug.Success();
+            STOLON.Debug.Log($">loading resources.");
+
+            Parallel.ForEach(files, file =>
+            {
+                string toLoadId = GetId(file);
+                STOLON.Debug.LogThreadSafe($"loading resource from '{file}' as '{toLoadId}'.");
+                TContent loaderResult = LoadFile(file);
+                _resources[toLoadId] = loaderResult;
+                STOLON.Debug.LogThreadSafe($"succesfully loaded resource from '{file}' as '{toLoadId}'.");
+            });
+
+            STOLON.Debug.Success(_resources.Values.Count + " assets loaded.");
+
+            return _resources.ToFrozenDictionary();
+        }
     }
 
     public abstract class SequentialResourceLoader<TContent> : IResourceLoader<TContent>
@@ -37,21 +82,29 @@ namespace STOLON
 
         public FrozenDictionary<string, TContent> GetResources()
         {
-            STOLON.Debug.Log($">[s]loading data of type '{typeof(TContent).Name}' sequentially.");
+            STOLON.Debug.Log($">[s]loading data of type '{typeof(TContent).Name}' in sequence.");
+            STOLON.Debug.Log($">getting files..");
 
-            foreach (string file in GetFiles())
+            string[] files = GetFiles();
+            foreach (string file in files)
             {
                 STOLON.Debug.Log("found file: " + file);
-                string toLoadId = GetId(file);
-                STOLON.Debug.Log(">attempting load of resource with id/key: " + file);
-                TContent loaderResult = LoadFile(file);
-                _resources[toLoadId] = loaderResult;
-                STOLON.Debug.Log("added with id: " + toLoadId);
-                STOLON.Debug.Success();
             }
 
-            STOLON.Debug.Log(_resources.Values.Count + " assets loaded.");
             STOLON.Debug.Success();
+            STOLON.Debug.Log($">loading resources.");
+
+            foreach (string file in files)
+            {
+                string toLoadId = GetId(file);
+                STOLON.Debug.Log($">loading resource from '{file}' as '{toLoadId}'.");
+                TContent loaderResult = LoadFile(file);
+                _resources[toLoadId] = loaderResult;
+                STOLON.Debug.Success();
+            }
+            STOLON.Debug.Success();
+
+            STOLON.Debug.Success(_resources.Values.Count + " assets loaded.");
 
             return _resources.ToFrozenDictionary();
         }
