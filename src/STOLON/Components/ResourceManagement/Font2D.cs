@@ -82,6 +82,7 @@ namespace STOLON
 
         public override string ToString() => $"{{Scale: {Scale}, Dimensions: {Dimensions}}}";
         public static implicit operator BitmapFont(Font2D font) => font.CoreFont;
+        public static implicit operator Font2D(BitmapFont font) => new Font2D(font);
     }
 
     public static class Font2DDrawingExtensions
