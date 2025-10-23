@@ -57,41 +57,12 @@ namespace STOLON
         }
     }
 
-    public abstract class ResourceCollection<TContent> : IEnumerable<TContent>, IDisposable
+    public abstract class ResourceCollection : IDisposable
     {
-        public FrozenDictionary<string, TContent>? Resources { get; private set; }
         private bool _disposedValue;
 
-        public IEnumerable<string> Keys => Resources.Keys;
-        public IEnumerable<TContent> Values => Resources.Values;
-        public int Count => Resources.Count;
-        public TContent this[string key] => Resources[key];
-
-        private readonly IResourceLoader<TContent> _loader;
-
-        public ResourceCollection(IResourceLoader<TContent> loader)
-        {
-            _loader = loader;
-        }
-
-        public virtual TContent GetReference(string path) => this[path];
-
-        public bool ContainsKey(string key) => Resources.ContainsKey(key);
-        public bool TryGetValue(string key, [MaybeNullWhen(false)] out TContent value) => Resources.TryGetValue(key, out value);
-
-        public virtual void LoadResources() => Resources = _loader.GetResources();
-
-        public virtual void UnloadResources()
-        {
-            if (Count == 0) return;
-            foreach (TContent item in Resources.Values)
-                if (item is IDisposable disposable)
-                    disposable.Dispose();
-            //Resources.();
-        }
-
-        IEnumerator<TContent> IEnumerable<TContent>.GetEnumerator() => Values.GetEnumerator();
-        public IEnumerator GetEnumerator() => ((IEnumerable)Values).GetEnumerator();
+        public abstract void LoadResources();
+        public abstract void UnloadResources();
 
         protected virtual void Dispose(bool disposing)
         {
@@ -111,11 +82,47 @@ namespace STOLON
             GC.SuppressFinalize(this);
         }
 
-        public static TResourceCollection LoadCollection<TResourceCollection>() where TResourceCollection : ResourceCollection<TContent>, new()
+        public static TResourceCollection LoadCollection<TResourceCollection>() where TResourceCollection : ResourceCollection, new()
         {
             TResourceCollection collection = new TResourceCollection();
             collection.LoadResources();
             return collection;
         }
+    }
+
+    public abstract class ResourceCollection<TContent> : ResourceCollection, IEnumerable<TContent>
+    {
+        public FrozenDictionary<string, TContent>? Resources { get; private set; }
+
+        public IEnumerable<string> Keys => Resources.Keys;
+        public IEnumerable<TContent> Values => Resources.Values;
+        public int Count => Resources.Count;
+        public TContent this[string key] => Resources[key];
+
+        private readonly IResourceLoader<TContent> _loader;
+
+        public ResourceCollection(IResourceLoader<TContent> loader)
+        {
+            _loader = loader;
+        }
+
+        public virtual TContent GetReference(string path) => this[path];
+
+        public bool ContainsKey(string key) => Resources.ContainsKey(key);
+        public bool TryGetValue(string key, [MaybeNullWhen(false)] out TContent value) => Resources.TryGetValue(key, out value);
+
+        public override void LoadResources() => Resources = _loader.GetResources();
+
+        public override void UnloadResources()
+        {
+            if (Count == 0) return;
+            foreach (TContent item in Resources.Values)
+                if (item is IDisposable disposable)
+                    disposable.Dispose();
+            //Resources.();
+        }
+
+        IEnumerator<TContent> IEnumerable<TContent>.GetEnumerator() => Values.GetEnumerator();
+        public IEnumerator GetEnumerator() => ((IEnumerable)Values).GetEnumerator();
     }
 }
