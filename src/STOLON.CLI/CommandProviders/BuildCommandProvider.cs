@@ -27,7 +27,7 @@ namespace STOLON.CLI
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
         public void Effects(bool debug = false)
         {
-            string effectsSource = CLI.SourcePath! + @"\STOLON\Content\Effects";
+            string effectsSource = CLI.SourcePath! + @"STOLON\Content\Effects\";
             string[] effects = Directory.GetFiles(effectsSource, "*.fx");
 
             CLI.Debug.Log($">building effects from: '{effectsSource}'.");
@@ -36,8 +36,9 @@ namespace STOLON.CLI
 
             for (int i = 0; i < effects.Length; i++)
             {
-                string effect = "Effects\\" + effects[i][(effectsSource.Length + 1)..];
-                string target = "Effects\\" + effects[i][(effectsSource.Length + 1)..^(".fx".Length)] + ".mgfx";
+                string effect = Path.Combine("Effects", Path.GetFileName(effects[i]));
+                string target = Path.Combine("Effects", Path.GetFileNameWithoutExtension(effects[i]) + ".mgfx");
+
                 CLI.Debug.Log($">compiling '{effect}' as '{target}'.");
 
                 using Process p = Process.Start("powershell.exe", $"dotnet tool run mgfxc {effects[i]} {target} /Profile:OpenGL" + (debug ? " /Debug" : string.Empty));

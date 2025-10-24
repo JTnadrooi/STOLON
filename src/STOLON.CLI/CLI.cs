@@ -167,12 +167,12 @@ namespace STOLON.CLI
         public static TProvider GetProvider<TProvider>() where TProvider : CommandProvider
             => (TProvider)CLI.Instance.Providers.Values.First(p => p.GetType() == typeof(TProvider));
 
-        public const string BUILD_INFO_DIRECTORY = ".buildinfo";
-        private const string RELATIVE_SOURCE_PATH = "./../../src";
+        public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
+        private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
 
         public static bool IsDev => Directory.Exists(BUILD_INFO_DIRECTORY);
-        public static string? SourcePath => IsDev ? System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH) : null;
-        public static string? SourcePostBuildPath => SourcePath == null ? null : (SourcePath + @"\STOLON\PostBuild");
+        public static string? SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : null;
+        public static string? SourcePostBuildPath => SourcePath == null ? null : (SourcePath + @"STOLON\PostBuild\");
         public static string Version { get; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.

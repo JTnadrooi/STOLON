@@ -21,8 +21,8 @@ namespace STOLON.CLI
                 _ => "open"
             }, CLI.SourcePath! + subDir switch
             {
-                "sl" => "\\STOLON",
-                "cli" => "\\STOLON.CLI",
+                "sl" => "STOLON\\",
+                "cli" => "STOLON.CLI\\",
                 null => string.Empty,
                 _ => throw new ArgumentException("Accepted values; sl, cli", nameof(subDir))
             });
