@@ -147,6 +147,7 @@ namespace STOLON
 
             STOLON.Textures = _textures = ResourceCollection.LoadCollection<Texture2DCollection>();
             STOLON.Fonts = _fonts = ResourceCollection.LoadCollection<Font2DCollection>();
+            STOLON.Effects = ResourceCollection.LoadCollection<EffectResourceCollection>();
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
@@ -234,6 +235,7 @@ namespace STOLON
         {
             public static Texture2DCollection _textures;
             public static Font2DCollection _fonts;
+            public static EffectResourceCollection _effects;
             public static AudioEngine _audio;
             public static DebugStream _debug;
             public static GameEnvironment _environment;
@@ -249,6 +251,7 @@ namespace STOLON
         public static STOLON Instance { get => ThrowIfNotInitiated(BackingFields._instance); private set => BackingFields._instance = value; }
         public static Texture2DCollection Textures { get => ThrowIfNotInitiated(BackingFields._textures); set => BackingFields._textures = value; }
         public static Font2DCollection Fonts { get => ThrowIfNotInitiated(BackingFields._fonts); private set => BackingFields._fonts = value; }
+        public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
         public static AudioEngine Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
         public static DebugStream Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }

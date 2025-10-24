@@ -64,7 +64,7 @@ namespace STOLON
             foreach (Shader shader in tempShaders)
             {
                 STOLON.Debug.Log($"found effect with name '{shader.Effect.Name}'.");
-                _shaders.Add(shader.Effect.Name["Effects\\".Length..], shader);
+                _shaders.Add(shader.Effect.Name, shader);
             }
             STOLON.Debug.Success();
 

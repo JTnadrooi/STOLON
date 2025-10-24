@@ -29,7 +29,7 @@ namespace STOLON
 
     public class StolonReplaceColorShader : Shader
     {
-        public StolonReplaceColorShader() : base(STOLON.Instance.Content.Load<Effect>("Effects\\apply_palette"), true)
+        public StolonReplaceColorShader() : base(STOLON.Effects["apply_palette"], true)
         {
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
             Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
@@ -40,7 +40,7 @@ namespace STOLON
 
     public class CRTShader : Shader
     {
-        public CRTShader() : base(STOLON.Instance.Content.Load<Effect>("Effects\\crt"), false)
+        public CRTShader() : base(STOLON.Effects["crt"], false)
         {
             Effect.Parameters["brightboost"].SetValue(0.92f);
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());
