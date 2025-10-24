@@ -322,7 +322,7 @@ namespace STOLON
         }
 
         public static Playlist GetLooped(string trackId)
-            => new Playlist(trackId.ToSingleArray(), false, true);
+            => new Playlist([trackId], false, true);
         public static Playlist Merged(Playlist playlist1, Playlist playlist2, bool scramble, bool loop)
             => new Playlist(playlist1.Get().Concat(playlist2.Get()).ToHashSet().ToArray(), scramble, loop);
     }

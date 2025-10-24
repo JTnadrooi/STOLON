@@ -83,7 +83,7 @@ namespace STOLON
         }
         public static float Size(this Vector2 vector) => vector.X * vector.Y;
         public static int Size(this Point point) => point.X * point.Y;
-        public static Texture2D ReplaceColor(this Texture2D texture, Color color1, Color color2) => ReplaceColor(texture, color1.ToSingleArray(), color2);
+        public static Texture2D ReplaceColor(this Texture2D texture, Color color1, Color color2) => ReplaceColor(texture, [color1], color2);
         public static Texture2D ReplaceColor(this Texture2D texture, Color[] color1s, Color color2)
         {
             Color[] data = new Color[texture.Width * texture.Height];
