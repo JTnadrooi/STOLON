@@ -59,6 +59,7 @@ namespace STOLON
                 STOLON.Debug.LogThreadSafe($"succesfully loaded resource from '{item}' as '{toLoadId}'.");
             });
 
+            STOLON.Debug.Success();
             STOLON.Debug.Success(_resources.Values.Count + " assets loaded.");
 
             return _resources.ToFrozenDictionary();
