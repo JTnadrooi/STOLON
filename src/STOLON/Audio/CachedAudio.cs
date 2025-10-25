@@ -23,7 +23,7 @@ namespace STOLON
         public long Position => _position;
         public CachedAudio CachedAudio => _cachedAudio;
         public WaveFormat WaveFormat => CachedAudio.WaveFormat;
-        public long Lenght => CachedAudio.AudioData.Length;
+        public long Lenght => CachedAudio.Data.Length;
         public bool Finished => AvailableSamples < 1;
         public long AvailableSamples => Lenght - Position;
 
@@ -32,29 +32,34 @@ namespace STOLON
         public int Read(float[] buffer, int offset, int count)
         {
             long samplesToCopy = Math.Min(AvailableSamples, count);
-            Array.Copy(_cachedAudio.AudioData, _position, buffer, offset, samplesToCopy);
+            Array.Copy(_cachedAudio.Data, _position, buffer, offset, samplesToCopy);
             _position += samplesToCopy;
             return (int)samplesToCopy;
         }
     }
-    public class CachedAudio
+
+    public sealed class CachedAudio
     {
-        public float[] AudioData { get; private set; }
+        public float[] Data { get; }
         public string Id { get; }
-        public WaveFormat WaveFormat { get; private set; }
+        public WaveFormat WaveFormat { get; }
+
         public CachedAudio(string audioFileName, string id)
         {
             Id = id;
-            using var audioFileReader = new AudioFileReader(audioFileName);
-            WaveFormat = audioFileReader.WaveFormat;
 
+            using var audioFileReader = new AudioFileReader(audioFileName);
             int totalSamples = (int)(audioFileReader.Length / sizeof(float));
-            AudioData = new float[totalSamples];
+
+            Data = new float[totalSamples];
+            WaveFormat = audioFileReader.WaveFormat;
 
             int offset = 0;
             int samplesRead;
-            while ((samplesRead = audioFileReader.Read(AudioData, offset, totalSamples - offset)) > 0) offset += samplesRead;
+            while ((samplesRead = audioFileReader.Read(Data, offset, totalSamples - offset)) > 0) offset += samplesRead;
         }
+
         public CachedAudioSampleProvider GetAsSampleProvider() => new CachedAudioSampleProvider(this);
+        public override string ToString() => $"{{Id: '{Id}', Lenght: '{Data.LongLength}'}}";
     }
 }

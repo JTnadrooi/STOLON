@@ -168,19 +168,19 @@ namespace STOLON
             AddMixerInput(new CachedAudioSampleProvider(audio), audio.Id, domain);
             return audio;
         }
-        /// <summary>
-        /// Cancel a <see cref="CachedAudio"/> from playing. 
-        /// </summary>
-        /// <param name="audioId">The <see cref="CachedAudio.Id"/> of the <see cref="CachedAudio"/> object.</param>
-        /// <returns>The canceled <see cref="CachedAudio"/> object.</returns>
-        public CachedAudio CancelCashed(string audioId, AudioDomain domain)
-        {
-            DictionaryMixingSampleProvider mixer = GetMixer(domain);
+        ///// <summary>
+        ///// Cancel a <see cref="CachedAudio"/> from playing. 
+        ///// </summary>
+        ///// <param name="audioId">The <see cref="CachedAudio.Id"/> of the <see cref="CachedAudio"/> object.</param>
+        ///// <returns>The canceled <see cref="CachedAudio"/> object.</returns>
+        //public CachedAudio CancelCashed(string audioId, AudioDomain domain)
+        //{
+        //    DictionaryMixingSampleProvider mixer = GetMixer(domain);
 
-            CachedAudio audio = (CachedAudio)mixer.Sources[audioId];
-            mixer.RemoveMixerInput(audioId);
-            return audio;
-        }
+        //    CachedAudio audio = (CachedAudio)mixer.Sources[audioId];
+        //    mixer.RemoveMixerInput(audioId);
+        //    return audio;
+        //}
         public void AddMixerInput(ISampleProvider input, string id, AudioDomain domain)
         {
             DictionaryMixingSampleProvider mixer = GetMixer(domain);
