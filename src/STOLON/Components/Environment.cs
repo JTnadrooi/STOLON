@@ -86,7 +86,7 @@ namespace STOLON
             STOLON.StateManager.Update(elapsedMilliseconds);
 
             //_userInterface.PostUpdate(elapsedMilliseconds);
-            STOLON.Audio.Update(elapsedMilliseconds);
+            STOLON.AudioEngine.Update(elapsedMilliseconds);
             STOLON.Instance.DRP.UpdateDetails(STOLON.StateManager.Current.DRPStatus);
 
             _overlayer.Update(elapsedMilliseconds);

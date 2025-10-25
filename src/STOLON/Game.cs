@@ -143,11 +143,12 @@ namespace STOLON
             STOLON.Debug.Log("palette set.");
 
             STOLON.Config = new Configuration();
-            STOLON.Audio = new AudioEngine();
+            STOLON.AudioEngine = new AudioEngine();
 
             STOLON.Textures = _textures = ResourceCollection.LoadCollection<Texture2DCollection>();
             STOLON.Fonts = _fonts = ResourceCollection.LoadCollection<Font2DCollection>();
             STOLON.Effects = ResourceCollection.LoadCollection<EffectResourceCollection>();
+            STOLON.Audio = ResourceCollection.LoadCollection<CachedAudioResourceCollection>();
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new GameInput();
             STOLON.Tasks = new TaskHeap();
@@ -168,7 +169,7 @@ namespace STOLON
         }
         protected override void UnloadContent()
         {
-            Audio.Dispose();
+            AudioEngine.Dispose();
             MediaPlayer.Stop();
             Textures.UnloadResources();
             Fonts.UnloadResources();
@@ -236,7 +237,8 @@ namespace STOLON
             public static Texture2DCollection _textures;
             public static Font2DCollection _fonts;
             public static EffectResourceCollection _effects;
-            public static AudioEngine _audio;
+            public static CachedAudioResourceCollection _audio;
+            public static AudioEngine _audioEngine;
             public static DebugStream _debug;
             public static GameEnvironment _environment;
             public static GameInput _input;
@@ -252,7 +254,8 @@ namespace STOLON
         public static Texture2DCollection Textures { get => ThrowIfNotInitiated(BackingFields._textures); set => BackingFields._textures = value; }
         public static Font2DCollection Fonts { get => ThrowIfNotInitiated(BackingFields._fonts); private set => BackingFields._fonts = value; }
         public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
-        public static AudioEngine Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
+        public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
+        public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
         public static DebugStream Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static GameInput Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }

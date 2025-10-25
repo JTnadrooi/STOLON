@@ -49,7 +49,6 @@ namespace STOLON
         private Queue<string> _trackQueue;
         private Playlist? _currentPlaylist;
 
-
         /// <summary>
         /// The mixer used to mix all the <see cref="AudioFileReader"/>
         /// </summary>
@@ -80,11 +79,6 @@ namespace STOLON
             get => _ostVolumeSampleProvider.Volume;
             set => _ostVolumeSampleProvider.Volume = Math.Clamp(value, 0f, 1f);
         }
-        /// <summary>
-        /// All loaded sounds relevant for the stolon <see cref="GameEnvironment"/>
-        /// </summary>
-        public Dictionary<string, CachedAudio> Library { get; }
-        public CachedAudio this[string audioId] => Library[audioId];
         public const int FadeTimeMilliseconds = 2000;
         /// <summary>
         /// Initialize a new <see cref="AudioEngine"/>.
@@ -94,24 +88,7 @@ namespace STOLON
             STOLON.Debug.Log(">initiating AudioEngine");
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-            Library = new Dictionary<string, CachedAudio>();
 
-            STOLON.Debug.Log(">loading audio");
-
-            string[] files = Directory.GetFiles("audio", "*.wav", SearchOption.AllDirectories);
-            object _logLock = new object();
-            ConcurrentDictionary<string, CachedAudio> tempLibrary = new ConcurrentDictionary<string, CachedAudio>();
-
-            Parallel.ForEach(files, filePath =>
-            {
-                string fileName = Path.GetFileNameWithoutExtension(filePath);
-                tempLibrary[fileName] = new CachedAudio(filePath, fileName);
-                //lock (_logLock) STOLON.Debug.Log("loaded audio with id: " + fileName);
-            });
-
-            foreach (var kvp in tempLibrary) Library.Add(kvp.Key, kvp.Value);
-
-            STOLON.Debug.Success();
 
             _masterMixer = new MixingSampleProvider(waveFormat);
             _masterMixer.ReadFully = true;
@@ -140,6 +117,7 @@ namespace STOLON
             OstVolume = STOLON.Config.GetFloat("audio.vol.ost");
             MasterVolume = STOLON.Config.GetFloat("audio.vol.master");
             STOLON.Debug.Log($"found as: Fx={FxVolume}, OST={OstVolume}, Master={MasterVolume}");
+
             STOLON.Debug.Success();
             STOLON.Debug.Success();
         }
@@ -221,7 +199,7 @@ namespace STOLON
             {
                 TryRemoveMixerInput(ostProviderId, AudioDomain.OST);
                 STOLON.Debug.Log("\ttrack changed to " + id);
-                _fadeInOutSampleProviderSource = Library[id].GetAsSampleProvider();
+                _fadeInOutSampleProviderSource = STOLON.Audio[id].GetAsSampleProvider();
                 _fadeInOutSampleProvider = new FadeInOutSampleProvider(_fadeInOutSampleProviderSource);
 
                 AddMixerInput(_fadeInOutSampleProvider, ostProviderId, AudioDomain.OST);

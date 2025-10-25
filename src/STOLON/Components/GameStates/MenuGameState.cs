@@ -379,13 +379,13 @@ namespace STOLON
             }
             if (STOLON.UI.UpdateDump["vol_up"].IsClicked)
             {
-                STOLON.Audio.MasterVolume += 0.1001f;
-                STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
+                STOLON.AudioEngine.MasterVolume += 0.1001f;
+                STOLON.Debug.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
             }
             if (STOLON.UI.UpdateDump["vol_down"].IsClicked)
             {
-                STOLON.Audio.MasterVolume -= 0.1001f;
-                STOLON.Debug.Log("new volume: " + STOLON.Audio.MasterVolume);
+                STOLON.AudioEngine.MasterVolume -= 0.1001f;
+                STOLON.Debug.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
             }
             if (STOLON.UI.UpdateDump["story_start"].IsClicked)
             {
