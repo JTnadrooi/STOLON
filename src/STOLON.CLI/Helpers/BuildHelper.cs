@@ -8,9 +8,14 @@ namespace STOLON.CLI.Helpers
 {
     public static class BuildHelper
     {
-        public static bool NeedsBuild(string from, string to)
+        public static bool NeedsBuild(string from, string to, bool force = false)
         {
             CLI.Debug.Log($">checking if '{from}' needs to be rebuild as '{to}'.");
+            if (force)
+            {
+                CLI.Debug.Log($"skipped, '{nameof(force)}' is enabled.");
+                return true;
+            }
 
             if (!File.Exists(to))
             {

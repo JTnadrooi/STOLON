@@ -20,18 +20,18 @@ namespace STOLON.CLI
         }
 
         [Command("Build content.")]
-        public void _M(bool debug = false)
+        public void _M(bool debug = false, bool force = false)
         {
-            Effects(debug);
+            Effects(debug, force);
         }
 
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
-        public void Effects(bool debug = false)
+        public void Effects(bool debug = false, bool force = false)
         {
             string effectsSource = CLI.SourcePath! + @"STOLON\resources\Effects\";
             string[] rawEffects = Directory.GetFiles(effectsSource, "*.fx");
 
-            CLI.Debug.Log($">building effects from: '{effectsSource}'.");
+            CLI.Debug.Log($">{(force ? "force-" : string.Empty)}building effects from: '{effectsSource}'.");
             CLI.Debug.Log($"found {rawEffects.Length} files.");
             Directory.CreateDirectory("Effects\\");
 
@@ -40,7 +40,7 @@ namespace STOLON.CLI
                 string effect = rawEffects[i];
                 string target = Path.Combine(@".\Effects", Path.GetFileNameWithoutExtension(rawEffects[i]) + ".mgfx");
 
-                if (!BuildHelper.NeedsBuild(effect, target)) continue;
+                if (!BuildHelper.NeedsBuild(effect, target, force)) continue;
 
                 CLI.Debug.Log($">compiling '{effect}' as '{target}'.");
 
