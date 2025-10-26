@@ -22,12 +22,19 @@ namespace STOLON.CLI
         public void _M(bool debug = false, bool force = false)
         {
             Effects(debug, force);
+            Audio(force);
         }
 
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectBuilder(debug), force);
+        }
+
+        [Command("Compile audio.", needsDev: true)]
+        public void Audio(bool force = false)
+        {
+            Builder.Build(new AudioBuilder(), force);
         }
     }
 }
