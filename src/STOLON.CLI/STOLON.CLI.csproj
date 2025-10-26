@@ -14,24 +14,20 @@
 
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>..\STOLON\PostBuild\AsitLib.dll</HintPath>
+			<HintPath>..\STOLON\lib\AsitLib.dll</HintPath>
 		</Reference>
-		<SLBuildAssets Include="..\STOLON\PostBuild\**\*.*" Exclude="..\STOLON\PostBuild\**\.gitkeep" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\STOLON\PostBuild\**\*.*" Link="PostBuild\%(RecursiveDir)%(Filename)%(Extension)" />
+		<None Include="..\STOLON\resources\**\*.*" Link="resources\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\STOLON\STOLON.csproj" />
 	</ItemGroup>
-	<Target Name="DepositAssets" AfterTargets="Build">
-		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
-	</Target>
 
-	<PropertyGroup>
-		<DebugBuildCondition Condition="'$(Configuration)' == 'Debug'">true</DebugBuildCondition>
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DebugBuildCondition>True</DebugBuildCondition>
 	</PropertyGroup>
-	<Target Name="CreateBuildInfoFolder" AfterTargets="Build" Condition="'$(DebugBuildCondition)' == 'true'">
-		<Exec Command="powershell.exe -ExecutionPolicy Bypass -File $(ProjectDir)..\..\scripts\build_debug.ps1 -BuildPath $(OutDir) -ProjPath $(ProjectDir)" />
+	<Target Name="CreateBuildInfoFolder" AfterTargets="AfterBuild">
+		<Exec Command="powershell.exe -ExecutionPolicy Bypass -File $(ProjectDir)..\..\scripts\build.ps1 -BuildConfiguration $(Configuration) -ProjPath $(ProjectDir) -DebugBuild $(DebugBuildCondition)" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\scripts" />
 	</Target>
 </Project>

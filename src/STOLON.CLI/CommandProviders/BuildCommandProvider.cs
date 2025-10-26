@@ -27,7 +27,7 @@ namespace STOLON.CLI
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
         public void Effects(bool debug = false)
         {
-            string effectsSource = CLI.SourcePath! + @"STOLON\Content\Effects\";
+            string effectsSource = CLI.SourcePath! + @"STOLON\resources\Effects\";
             string[] effects = Directory.GetFiles(effectsSource, "*.fx");
 
             CLI.Debug.Log($">building effects from: '{effectsSource}'.");

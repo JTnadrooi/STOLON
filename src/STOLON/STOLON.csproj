@@ -19,22 +19,9 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<MonoGameExtendedPipelineReferencePath>$(MSBuildThisFileDirectory)pipeline-references</MonoGameExtendedPipelineReferencePath>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="Content\bin\**" />
-		<Compile Remove="Content\obj\**" />
-		<EmbeddedResource Remove="Content\bin\**" />
-		<EmbeddedResource Remove="Content\obj\**" />
-		<None Remove="Content\bin\**" />
-		<None Remove="Content\obj\**" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>./PostBuild/AsitLib.dll</HintPath>
+			<HintPath>./lib/AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -54,26 +41,15 @@
 		</PackageReference>
 		<PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
 		<PackageReference Include="MonoGame.Extended" Version="4.1.0" />
-		<PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="4.0.4" />
 		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
-		<PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
-		<PackageReference Include="Nopipeline.Task" Version="2.3.0" />
 		<PackageReference Include="Tomlyn" Version="0.19.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<SLBuildAssets Include="PostBuild\**\*.*" Exclude="..\STOLON\PostBuild\**\.gitkeep" />
+		<SLBuildAssets Include="static-assets\**\*.*" />
 	</ItemGroup>
-
 	<Target Name="DepositAssets" AfterTargets="Build">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
-	</Target>
-
-	<PropertyGroup>
-		<DebugBuildCondition Condition="'$(Configuration)' == 'Debug'">true</DebugBuildCondition>
-	</PropertyGroup>
-	<Target Name="CreateBuildInfoFolder" AfterTargets="Build" Condition="'$(DebugBuildCondition)' == 'true'">
-		<Exec Command="powershell.exe -ExecutionPolicy Bypass -File $(ProjectDir)..\..\scripts\build_debug.ps1 -BuildPath $(OutDir) -ProjPath $(ProjectDir)" />
 	</Target>
 </Project>

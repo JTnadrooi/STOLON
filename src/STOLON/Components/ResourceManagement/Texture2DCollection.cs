@@ -52,7 +52,7 @@ namespace STOLON
         public override void LoadResources()
         {
             _pixel = new Texture2D(STOLON.Instance.GraphicsDevice, 1, 1);
-            ((Texture2D)_pixel).SetData([Color.White]);
+            _pixel.SetData([Color.White]);
             base.LoadResources();
         }
 

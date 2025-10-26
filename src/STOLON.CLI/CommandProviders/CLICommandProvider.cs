@@ -64,8 +64,8 @@ namespace STOLON.CLI
         [Command("Bump the .cli-version to .version.", needsDev: true)]
         public void Bump()
         {
-            string slVer = File.ReadAllText(Path.Combine(CLI.SourcePostBuildPath!, ".version"));
-            File.WriteAllText(Path.Combine(CLI.SourcePostBuildPath!, ".cli-version"), slVer);
+            string slVer = File.ReadAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"));
+            File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".cli-version"), slVer);
             CLI.Debug.Log($"bumped .cli-version to {slVer}.");
         }
     }

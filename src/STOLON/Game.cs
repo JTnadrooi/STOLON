@@ -56,7 +56,7 @@ namespace STOLON
             IsInitiated = true;
 
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            Content.RootDirectory = string.Empty; // heh
             IsMouseVisible = true;
 
             Debug = new DebugStream(header: "STOLON");

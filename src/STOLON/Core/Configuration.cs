@@ -1,6 +1,6 @@
 ﻿using AsitLib;
 using Microsoft.Xna.Framework.Input;
-using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -18,11 +18,10 @@ namespace STOLON
 
         private TomlTable _model;
         public FrozenDictionary<string, object> TomlValues { get; private set; }
-        private const string PATH = @"Configs\user.toml";
+        private const string PATH = @"user.toml";
 
         public Configuration() // no debug printing!
         {
-
             _model = Toml.ToModel(File.ReadAllText(PATH));
             TomlValues = GetTomlValues(_model);
 
