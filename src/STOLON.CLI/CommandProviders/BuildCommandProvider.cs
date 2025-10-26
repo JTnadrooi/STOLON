@@ -23,6 +23,7 @@ namespace STOLON.CLI
         {
             Effects(debug, force);
             Audio(force);
+            Fonts(force);
         }
 
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
@@ -35,6 +36,12 @@ namespace STOLON.CLI
         public void Audio(bool force = false)
         {
             Builder.Build(new AudioBuilder(), force);
+        }
+
+        [Command("Compile fonts.", needsDev: true)]
+        public void Fonts(bool force = false)
+        {
+            Builder.Build(new FontsBuilder(), force);
         }
     }
 }
