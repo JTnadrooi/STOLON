@@ -2,11 +2,11 @@
 
 namespace STOLON.CLI.Build
 {
-    public class EffectBuilder : IBuilder
+    public class EffectsBuilder : IBuilder
     {
         private readonly bool _debug;
 
-        public EffectBuilder(bool debug)
+        public EffectsBuilder(bool debug)
         {
             _debug = debug;
         }

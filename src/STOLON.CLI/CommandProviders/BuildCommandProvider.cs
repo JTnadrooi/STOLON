@@ -29,7 +29,7 @@ namespace STOLON.CLI
         [Command("Compile effects.", idOverride: "fx", needsDev: true)]
         public void Effects(bool debug = false, bool force = false)
         {
-            Builder.Build(new EffectBuilder(debug), force);
+            Builder.Build(new EffectsBuilder(debug), force);
         }
 
         [Command("Compile audio.", needsDev: true)]
