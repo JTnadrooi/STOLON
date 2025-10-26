@@ -27,7 +27,7 @@
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DebugBuildCondition>True</DebugBuildCondition>
 	</PropertyGroup>
-	<Target Name="CreateBuildInfoFolder" AfterTargets="AfterBuild">
+	<Target Name="CLI_AfterBuild" AfterTargets="AfterBuild">
 		<Exec Command="powershell.exe -ExecutionPolicy Bypass -File $(ProjectDir)..\..\scripts\build.ps1 -BuildConfiguration $(Configuration) -ProjPath $(ProjectDir) -DebugBuild $(DebugBuildCondition)" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\scripts" />
 	</Target>
 </Project>

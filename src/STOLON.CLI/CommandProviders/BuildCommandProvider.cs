@@ -2,6 +2,7 @@
 using AsitLib.Stele;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using STOLON.CLI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,20 +29,22 @@ namespace STOLON.CLI
         public void Effects(bool debug = false)
         {
             string effectsSource = CLI.SourcePath! + @"STOLON\resources\Effects\";
-            string[] effects = Directory.GetFiles(effectsSource, "*.fx");
+            string[] rawEffects = Directory.GetFiles(effectsSource, "*.fx");
 
             CLI.Debug.Log($">building effects from: '{effectsSource}'.");
-            CLI.Debug.Log($"found {effects.Length} files.");
+            CLI.Debug.Log($"found {rawEffects.Length} files.");
             Directory.CreateDirectory("Effects\\");
 
-            for (int i = 0; i < effects.Length; i++)
+            for (int i = 0; i < rawEffects.Length; i++)
             {
-                string effect = Path.Combine("Effects", Path.GetFileName(effects[i]));
-                string target = Path.Combine("Effects", Path.GetFileNameWithoutExtension(effects[i]) + ".mgfx");
+                string effect = rawEffects[i];
+                string target = Path.Combine(@".\Effects", Path.GetFileNameWithoutExtension(rawEffects[i]) + ".mgfx");
+
+                if (!BuildHelper.NeedsBuild(effect, target)) continue;
 
                 CLI.Debug.Log($">compiling '{effect}' as '{target}'.");
 
-                using Process p = Process.Start("powershell.exe", $"dotnet tool run mgfxc {effects[i]} {target} /Profile:OpenGL" + (debug ? " /Debug" : string.Empty));
+                using Process p = Process.Start("powershell.exe", $"dotnet tool run mgfxc {rawEffects[i]} {target} /Profile:OpenGL" + (debug ? " /Debug" : string.Empty));
                 p.WaitForExit();
 
                 CLI.Debug.Success();
