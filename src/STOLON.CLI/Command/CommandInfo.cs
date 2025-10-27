@@ -16,7 +16,7 @@ namespace STOLON.CLI.Command
         public MethodInfo MethodInfo { get; }
         public CommandProvider Provider { get; }
         public bool IsMain { get; }
-        public bool NeedsDev { get; }
+        public CommandFlag Flags { get; }
 
         public CommandInfo(string[] ids, CommandAttribute attribute, MethodInfo methodInfo, CommandProvider source)
         {
@@ -26,8 +26,10 @@ namespace STOLON.CLI.Command
             MethodInfo = methodInfo;
             Provider = source;
             IsMain = methodInfo.Name == "_M";
-            NeedsDev = attribute.NeedsDev;
+            Flags = attribute.Flags;
         }
+
+        public bool HasFlag(CommandFlag flag) => Flags.HasFlag(flag);
 
         public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Provider?.ToString()})";
     }

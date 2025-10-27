@@ -32,7 +32,7 @@ namespace STOLON.CLI
             }
         }
 
-        [Command("Print repository .git link.", isReadOnly: true)]
+        [Command("Print repository .git link.",  flags: CommandFlag.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(REPO_LINK_GIT);

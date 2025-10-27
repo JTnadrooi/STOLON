@@ -14,7 +14,7 @@ namespace STOLON.CLI
 
         }
 
-        [Command("Print the name of the color theme.", isReadOnly: true)]
+        [Command("Print the name of the color theme.",  flags: CommandFlag.ReadOnly)]
         public void _M()
         {
             Console.WriteLine(CLI.Instance.Config.Get<string>("graphics.theme"));

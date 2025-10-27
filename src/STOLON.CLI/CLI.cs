@@ -124,7 +124,7 @@ namespace STOLON.CLI
                 if (flagHandler.ShouldListen(arguments))
                     flagHandler.PreCommand(arguments);
 
-            if (command.NeedsDev && !IsDev) throw new InvalidOperationException($"Command '{arguments.CmdName}' is dev-only.");
+            if (command.HasFlag(CommandFlag.DevOnly) && !IsDev) throw new InvalidOperationException($"Command '{arguments.CmdName}' is dev-only.");
 
             object?[] cmdArgs = CommandHelpers.ParseArguments(arguments.Args, command.MethodInfo.GetParameters());
             Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");

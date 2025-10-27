@@ -39,7 +39,7 @@ namespace STOLON.CLI
         [Command("Print the STOLON version.")]
         public void Version() => Console.WriteLine(STOLON.Version);
 
-        [Command("Set the STOLON version.", "version-set", needsDev: true)]
+        [Command("Set the STOLON version.", "version-set", flags: CommandFlag.DevOnly)]
         public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
     }
 }

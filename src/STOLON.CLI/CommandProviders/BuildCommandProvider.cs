@@ -28,25 +28,25 @@ namespace STOLON.CLI
             Textures(force);
         }
 
-        [Command("Compile effects.", idOverride: "fx", needsDev: true)]
+        [Command("Compile effects.", idOverride: "fx", flags: CommandFlag.DevOnly)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectsBuilder(debug), force);
         }
 
-        [Command("Compile audio.", needsDev: true)]
+        [Command("Compile audio.", flags: CommandFlag.DevOnly)]
         public void Audio(bool force = false)
         {
             Builder.Build(new AudioBuilder(), force);
         }
 
-        [Command("Compile fonts.", needsDev: true)]
+        [Command("Compile fonts.", flags: CommandFlag.DevOnly)]
         public void Fonts(bool force = false)
         {
             Builder.Build(new FontsBuilder(), force);
         }
 
-        [Command("Compile textures.", needsDev: true)]
+        [Command("Compile textures.", flags: CommandFlag.DevOnly)]
         public void Textures(bool force = false)
         {
             Builder.Build(new TexturesBuilder(), force);

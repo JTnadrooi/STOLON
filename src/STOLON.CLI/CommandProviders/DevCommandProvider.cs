@@ -12,7 +12,7 @@ namespace STOLON.CLI.CommandProviders
     {
         public DevCommandProvider() : base("dev") { }
 
-        [Command($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.")]
+        [Command($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.", flags: CommandFlag.ReadOnly)]
         public void _M()
         {
             Console.WriteLine(CLI.IsDev);

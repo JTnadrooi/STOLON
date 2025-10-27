@@ -15,7 +15,7 @@ namespace STOLON.CLI
     {
         public CLICommandProvider() : base("cli") { }
 
-        [Command("Display info about the STOLON.CLI.", isReadOnly: true)]
+        [Command("Display info about the STOLON.CLI.", flags: CommandFlag.ReadOnly)]
         public void _M()
         {
             Console.WriteLine($"Command_Count={CLI.Instance.UniqueCommands.Count}");
@@ -28,7 +28,7 @@ namespace STOLON.CLI
             //}
         }
 
-        [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, isReadOnly: true)]
+        [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, flags: CommandFlag.ReadOnly)]
         public void Help(string? filter = null)
         {
             void WriteCommand(CommandInfo cmd) => Console.WriteLine($"{cmd.Id}{(cmd.HasAliases ? $"[{cmd.Ids.Skip(1).ToJoinedString(", ")}]" : string.Empty)} {cmd.MethodInfo.GetParameters()

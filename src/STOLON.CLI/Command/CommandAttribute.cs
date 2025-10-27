@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI.Command
 {
+    [Flags]
+    public enum CommandFlag : int
+    {
+        None = 0,
+        ReadOnly = 1,
+        DevOnly = 2,
+    }
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class CommandAttribute : Attribute
     {
@@ -13,22 +20,19 @@ namespace STOLON.CLI.Command
         public string[]? Aliases { get; }
         public string Description { get; }
         public bool InheritNamespace { get; }
-        public bool IsReadOnly { get; }
-        public bool NeedsDev { get; }
+        public CommandFlag Flags { get; }
         public CommandAttribute(
             string description,
             string? idOverride = null,
             string[]? aliases = null,
             bool inheritNamespace = true,
-            bool isReadOnly = false,
-            bool needsDev = false)
+            CommandFlag flags = CommandFlag.None)
         {
             IdOverride = idOverride;
             Description = description;
             Aliases = aliases;
             InheritNamespace = inheritNamespace;
-            IsReadOnly = isReadOnly;
-            NeedsDev = needsDev;
+            Flags = flags;
         }
     }
 }

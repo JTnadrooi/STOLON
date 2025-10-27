@@ -24,13 +24,13 @@ namespace STOLON.CLI
             CLI.Debug.Log("opened user config file (user.ini).");
         }
 
-        [Command("Print the path to the user.ini file.", isReadOnly: true)]
+        [Command("Print the path to the user.ini file.", flags: CommandFlag.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(System.IO.Path.GetFullPath(_userIniPath));
         }
 
-        [Command("Print the value of a key.", isReadOnly: true)]
+        [Command("Print the value of a key.", flags: CommandFlag.ReadOnly)]
         public void Get(string key)
         {
             string Represent(object o)
@@ -54,7 +54,7 @@ namespace STOLON.CLI
             CLI.Instance.Config.Reset(key);
         }
 
-        [Command("Reset a specific key.", isReadOnly: true)]
+        [Command("Reset a specific key.", flags: CommandFlag.ReadOnly)]
         public void Keys()
         {
             string Format(string key, object value, object defaultValue) => $"Key = {key}, Value = {value ?? "null"}, DefaultValue = {defaultValue ?? "null"}";

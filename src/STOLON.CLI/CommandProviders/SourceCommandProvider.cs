@@ -12,7 +12,7 @@ namespace STOLON.CLI
     {
         public SourceCommandProvider() : base("src") { }
 
-        [Command("Open the local source code directory.", needsDev: true)]
+        [Command("Open the local source code directory.", flags: CommandFlag.DevOnly)]
         public void _M(string? subDir = null)
         {
             using Process p = Process.Start(Environment.OSVersion.Platform switch
@@ -30,7 +30,7 @@ namespace STOLON.CLI
             CLI.Debug.Log($"Opened {(subDir == null ? string.Empty : $"'{subDir}'")} source directory.");
         }
 
-        [Command("Prints the local source code directory path.", needsDev: true)]
+        [Command("Prints the local source code directory path.", flags: CommandFlag.DevOnly | CommandFlag.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(CLI.SourcePath);
