@@ -22,7 +22,7 @@ namespace STOLON.CLI.Build
         }
 
         public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Textures\", "*.png")
+            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Textures\", "*.png", SearchOption.AllDirectories)
             .Select(f => new BuildItemInfo(f, Path.Combine(@".\Textures", Path.GetFileName(f))))
             .ToArray();
     }

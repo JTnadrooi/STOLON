@@ -22,7 +22,7 @@ namespace STOLON.CLI.Build
         }
 
         public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Fonts\", "*")
+            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Fonts\", "*", SearchOption.AllDirectories)
             .Select(f => new BuildItemInfo(f, Path.Combine(@".\Fonts", Path.GetFileName(f))))
             .ToArray();
     }

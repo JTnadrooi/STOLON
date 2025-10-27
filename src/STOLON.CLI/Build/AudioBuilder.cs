@@ -22,7 +22,7 @@ namespace STOLON.CLI.Build
         }
 
         public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Audio\", "*.wav")
+            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Audio\", "*.wav", SearchOption.AllDirectories)
             .Select(f => new BuildItemInfo(f, Path.Combine(@".\Audio", Path.GetFileName(f))))
             .ToArray();
     }
