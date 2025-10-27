@@ -21,16 +21,12 @@ namespace STOLON.CLI
             Console.WriteLine($"Command_Count={CLI.Instance.UniqueCommands.Count}");
             Console.WriteLine($"Provider_Count={CLI.Instance.Providers.Count}");
             Console.WriteLine($"Is_Dev={CLI.IsDev}");
-            Console.WriteLine($"CLI_Version={CLI.Version}");
             Console.WriteLine($"STOLON_Version={STOLON.Version}");
             //if (CLI.IsDev)
             //{
             //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
             //}
         }
-
-        [Command("Print the cli version.", isReadOnly: true)]
-        public void Version() => Console.WriteLine(CLI.Version);
 
         [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, isReadOnly: true)]
         public void Help(string? filter = null)
@@ -61,13 +57,5 @@ namespace STOLON.CLI
 
         [Command("Exit the program.")]
         public void Exit() => Environment.Exit(0);
-
-        [Command("Bump the .cli-version to .version.", needsDev: true)]
-        public void Bump()
-        {
-            string slVer = File.ReadAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"));
-            File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".cli-version"), slVer);
-            CLI.Debug.Log($"bumped .cli-version to {slVer}.");
-        }
     }
 }
