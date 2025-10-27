@@ -1,6 +1,7 @@
 ﻿using AsitLib;
 using AsitLib.Debug;
 using STOLON.CLI;
+using STOLON.CLI.Command;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -183,57 +184,6 @@ namespace STOLON.CLI
             //throw new Exception(Directory.GetFiles(".\\", "*", SearchOption.AllDirectories).ToJoinedString("\n"));
             Version = File.ReadAllText(".cli-version");
 
-        }
-    }
-
-    public class CommandInfo
-    {
-        public HashSet<string> Ids { get; }
-        public bool HasAliases => Ids.Count > 1;
-        public string Id { get; }
-        public string Description { get; }
-        public MethodInfo MethodInfo { get; }
-        public CommandProvider Provider { get; }
-        public bool IsMain { get; }
-        public bool NeedsDev { get; }
-
-        public CommandInfo(string[] ids, CommandAttribute attribute, MethodInfo methodInfo, CommandProvider source)
-        {
-            Ids = ids.ToHashSet();
-            Id = ids[0];
-            Description = attribute.Description;
-            MethodInfo = methodInfo;
-            Provider = source;
-            IsMain = methodInfo.Name == "_M";
-            NeedsDev = attribute.NeedsDev;
-        }
-
-        public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Provider?.ToString()})";
-    }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class CommandAttribute : Attribute
-    {
-        public string? IdOverride { get; }
-        public string[]? Aliases { get; }
-        public string Description { get; }
-        public bool InheritNamespace { get; }
-        public bool IsReadOnly { get; }
-        public bool NeedsDev { get; }
-        public CommandAttribute(
-            string description,
-            string? idOverride = null,
-            string[]? aliases = null,
-            bool inheritNamespace = true,
-            bool isReadOnly = false,
-            bool needsDev = false)
-        {
-            IdOverride = idOverride;
-            Description = description;
-            Aliases = aliases;
-            InheritNamespace = inheritNamespace;
-            IsReadOnly = isReadOnly;
-            NeedsDev = needsDev;
         }
     }
 }

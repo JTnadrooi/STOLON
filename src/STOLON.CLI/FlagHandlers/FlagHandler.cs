@@ -19,6 +19,7 @@ namespace STOLON.CLI
             LongId = longId;
             Description = description;
         }
+
         public virtual void PreCommand(ArgumentsInfo arguments) { }
         public virtual void PostCommand() { }
 
