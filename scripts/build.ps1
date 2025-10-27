@@ -31,7 +31,7 @@ if ($DebugBuild) {
     }
 }
 
-Copy-Item -Path ($ProjPath + "..\STOLON\" + "resources\*") -Destination "..\build\Debug\" -Recurse -Force
+# Copy-Item -Path ($ProjPath + "..\STOLON\" + "resources\*") -Destination "..\build\Debug\" -Recurse -Force
 
 Write-Output "running build command.";
 
@@ -47,7 +47,6 @@ Write-Output "running build command.";
 # else {
 #     $files | ForEach-Object { Write-Output $_.FullName }
 # }
-
 
 Start-Process -FilePath "C:\Users\Gebruiker\source\repos\STOLON\build\Debug\STOLON.CLI.exe" -ArgumentList "build -v" -WorkingDirectory (Split-Path "C:\Users\Gebruiker\source\repos\STOLON\build\Debug\STOLON.CLI.exe") -NoNewWindow -Wait
 
