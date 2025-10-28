@@ -18,12 +18,9 @@ namespace STOLON.CLI.Build
 
         public void Build(string src, string dest)
         {
-            File.Copy(src, dest, true);
+            BuildHelper.Copy(src, dest);
         }
 
-        public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Textures\", "*.png", SearchOption.AllDirectories)
-            .Select(f => new BuildItemInfo(f, Path.Combine(@".\Textures", Path.GetFileName(f))))
-            .ToArray();
+        public BuildItemInfo[] GetBuildItems() => BuildItemInfo.GetRelativeBuildItems(CLI.SourcePath! + @"STOLON\resources\Textures\", "*.png");
     }
 }

@@ -23,8 +23,6 @@ namespace STOLON.CLI.Build
         }
 
         public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Effects\", "*.fx", SearchOption.AllDirectories)
-            .Select(f => new BuildItemInfo(f, Path.Combine(@".\Effects", Path.GetFileNameWithoutExtension(f) + ".mgfx")))
-            .ToArray();
+            => BuildItemInfo.GetRelativeBuildItems(CLI.SourcePath! + @"STOLON\resources\Effects\", "*.fx", f => Path.ChangeExtension(f, ".mgfx"));
     }
 }

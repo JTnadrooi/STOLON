@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STOLON.CLI.Helpers
+namespace STOLON.CLI.Build
 {
     public static class BuildHelper
     {
@@ -36,6 +36,12 @@ namespace STOLON.CLI.Helpers
                 CLI.Debug.Success($"no rebuild needed.");
                 return false;
             }
+        }
+
+        public static void Copy(string src, string dest)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+            File.Copy(src, dest, true);
         }
     }
 }

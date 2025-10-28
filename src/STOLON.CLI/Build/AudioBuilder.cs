@@ -18,12 +18,9 @@ namespace STOLON.CLI.Build
 
         public void Build(string src, string dest)
         {
-            File.Copy(src, dest, true);
+            BuildHelper.Copy(src, dest);
         }
 
-        public BuildItemInfo[] GetBuildItems()
-            => Directory.GetFiles(CLI.SourcePath! + @"STOLON\resources\Audio\", "*.wav", SearchOption.AllDirectories)
-            .Select(f => new BuildItemInfo(f, Path.Combine(@".\Audio", Path.GetFileName(f))))
-            .ToArray();
+        public BuildItemInfo[] GetBuildItems() => BuildItemInfo.GetRelativeBuildItems(CLI.SourcePath! + @"STOLON\resources\Audio\", "*.wav");
     }
 }

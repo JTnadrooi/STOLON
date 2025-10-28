@@ -14,7 +14,7 @@ namespace STOLON.CLI
 
         }
 
-        [Command("Print the name of the color theme.",  flags: CommandFlag.ReadOnly)]
+        [Command("Print the name of the color theme.", flags: CommandFlag.ReadOnly)]
         public void _M()
         {
             Console.WriteLine(CLI.Instance.Config.Get<string>("graphics.theme"));
@@ -33,7 +33,7 @@ namespace STOLON.CLI
         }
 
         [Command("Print the path of the color theme.")]
-        public void Path(string themeId)
+        public void Path(string? themeId = null)
         {
             throw new NotImplementedException();
         }
