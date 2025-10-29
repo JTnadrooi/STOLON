@@ -17,12 +17,12 @@ namespace STOLON.CLI.Build
             Destination = dest;
         }
 
-        public static BuildItemInfo[] GetRelativeBuildItems(string src, string pattern, Func<string, string>? selector = null)
+        public static BuildItemInfo[] GetRelativeBuildItems(string src, string searchPattern, Func<string, string>? selector = null)
         {
             Func<string, string> sel = selector ?? (f => f);
-            return Directory.GetFiles(src, pattern, SearchOption.AllDirectories)
-            .Select(f => new BuildItemInfo(f, sel.Invoke(Path.Combine(new DirectoryInfo(src).Name, Path.GetRelativePath(src, f)))))
-            .ToArray();
+            return Directory.GetFiles(src, searchPattern, SearchOption.AllDirectories)
+                .Select(f => new BuildItemInfo(f, sel.Invoke(Path.Combine(new DirectoryInfo(src).Name, Path.GetRelativePath(src, f)))))
+                .ToArray();
         }
 
         public static BuildItemInfo[] GetRelativeBuildItems(string src, Func<string, bool>? predicate = null, Func<string, string>? selector = null)
@@ -30,8 +30,8 @@ namespace STOLON.CLI.Build
             Func<string, string> sel = selector ?? (f => f);
             Func<string, bool> pred = predicate ?? (f => true);
             return Directory.GetFiles(src, "*", SearchOption.AllDirectories).Where(pred)
-            .Select(f => new BuildItemInfo(f, sel.Invoke(Path.Combine(new DirectoryInfo(src).Name, Path.GetRelativePath(src, f)))))
-            .ToArray();
+                .Select(f => new BuildItemInfo(f, sel.Invoke(Path.Combine(new DirectoryInfo(src).Name, Path.GetRelativePath(src, f)))))
+                .ToArray();
         }
     }
 
