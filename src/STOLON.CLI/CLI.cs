@@ -172,7 +172,7 @@ namespace STOLON.CLI
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
 
-        public static bool IsDev => Directory.Exists(BUILD_INFO_DIRECTORY);
+        public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
         public static string? SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : null;
         public static string? SourceResourcesPath => SourcePath == null ? null : (SourcePath + @"STOLON\resources\");
     }

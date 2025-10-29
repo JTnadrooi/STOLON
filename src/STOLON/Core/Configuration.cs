@@ -51,7 +51,8 @@ namespace STOLON
 
                 {"cli.catch_errors", true},
                 {"cli.global_flags", Array.Empty<string>()},
-                {"cli.global_flags_on_startup_arguments", Array.Empty<string>()}
+                {"cli.global_flags_on_startup_arguments", Array.Empty<string>()},
+                {"cli.ignore_buildinfo", false}
                 //{"___", true},
             };
 

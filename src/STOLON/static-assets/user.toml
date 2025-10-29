@@ -38,3 +38,4 @@ enable = true
 catch_errors = false
 global_flags = []
 global_flags_on_startup_arguments = [] # wip, if empty uses global flags
+ignore_buildinfo = true #
