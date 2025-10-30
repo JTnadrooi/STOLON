@@ -3,12 +3,16 @@
 
 Param(
     [Parameter(Mandatory)]
-    $BuildConfiguration,
+    [string]$BuildConfiguration,
+    [Parameter(Mandatory = $false)]
+    [string]$ProjPath,
     [Parameter(Mandatory)]
-    $ProjPath,
-    [Parameter(Mandatory)]
-    $DebugBuild
+    [bool]$DebugBuild
 );
+
+# if (-not $ProjPath) {
+#     $ProjPath = "[UNSET]"
+# }
 
 Write-Output "[build.ps1]:";
 
@@ -30,8 +34,6 @@ if ($DebugBuild) {
         New-Item -ItemType Directory -Path $buildInfoDir | Out-Null;
     }
 }
-
-# Copy-Item -Path ($ProjPath + "..\STOLON\" + "resources\*") -Destination "..\build\Debug\" -Recurse -Force
 
 Write-Output "running build command.";
 
