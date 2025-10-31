@@ -4,42 +4,42 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using STOLON.CLI.Command;
+
 
 namespace STOLON.CLI
 {
-    public class GameCommandProvider : CommandProvider
-    {
-        public GameCommandProvider() : base("sl") { }
+	public class GameCommandProvider : CommandProvider
+	{
+		public GameCommandProvider() : base("sl") { }
 
-        [Command("Start STOLON.")]
-        public void Start()
-        {
-            using Process p = Process.Start("STOLON.exe");
-            CLI.Debug.Log($"started STOLON as '{p.ProcessName}'.");
-        }
+		[Command("Start STOLON.")]
+		public void Start()
+		{
+			using Process p = Process.Start("STOLON.exe");
+			CLI.Debug.Log($"started STOLON as '{p.ProcessName}'.");
+		}
 
-        [Command("Exit STOLON.")]
-        public void Exit()
-        {
-            Process[] processes = Process.GetProcessesByName("STOLON");
-            if (processes.Length > 0)
-                foreach (Process process in processes)
-                {
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                        process.WaitForExit();
-                        CLI.Debug.Log($"STOLON process with PID {process.Id} has been terminated.");
-                    }
-                }
-            else Console.WriteLine("No running STOLON processes found.");
-        }
+		[Command("Exit STOLON.")]
+		public void Exit()
+		{
+			Process[] processes = Process.GetProcessesByName("STOLON");
+			if (processes.Length > 0)
+				foreach (Process process in processes)
+				{
+					if (!process.HasExited)
+					{
+						process.Kill();
+						process.WaitForExit();
+						CLI.Debug.Log($"STOLON process with PID {process.Id} has been terminated.");
+					}
+				}
+			else Console.WriteLine("No running STOLON processes found.");
+		}
 
-        [Command("Print the STOLON version.")]
-        public void Version() => Console.WriteLine(STOLON.Version);
+		[Command("Print the STOLON version.")]
+		public void Version() => Console.WriteLine(STOLON.Version);
 
-        [Command("Set the STOLON version.", "version-set", flags: CommandFlag.DevOnly)]
-        public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
-    }
+		[Command("Set the STOLON version.", "version-set", flags: CommandFlag.DevOnly)]
+		public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
+	}
 }

@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using STOLON.CLI.Command;
 
 namespace STOLON.CLI
 {

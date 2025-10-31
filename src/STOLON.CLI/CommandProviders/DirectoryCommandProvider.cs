@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using STOLON.CLI.Command;
+
 
 namespace STOLON.CLI
 {
@@ -24,7 +24,7 @@ namespace STOLON.CLI
             CLI.Debug.Log("Opened STOLON directory.");
         }
 
-        [Command("Print the path of the directory where STOLON is located.",  flags: CommandFlag.ReadOnly)]
+        [Command("Print the path of the directory where STOLON is located.", flags: CommandFlag.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);

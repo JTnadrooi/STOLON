@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STOLON.CLI.Command
+namespace STOLON.CLI
 {
     [Flags]
     public enum CommandFlag : int
