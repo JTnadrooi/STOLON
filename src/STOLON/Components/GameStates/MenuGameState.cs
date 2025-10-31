@@ -287,7 +287,7 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (GameStateHelpers.SkipTarget)
+            switch (Scene.SkipTarget)
             {
                 case "entity_select":
                     if (_millisecondsSinceStartup < 10000)
@@ -301,7 +301,7 @@ namespace STOLON
                     }
                     break;
             }
-            if (SkipAnimation && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
+            if (ShouldSkipAnimation() && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
 
             #region inFlash
             _millisecondsSinceStartup += elapsedMilliseconds;

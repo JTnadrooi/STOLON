@@ -396,9 +396,9 @@ namespace STOLON
             _allocNotes = new ConditionalNoteEnumerationGraphic(this, new Vector2(0, INFO_WINDOW_TOPLINE), TILE_SIZE);
             _abilityNotes = new ConditionalNoteEnumerationGraphic(this, new Vector2(TILE_SIZE, INFO_WINDOW_TOPLINE), TILE_SIZE);
 
-            if (SkipArgs != null)
+            if (GetSkipParameters() != null)
             {
-                _lastSelected = SkipArgs[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == SkipArgs[0]) : _lastSelected;
+                _lastSelected = GetSkipParameters()[0] != "-1" ? _entities.GetFirstIndexWhere(e => e.Id == GetSkipParameters()[0]) : _lastSelected;
             }
 
             Selection = new EntitySelection(MAX_SELECTION);
@@ -413,7 +413,7 @@ namespace STOLON
             _lineTweener.Update(deltaTime);
             _initDone = !_lineTweener.Running;
 
-            if (SkipAnimation && _lineTweener.Running)
+            if (ShouldSkipAnimation() && _lineTweener.Running)
                 _lineTweener.Update(12f); // skip animation instantly.
 
             _line1x = (int)MathHelper.Lerp(_menuGameState.RemoveLine1x, LINE1_TARGET, _lineTweener.Value);
