@@ -11,7 +11,7 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public class EntitySelectGameState : GameState
+    public class EntitySelectGameState : Scene
     {
         public class EntitySelectOrderContainer : OrderContainer
         {

@@ -15,7 +15,7 @@ using MonoGame.Extended;
 
 namespace STOLON
 {
-    public class BoardGameState : GameState
+    public class BoardGameState : Scene
     {
         private int _lineX1;
         private int _lineX2;

@@ -242,7 +242,7 @@ namespace STOLON
             public static DebugStream _debug;
             public static GameEnvironment _environment;
             public static GameInput _input;
-            public static GameStateManager _stateManager;
+            public static SceneManager _stateManager;
             public static Interface _ui;
             public static Configuration _config;
             public static DrawingContext _drawingContext;
@@ -259,7 +259,7 @@ namespace STOLON
         public static DebugStream Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static GameInput Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
-        public static GameStateManager StateManager { get => BackingFields._stateManager; internal set => BackingFields._stateManager = value; }
+        public static SceneManager StateManager { get => BackingFields._stateManager; internal set => BackingFields._stateManager = value; }
         public static Interface UI { get => BackingFields._ui; internal set => BackingFields._ui = value; }
         public static Configuration Config { get => BackingFields._config; internal set => BackingFields._config = value; }
         public static DrawingContext DrawingContext { get => BackingFields._drawingContext; internal set => BackingFields._drawingContext = value; }
