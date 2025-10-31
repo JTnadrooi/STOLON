@@ -15,7 +15,7 @@ using MonoGame.Extended;
 
 namespace STOLON
 {
-    public class BoardGameState : GameState
+    public class BoardGameState : Scene
     {
         private int _lineX1;
         private int _lineX2;
@@ -55,7 +55,7 @@ namespace STOLON
         }
         protected override void UpdateUI(int elapsedMilliseconds)
         {
-            float zoomIntensity = ((BoardGameState)STOLON.StateManager.Current).Board.ZoomIntensity;
+            float zoomIntensity = ((BoardGameState)STOLON.SceneManager.Current).Board.ZoomIntensity;
             float lineZoomOffset = zoomIntensity * 30f * (zoomIntensity < 0 ? 0.5f : 1f); // 30 being the max zoom in pixels, the last bit is smoothening the inverted zoom.
 
             lineZoomOffset = Math.Max(0, lineZoomOffset);

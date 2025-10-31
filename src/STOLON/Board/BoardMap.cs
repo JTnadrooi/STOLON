@@ -92,7 +92,7 @@ namespace STOLON
             for (int i = 0; i < InitialUniqueMoveCount; i++)
             {
                 if (TryGetMove(i, state, out Move? move)) toret.Add(move!.Value);
-            } 
+            }
             return toret;
         }
     }

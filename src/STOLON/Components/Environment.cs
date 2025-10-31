@@ -44,13 +44,13 @@ namespace STOLON
         private Interface _userInterface;
         private OverlayEngine _overlayer;
         private Dictionary<string, Entity> _entities;
-        private GameStateManager _stateManager;
+        private SceneManager _sceneManager;
 
         public GameEnvironment() : base(null)
         {
             _entities = new Dictionary<string, Entity>();
             _userInterface = null!;
-            _stateManager = null!;
+            _sceneManager = null!;
             _overlayer = null!;
 
 
@@ -68,8 +68,8 @@ namespace STOLON
             STOLON.Debug.Success();
 
             STOLON.UI = _userInterface = new Interface();
-            STOLON.StateManager = _stateManager = new GameStateManager();
-            STOLON.StateManager.ChangeState<MenuGameState>();
+            STOLON.SceneManager = _sceneManager = new SceneManager();
+            STOLON.SceneManager.ChangeScene<MenuGameState>();
 
 
             _overlayer = new OverlayEngine();
@@ -83,18 +83,18 @@ namespace STOLON
         {
             _userInterface.Update(elapsedMilliseconds);
 
-            STOLON.StateManager.Update(elapsedMilliseconds);
+            STOLON.SceneManager.Update(elapsedMilliseconds);
 
             //_userInterface.PostUpdate(elapsedMilliseconds);
             STOLON.AudioEngine.Update(elapsedMilliseconds);
-            STOLON.Instance.DRP.UpdateDetails(STOLON.StateManager.Current.DRPStatus);
+            STOLON.Instance.DRP.UpdateDetails(STOLON.SceneManager.Current.DRPStatus);
 
             _overlayer.Update(elapsedMilliseconds);
             base.Update(elapsedMilliseconds);
         }
         public override void Draw(DrawingContext drawingContext)
         {
-            STOLON.StateManager.Draw(drawingContext);
+            STOLON.SceneManager.Draw(drawingContext);
             _userInterface.Draw(drawingContext);
 
             _overlayer.Draw(drawingContext);

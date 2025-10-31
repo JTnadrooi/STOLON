@@ -50,7 +50,7 @@ namespace STOLON
                 : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }
     }
-    public class MenuGameState : GameState
+    public class MenuGameState : Scene
     {
         private Texture2D _logoLines;
         private Texture2D _logoMarks;
@@ -287,7 +287,7 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (GameStateHelpers.SkipTo)
+            switch (GameStateHelpers.SkipTarget)
             {
                 case "entity_select":
                     if (_millisecondsSinceStartup < 10000)
@@ -415,7 +415,7 @@ namespace STOLON
                 _onLeave = null;
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
-                STOLON.StateManager.ChangeState<EntitySelectGameState>(true);
+                STOLON.SceneManager.ChangeScene<EntitySelectGameState>(true);
                 _boardPlayers = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;

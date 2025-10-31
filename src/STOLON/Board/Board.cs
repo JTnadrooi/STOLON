@@ -36,10 +36,10 @@ namespace STOLON
 
         public float MaxDeltaZoom => SmoothnessModifier * 10f;
         public float ZoomIntensity => (Zoom - _desiredZoom) / MaxDeltaZoom;
-        public Vector2 BoardCenter => _state.Tiles[_state.Tiles.GetLength(0) / 2, _state.Tiles.GetLength(1) / 2].BoardPosition;
+        public Vector2 BoardCenter => _scene.Tiles[_scene.Tiles.GetLength(0) / 2, _scene.Tiles.GetLength(1) / 2].BoardPosition;
         public float SmoothnessModifier => 0.003f;
         public int TurnNumber { get; private set; }
-        public ref BoardState State => ref _state;
+        public ref BoardState State => ref _scene;
         public ReadOnlyDictionary<string, SearchTarget> SearchTargets => new ReadOnlyDictionary<string, SearchTarget>(_searchTargets);
         public BoardState InitialState { get; }
         public Stack<BoardState> History { get; private set; }
@@ -48,7 +48,7 @@ namespace STOLON
         public Vector2 WorldMousePos { get; private set; }
 
         private SpriteBatch _boardSpriteBatch;
-        private BoardState _state;
+        private BoardState _scene;
 
         int _mouseStateCoefficient;
         private float _desiredZoom;
@@ -68,7 +68,7 @@ namespace STOLON
             Camera = new Camera2D();
             TurnNumber = 0;
 
-            _state = conf;
+            _scene = conf;
             _boardSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _desiredZoom = MathF.Max(0.45f, CONF_ZOOM_COEFFICIENT * (4f / conf.Dimensions.X)); // does not change.
             _desiredCameraPos = BoardCenter;
@@ -171,7 +171,7 @@ namespace STOLON
         public void Undo()
         {
             STOLON.Debug.Log(">attempting move undo");
-            _state.Undo();
+            _scene.Undo();
             STOLON.Debug.Success();
 
         }
@@ -210,9 +210,9 @@ namespace STOLON
             {
                 STOLON.Debug.Log(">attempting board alter after mouseclick");
                 Move? move = null;
-                for (int x = 0; x < _state.Tiles.GetLength(0); x++)
-                    for (int y = 0; y < _state.Tiles.GetLength(1); y++)
-                        if (_state.Tiles[x, y].HitBox.Contains(WorldMousePos) && !_state.Tiles[x, y].IsSolid())
+                for (int x = 0; x < _scene.Tiles.GetLength(0); x++)
+                    for (int y = 0; y < _scene.Tiles.GetLength(1); y++)
+                        if (_scene.Tiles[x, y].HitBox.Contains(WorldMousePos) && !_scene.Tiles[x, y].IsSolid())
                         {
                             move = new Move(x, y);
                             break;
@@ -246,10 +246,10 @@ namespace STOLON
         public override void Draw(DrawingContext drawingContext)
         {
             _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
-            for (int x = 0; x < _state.Dimensions.X; x++)
-                for (int y = 0; y < _state.Dimensions.Y; y++)
+            for (int x = 0; x < _scene.Dimensions.X; x++)
+                for (int y = 0; y < _scene.Dimensions.Y; y++)
                 {
-                    Tile tile = _state.Tiles[x, y];
+                    Tile tile = _scene.Tiles[x, y];
                     _boardSpriteBatch.Draw(tile.TileType.Texture, tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                     int playerid = tile.GetOccupiedByPlayerId();
                     if (playerid != -1)
@@ -276,7 +276,7 @@ namespace STOLON
         public void EndGame(int winner)
         {
             bool draw = winner < 0;
-            STOLON.Debug.Log(">ending game with " + (draw ? "a draw" : "winner: " + _state.Players[winner]));
+            STOLON.Debug.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
 
             STOLON.Environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
             STOLON.Debug.Success();

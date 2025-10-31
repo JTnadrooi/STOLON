@@ -11,7 +11,7 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public class EntitySelectGameState : GameState
+    public class EntitySelectGameState : Scene
     {
         public class EntitySelectOrderContainer : OrderContainer
         {
@@ -311,7 +311,7 @@ namespace STOLON
         private readonly Entity[] _entities;
 
         private OrderContainer _entityInfoContainer;
-        private OrderContainer _gamestateInfoContainer;
+        private OrderContainer _sceneInfoContainer;
 
         private ConditionalNoteEnumerationGraphic _allocNotes;
         private ConditionalNoteEnumerationGraphic _abilityNotes;
@@ -359,7 +359,7 @@ namespace STOLON
         public EntitySelectGameState() : base("entity_select")
         {
             _tileTexture = STOLON.Textures.GetReference("Debug\\temp-" + TILE_SIZE);
-            if (!STOLON.StateManager.TryGetState(out _menuGameState!)) throw new Exception();
+            if (!STOLON.SceneManager.TryGetState(out _menuGameState!)) throw new Exception();
             _lineTweener = new Tweener<float>(0, 1, 2, Ease.Quad.InOut);
             _lineTweener.Start();
             _posCache = new Dictionary<int, Vector2>();
@@ -388,7 +388,7 @@ namespace STOLON
                 new UIElement("alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("v_alloc", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, INFO_WINDOW_TOPLINE));
-            _gamestateInfoContainer = new EntitySelectOrderContainer([
+            _sceneInfoContainer = new EntitySelectOrderContainer([
                 new UIElement("lvl_name", UIElement.TOP_ID, null, UIElementType.Ignore),
                 new UIElement("lvl_diff", UIElement.TOP_ID, null, UIElementType.Ignore),
             ], new Vector2(0, STOLON.V_HEIGHT - BOXED_TEXT_DIV_CLEARANCE));
@@ -504,9 +504,9 @@ namespace STOLON
             _entityInfoContainer.Update(elapsedMilliseconds);
 
             // update level info container.
-            _gamestateInfoContainer.Elements["lvl_name"].Text = "Entity Selection";
-            _gamestateInfoContainer.Elements["lvl_diff"].Text = "MAX: " + MAX_SELECTION;
-            _gamestateInfoContainer.Update(elapsedMilliseconds);
+            _sceneInfoContainer.Elements["lvl_name"].Text = "Entity Selection";
+            _sceneInfoContainer.Elements["lvl_diff"].Text = "MAX: " + MAX_SELECTION;
+            _sceneInfoContainer.Update(elapsedMilliseconds);
 
             _allocNotes.Notes = SelectedEntity.AllocationNotes;
             _allocNotes.Update(elapsedMilliseconds);
@@ -643,7 +643,7 @@ namespace STOLON
 
                 drawingContext.DrawVerticalLine(TILE_SIZE * 3, 0, ROSTER_BOTTOM_LINE);
 
-                drawingContext.Draw(_gamestateInfoContainer);
+                drawingContext.Draw(_sceneInfoContainer);
             }
 
             drawingContext.DrawVerticalLine(_line1x, -10f);
