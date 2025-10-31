@@ -10,13 +10,11 @@ Param(
     [bool]$DebugBuild
 );
 
-# if (-not $ProjPath) {
-#     $ProjPath = "[UNSET]"
-# }
+if (-not $ProjPath) {
+    $ProjPath = "[UNSET]"
+}
 
 Write-Output "[build.ps1]:";
-
-Write-Output "running from $(Split-Path $ProjPath -Leaf).";
 
 Write-Output "BuildConfiguration=$BuildConfiguration"
 Write-Output "ProjPath=$ProjPath"
