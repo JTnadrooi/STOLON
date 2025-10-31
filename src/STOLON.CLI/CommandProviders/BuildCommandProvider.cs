@@ -27,7 +27,7 @@ namespace STOLON.CLI
             Textures(force);
         }
 
-        [Command("Build effects.", idOverride: "fx", flags: CommandFlag.DevOnly)]
+        [Command("Build effects.", id: "fx", flags: CommandFlag.DevOnly)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectsBuilder(debug), force);

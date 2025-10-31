@@ -88,7 +88,7 @@ namespace STOLON.CLI
 
                         string cmdId;
                         if (methodInfo.Name == "_M") cmdId = providerInstance.FullNamespace;
-                        else cmdId = (attribute.InheritNamespace ? (providerInstance.FullNamespace + "-") : string.Empty) + (attribute.IdOverride?.ToLower() ?? methodInfo.Name.ToLower());
+                        else cmdId = (attribute.InheritNamespace ? (providerInstance.FullNamespace + "-") : string.Empty) + (attribute.Id?.ToLower() ?? methodInfo.Name.ToLower());
 
                         string[] ids = new string[] { cmdId }.Concat(attribute.Aliases ?? Enumerable.Empty<string>()).ToArray();
 
