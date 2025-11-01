@@ -36,7 +36,7 @@ namespace STOLON.CLI
         public virtual void PostCommand(ArgumentsInfo arguments) { }
 
         /// <summary>
-        /// Checks if the current <see cref="FlagHandler"/> should run its <see cref="PreCommand(ArgumentsInfo)"/> and <see cref="PostCommand"/> actions.
+        /// Gets if the current <see cref="FlagHandler"/> should run its <see cref="PreCommand(ArgumentsInfo)"/> and <see cref="PostCommand"/> actions.
         /// </summary>
         /// <param name="args"></param>
         /// <returns><see langword="true"/> if </returns>
