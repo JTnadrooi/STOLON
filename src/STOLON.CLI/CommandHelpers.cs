@@ -12,8 +12,17 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
+    /// <summary>
+    /// A collection of helper methods for validating and parsing the program arguments <see cref="string"/> <see cref="Array"/>.
+    /// </summary>
     public static class CommandHelpers
     {
+        /// <summary>
+        /// Validate if a command <paramref name="argument"/> against the <see cref="ValidationAttribute"/> attributes on the <see cref="ParameterInfo"/>.
+        /// </summary>
+        /// <param name="argument">The argument to validate.</param>
+        /// <param name="parameter">The parameter to get the <see cref="ValidationAttribute"/> attributes from.</param>
+        /// <exception cref="ArgumentException">Argument is not valid.</exception>
         public static void ValidateArgument(object? argument, ParameterInfo parameter)
         {
             IEnumerable<ValidationAttribute> validationAttributes = parameter.GetCustomAttributes<ValidationAttribute>();
@@ -24,6 +33,11 @@ namespace STOLON.CLI
             }
         }
 
+        /// <summary>
+        /// Parse a value to the target <paramref name="conversionType"/>.
+        /// </summary>
+        /// <param name="conversionType">The target <see cref="Type"/>.</param>
+        /// <returns><paramref name="value"/> parsed to the target <see cref="Type"/>.</returns>
         public static object? ParseArgument(object? value, Type conversionType)
         {
             if (value == null) return null;
@@ -33,6 +47,12 @@ namespace STOLON.CLI
             return Convert.ChangeType(value, conversionType);
         }
 
+        /// <summary>
+        /// Parse <see cref="string"/> arguments to their expected values.
+        /// </summary>
+        /// <param name="expected">The parameters the arguments should conform and be parsed to. Obtained from <see cref="MethodBase.GetParameters"/>.</param>
+        /// <returns><paramref name="args"/> fit for use in the <see cref="MethodBase"/> the <see cref="ParameterInfo"/> objects are extracted from.</returns>
+        /// <exception cref="ArgumentException">Missing argument.</exception>
         public static object?[] ParseArguments(string[] args, ParameterInfo[] expected)
         {
             object?[] methodArguments = new object?[expected.Length];
@@ -63,6 +83,9 @@ namespace STOLON.CLI
 
         public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Flags);
 
+        /// <summary>
+        /// Extract more detailed arguments info from a <see cref="string"/> <see cref="Array"/>.
+        /// </summary>
         public static ArgumentsInfo RefineArguments(string[] args)
         {
             HashSet<string> merged = new HashSet<string>(CLI.Instance.GlobalFlags);

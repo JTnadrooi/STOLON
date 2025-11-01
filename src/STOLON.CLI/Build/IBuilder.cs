@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI.Build
 {
+    /// <summary>
+    /// Represents a single needing to be build item.
+    /// </summary>
     public sealed class BuildItemInfo
     {
+        /// <summary>
+        /// Gets the source of the item to get passed to the <see cref="IBuilder.Build(string, string)"/> method.
+        /// </summary>
         public string Source { get; }
+        /// <summary>
+        /// Gets the destination of the item to get passed to the <see cref="IBuilder.Build(string, string)"/> method.
+        /// </summary>
         public string Destination { get; }
 
         public BuildItemInfo(string src, string dest)
@@ -35,11 +44,32 @@ namespace STOLON.CLI.Build
         }
     }
 
+    /// <summary>
+    /// Represents an assets builder.
+    /// </summary>
     public interface IBuilder
     {
+        /// <summary>
+        /// Gets the items that have to be build. Do not check if an item needs to be build. That is done by the <see cref="BuildHelper.NeedsBuild(string, string, bool)"/> function.
+        /// </summary>
+        /// <returns>An array of <see cref="BuildItemInfo"/> objects representing both the source of the item and the destination.</returns>
         public BuildItemInfo[] GetBuildItems();
+
+        /// <summary>
+        /// Gets called before the first <see cref="Build(string, string)"/> call.
+        /// </summary>
         public void PreBuild() { }
+
+        /// <summary>
+        /// Gets called after the last <see cref="Build(string, string)"/> call.
+        /// </summary>
         public void PostBuild() { }
+
+        /// <summary>
+        /// Build a single item.
+        /// </summary>
+        /// <param name="src">The item source. See <see cref="BuildItemInfo.Source"/>.</param>
+        /// <param name="dest">The item destination. See <see cref="BuildItemInfo.Destination"/>.</param>
         public void Build(string src, string dest);
     }
 }

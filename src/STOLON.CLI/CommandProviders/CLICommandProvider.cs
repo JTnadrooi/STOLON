@@ -21,10 +21,6 @@ namespace STOLON.CLI
             Console.WriteLine($"Provider_Count={CLI.Instance.Providers.Count}");
             Console.WriteLine($"Is_Dev={CLI.IsDev}");
             Console.WriteLine($"STOLON_Version={STOLON.Version}");
-            //if (CLI.IsDev)
-            //{
-            //    Console.WriteLine($"SourcePath={CLI.SourcePath}");
-            //}
         }
 
         [Command("Display help.", aliases: ["?", "h"], inheritNamespace: false, flags: CommandFlag.ReadOnly)]

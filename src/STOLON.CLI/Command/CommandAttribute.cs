@@ -26,10 +26,16 @@ namespace STOLON.CLI
     public sealed class CommandAttribute : Attribute
     {
         /// <summary>
-        /// The command id. If <see langword="null"/>, the <see cref="CommandInfo.Id"/> will be the name of the method converted to lowercase using <see cref="string.ToLower()"/>.
+        /// The <see cref="CommandInfo.Id"/>. If <see langword="null"/>, the <see cref="CommandInfo.Id"/> will be the name of the method converted to lowercase using <see cref="string.ToLower()"/>.
         /// </summary>
         public string? Id { get; }
+        /// <summary>
+        /// The command aliases. Any <see cref="string"/> objects here will be provided as an alternative <see cref="CommandInfo.Id"/> in command calls. See <see cref="CommandInfo.Ids"/>.
+        /// </summary>
         public string[]? Aliases { get; }
+        /// <summary>
+        /// The command description. Will be displayed in the <see cref="CLICommandProvider.Help(string?)"/> command.
+        /// </summary>
         public string Description { get; }
         /// <summary>
         /// If <see cref="true"/>, the <see cref="CommandProvider.FullNamespace"/> <i>(+ "-")</i> will be prefixed to the <see cref="CommandInfo.Id"/>.

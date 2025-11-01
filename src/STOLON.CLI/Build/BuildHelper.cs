@@ -8,6 +8,13 @@ namespace STOLON.CLI.Build
 {
     public static class BuildHelper
     {
+        /// <summary>
+        /// Gets a value indicating if the target item (<paramref name="to"/>) needs to be rebuild.
+        /// </summary>
+        /// <param name="from">The source item.</param>
+        /// <param name="to">The target item.</param>
+        /// <param name="force">If <see langword="true"/>, this function will always return <see langword="true"/>.</param>
+        /// <returns>A value indicating if the target item (<paramref name="to"/>) needs to be rebuild or <see langword="true"/> if <paramref name="force"/> is set to <see langword="true"/>.</returns>
         public static bool NeedsBuild(string from, string to, bool force = false)
         {
             CLI.Debug.Log($">checking if '{from}' needs to be rebuild as '{to}'.");
@@ -38,6 +45,9 @@ namespace STOLON.CLI.Build
             }
         }
 
+        /// <summary>
+        /// Copy the <paramref name="src"/> to the <paramref name="dest"/> and make needed directories.
+        /// </summary>
         public static void Copy(string src, string dest)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(dest)!);

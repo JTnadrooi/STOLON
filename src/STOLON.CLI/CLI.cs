@@ -16,17 +16,29 @@ using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
+    /// <summary>
+    /// The main CLI class. See <see cref="CLI.Instance"/>.
+    /// </summary>
     public sealed class CLI : IDisposable
     {
         private bool disposedValue;
 
+        /// <summary>
+        /// The <see cref="FrozenDictionary{TKey, TValue}"/> containing of all <see cref="CommandInfo.Ids"/> and their respective <see cref="CommandInfo"/> object. 
+        /// As such, this <see cref="FrozenDictionary{TKey, TValue}"/> may return duplicate <see cref="CommandInfo"/> instances with a different alias.
+        /// </summary>
         public FrozenDictionary<string, CommandInfo> Commands { get; }
+        /// <summary>
+        /// The <see cref="FrozenDictionary{TKey, TValue}"/> containing of all main <see cref="CommandInfo.Id"/> strings and their respective <see cref="CommandInfo"/> object.
+        /// </summary>
         public FrozenDictionary<string, CommandInfo> UniqueCommands { get; }
         public FrozenDictionary<string, CommandProvider> Providers { get; }
         public FrozenDictionary<string, FlagHandler> FlagHandlers { get; }
 
         public Configuration Config { get; }
-
+        /// <summary>
+        /// The flags applied to all commands. From config key: <code>[user.toml]cli.global_flags</code>
+        /// </summary>
         public HashSet<string> GlobalFlags { get; }
 
         public CLI(string[] args)
@@ -112,6 +124,7 @@ namespace STOLON.CLI
             Debug.Log($"<cli created succesfully.");
             //Console.WriteLine(nestedProviders.ToJoinedString(",\n"));
         }
+
         public void Execute(string str) => Execute(CommandHelpers.SplitArgs(str));
         public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
         public void Execute(ArgumentsInfo arguments)
@@ -171,9 +184,17 @@ namespace STOLON.CLI
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
-
+        /// <summary>
+        /// <see langword="true"/> if built from a local repo. See the <i>scripts\build.ps1</i> script.
+        /// </summary>
         public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
+        /// <summary>
+        /// The absolute path of the <i>src\</i> folder.
+        /// </summary>
         public static string? SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : null;
+        /// <summary>
+        /// The absolute path of the <i>src\STOLON\resources\</i> folder.
+        /// </summary>
         public static string? SourceResourcesPath => SourcePath == null ? null : (SourcePath + @"STOLON\resources\");
     }
 }
