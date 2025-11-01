@@ -12,7 +12,7 @@ namespace STOLON.CLI.Build
     public static class Builder
     {
         /// <summary>
-        /// Build assets using the specified <paramref name="builder"/>.
+        /// Builds assets using the specified <paramref name="builder"/>.
         /// </summary>
         /// <typeparam name="TBuilder">The <see cref="IBuilder"/> implementing type.</typeparam>
         /// <param name="builder">The asset builder.</param>

@@ -11,34 +11,34 @@ namespace STOLON.CLI
     {
         None = 0,
         /// <summary>
-        /// The command only writes something to the screen.
+        /// Specifies that the command only writes something to the screen.
         /// </summary>
         ReadOnly = 1,
         /// <summary>
-        /// The command can only be executed if <see cref="CLI.IsDev"/> is <see langword="true"/>.
+        /// Specifies that the command can only be executed if <see cref="CLI.IsDev"/> is <see langword="true"/>.
         /// </summary>
         DevOnly = 2,
     }
     /// <summary>
-    /// Specifies that this method can be called from a cli command. This attribute only has an effect if the method is a <see cref="CommandProvider"/> member.
+    /// Specifies that this method can be called as a cli command. This attribute only has an effect if the method is a <see cref="CommandProvider"/> member.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class CommandAttribute : Attribute
     {
         /// <summary>
-        /// The <see cref="CommandInfo.Id"/>. If <see langword="null"/>, the <see cref="CommandInfo.Id"/> will be the name of the method converted to lowercase using <see cref="string.ToLower()"/>.
+        /// Gets the <see cref="CommandInfo.Id"/>. If <see langword="null"/>, the <see cref="CommandInfo.Id"/> will be the name of the method converted to lowercase using <see cref="string.ToLower()"/>.
         /// </summary>
         public string? Id { get; }
         /// <summary>
-        /// The command aliases. Any <see cref="string"/> objects here will be provided as an alternative <see cref="CommandInfo.Id"/> in command calls. See <see cref="CommandInfo.Ids"/>.
+        /// Gets the command aliases. Any <see cref="string"/> objects here will be provided as an alternative <see cref="CommandInfo.Id"/> in command calls. See <see cref="CommandInfo.Ids"/>.
         /// </summary>
         public string[]? Aliases { get; }
         /// <summary>
-        /// The command description. Will be displayed in the <see cref="CLICommandProvider.Help(string?)"/> command.
+        /// Gets the command description. Will be displayed in the <see cref="CLICommandProvider.Help(string?)"/> command.
         /// </summary>
         public string Description { get; }
         /// <summary>
-        /// If <see cref="true"/>, the <see cref="CommandProvider.FullNamespace"/> will be prefixed to the <see cref="CommandInfo.Id"/>, separated by a dash.
+        /// Gets if the <see cref="CommandProvider.FullNamespace"/> should be prefixed to the <see cref="CommandInfo.Id"/>, separated by a dash.
         /// </summary>
         public bool InheritNamespace { get; }
         public CommandFlag Flags { get; }

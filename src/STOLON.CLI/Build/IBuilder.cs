@@ -66,7 +66,7 @@ namespace STOLON.CLI.Build
         public void PostBuild() { }
 
         /// <summary>
-        /// Build a single item.
+        /// Builds a single item.
         /// </summary>
         /// <param name="src">The item source. See <see cref="BuildItemInfo.Source"/>.</param>
         /// <param name="dest">The item destination. See <see cref="BuildItemInfo.Destination"/>.</param>

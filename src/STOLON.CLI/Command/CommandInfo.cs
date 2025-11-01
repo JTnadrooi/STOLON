@@ -13,7 +13,7 @@ namespace STOLON.CLI
     public sealed class CommandInfo
     {
         /// <summary>
-        /// A <see cref="HashSet{T}"/> containing all command ids. Includes <see cref="Id"/>.
+        /// Gets a <see cref="HashSet{T}"/> containing all command ids. Includes <see cref="Id"/>.
         /// </summary>
         public HashSet<string> Ids { get; }
         public bool HasAliases => Ids.Count > 1;
@@ -25,7 +25,7 @@ namespace STOLON.CLI
         public string Description { get; }
 
         /// <summary>
-        /// The methodinfo this <see cref="CommandInfo"/> is create from.
+        /// Gets the <see cref="System.Reflection.MethodInfo"/> this <see cref="CommandInfo"/> is created from.
         /// </summary>
         public MethodInfo MethodInfo { get; }
         public CommandProvider Provider { get; }

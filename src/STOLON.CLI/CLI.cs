@@ -37,7 +37,7 @@ namespace STOLON.CLI
 
         public Configuration Config { get; }
         /// <summary>
-        /// The flags applied to all commands. From config key: <code>[user.toml]cli.global_flags</code>
+        /// Gets the flags applied to all commands. From config key: <code>[user.toml]cli.global_flags</code>
         /// </summary>
         public HashSet<string> GlobalFlags { get; }
 
@@ -175,25 +175,33 @@ namespace STOLON.CLI
         }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        /// <summary>
+        /// Gets the only <see cref="CLI"/> instance.
+        /// </summary>
         public static CLI Instance { get; private set; }
         public static DebugStream Debug { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
+        /// <summary>
+        /// Gets the instance of a <see cref="CommandProvider"/> of the specified <typeparamref name="TProvider"/> type.
+        /// </summary>
+        /// <typeparam name="TProvider">The <see cref="CommandProvider"/> type.</typeparam>
+        /// <returns>The instance of a <see cref="CommandProvider"/> of the specified <typeparamref name="TProvider"/> type.</returns>
         public static TProvider GetProvider<TProvider>() where TProvider : CommandProvider
             => (TProvider)CLI.Instance.Providers.Values.First(p => p.GetType() == typeof(TProvider));
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
         /// <summary>
-        /// <see langword="true"/> if built from a local repo. See the <i>scripts\build.ps1</i> script.
+        /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
         public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
         /// <summary>
-        /// The absolute path of the <i>src\</i> folder.
+        /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>
         public static string? SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : null;
         /// <summary>
-        /// The absolute path of the <i>src\STOLON\resources\</i> folder.
+        /// Gets the absolute path of the <i>src\STOLON\resources\</i> folder.
         /// </summary>
         public static string? SourceResourcesPath => SourcePath == null ? null : (SourcePath + @"STOLON\resources\");
     }

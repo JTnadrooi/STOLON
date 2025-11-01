@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 namespace STOLON.CLI
 {
     /// <summary>
-    /// A collection of helper methods for validating and parsing the program arguments <see cref="string"/> <see cref="Array"/>.
+    /// Performs operations for validating and parsing the program arguments <see cref="string"/> <see cref="Array"/>.
     /// </summary>
     public static class CommandHelpers
     {
         /// <summary>
-        /// Validate if a command <paramref name="argument"/> against the <see cref="ValidationAttribute"/> attributes on the <see cref="ParameterInfo"/>.
+        /// Validates if a command <paramref name="argument"/> against the <see cref="ValidationAttribute"/> attributes on the <see cref="ParameterInfo"/>.
         /// </summary>
         /// <param name="argument">The argument to validate.</param>
         /// <param name="parameter">The parameter to get the <see cref="ValidationAttribute"/> attributes from.</param>
@@ -34,7 +34,7 @@ namespace STOLON.CLI
         }
 
         /// <summary>
-        /// Parse a value to the target <paramref name="conversionType"/>.
+        /// Parses a value to the target <paramref name="conversionType"/>.
         /// </summary>
         /// <param name="conversionType">The target <see cref="Type"/>.</param>
         /// <returns><paramref name="value"/> parsed to the target <see cref="Type"/>.</returns>
@@ -48,7 +48,7 @@ namespace STOLON.CLI
         }
 
         /// <summary>
-        /// Parse <see cref="string"/> arguments to their expected values.
+        /// Parses <see cref="string"/> arguments to their expected values.
         /// </summary>
         /// <param name="expected">The parameters the arguments should conform and be parsed to. Obtained from <see cref="MethodBase.GetParameters"/>.</param>
         /// <returns><paramref name="args"/> fit for use in the <see cref="MethodBase"/> the <see cref="ParameterInfo"/> objects are extracted from.</returns>
@@ -84,7 +84,7 @@ namespace STOLON.CLI
         public readonly record struct ArgumentsInfo(string CmdName, string[] Args, HashSet<string> Flags);
 
         /// <summary>
-        /// Extract more detailed arguments info from a <see cref="string"/> <see cref="Array"/>.
+        /// Extracts more detailed arguments info from a <see cref="string"/> <see cref="Array"/>.
         /// </summary>
         public static ArgumentsInfo RefineArguments(string[] args)
         {
