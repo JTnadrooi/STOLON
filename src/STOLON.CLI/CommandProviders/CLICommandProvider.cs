@@ -51,6 +51,6 @@ namespace STOLON.CLI
         }
 
         [Command("Exit the program.")]
-        public void Exit() => Environment.Exit(0);
+        public void Exit() => CLI.Instance.Exit();
     }
 }
