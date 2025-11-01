@@ -15,7 +15,7 @@ namespace STOLON.CLI
         public QuitFlagHandler() : base("quit", "Quit after command.", "q") { }
 
         public override void PreCommand(ArgumentsInfo arguments) { }
-        public override void PostCommand()
+        public override void PostCommand(ArgumentsInfo arguments)
         {
             CLI.Instance.Exit(0);
         }
