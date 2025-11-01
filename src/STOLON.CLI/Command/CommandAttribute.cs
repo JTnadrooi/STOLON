@@ -38,7 +38,7 @@ namespace STOLON.CLI
         /// </summary>
         public string Description { get; }
         /// <summary>
-        /// If <see cref="true"/>, the <see cref="CommandProvider.FullNamespace"/> <i>(+ "-")</i> will be prefixed to the <see cref="CommandInfo.Id"/>.
+        /// If <see cref="true"/>, the <see cref="CommandProvider.FullNamespace"/> will be prefixed to the <see cref="CommandInfo.Id"/>, separated by a dash.
         /// </summary>
         public bool InheritNamespace { get; }
         public CommandFlag Flags { get; }
