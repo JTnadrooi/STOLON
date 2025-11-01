@@ -148,7 +148,7 @@ namespace STOLON
             }
 
             public MinMaxResult InvertScore() => new MinMaxResult(-Score, Move);
-            public override string ToString() => "{score: " + Score + ", move:" + Move + "}";
+            public override string ToString() => $"{{Score: {Score}, Move: {Move}}}";
             public static MinMaxResult operator -(MinMaxResult result) => result.InvertScore();
         }
 
@@ -206,10 +206,7 @@ namespace STOLON
                 Value = value;
                 Depth = depth;
             }
-            public override string ToString()
-            {
-                return $"Flag: {Flag}, Value: {Value}, Depth: {Depth}";
-            }
+            public override string ToString() => $"{{Flag: {Flag}, Value: {Value}, Depth: {Depth}}}";
         }
         public struct NegamaxEndResult
         {
@@ -227,10 +224,7 @@ namespace STOLON
                 MsAItem = msAItem;
             }
 
-            public override string ToString()
-            {
-                return $"Move: {Move}, Items: {Items}, Total Time Elapsed: {TotalTimeElapsed} ms, Ms/Item: ~{MsAItem}";
-            }
+            public override string ToString() => $"{{Move: {Move}, Items: {Items}, Total Time Elapsed: {TotalTimeElapsed} ms, Ms/Item: ~{MsAItem}}}";
         }
         public enum NodeState
         {

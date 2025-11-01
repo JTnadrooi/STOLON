@@ -86,7 +86,7 @@ namespace STOLON
         public string this[int index] => _segments[index];
         public IEnumerator<string> GetEnumerator() => (IEnumerator<string>)_segments.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        public override string ToString() => "{" + _segments.ToJoinedString(">") + "}";
+        public override string ToString() => $"[{_segments.ToJoinedString(">")}]";
         public override int GetHashCode() => _segments.ToJoinedString(string.Empty).GetHashCode();
         public override bool Equals([NotNullWhen(true)] object? obj) => obj.GetHashCode() == GetHashCode();
 

@@ -57,6 +57,6 @@ namespace STOLON.CLI
 
         public bool HasFlag(CommandFlag flag) => Flags.HasFlag(flag);
 
-        public override string ToString() => $"CommandInfo(Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Source: {Provider?.ToString()})";
+        public override string ToString() => $"{{Ids: {string.Join(", ", Ids)}, Method: {MethodInfo}, Provider: {Provider?.ToString()}}}";
     }
 }

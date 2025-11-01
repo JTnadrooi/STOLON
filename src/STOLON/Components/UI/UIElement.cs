@@ -81,11 +81,7 @@ namespace STOLON
             return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
         }
 
-
-        public override string ToString()
-        {
-            return "{" + $"Id={Id}, Type={Type}, Text={Text}, Order={Order}, ChildOf={ParentId}" + "}";
-        }
+        public override string ToString() => $"{{Id: {Id}, Type: {Type}, Text: {Text}, Order: {Order}, ParentId: {ParentId}}}";
     }
     /// <summary>
     /// The data element relevant for draw methods.
@@ -138,7 +134,7 @@ namespace STOLON
             Hide = hide;
             DrawBackground = drawBg;
         }
-        public override string ToString() => $"UIElementDrawData {{ Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"} }}";
+        public override string ToString() => $"{{Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
 
         public static UIElementDrawData Empty = new UIElementDrawData(null, string.Empty, STOLON.Fonts.Medium, UIElementType.Ignore, default, default, false, true);
     }
