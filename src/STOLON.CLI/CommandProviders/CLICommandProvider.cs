@@ -45,7 +45,11 @@ namespace STOLON.CLI
                 if (!CLI.Instance.Providers.ContainsKey(providerId)) throw new InvalidOperationException($"No CommandProvider with id '{providerId}' found.");
                 toPrint = CLI.Instance.UniqueCommands.Values.Where(c => c.Provider.Namespace == providerId);
             }
-            else toPrint = [CLI.Instance.Commands[filter]];
+            else
+            {
+                if (CLI.Instance.Commands.TryGetValue(filter, out CommandInfo? tempToPrint)) toPrint = [tempToPrint!];
+                else throw new ArgumentException($"Invalid filter or command not found with id '{filter}'.", nameof(filter));
+            }
 
             foreach (CommandInfo cmd in toPrint) WriteCommand(cmd);
         }
