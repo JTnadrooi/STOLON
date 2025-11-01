@@ -19,20 +19,10 @@ namespace STOLON.CLI
         [Command("Open the main repository page on Github.")]
         public void _M()
         {
-            try
-            {
-                Process.Start(REPO_LINK);
-            }
-            catch
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Process.Start(new ProcessStartInfo(REPO_LINK.Replace("&", "^&")) { UseShellExecute = true });
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) Process.Start("xdg-open", REPO_LINK);
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) Process.Start("open", REPO_LINK);
-                else throw;
-            }
+            CLIHelpers.OpenLink(REPO_LINK);
         }
 
-        [Command("Print repository .git link.",  flags: CommandFlag.ReadOnly)]
+        [Command("Print repository .git link.", flags: CommandFlag.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(REPO_LINK_GIT);

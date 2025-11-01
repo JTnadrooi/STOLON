@@ -192,6 +192,7 @@ namespace STOLON.CLI
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
+        public const string DISCORD_INVITE_LINK = @"https://discord.gg/qmuWrqbDG2";
         /// <summary>
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
