@@ -33,7 +33,7 @@ namespace STOLON.CLI
         /// Gets called after the command executes. Only calls if the <see cref="ShouldListen(ArgumentsInfo)"/> returns <see langword="true"/>.
         /// </summary>
         /// <param name="arguments">The command arguments. Do not check if this flag is present, that is done by the <see cref="ShouldListen(ArgumentsInfo)"/> method.</param>
-        public virtual void PostCommand() { }
+        public virtual void PostCommand(ArgumentsInfo arguments) { }
 
         /// <summary>
         /// Checks if the current <see cref="FlagHandler"/> should run its <see cref="PreCommand(ArgumentsInfo)"/> and <see cref="PostCommand"/> actions.

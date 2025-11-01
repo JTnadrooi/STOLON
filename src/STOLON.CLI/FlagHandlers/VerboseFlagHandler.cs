@@ -24,7 +24,7 @@ namespace STOLON.CLI
             CLI.Debug.Silent = false;
         }
 
-        public override void PostCommand()
+        public override void PostCommand(ArgumentsInfo arguments)
         {
             CLI.Debug.Silent = _initialVerboseState;
         }

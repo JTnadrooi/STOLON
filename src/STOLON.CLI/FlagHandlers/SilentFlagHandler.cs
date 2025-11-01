@@ -29,7 +29,7 @@ namespace STOLON.CLI
             Console.SetError(TextWriter.Null);
         }
 
-        public override void PostCommand()
+        public override void PostCommand(ArgumentsInfo arguments)
         {
             if (originalOut != null)
                 Console.SetOut(originalOut);

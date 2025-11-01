@@ -147,7 +147,7 @@ namespace STOLON.CLI
 
             foreach (FlagHandler flagHandler in FlagHandlers.Values)
                 if (flagHandler.ShouldListen(arguments))
-                    flagHandler.PostCommand();
+                    flagHandler.PostCommand(arguments);
         }
 
         public void Exit(int exitCode = 0)
