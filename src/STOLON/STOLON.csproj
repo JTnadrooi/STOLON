@@ -3,7 +3,6 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<RollForward>Major</RollForward>
-		<PublishReadyToRun>false</PublishReadyToRun>
 		<TieredCompilation>false</TieredCompilation>
 		<BaseOutputPath>..\..\build</BaseOutputPath>
 	</PropertyGroup>
@@ -21,7 +20,7 @@
 
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>./lib/AsitLib.dll</HintPath>
+			<HintPath>..\..\lib\AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

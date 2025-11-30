@@ -14,7 +14,7 @@
 
 	<ItemGroup>
 		<Reference Include="AsitLib">
-			<HintPath>..\STOLON\lib\AsitLib.dll</HintPath>
+			<HintPath>..\..\lib\AsitLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

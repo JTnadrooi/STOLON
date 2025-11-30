@@ -1,5 +1,5 @@
 ﻿using AsitLib;
-using AsitLib.Debug;
+using AsitLib.Diagnostics;
 using STOLON.CLI;
 
 using System;
@@ -57,7 +57,7 @@ namespace STOLON.CLI
 
             Config = new Configuration();
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
-            STOLON.Debug = Debug = new DebugStream(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+            STOLON.Debug = Debug = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             Instance = this;
 
@@ -179,7 +179,7 @@ namespace STOLON.CLI
         /// Gets the only <see cref="CLI"/> instance.
         /// </summary>
         public static CLI Instance { get; private set; }
-        public static DebugStream Debug { get; private set; }
+        public static Logger Debug { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         /// <summary>

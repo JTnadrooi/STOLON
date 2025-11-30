@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using AsitLib;
-using AsitLib.Debug;
+using AsitLib.Diagnostics;
 using MonoGame.Extended;
 using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
@@ -59,7 +59,7 @@ namespace STOLON
             Content.RootDirectory = string.Empty; // heh
             IsMouseVisible = true;
 
-            Debug = new DebugStream(header: "STOLON");
+            Debug = new Logger(header: "STOLON");
             Debug.Silent = false;
         }
 
@@ -239,7 +239,7 @@ namespace STOLON
             public static EffectResourceCollection _effects;
             public static CachedAudioResourceCollection _audio;
             public static AudioEngine _audioEngine;
-            public static DebugStream _debug;
+            public static Logger _debug;
             public static GameEnvironment _environment;
             public static GameInput _input;
             public static SceneManager _sceneManager;
@@ -256,7 +256,7 @@ namespace STOLON
         public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
         public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
         public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
-        public static DebugStream Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
+        public static Logger Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static GameInput Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
         public static SceneManager SceneManager { get => BackingFields._sceneManager; internal set => BackingFields._sceneManager = value; }
