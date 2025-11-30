@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using AsitLib.CommandLine;
 using System.Threading.Tasks;
 
 
@@ -12,8 +13,8 @@ namespace STOLON.CLI
     {
         public SourceCommandProvider() : base("src") { }
 
-        [Command("Open the local source code directory.", flags: CommandFlag.DevOnly)]
-        public void _M(string? subDir = null)
+        [SLCommand("Open the local source code directory.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        public void Main(string? subDir = null)
         {
             CLIHelpers.OpenDirectory(CLI.SourcePath! + subDir switch
             {
@@ -22,10 +23,10 @@ namespace STOLON.CLI
                 null => string.Empty,
                 _ => throw new ArgumentException("Accepted values; sl, cli", nameof(subDir))
             });
-            CLI.Debug.Log($"Opened {(subDir == null ? string.Empty : $"'{subDir}'")} source directory.");
+            CLI.Logger.Log($"Opened {(subDir == null ? string.Empty : $"'{subDir}'")} source directory.");
         }
 
-        [Command("Prints the local source code directory path.", flags: CommandFlag.DevOnly | CommandFlag.ReadOnly)]
+        [SLCommand("Prints the local source code directory path.", Flags = CommandFlags.DevOnly | CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(CLI.SourcePath);

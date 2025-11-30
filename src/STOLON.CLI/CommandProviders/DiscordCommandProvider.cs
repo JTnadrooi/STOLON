@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using AsitLib.CommandLine;
 namespace STOLON.CLI
 {
     public class DiscordCommandProvider : CommandProvider
@@ -12,13 +12,13 @@ namespace STOLON.CLI
 
         public DiscordCommandProvider() : base("dc") { }
 
-        [Command("Opens the discord invite link.")]
-        public void _M()
+        [SLCommand("Opens the discord invite link.", IsMain = true)]
+        public void Main()
         {
             CLIHelpers.OpenLink(DISCORD_INVITE_LINK);
         }
 
-        [Command("Print discord invite link.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Print discord invite link.", Flags = CommandFlags.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(DISCORD_INVITE_LINK);

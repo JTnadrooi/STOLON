@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using AsitLib.CommandLine;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -16,20 +17,20 @@ namespace STOLON.CLI
 
         private string _userIniPath = "user.ini";
 
-        [Command("Open user.ini file.")]
-        public void _M()
+        [SLCommand("Open user.ini file.", IsMain = true)]
+        public void Main()
         {
             Process.Start("notepad.exe", _userIniPath);
-            CLI.Debug.Log("opened user config file (user.ini).");
+            CLI.Logger.Log("opened user config file (user.ini).");
         }
 
-        [Command("Print the path to the user.ini file.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Print the path to the user.ini file.", Flags = CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(System.IO.Path.GetFullPath(_userIniPath));
         }
 
-        [Command("Print the value of a key.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Print the value of a key.", Flags = CommandFlags.ReadOnly)]
         public void Get(string key)
         {
             string Represent(object o)
@@ -41,19 +42,19 @@ namespace STOLON.CLI
             Console.WriteLine(Represent(CLI.Instance.Config.Get(key)));
         }
 
-        [Command("Set the value of a key.")]
+        [SLCommand("Set the value of a key.")]
         public void Set(string key, string value)
         {
             CLI.Instance.Config.Set(key, value);
         }
 
-        [Command("Reset a specific key.")]
+        [SLCommand("Reset a specific key.")]
         public void Reset(string key)
         {
             CLI.Instance.Config.Reset(key);
         }
 
-        [Command("Reset a specific key.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Reset a specific key.", Flags = CommandFlags.ReadOnly)]
         public void Keys()
         {
             string Format(string key, object value, object defaultValue) => $"Key = {key}, Value = {value ?? "null"}, DefaultValue = {defaultValue ?? "null"}";

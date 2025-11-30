@@ -21,8 +21,8 @@ namespace STOLON.CLI.Build
         {
             BuildItemInfo[] buildItems = builder.GetBuildItems();
 
-            CLI.Debug.Log($">{(force ? "force-" : string.Empty)}building for Builder of type '{typeof(TBuilder).Name}'.");
-            CLI.Debug.Log($"found {buildItems.Length} files.");
+            CLI.Logger.Log($">{(force ? "force-" : string.Empty)}building for Builder of type '{typeof(TBuilder).Name}'.");
+            CLI.Logger.Log($"found {buildItems.Length} files.");
 
             builder.PreBuild();
 
@@ -30,16 +30,16 @@ namespace STOLON.CLI.Build
             {
                 if (!BuildHelper.NeedsBuild(buildItem.Source, buildItem.Destination, force)) continue;
 
-                CLI.Debug.Log($">building '{buildItem.Source}' as '{buildItem.Destination}'.");
+                CLI.Logger.Log($">building '{buildItem.Source}' as '{buildItem.Destination}'.");
 
                 builder.Build(buildItem.Source, buildItem.Destination);
 
-                CLI.Debug.Success();
+                CLI.Logger.Success();
             }
 
             builder.PostBuild();
 
-            CLI.Debug.Success();
+            CLI.Logger.Success();
         }
     }
 }

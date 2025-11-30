@@ -17,16 +17,16 @@ namespace STOLON.CLI.Build
         /// <returns>A value indicating if the target item (<paramref name="to"/>) needs to be rebuild or <see langword="true"/> if <paramref name="force"/> is set to <see langword="true"/>.</returns>
         public static bool NeedsBuild(string from, string to, bool force = false)
         {
-            CLI.Debug.Log($">checking if '{from}' needs to be rebuild as '{to}'.");
+            CLI.Logger.Log($">checking if '{from}' needs to be rebuild as '{to}'.");
             if (force)
             {
-                CLI.Debug.Log($"skipped, '{nameof(force)}' is enabled.");
+                CLI.Logger.Log($"skipped, '{nameof(force)}' is enabled.");
                 return true;
             }
 
             if (!File.Exists(to))
             {
-                CLI.Debug.Success($"<build needed, file at build target does not exist.");
+                CLI.Logger.Success($"<build needed, file at build target does not exist.");
                 return true;
             }
 
@@ -35,12 +35,12 @@ namespace STOLON.CLI.Build
 
             if (fromModDate > toModDate)
             {
-                CLI.Debug.Success($"rebuild pending.");
+                CLI.Logger.Success($"rebuild pending.");
                 return true;
             }
             else
             {
-                CLI.Debug.Success($"no rebuild needed.");
+                CLI.Logger.Success($"no rebuild needed.");
                 return false;
             }
         }

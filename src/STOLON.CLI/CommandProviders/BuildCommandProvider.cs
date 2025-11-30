@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using AsitLib.CommandLine;
 using AsitLib.Stele;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,8 +18,8 @@ namespace STOLON.CLI
     {
         public BuildCommandProvider() : base("build") { }
 
-        [Command("Build content.", flags: CommandFlag.DevOnly)]
-        public void _M(bool debug = false, bool force = false)
+        [SLCommand("Build content.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        public void Main(bool debug = false, bool force = false)
         {
             Effects(debug, force);
             Audio(force);
@@ -26,25 +27,25 @@ namespace STOLON.CLI
             Textures(force);
         }
 
-        [Command("Build effects.", id: "fx", flags: CommandFlag.DevOnly)]
+        [SLCommand("Build effects.", Id = "fx", Flags = CommandFlags.DevOnly)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectsBuilder(debug), force);
         }
 
-        [Command("Build audio.", flags: CommandFlag.DevOnly)]
+        [SLCommand("Build audio.", Flags = CommandFlags.DevOnly)]
         public void Audio(bool force = false)
         {
             Builder.Build(new AudioBuilder(), force);
         }
 
-        [Command("Build fonts.", flags: CommandFlag.DevOnly)]
+        [SLCommand("Build fonts.", Flags = CommandFlags.DevOnly)]
         public void Fonts(bool force = false)
         {
             Builder.Build(new FontsBuilder(), force);
         }
 
-        [Command("Build textures.", flags: CommandFlag.DevOnly)]
+        [SLCommand("Build textures.", Flags = CommandFlags.DevOnly)]
         public void Textures(bool force = false)
         {
             Builder.Build(new TexturesBuilder(), force);

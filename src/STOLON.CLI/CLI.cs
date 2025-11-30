@@ -1,4 +1,5 @@
 ﻿using AsitLib;
+using AsitLib.CommandLine;
 using AsitLib.Diagnostics;
 using STOLON.CLI;
 
@@ -12,166 +13,78 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using static STOLON.CLI.CommandHelpers;
 
 namespace STOLON.CLI
 {
-    /// <summary>
-    /// The main CLI class. See <see cref="CLI.Instance"/>.
-    /// </summary>
-    public sealed class CLI : IDisposable
+    public sealed class DevActionHook : ActionHook
     {
-        private bool disposedValue;
+        public DevActionHook() : base("dev-validate") { }
 
-        /// <summary>
-        /// The <see cref="FrozenDictionary{TKey, TValue}"/> containing of all <see cref="CommandInfo.Ids"/> and their respective <see cref="CommandInfo"/> object. 
-        /// As such, this <see cref="FrozenDictionary{TKey, TValue}"/> may return duplicate <see cref="CommandInfo"/> instances with a different alias.
-        /// </summary>
-        public FrozenDictionary<string, CommandInfo> Commands { get; }
-        /// <summary>
-        /// The <see cref="FrozenDictionary{TKey, TValue}"/> containing of all main <see cref="CommandInfo.Id"/> strings and their respective <see cref="CommandInfo"/> object.
-        /// </summary>
-        public FrozenDictionary<string, CommandInfo> UniqueCommands { get; }
-        public FrozenDictionary<string, CommandProvider> Providers { get; }
-        public FrozenDictionary<string, FlagHandler> FlagHandlers { get; }
+        public override void PreCommand(CommandContext context)
+        {
+            if (context.Command is SLCommandInfo cmd)
+            {
+                if (cmd.HasFlag(CommandFlags.DevOnly))
+                {
+                    if (!CLI.IsDev)
+                    {
+                        throw new Exception("This command cannot run without source code/assets.");
+                    }
+                }
+            }
+        }
+    }
 
+    public sealed class SLInfoFactory : ICommandInfoFactory<SLCommandAttribute, SLCommandInfo>
+    {
+        public SLCommandInfo? Convert(SLCommandAttribute attribute, CommandProvider provider, MethodInfo methodInfo)
+            => new SLCommandInfo(CommandHelpers.CreateCommandId(attribute, provider, methodInfo).ToSingleArray().Concat(attribute.Aliases).ToArray(), attribute, methodInfo, provider);
+    }
+
+    public sealed class CLI
+    {
         public Configuration Config { get; }
-        /// <summary>
-        /// Gets the flags applied to all commands. From config key: <code>[user.toml]cli.global_flags</code>
-        /// </summary>
+
         public HashSet<string> GlobalFlags { get; }
 
         public CLI(string[] args)
         {
-            //throw new Exception(Directory.GetFiles(".\\", "*", SearchOption.AllDirectories).ToJoinedString("\n"));
-            static int GetNestedClassDepth(Type type)
-            {
-                int depth = 0;
-                while (type.DeclaringType != null)
-                {
-                    depth++;
-                    type = type.DeclaringType;
-                }
-                return depth;
-            }
-
             Config = new Configuration();
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
-            STOLON.Debug = Debug = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+            STOLON.Debug = Logger = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+
+            Logger.Log(">creating cli.");
+
+            Engine = new CommandEngine()
+            {
+                NullString = null,
+            }.AddHook(new DevActionHook())
+                .AddGlobalOption(Logger.GetVerboseGlobalOption());
+
+            SLInfoFactory infoFactory = new SLInfoFactory();
+
+            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(CommandProvider))))
+            {
+                Logger.Log($"adding provider '{type.ToString()}'.");
+                Engine.AddProvider((CommandProvider)Activator.CreateInstance(type)!, infoFactory);
+            }
 
             Instance = this;
 
-            Debug.Log(">creating cli.");
-            Dictionary<string, CommandInfo> commandInfos = new Dictionary<string, CommandInfo>();
-            Dictionary<string, CommandProvider> nestedProviders = new Dictionary<string, CommandProvider>();
-            Dictionary<string, CommandInfo> uniqueCommandInfos = new Dictionary<string, CommandInfo>();
-            FlagHandlers = Assembly.GetExecutingAssembly().GetTypes()
-                    .Where(t => t.IsSubclassOf(typeof(FlagHandler)) && !t.IsAbstract)
-                    .Select(fht => (FlagHandler)Activator.CreateInstance(fht)!)
-                    .ToFrozenDictionary(fh => fh.LongId);
-            List<Type> commandProviderTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(CommandProvider)) && !t.IsAbstract)
-                .OrderBy(t => GetNestedClassDepth(t))
-                .ToList();
-            Debug.Log($">found {commandProviderTypes.Count} command provider types, scanning.");
-            foreach (Type providerType in commandProviderTypes)
-            {
-                CommandProvider providerInstance = (CommandProvider)Activator.CreateInstance(providerType)!;
-
-                string ResolveNamespaceRecusive(string ns, CommandProvider current)
-                {
-                    Type? nestedIn = current.GetType().DeclaringType;
-                    if (nestedIn == null) return ns;
-                    if (nestedIn.BaseType != typeof(CommandProvider)) throw new InvalidOperationException($"Nested provider '{current.GetType()}' is declared inside '{nestedIn}', which does not inherit from CommandProvider.");
-
-                    CommandProvider cmdp = nestedProviders.Values.Where(v => v.GetType() == nestedIn).First();
-
-                    return ResolveNamespaceRecusive(cmdp.Namespace + "-" + ns, cmdp);
-                }
-                providerInstance.FullNamespace = ResolveNamespaceRecusive(providerInstance.Namespace, providerInstance);
-
-                nestedProviders.Add(providerInstance.FullNamespace, providerInstance);
-
-                MethodInfo[] commandMethods = providerType.GetMethods();
-                foreach (MethodInfo methodInfo in commandMethods)
-                    if (methodInfo.GetCustomAttribute<CommandAttribute>() is CommandAttribute attribute)
-                    {
-                        if (methodInfo.ReturnType != typeof(void)) throw new InvalidOperationException("Commands must have a void return type.");
-
-                        string cmdId;
-                        if (methodInfo.Name == "_M") cmdId = providerInstance.FullNamespace;
-                        else cmdId = (attribute.InheritNamespace ? (providerInstance.FullNamespace + "-") : string.Empty) + (attribute.Id?.ToLower() ?? methodInfo.Name.ToLower());
-
-                        string[] ids = new string[] { cmdId }.Concat(attribute.Aliases ?? Enumerable.Empty<string>()).ToArray();
-
-                        CommandInfo info = new CommandInfo(ids, attribute, methodInfo, providerInstance);
-                        uniqueCommandInfos.Add(info.Id, info);
-                        for (int i = 0; i < ids.Length; i++)
-                        {
-                            string alias = ids[i];
-                            if (commandInfos.ContainsKey(alias))
-                                throw new InvalidOperationException($"Command with '{alias}' is already registered. Overloads are not supported.");
-                            else commandInfos.Add(alias, info);
-                        }
-                    }
-            }
-            Debug.Log($"<found {commandInfos.Count} commands.");
-
-            Commands = commandInfos.ToFrozenDictionary();
-            UniqueCommands = uniqueCommandInfos.ToFrozenDictionary();
-            Providers = nestedProviders.ToFrozenDictionary();
-
-            Debug.Log($"<cli created succesfully.");
-            //Console.WriteLine(nestedProviders.ToJoinedString(",\n"));
-        }
-
-        public void Execute(string str) => Execute(CommandHelpers.SplitArgs(str));
-        public void Execute(string[] arguments) => Execute(CommandHelpers.RefineArguments(arguments));
-        public void Execute(ArgumentsInfo arguments)
-        {
-            if (!Commands.TryGetValue(arguments.CmdName, out CommandInfo? command)) throw new InvalidOperationException($"Command '{arguments.CmdName}' not found.");
-
-            Debug.Log($"found command with id/alias: '{arguments.CmdName}'.");
-
-            foreach (FlagHandler flagHandler in FlagHandlers.Values)
-                if (flagHandler.ShouldListen(arguments))
-                    flagHandler.PreCommand(arguments);
-
-            if (command.HasFlag(CommandFlag.DevOnly) && !IsDev) throw new InvalidOperationException($"Command '{arguments.CmdName}' is dev-only.");
-
-            object?[] cmdArgs = CommandHelpers.ParseArguments(arguments.Args, command.MethodInfo.GetParameters());
-            Debug.Log($"executing with arguments: {string.Join(", ", cmdArgs)}");
-            Debug.Log($"executing with options: {string.Join(", ", arguments.Flags)}");
-
-            command.MethodInfo.Invoke(command.Provider, cmdArgs);
-
-            foreach (FlagHandler flagHandler in FlagHandlers.Values)
-                if (flagHandler.ShouldListen(arguments))
-                    flagHandler.PostCommand(arguments);
+            Logger.Log($"<cli created succesfully.");
         }
 
         public void Exit(int exitCode = 0)
         {
-            Dispose();
             Environment.Exit(exitCode);
         }
 
-        private void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    foreach (CommandProvider cmdp in Providers.Values) (cmdp as IDisposable)?.Dispose();
-                }
-                disposedValue = true;
-            }
-        }
+        public void Execute(string args) => ExecuteWriteLine(Engine.Execute(args));
+        public void Execute(string[] args) => ExecuteWriteLine(Engine.Execute(args));
 
-        public void Dispose()
+        private void ExecuteWriteLine(string? executeReturn)
         {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            if (executeReturn is not null) Console.WriteLine(executeReturn);
         }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -179,23 +92,18 @@ namespace STOLON.CLI
         /// Gets the only <see cref="CLI"/> instance.
         /// </summary>
         public static CLI Instance { get; private set; }
-        public static Logger Debug { get; private set; }
+        public static CommandEngine Engine { get; private set; }
+        public static Logger Logger { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-        /// <summary>
-        /// Gets the instance of a <see cref="CommandProvider"/> of the specified <typeparamref name="TProvider"/> type.
-        /// </summary>
-        /// <typeparam name="TProvider">The <see cref="CommandProvider"/> type.</typeparam>
-        /// <returns>The instance of a <see cref="CommandProvider"/> of the specified <typeparamref name="TProvider"/> type.</returns>
-        public static TProvider GetProvider<TProvider>() where TProvider : CommandProvider
-            => (TProvider)CLI.Instance.Providers.Values.First(p => p.GetType() == typeof(TProvider));
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
         /// <summary>
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
-        public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
+        public static bool IsDev => false;
+        //public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
         /// <summary>
         /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>

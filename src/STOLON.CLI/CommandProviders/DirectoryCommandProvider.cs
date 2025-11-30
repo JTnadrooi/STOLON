@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AsitLib.CommandLine;
 
 
 namespace STOLON.CLI
@@ -12,14 +13,14 @@ namespace STOLON.CLI
     {
         public DirectoryCommandProvider() : base("dir") { }
 
-        [Command("Open the directory where STOLON is located.")]
-        public void _M()
+        [SLCommand("Open the directory where STOLON is located.", IsMain = true)]
+        public void Main()
         {
             CLIHelpers.OpenDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            CLI.Debug.Log("Opened STOLON directory.");
+            CLI.Logger.Log("Opened STOLON directory.");
         }
 
-        [Command("Print the path of the directory where STOLON is located.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Print the path of the directory where STOLON is located.", Flags = CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);

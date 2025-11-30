@@ -8,15 +8,15 @@ namespace STOLON.CLI
     {
         public static void Main(string[] args)
         {
-            using CLI cli = new CLI(args);
+            CLI cli = new CLI(args);
 
             if (args.Length == 0)
             {
-                CLI.Debug.Log("no startup arguments given, awaiting arguments.");
+                CLI.Logger.Log("no startup arguments given, awaiting arguments.");
                 while (true)
                 {
                     Console.Write("> ");
-                    if (cli.Config.GetBool("cli.catch_errors"))
+                    if (CLI.Instance.Config.GetBool("cli.catch_errors"))
                         try
                         {
                             CLI.Instance.Execute(Console.ReadLine()!);

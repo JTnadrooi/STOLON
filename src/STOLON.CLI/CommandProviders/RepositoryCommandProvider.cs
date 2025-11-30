@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using AsitLib.CommandLine;
 
 
 namespace STOLON.CLI
@@ -16,13 +17,13 @@ namespace STOLON.CLI
         private const string REPO_LINK = "https://github.com/JTnadrooi/STOLON";
         private const string REPO_LINK_GIT = "https://github.com/JTnadrooi/STOLON.git";
 
-        [Command("Open the main repository page on Github.")]
-        public void _M()
+        [SLCommand("Open the main repository page on Github.", IsMain = true)]
+        public void Main()
         {
             CLIHelpers.OpenLink(REPO_LINK);
         }
 
-        [Command("Print repository .git link.", flags: CommandFlag.ReadOnly)]
+        [SLCommand("Print repository .git link.", Flags = CommandFlags.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(REPO_LINK_GIT);
