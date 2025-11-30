@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AsitLib.CommandLine;
 
 
-namespace STOLON.CLI.CommandProviders
+namespace STOLON.CLI
 {
     public class DevCommandProvider : CommandProvider
     {
