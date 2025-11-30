@@ -17,13 +17,13 @@ namespace STOLON.CLI
         private const string REPO_LINK = "https://github.com/JTnadrooi/STOLON";
         private const string REPO_LINK_GIT = "https://github.com/JTnadrooi/STOLON.git";
 
-        [SLCommand("Open the main repository page on Github.", IsMain = true)]
+        [SLCommand("Opens the main repository page on Github.", IsMain = true)]
         public void Main()
         {
             CLIHelpers.OpenLink(REPO_LINK);
         }
 
-        [SLCommand("Print repository .git link.", Flags = CommandFlags.ReadOnly)]
+        [SLCommand("Prints repository .git link.", Flags = CommandFlags.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(REPO_LINK_GIT);

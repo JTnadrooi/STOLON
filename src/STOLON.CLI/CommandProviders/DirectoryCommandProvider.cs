@@ -13,14 +13,14 @@ namespace STOLON.CLI
     {
         public DirectoryCommandProvider() : base("dir") { }
 
-        [SLCommand("Open the directory where STOLON is located.", IsMain = true)]
+        [SLCommand("Opens the directory where STOLON is located.", IsMain = true)]
         public void Main()
         {
             CLIHelpers.OpenDirectory(AppDomain.CurrentDomain.BaseDirectory);
             CLI.Logger.Log("Opened STOLON directory.");
         }
 
-        [SLCommand("Print the path of the directory where STOLON is located.", Flags = CommandFlags.ReadOnly)]
+        [SLCommand("Prints the path of the directory where STOLON is located.", Flags = CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);

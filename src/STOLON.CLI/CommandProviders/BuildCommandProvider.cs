@@ -18,7 +18,7 @@ namespace STOLON.CLI
     {
         public BuildCommandProvider() : base("build") { }
 
-        [SLCommand("Build content.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        [SLCommand("Builds content.", Flags = CommandFlags.DevOnly, IsMain = true)]
         public void Main(bool debug = false, bool force = false)
         {
             Effects(debug, force);
@@ -27,25 +27,25 @@ namespace STOLON.CLI
             Textures(force);
         }
 
-        [SLCommand("Build effects.", Id = "fx", Flags = CommandFlags.DevOnly)]
+        [SLCommand("Builds effects.", Id = "fx", Flags = CommandFlags.DevOnly)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectsBuilder(debug), force);
         }
 
-        [SLCommand("Build audio.", Flags = CommandFlags.DevOnly)]
+        [SLCommand("Builds audio.", Flags = CommandFlags.DevOnly)]
         public void Audio(bool force = false)
         {
             Builder.Build(new AudioBuilder(), force);
         }
 
-        [SLCommand("Build fonts.", Flags = CommandFlags.DevOnly)]
+        [SLCommand("Builds fonts.", Flags = CommandFlags.DevOnly)]
         public void Fonts(bool force = false)
         {
             Builder.Build(new FontsBuilder(), force);
         }
 
-        [SLCommand("Build textures.", Flags = CommandFlags.DevOnly)]
+        [SLCommand("Builds textures.", Flags = CommandFlags.DevOnly)]
         public void Textures(bool force = false)
         {
             Builder.Build(new TexturesBuilder(), force);

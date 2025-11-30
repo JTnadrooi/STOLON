@@ -15,25 +15,25 @@ namespace STOLON.CLI
 
         }
 
-        [SLCommand("Print the name of the color theme.", Flags = CommandFlags.ReadOnly, IsMain = true)]
+        [SLCommand("Prints the name of the color theme.", Flags = CommandFlags.ReadOnly, IsMain = true)]
         public void Main()
         {
             Console.WriteLine(CLI.Instance.Config.Get<string>("graphics.theme"));
         }
 
-        [SLCommand("Set the color theme.")]
+        [SLCommand("Sets the color theme.")]
         public void Set(string themeId)
         {
             CLI.Instance.Config.Set("graphics.theme", themeId);
         }
 
-        [SLCommand("Set the color theme.")]
+        [SLCommand("Sets the color theme.")]
         public void Reset(string themeId)
         {
             CLI.Instance.Config.Reset("graphics.theme");
         }
 
-        [SLCommand("Print the path of the color theme.")]
+        [SLCommand("Prints the path of the color theme.")]
         public void Path(string? themeId = null)
         {
             throw new NotImplementedException();

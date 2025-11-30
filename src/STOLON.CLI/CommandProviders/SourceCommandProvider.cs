@@ -13,7 +13,7 @@ namespace STOLON.CLI
     {
         public SourceCommandProvider() : base("src") { }
 
-        [SLCommand("Open the local source code directory.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        [SLCommand("Opens the local source code directory.", Flags = CommandFlags.DevOnly, IsMain = true)]
         public void Main(string? subDir = null)
         {
             CLIHelpers.OpenDirectory(CLI.SourcePath! + subDir switch

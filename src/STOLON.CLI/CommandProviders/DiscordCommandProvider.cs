@@ -18,7 +18,7 @@ namespace STOLON.CLI
             CLIHelpers.OpenLink(DISCORD_INVITE_LINK);
         }
 
-        [SLCommand("Print discord invite link.", Flags = CommandFlags.ReadOnly)]
+        [SLCommand("Prints the discord invite link.", Flags = CommandFlags.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(DISCORD_INVITE_LINK);

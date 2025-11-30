@@ -13,14 +13,14 @@ namespace STOLON.CLI
     {
         public GameCommandProvider() : base("sl") { }
 
-        [SLCommand("Start STOLON.")]
+        [SLCommand("Starts STOLON.")]
         public void Start()
         {
             using Process p = Process.Start("STOLON.exe");
             CLI.Logger.Log($"started STOLON as '{p.ProcessName}'.");
         }
 
-        [SLCommand("Exit STOLON.")]
+        [SLCommand("Exits STOLON.")]
         public void Exit()
         {
             Process[] processes = Process.GetProcessesByName("STOLON");
@@ -37,7 +37,7 @@ namespace STOLON.CLI
             else Console.WriteLine("No running STOLON processes found.");
         }
 
-        [SLCommand("Set the STOLON version.", Id = "version-set", Flags = CommandFlags.DevOnly)]
+        [SLCommand("Sets the STOLON version.", Id = "version-set", Flags = CommandFlags.DevOnly)]
         public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
     }
 }
