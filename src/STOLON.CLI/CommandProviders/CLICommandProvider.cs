@@ -26,5 +26,8 @@ namespace STOLON.CLI
 
         [SLCommand("Exit the program.")]
         public void Exit() => CLI.Instance.Exit();
+
+        [SLCommand("Prints the STOLON/CLI version.", Aliases = ["v"], InheritNamespace = false, Flags = CommandFlags.ReadOnly, IsGenericFlag = true)]
+        public void Version() => Console.WriteLine(STOLON.Version);
     }
 }

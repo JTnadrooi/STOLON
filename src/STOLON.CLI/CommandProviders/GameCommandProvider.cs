@@ -37,9 +37,6 @@ namespace STOLON.CLI
             else Console.WriteLine("No running STOLON processes found.");
         }
 
-        [SLCommand("Print the STOLON version.")]
-        public void Version() => Console.WriteLine(STOLON.Version);
-
         [SLCommand("Set the STOLON version.", Id = "version-set", Flags = CommandFlags.DevOnly)]
         public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
     }
