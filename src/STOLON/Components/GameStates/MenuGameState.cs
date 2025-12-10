@@ -101,9 +101,9 @@ namespace STOLON
         private Tweener<float> _logoEaseTweener;
         private Tweener<float> _removeTweener;
 
-        private string[] _tips;
-        private Vector2 _tipPos;
-        private int _tipId;
+        private string[] _splashTexts;
+        private Vector2 _splashTextPos;
+        private string _splashText;
         private Action? _onLeave;
         private bool _fastLeave;
 
@@ -163,24 +163,23 @@ namespace STOLON
 
             //Console.WriteLine(STOLON.UI.UIElements.ToJoinedString(", "));
 
-            _tips = new string[]
+            _splashTexts = new string[]
             {
-                //"A Stolon is a line where both players cannot drop their tiles.", // to long
-                "The center rows are most valueable.",
+                "The center rows are most valueable.", // fact, the tiles in them have the most posibilies.
                 "CENTER, ROWS, VALUABLE.",
                 "The border rows are most respectable.",
-                "They are stingers.",
+                "They are stingers.", // Thetalore Fax(char) reference.
                 "Reality is overrated.",
-                "STOLON's deadline has always been 2025.",
+                "STOLON's deadline has always been 2025.", // Uh oh. 10/12/2025
                 "If you listen very closely you can hear the main theme.",
                 "If you listen very closely you can hear the sound effects.",
                 "Listed twice.",
-                "KEES NOOOOOOOO",
-                "That definitely something Vox would say.",
-                "Inity waits patiently..",
-                "Super colliding..",
-                "Teaching garden chairs how to fly..",
-                "\"Is that an ability or a program?\"",
+                "KEES NOOOOOOOO", // Keespro reference.
+                "That definitely something Vox would say.", // Voxuuu reference.
+                "Inity waits patiently..", // Initial3d waiting for art reference.
+                "Super colliding..", // LandronSC/lanpi (dicord user) reference.
+                "Teaching garden chairs how to fly..", // FlyingGarderChair (dicord user) reference.
+                "\"Is that an ability or a program?\"", // Nadrooi quote.
                 "Oh dear..",
                 "Goldsilk hates the player.",
                 "This week.",
@@ -189,70 +188,80 @@ namespace STOLON
                 "Good luck!!",
                 "This is a fake loading screen.",
                 "This is a real loading screen.",
-                "For Them, Light.",
+                "For Them, Light.", // Thetalore reference.
                 "Can you read this?",
                 "CAN YOU READ THIS?",
-                "POWER SURGING!",
-                "Galore!",
-                "The start of the unending.",
-                "There,",
+                "POWER SURGING!", // Megumin reference.
+                "There,", // Thetalore word.
                 "No shaders?",
-                "All colors, Her.",
+                "All colors, Her.", // Thetalore Nue reference.
                 "Thanks for playing! :D",
                 "\"Call that a Natural Deadline.\"",
                 "Nue not included!",
-                "Assembling the Pharos..",
                 "Fishing update when?",
-                "\"What even is a Stolon?\"",
-                "The Sun is gone..",
+                "\"What even is a Stolon?\"", // stolons are some sort of tree "root". 
+                "The Sun is gone..", // Terraria mod reference.
                 "Comparing chaos to disorder..",
                 "Luck good.",
                 "The chance of getting this message is quite low.",
-                "Fax as in the machine.",
+                "Fax as in the machine.", // fax (thetalore char) reference.
                 "Self proclaimed?.",
                 "The Musical",
+                "The Movie",
                 "Why is Lanulox here..",
-                "Time's Up! Fate sealed.",
-                "Seems vacant..",
-                "You are week, I am month.",
-                "Lanu Lanu Lanu La-",
+                "Time's Up! Fate sealed.", // Thetalore Nue reference.
+                "Seems vacant..", // inside joke around the word "vacant".
+                "You are week, I am month.", // meme reference.
+                "Lanu Lanu Lanu La-", // Lanulox reference
                 "Welcome.",
                 "Welcome!",
-                "Galore.",
+                "Galore.", // fav word.
+                "Galore!",
                 "NOT solved.",
-                "NOT CLUELESS!",
-                "Tiory?",
-                "27 Compile errors..?",
+                "NOT CLUELESS!", // prof dave explains reference. (from debate against tour)
+                "Tiory?", // reference to a ancient story I wrote, it had a character named Tiory.
+                "27 Compile errors..?", // reference to cracktorio finding out STOLON only builds on my pc. (fixed now)
                 "Simply Rendering,",
-                "Behold, The \"Sky Train\"!",
+                "Behold, The \"Sky Train\"!", // reference to one of my Stormworks creations.
                 "dot hat :drool:",
-                "Cherry-pilled!",
-                "The stolons brace themselfs..",
-                "Potatofruit?",
-                "A reality loved by many, hated by more.",
+                "Cherry-pilled!", // Cherry (lanpi) reference.
+                "The Stolons brace themselfs..", // Motorstorm reference.
+                "Potatofruit?", // Thetalore reference.
+                "A reality loved by many, hated by more.", // Thetalore quote.
                 "VWS cares not.",
-                "Eeeeh maji? Easy modo???",
-                "Sto owes someone 5 dollars.",
-                "\"Souls are overrated but quite underused.\"",
-                "\"I-I don't quite understand..\"",
-                "1bit!",
-                "haha",
+                "Eeeeh maji? Easy modo???", // Touhou reference.
+                "Sto owes someone 5 dollars.", // Superman 5 dollars meme reference.
+                "\"Souls are overrated but quite underused.\"", // Thetalore quote.
+                "1bit!", // I suppose STOLON isnt 1 bit anymore.
+                "haha", // Bloem reference.
+                "ma'am", // Bloem reference.
                 "elevenhundredthousand.",
-                "The comfort of finity.",
-                "Pressure discrepancy detected - reversing airflow.",
-                ":LOVINGSTARE:",
-                ":STARE:",
-                "Collida past 3.",
-                "That translates to \"flour\".",
+                "The comfort of finity.", // Antics (lanpi) reference
+                "Pressure discrepancy detected - reversing airflow.", // White knuckle reference.
+                ":LOVINGSTARE:", // Efvour reference.
+                ":STARE:", // Efvour reference.
+                "Collida past 3.", // Lanpi reference.
+                "That translates to \"flour\".", // Bloem reference.
                 "Index is jealous.",
                 "the chairs have eyes",
-                "\"Its funny. You.\"",
-                "The BOULDER.",
+                "\"Its funny. You.\"", // Efvour talks like this.
+                "The BOULDER.", // that one cavevideo meme maker.
                 "Merde.",
-                "Seven-eyed wonders.",
+                "Seven-eyed wonders.", // Cenci reference.
+                "Antartica is not the answer.", // random meme.
+                "Alloclassified.",
+                "Envi states but doesn't inform.", // im trying to make envi helpfull...
+                "Powered by AsitLib!", // STOLON makes heavy use of one of my libaries named AsitLib.
+                "Powered by AsitLib's mild enthusiasm!",
+                "\"Guys.. Guys.. I think this game was made by ONLY ONE DEVELOPER!?!!111!", // reference to a roblox horror game gameplay video (to long probably)
+                "Christmass special!",
+                "ITS BLUE! ITS BLUE!", //limbo verified run.
+                "FOCUS", // limbo.
+                "l'n'p's", // lanpi.
+                "A vague sense of purpose.",
             };
 
-            _tipId = new Random().Next(0, _tips.Length);
+            _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
 
         }
 
@@ -260,13 +269,13 @@ namespace STOLON
         /// Get random splash text.
         /// </summary>
         /// <returns>A random splash text.</returns>
-        public string GetRandomSplashText() => _tips[new Random().Next(0, _tips.Length)];
+        public string GetRandomSplashText() => _splashTexts[new Random().Next(0, _splashTexts.Length)];
         /// <summary>
         /// Get a random splash text and get the <paramref name="i"/> as index.
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public string GetRandomSplashText(out int i) => _tips[i = new Random().Next(0, _tips.Length)];
+        public string GetRandomSplashText(out int i) => _splashTexts[i = new Random().Next(0, _splashTexts.Length)];
         /// <summary>
         /// Leave the main menu.
         /// </summary>
@@ -420,7 +429,7 @@ namespace STOLON
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
-            _tipPos = Centering.CenterX((int)(STOLON.Fonts.Small.FastMeasure(_tips[_tipId]).X),
+            _splashTextPos = Centering.CenterX((int)(STOLON.Fonts.Small.FastMeasure(_splashText).X),
                 _logoDrawPos.Y - STOLON.Fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
 
             _removeLineYAmount = STOLON.V_HEIGHT - (int)(_removeTweener.Value * STOLON.V_HEIGHT);
@@ -434,7 +443,7 @@ namespace STOLON
         {
             drawingContext.DrawLine(_divLine1X, -10f, _divLine1X, _divLineLenght, Color.White, _divLineWidth);
             drawingContext.DrawLine(_divLine2X, -10f, _divLine2X, _divLineLenght, Color.White, _divLineWidth);
-            if (_done && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _tips[_tipId], _tipPos);
+            if (_done && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _splashText, _splashTextPos);
 
             if (_drawLogoLowResFonted)
             {
