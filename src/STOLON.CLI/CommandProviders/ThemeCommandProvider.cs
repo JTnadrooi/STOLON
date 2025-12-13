@@ -8,32 +8,32 @@ using AsitLib.CommandLine;
 
 namespace STOLON.CLI
 {
-    public class ThemeCommandProvider : CommandProvider
+    public class ThemeCommandProvider : CommandGroup
     {
-        public ThemeCommandProvider() : base("theme")
+        public ThemeCommandProvider() : base("theme", CLI.InfoFactory, nameOfMainMethod: nameof(Main))
         {
 
         }
 
-        [SLCommand("Prints the name of the color theme.", Flags = CommandFlags.ReadOnly, IsMain = true)]
+        [FlaggedCommand("Prints the name of the color theme.", Flags = CommandFlags.ReadOnly)]
         public void Main()
         {
             Console.WriteLine(CLI.Instance.Config.Get<string>("graphics.theme"));
         }
 
-        [SLCommand("Sets the color theme.")]
+        [FlaggedCommand("Sets the color theme.")]
         public void Set(string themeId)
         {
             CLI.Instance.Config.Set("graphics.theme", themeId);
         }
 
-        [SLCommand("Sets the color theme.")]
+        [FlaggedCommand("Sets the color theme.")]
         public void Reset(string themeId)
         {
             CLI.Instance.Config.Reset("graphics.theme");
         }
 
-        [SLCommand("Prints the path of the color theme.")]
+        [FlaggedCommand("Prints the path of the color theme.")]
         public void Path(string? themeId = null)
         {
             throw new NotImplementedException();

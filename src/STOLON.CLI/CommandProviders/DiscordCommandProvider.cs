@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 using AsitLib.CommandLine;
 namespace STOLON.CLI
 {
-    public class DiscordCommandProvider : CommandProvider
+    public class DiscordCommandProvider : CommandGroup
     {
         private const string DISCORD_INVITE_LINK = @"https://discord.gg/qmuWrqbDG2";
 
-        public DiscordCommandProvider() : base("dc") { }
+        public DiscordCommandProvider() : base("dc", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [SLCommand("Opens the discord invite link.", IsMain = true)]
+        [FlaggedCommand("Opens the discord invite link.")]
         public void Main()
         {
             CLIHelpers.OpenLink(DISCORD_INVITE_LINK);
         }
 
-        [SLCommand("Prints the discord invite link.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand("Prints the discord invite link.", Flags = CommandFlags.ReadOnly)]
         public void Link()
         {
             Console.WriteLine(DISCORD_INVITE_LINK);

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
-    public class SourceCommandProvider : CommandProvider
+    public class SourceCommandProvider : CommandGroup
     {
-        public SourceCommandProvider() : base("src") { }
+        public SourceCommandProvider() : base("src", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [SLCommand("Opens the local source code directory.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        [FlaggedCommand("Opens the local source code directory.", Flags = CommandFlags.DevOnly, PassingPolicies = OptionPassingPolicies.Named)]
         public void Main(string? subDir = null)
         {
             CLIHelpers.OpenDirectory(CLI.SourcePath! + subDir switch
@@ -23,10 +23,10 @@ namespace STOLON.CLI
                 null => string.Empty,
                 _ => throw new ArgumentException("Accepted values; sl, cli", nameof(subDir))
             });
-            CLI.Logger.Log($"Opened {(subDir == null ? string.Empty : $"'{subDir}'")} source directory.");
+            CLI.Logger.Log($"Opened {(subDir == null ? string.Empty : $"'{subDir} '")}source directory.");
         }
 
-        [SLCommand("Prints the local source code directory path.", Flags = CommandFlags.DevOnly | CommandFlags.ReadOnly)]
+        [FlaggedCommand("Prints the local source code directory path.", Flags = CommandFlags.DevOnly | CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(CLI.SourcePath);

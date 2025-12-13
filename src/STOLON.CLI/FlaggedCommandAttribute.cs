@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace STOLON.CLI
 {
     [Flags]
-    public enum CommandFlags : int
+    public enum CommandFlags
     {
         None = 0,
         /// <summary>
@@ -25,10 +25,10 @@ namespace STOLON.CLI
     /// Specifies that this method can be called as a cli command. This attribute only has an effect if the method is a <see cref="CommandProvider"/> member.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SLCommandAttribute : CommandAttribute
+    public sealed class FlaggedCommandAttribute : CommandAttribute
     {
         public CommandFlags Flags { get; init; }
 
-        public SLCommandAttribute(string desc) : base(desc) { }
+        public FlaggedCommandAttribute(string desc) : base(desc) { }
     }
 }

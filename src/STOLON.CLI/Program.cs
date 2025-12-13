@@ -19,17 +19,17 @@ namespace STOLON.CLI
                     if (CLI.Instance.Config.GetBool("cli.catch_errors"))
                         try
                         {
-                            CLI.Instance.Execute(Console.ReadLine()!);
+                            CLI.Engine.Execute(Console.ReadLine()!).WriteToConsole();
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine("command failed: " + e.Message);
                         }
                     else
-                        CLI.Instance.Execute(Console.ReadLine()!);
+                        CLI.Engine.Execute(Console.ReadLine()!).WriteToConsole();
                 }
             }
-            else CLI.Instance.Execute(args);
+            else CLI.Engine.Execute(args).WriteToConsole();
         }
     }
 }

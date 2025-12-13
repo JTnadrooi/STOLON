@@ -11,14 +11,15 @@ namespace STOLON.CLI
     /// <summary>
     /// Represents info for a specific command. See <see cref="CommandAttribute"/>.
     /// </summary>
-    public sealed class SLCommandInfo : ProviderCommandInfo
+    public sealed class FlaggedCommandInfo : MethodCommandInfo
     {
-        public SLCommandInfo(string[] ids, SLCommandAttribute attribute, MethodInfo methodInfo, CommandProvider provider) : base(ids, attribute, methodInfo, provider)
-        {
-            Flags = attribute.Flags;
-        }
+        public CommandFlags Flags { get; init; }
 
-        public CommandFlags Flags { get; }
+        public FlaggedCommandInfo(string[] ids, string description, MethodInfo methodInfo)
+            : base(ids, description, methodInfo)
+        {
+
+        }
 
         public bool HasFlag(CommandFlags flag) => Flags.HasFlag(flag);
 

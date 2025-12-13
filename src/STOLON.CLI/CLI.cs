@@ -22,7 +22,7 @@ namespace STOLON.CLI
 
         public override void PreCommand(CommandContext context)
         {
-            if (context.Command is SLCommandInfo cmd)
+            if (context.Command is FlaggedCommandInfo cmd)
             {
                 if (cmd.HasFlag(CommandFlags.DevOnly))
                 {
@@ -35,10 +35,21 @@ namespace STOLON.CLI
         }
     }
 
-    public sealed class SLInfoFactory : ICommandInfoFactory<SLCommandAttribute, SLCommandInfo>
+    public sealed class FlaggedCommandInfoFactory : ICommandInfoFactory
     {
-        public SLCommandInfo? Convert(SLCommandAttribute attribute, CommandProvider provider, MethodInfo methodInfo)
-            => new SLCommandInfo(CommandHelpers.CreateCommandId(attribute, provider, methodInfo).ToSingleArray().Concat(attribute.Aliases).ToArray(), attribute, methodInfo, provider);
+        public CommandInfo? Convert(CommandProvider provider, MethodInfo methodInfo, CommandAttribute attribute)
+        {
+            FlaggedCommandAttribute flaggedCommandAttribute = (FlaggedCommandAttribute)attribute;
+
+            CommandInfo defaultResult = MethodCommandInfo.FromMethod(methodInfo, provider);
+
+            return new FlaggedCommandInfo(defaultResult.Ids.ToArray(), defaultResult.Description, methodInfo)
+            {
+                Flags = flaggedCommandAttribute.Flags,
+                PassingPolicies = flaggedCommandAttribute.PassingPolicies,
+                Provider = provider,
+            };
+        }
     }
 
     public sealed class CLI
@@ -53,21 +64,14 @@ namespace STOLON.CLI
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
             STOLON.Debug = Logger = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
+            InfoFactory = new FlaggedCommandInfoFactory();
+
             Logger.Log(">creating cli.");
 
             Engine = new CommandEngine()
-            {
-                NullString = null,
-            }.AddHook(new DevActionHook())
-                .AddGlobalOption(Logger.GetVerboseGlobalOption());
-
-            SLInfoFactory infoFactory = new SLInfoFactory();
-
-            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(CommandProvider))))
-            {
-                Logger.Log($"adding provider '{type.ToString()}'.");
-                Engine.AddProvider((CommandProvider)Activator.CreateInstance(type)!, infoFactory);
-            }
+                .AddHook(new DevActionHook())
+                .AddGlobalOption(Logger.GetVerboseGlobalOption())
+                .Populate();
 
             Instance = this;
 
@@ -79,14 +83,6 @@ namespace STOLON.CLI
             Environment.Exit(exitCode);
         }
 
-        public void Execute(string args) => ExecuteWriteLine(Engine.Execute(args));
-        public void Execute(string[] args) => ExecuteWriteLine(Engine.Execute(args));
-
-        private void ExecuteWriteLine(string? executeReturn)
-        {
-            if (executeReturn is not null) Console.WriteLine(executeReturn);
-        }
-
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         /// <summary>
         /// Gets the only <see cref="CLI"/> instance.
@@ -94,20 +90,20 @@ namespace STOLON.CLI
         public static CLI Instance { get; private set; }
         public static CommandEngine Engine { get; private set; }
         public static Logger Logger { get; private set; }
+        public static ICommandInfoFactory InfoFactory { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
         /// <summary>
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
-        public static bool IsDev => false;
-        //public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
+        //public static bool IsDev => false;
+        public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
         /// <summary>
         /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>
-        public static string? SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : null;
+        public static string SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : throw new InvalidOperationException("User is not a dev.");
         /// <summary>
         /// Gets the absolute path of the <i>src\STOLON\resources\</i> folder.
         /// </summary>

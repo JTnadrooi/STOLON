@@ -9,18 +9,18 @@ using AsitLib.CommandLine;
 
 namespace STOLON.CLI
 {
-    public class DirectoryCommandProvider : CommandProvider
+    public class DirectoryCommandProvider : CommandGroup
     {
-        public DirectoryCommandProvider() : base("dir") { }
+        public DirectoryCommandProvider() : base("dir", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [SLCommand("Opens the directory where STOLON is located.", IsMain = true)]
+        [FlaggedCommand("Opens the directory where STOLON is located.")]
         public void Main()
         {
             CLIHelpers.OpenDirectory(AppDomain.CurrentDomain.BaseDirectory);
             CLI.Logger.Log("Opened STOLON directory.");
         }
 
-        [SLCommand("Prints the path of the directory where STOLON is located.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand("Prints the path of the directory where STOLON is located.", Flags = CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);

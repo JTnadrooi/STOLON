@@ -9,11 +9,11 @@ using AsitLib.CommandLine;
 
 namespace STOLON.CLI
 {
-    public class DevCommandProvider : CommandProvider
+    public class DevCommandProvider : CommandGroup
     {
-        public DevCommandProvider() : base("dev") { }
+        public DevCommandProvider() : base("dev", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [SLCommand($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.", Flags = CommandFlags.ReadOnly, IsMain = true)]
+        [FlaggedCommand($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.", Flags = CommandFlags.ReadOnly)]
         public void Main()
         {
             Console.WriteLine(CLI.IsDev);

@@ -15,8 +15,8 @@ namespace STOLON.CLI
     {
         public CLICommandProvider() : base("cli") { }
 
-        [SLCommand("Displays info about the STOLON.CLI.", Flags = CommandFlags.ReadOnly, IsMain = true)]
-        public void Main()
+        [FlaggedCommand("Displays info about the STOLON.CLI.", Id = "cli", Aliases = ["info"], Flags = CommandFlags.ReadOnly)]
+        public void Info()
         {
             Console.WriteLine($"Command_Count={CLI.Engine.UniqueCommands.Count}");
             Console.WriteLine($"Provider_Count={CLI.Engine.Providers.Count}");
@@ -24,10 +24,10 @@ namespace STOLON.CLI
             Console.WriteLine($"STOLON_Version={STOLON.Version}");
         }
 
-        [SLCommand("Exits the program.")]
+        [FlaggedCommand("Exits the program.")]
         public void Exit() => CLI.Instance.Exit();
 
-        [SLCommand("Prints the STOLON/CLI version.", Aliases = ["v"], InheritNamespace = false, Flags = CommandFlags.ReadOnly, IsGenericFlag = true)]
+        [FlaggedCommand("Prints the STOLON/CLI version.", Aliases = ["v"], Flags = CommandFlags.ReadOnly, IsGenericFlag = true)]
         public void Version() => Console.WriteLine(STOLON.Version);
     }
 }

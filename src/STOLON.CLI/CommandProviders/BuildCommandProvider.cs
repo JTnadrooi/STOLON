@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
-    public class BuildCommandProvider : CommandProvider
+    public class BuildCommandProvider : CommandGroup
     {
-        public BuildCommandProvider() : base("build") { }
+        public BuildCommandProvider() : base("build", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [SLCommand("Builds content.", Flags = CommandFlags.DevOnly, IsMain = true)]
+        [FlaggedCommand("Builds content.", Flags = CommandFlags.DevOnly, PassingPolicies = OptionPassingPolicies.Named)]
         public void Main(bool debug = false, bool force = false)
         {
             Effects(debug, force);
@@ -27,25 +27,25 @@ namespace STOLON.CLI
             Textures(force);
         }
 
-        [SLCommand("Builds effects.", Id = "fx", Flags = CommandFlags.DevOnly)]
+        [FlaggedCommand("Builds effects.", Id = "fx", Flags = CommandFlags.DevOnly)]
         public void Effects(bool debug = false, bool force = false)
         {
             Builder.Build(new EffectsBuilder(debug), force);
         }
 
-        [SLCommand("Builds audio.", Flags = CommandFlags.DevOnly)]
+        [FlaggedCommand("Builds audio.", Flags = CommandFlags.DevOnly)]
         public void Audio(bool force = false)
         {
             Builder.Build(new AudioBuilder(), force);
         }
 
-        [SLCommand("Builds fonts.", Flags = CommandFlags.DevOnly)]
+        [FlaggedCommand("Builds fonts.", Flags = CommandFlags.DevOnly)]
         public void Fonts(bool force = false)
         {
             Builder.Build(new FontsBuilder(), force);
         }
 
-        [SLCommand("Builds textures.", Flags = CommandFlags.DevOnly)]
+        [FlaggedCommand("Builds textures.", Flags = CommandFlags.DevOnly)]
         public void Textures(bool force = false)
         {
             Builder.Build(new TexturesBuilder(), force);

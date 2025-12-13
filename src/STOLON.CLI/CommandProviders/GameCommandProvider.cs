@@ -9,18 +9,18 @@ using AsitLib.CommandLine;
 
 namespace STOLON.CLI
 {
-    public class GameCommandProvider : CommandProvider
+    public class GameCommandProvider : CommandGroup
     {
         public GameCommandProvider() : base("sl") { }
 
-        [SLCommand("Starts STOLON.")]
+        [FlaggedCommand("Starts STOLON.")]
         public void Start()
         {
             using Process p = Process.Start("STOLON.exe");
             CLI.Logger.Log($"started STOLON as '{p.ProcessName}'.");
         }
 
-        [SLCommand("Exits STOLON.")]
+        [FlaggedCommand("Exits STOLON.")]
         public void Exit()
         {
             Process[] processes = Process.GetProcessesByName("STOLON");
@@ -37,7 +37,7 @@ namespace STOLON.CLI
             else Console.WriteLine("No running STOLON processes found.");
         }
 
-        [SLCommand("Sets the STOLON version.", Id = "version-set", Flags = CommandFlags.DevOnly)]
+        [FlaggedCommand("Sets the STOLON version.", Id = "version-set", Flags = CommandFlags.DevOnly)]
         public void SetVersion(string newVer) => File.WriteAllText(Path.Combine(CLI.SourceResourcesPath!, ".version"), newVer);
     }
 }

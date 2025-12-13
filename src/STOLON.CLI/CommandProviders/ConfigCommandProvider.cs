@@ -11,26 +11,26 @@ using Tomlyn.Model;
 
 namespace STOLON.CLI
 {
-    public class ConfigCommandProvider : CommandProvider
+    public class ConfigCommandProvider : CommandGroup
     {
-        public ConfigCommandProvider() : base("conf") { }
+        public ConfigCommandProvider() : base("conf", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
         private string _userIniPath = "user.ini";
 
-        [SLCommand("Opens the user.ini file.", IsMain = true)]
+        [FlaggedCommand("Opens the user.ini file.")]
         public void Main()
         {
             Process.Start("notepad.exe", _userIniPath);
             CLI.Logger.Log("opened user config file (user.ini).");
         }
 
-        [SLCommand("Prints the path to the user.ini file.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand("Prints the path to the user.ini file.", Flags = CommandFlags.ReadOnly)]
         public void Path()
         {
             Console.WriteLine(System.IO.Path.GetFullPath(_userIniPath));
         }
 
-        [SLCommand("Prints the value of a key.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand("Prints the value of a key.", Flags = CommandFlags.ReadOnly)]
         public void Get(string key)
         {
             string Represent(object o)
@@ -42,19 +42,19 @@ namespace STOLON.CLI
             Console.WriteLine(Represent(CLI.Instance.Config.Get(key)));
         }
 
-        [SLCommand("Sets the value of a key.")]
+        [FlaggedCommand("Sets the value of a key.")]
         public void Set(string key, string value)
         {
             CLI.Instance.Config.Set(key, value);
         }
 
-        [SLCommand("Resets a specific key.")]
+        [FlaggedCommand("Resets a specific key.")]
         public void Reset(string key)
         {
             CLI.Instance.Config.Reset(key);
         }
 
-        [SLCommand("Resets a specific key.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand("Resets a specific key.", Flags = CommandFlags.ReadOnly)]
         public void Keys()
         {
             string Format(string key, object value, object defaultValue) => $"Key = {key}, Value = {value ?? "null"}, DefaultValue = {defaultValue ?? "null"}";
