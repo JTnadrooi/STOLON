@@ -134,10 +134,10 @@ namespace STOLON
             STOLON.Config = new Configuration();
             STOLON.AudioEngine = new AudioEngine();
 
-            STOLON.Textures = _textures = ResourceCollection.LoadCollection<Texture2DCollection>();
-            STOLON.Fonts = _fonts = ResourceCollection.LoadCollection<Font2DCollection>();
-            STOLON.Effects = ResourceCollection.LoadCollection<EffectResourceCollection>();
-            STOLON.Audio = ResourceCollection.LoadCollection<CachedAudioResourceCollection>();
+            STOLON.Textures = _textures = ResourceCollection.Load<Texture2DCollection>();
+            STOLON.Fonts = _fonts = ResourceCollection.Load<Font2DCollection>();
+            STOLON.Effects = ResourceCollection.Load<EffectResourceCollection>();
+            STOLON.Audio = ResourceCollection.Load<CachedAudioResourceCollection>();
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
             STOLON.Input = _input = new InputManager();
             STOLON.Tasks = new TaskHeap();
