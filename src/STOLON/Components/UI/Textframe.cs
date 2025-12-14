@@ -37,7 +37,7 @@ namespace STOLON
             }).ToArray(), info.PostMilliseconds);
         }
     }
-    public class Textframe : GameComponent
+    public class Textframe : Service
     {
         private Queue<DialogueInfo> _dialogueQueue;
         private Rectangle _dialoguebounds;
@@ -72,7 +72,7 @@ namespace STOLON
         public const int BOX_H = 96;
         public const int BOX_OFFSET_Y = 10;
 
-        public Textframe()
+        public Textframe() : base(STOLON.UI)
         {
             _dialogueQueue = new Queue<DialogueInfo>();
             _dialogueTextPos = Point.Zero;
@@ -168,7 +168,7 @@ namespace STOLON
             }
 
             if (_awaitingMouseDialogueHover) textFrameGoUp = true;
-            if (STOLON.Input.Domain == GameInput.MouseDomain.Dialogue && !_hide)
+            if (STOLON.Input.Domain == InputManager.MouseDomain.Dialogue && !_hide)
             {
                 _awaitingMouseDialogueHover = false;
                 textFrameGoUp = true;

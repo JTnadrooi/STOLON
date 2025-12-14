@@ -28,7 +28,7 @@ namespace STOLON
     /// <summary>
     /// A interface that provides a basic way to interact with <see cref="Intrara"/> component classes.
     /// </summary>
-    public interface IGameComponent
+    public interface IService
     {
         public Vector2 Position { get; }
         /// <summary>
@@ -42,24 +42,26 @@ namespace STOLON
         /// <param name="elapsedMilliseconds">The milliseconds since last frame.</param>
         public void Draw(DrawingContext drawingContext);
     }
-    public abstract class GameComponent : IGameComponent
+
+    public abstract class Service : IService
     {
         public virtual Vector2 Position { get; protected set; }
-        public IGameComponent? Source { get; }
+        public IService? Source { get; }
 
-        protected GameComponent(IGameComponent? source = null)
+        protected Service(IService? source)
         {
             Position = Vector2.Zero;
             Source = source;
         }
+
         public virtual void Draw(DrawingContext drawingContext)
         {
 
         }
+
         public virtual void Update(int elapsedMilliseconds)
         {
 
         }
     }
-
 }

@@ -13,5 +13,4 @@ namespace STOLON
     {
         void Draw(DrawingContext drawingContext);
     }
-
 }

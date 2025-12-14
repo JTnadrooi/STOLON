@@ -1,38 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using AsitLib;
-using AsitLib.Diagnostics;
-
-using MonoGame.Extended;
-
-
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using DiscordRPC;
-using DiscordRPC.Events;
-using System.Reflection;
 using System.Linq;
-using System.Diagnostics;
-
-
 
 namespace STOLON
 {
     /// <summary>
     /// The enviroment of the <see cref="STOLON"/> game.
     /// </summary>
-    public class GameEnvironment : GameComponent, IDialogueProvider
+    public class GameEnvironment : Service, IDialogueProvider
     {
         /// <summary>
-        /// The <see cref="OverlayEngine"/>.
+        /// The <see cref="OverlayManager"/>.
         /// </summary>
-        public OverlayEngine Overlayer => _overlayer;
+        public OverlayManager Overlayer => _overlayer;
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="Entity"/> objects and their <see cref="Entity.Id"/>.
         /// </summary>
@@ -40,9 +20,8 @@ namespace STOLON
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
 
-
         private Interface _userInterface;
-        private OverlayEngine _overlayer;
+        private OverlayManager _overlayer;
         private Dictionary<string, Entity> _entities;
         private SceneManager _sceneManager;
 
@@ -52,7 +31,6 @@ namespace STOLON
             _userInterface = null!;
             _sceneManager = null!;
             _overlayer = null!;
-
 
         }
         public void Initialize()
@@ -69,10 +47,10 @@ namespace STOLON
 
             STOLON.UI = _userInterface = new Interface();
             STOLON.SceneManager = _sceneManager = new SceneManager();
-            STOLON.SceneManager.ChangeScene<MenuGameState>();
+            STOLON.SceneManager.ChangeScene<MenuScene>();
 
 
-            _overlayer = new OverlayEngine();
+            _overlayer = new OverlayManager();
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"

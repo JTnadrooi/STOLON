@@ -25,7 +25,7 @@ namespace STOLON
     /// <summary>
     /// The user interface for the <see cref="GameEnvironment"/>.
     /// </summary>
-    public class Interface : GameComponent
+    public class Interface : Service
     {
         public const int LINE_WIDTH = 2;
 
@@ -92,5 +92,4 @@ namespace STOLON
 
         public static UIPath TopPath { get; } = new UIPath([UIElement.TOP_ID]);
     }
-
 }

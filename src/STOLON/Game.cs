@@ -1,33 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using AsitLib.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using AsitLib;
-using AsitLib.Diagnostics;
-using MonoGame.Extended;
+using Microsoft.Xna.Framework.Media;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using DiscordRPC;
-using DiscordRPC.Events;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Content;
-using System.Reflection;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.IO;
-
-
 
 namespace STOLON
 {
     public partial class STOLON : Game
     {
         private GraphicsDeviceManager _graphics;
-        private GameInput _input;
+        private InputManager _input;
         private DrawingContext _drawingContext;
 
         private GameEnvironment _environment;
@@ -150,7 +139,7 @@ namespace STOLON
             STOLON.Effects = ResourceCollection.LoadCollection<EffectResourceCollection>();
             STOLON.Audio = ResourceCollection.LoadCollection<CachedAudioResourceCollection>();
             STOLON.DrawingContext = _drawingContext = new DrawingContext();
-            STOLON.Input = _input = new GameInput();
+            STOLON.Input = _input = new InputManager();
             STOLON.Tasks = new TaskHeap();
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
@@ -167,6 +156,7 @@ namespace STOLON
 
             base.LoadContent();
         }
+
         protected override void UnloadContent()
         {
             AudioEngine.Dispose();
@@ -175,6 +165,7 @@ namespace STOLON
             Fonts.UnloadResources();
             base.UnloadContent();
         }
+
         protected override void Update(GameTime gameTime)
         {
             //[DllImport("kernel32.dll")]
@@ -192,10 +183,10 @@ namespace STOLON
                 STOLON.Input.PreviousKeyboard = STOLON.Input.CurrentKeyboard;
                 STOLON.Input.CurrentKeyboard = Keyboard.GetState();
 
-                if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = GameInput.MouseDomain.OfScreen;
-                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = GameInput.MouseDomain.Dialogue;
-                else if (STOLON.SceneManager.IsCurrent<BoardGameState>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.SceneManager.GetCurrent<BoardGameState>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.SceneManager.GetCurrent<BoardGameState>().Line2X) STOLON.Input.Domain = GameInput.MouseDomain.Board;
-                else STOLON.Input.Domain = GameInput.MouseDomain.UserInterfaceLow;
+                if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = InputManager.MouseDomain.OfScreen;
+                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = InputManager.MouseDomain.Dialogue;
+                else if (STOLON.SceneManager.IsCurrent<BoardScene>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.SceneManager.GetCurrent<BoardScene>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.SceneManager.GetCurrent<BoardScene>().Line2X) STOLON.Input.Domain = InputManager.MouseDomain.Board;
+                else STOLON.Input.Domain = InputManager.MouseDomain.UserInterfaceLow;
 
                 ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT);
                 //ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / new Vector2(V_WIDTH, V_HEIGHT)).Y;
@@ -223,6 +214,7 @@ namespace STOLON
             base.Draw(gameTime);
         }
     }
+
     public partial class STOLON
     {
 #nullable disable
@@ -241,7 +233,7 @@ namespace STOLON
             public static AudioEngine _audioEngine;
             public static Logger _debug;
             public static GameEnvironment _environment;
-            public static GameInput _input;
+            public static InputManager _input;
             public static SceneManager _sceneManager;
             public static Interface _ui;
             public static Configuration _config;
@@ -258,7 +250,7 @@ namespace STOLON
         public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
         public static Logger Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
-        public static GameInput Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
+        public static InputManager Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
         public static SceneManager SceneManager { get => BackingFields._sceneManager; internal set => BackingFields._sceneManager = value; }
         public static Interface UI { get => BackingFields._ui; internal set => BackingFields._ui = value; }
         public static Configuration Config { get => BackingFields._config; internal set => BackingFields._config = value; }

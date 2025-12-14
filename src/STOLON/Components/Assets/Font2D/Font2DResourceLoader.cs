@@ -18,7 +18,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Windows;
 using System.Xml.Linq;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Color = Microsoft.Xna.Framework.Color;
 using Math = System.Math;
 using Point = Microsoft.Xna.Framework.Point;
@@ -37,13 +36,5 @@ namespace STOLON
             using FileStream fileStream = new FileStream(item, FileMode.Open);
             return BitmapFont.FromStream(STOLON.Instance.GraphicsDevice, fileStream, item);
         }
-    }
-
-    public class Font2DCollection : ResourceCollection<Font2D>
-    {
-        public Font2D Small => this["smollerMono"];
-        public Font2D Medium => this["pixeloid"];
-
-        public Font2DCollection() : base(new Font2DResourceLoader()) { }
     }
 }

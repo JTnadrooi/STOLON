@@ -19,12 +19,12 @@ using System.Linq;
 
 namespace STOLON
 {
-    public class OverlayEngine : GameComponent
+    public class OverlayManager : Service
     {
         private Dictionary<string, IOverlay> _overlays;
         private List<string> _initialized;
 
-        public OverlayEngine() : base(STOLON.Environment)
+        public OverlayManager() : base(STOLON.Environment)
         {
             _overlays = new Dictionary<string, IOverlay>();
             _initialized = new List<string>();
@@ -108,13 +108,11 @@ namespace STOLON
             }
             base.Draw(drawingContext);
         }
-
-        public static OverlayEngine Engine => STOLON.Environment.Overlayer;
     }
 
     public interface IOverlay
     {
-        public void Initialize(OverlayEngine overlayer, params object?[] args);
+        public void Initialize(OverlayManager overlayer, params object?[] args);
         public void Update(int elapsedMilliseconds);
         public void Draw(DrawingContext drawingContext);
         public void Reset();
@@ -122,6 +120,7 @@ namespace STOLON
         public string Id { get; }
         public bool Ended { get; }
     }
+
     public class LoadOverlay : IOverlay
     {
         public string Id => "loading";
@@ -145,7 +144,7 @@ namespace STOLON
 
         }
 
-        public void Initialize(OverlayEngine overlayer, params object?[] args)
+        public void Initialize(OverlayManager overlayer, params object?[] args)
         {
             _pos = (Vector2)((args.Length > 0 ? args[0] : null) ?? _pos);
         }
@@ -166,6 +165,7 @@ namespace STOLON
             //drawingContext.DrawCircle(pos, scale * lineTexture.Width * 0.8f, 15, Color.White, 2);
         }
     }
+
     public class TransitionDitherOverlay : IOverlay
     {
         public string Id => "transition_dither";
@@ -201,7 +201,7 @@ namespace STOLON
         }
 
 
-        public void Initialize(OverlayEngine overlayer, params object?[] args)
+        public void Initialize(OverlayManager overlayer, params object?[] args)
         {
             STOLON.AudioEngine.Play(STOLON.Audio["randomize_4"]);
         }
@@ -250,6 +250,7 @@ namespace STOLON
             drawingContext.Draw(_ditherTexture, Vector2.Zero, (float)_resolution);
         }
     }
+
     public class TransitionOverlay : IOverlay
     {
         public string Id => "transition";
@@ -257,7 +258,7 @@ namespace STOLON
         public bool Ended { get; private set; }
 
         private Rectangle _area;
-        private OverlayEngine _overlayer;
+        private OverlayManager _overlayer;
         private Tweener<float> _tweener;
         private string _text;
 
@@ -310,7 +311,7 @@ namespace STOLON
             drawingContext.DrawString(STOLON.Fonts.Small, _text, _textPos, TextSizeMod);
         }
 
-        public void Initialize(OverlayEngine overlayer, params object?[] args)
+        public void Initialize(OverlayManager overlayer, params object?[] args)
         {
             Ended = false;
             _tweener = new Tweener<float>(0f, 1f, Duration / 1000f / 2, Ease.Sine.Out);

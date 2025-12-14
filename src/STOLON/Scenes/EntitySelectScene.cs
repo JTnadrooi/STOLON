@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static STOLON.EntitySelectGameState;
+using static STOLON.EntitySelectScene;
 using Point = Microsoft.Xna.Framework.Point;
 
 namespace STOLON
 {
-    public class EntitySelectGameState : Scene
+    public class EntitySelectScene : Scene
     {
         public class EntitySelectOrderContainer : OrderContainer
         {
@@ -52,7 +52,7 @@ namespace STOLON
             public Vector2 Pos { get; }
             public int TextWidth { get; }
 
-            private EntitySelectGameState _entitySelect;
+            private EntitySelectScene _entitySelect;
             private CachedNoteData[] _cachedNotes;
 
             private string _counterStr;
@@ -63,7 +63,7 @@ namespace STOLON
             private const int NOTE_CLEARANCE = 12;
             private const int NOTE_BORDER_X_CLEARANCE = 10;
 
-            public ConditionalNoteEnumerationGraphic(EntitySelectGameState entitySelect, Vector2 pos, int textWidth)
+            public ConditionalNoteEnumerationGraphic(EntitySelectScene entitySelect, Vector2 pos, int textWidth)
             {
                 Notes = Array.Empty<ConditionalNote>();
                 Pos = pos;
@@ -201,7 +201,7 @@ namespace STOLON
                         )
                     );
 
-                    if (STOLON.Input.IsClicked(GameInput.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
+                    if (STOLON.Input.IsClicked(InputManager.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
                     {
                         _selectedIndex = i;
                     }
@@ -268,10 +268,10 @@ namespace STOLON
             public readonly int Allocation;
             public readonly string SymbolNotation;
 
-            public SelectedEntityDrawData(EntitySelectGameState gameState, Entity entity)
+            public SelectedEntityDrawData(EntitySelectScene gameState, Entity entity)
                 : this(gameState, gameState.Selection.GetSlot(entity.Id), entity.SymbolNotation, gameState.Selection.GetAllocation(entity.Id), gameState.Selection.GetVirtualAllocation(entity.Id))
             { }
-            public SelectedEntityDrawData(EntitySelectGameState gameState, int slotIndex, string symbolNotation, int alloc, int valloc)
+            public SelectedEntityDrawData(EntitySelectScene gameState, int slotIndex, string symbolNotation, int alloc, int valloc)
             {
                 Rectangle GetMiniSlot(int ySlotIndex) => new Rectangle(TILE_SIZE * 2 + SYMBOL_NOTATION_SIZE * slotIndex + (int)gameState._symbolNotationOffset, INFO_WINDOW_TOPLINE - 32 - SYMBOL_NOTATION_SIZE * ySlotIndex, SYMBOL_NOTATION_SIZE, SYMBOL_NOTATION_SIZE);
 
@@ -286,7 +286,7 @@ namespace STOLON
         }
 
         private Texture2D _tileTexture;
-        private MenuGameState _menuGameState;
+        private MenuScene _menuGameState;
 
         private int _line1x;
         private int _line2x;
@@ -356,7 +356,7 @@ namespace STOLON
 
         #endregion
 
-        public EntitySelectGameState() : base("entity_select")
+        public EntitySelectScene() : base("entity_select")
         {
             _tileTexture = STOLON.Textures.GetReference("Debug\\temp-" + TILE_SIZE);
             if (!STOLON.SceneManager.TryGetState(out _menuGameState!)) throw new Exception();
@@ -448,7 +448,7 @@ namespace STOLON
 
                     Rectangle addBox = new Rectangle(basePos.ToPoint() + new Point(0, TILE_SIZE - ADD_BOX_SIZE), new Point(32));
 
-                    if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(GameInput.MouseButton.Left))
+                    if (addBox.Contains(STOLON.Input.VirtualMousePos) && STOLON.Input.IsClicked(InputManager.MouseButton.Left))
                         if (Selection.Contains(entityId))
                         {
                             _ghostSelectedEntityDrawDataTemplate = (_entities[entityIndex].SymbolNotation, Selection[entityId].Allocation, Selection[entityId].VAllocation);
@@ -459,7 +459,7 @@ namespace STOLON
                             _ghostSelectedEntityDrawDataTemplate = null;
                             Selection.Add(entityId);
                         }
-                    else if (STOLON.Input.IsClicked(GameInput.MouseButton.Left))
+                    else if (STOLON.Input.IsClicked(InputManager.MouseButton.Left))
                     {
                         if (_lastSelected != entityIndex)
                         {

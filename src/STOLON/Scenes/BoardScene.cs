@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using AsitLib;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-
+﻿using Microsoft.Xna.Framework;
+using System;
 using Point = Microsoft.Xna.Framework.Point;
-using Microsoft.Xna.Framework.Content;
-using Betwixt;
-using MonoGame.Extended;
 
 namespace STOLON
 {
-    public class BoardGameState : Scene
+    public class BoardScene : Scene
     {
         private int _lineX1;
         private int _lineX2;
@@ -36,7 +25,7 @@ namespace STOLON
         /// </summary>
         public float Line2X => _lineX2;
 
-        public BoardGameState() : base("board")
+        public BoardScene() : base("board")
         {
             _lineOffset = 192f;
         }
@@ -55,12 +44,12 @@ namespace STOLON
         }
         protected override void UpdateUI(int elapsedMilliseconds)
         {
-            float zoomIntensity = ((BoardGameState)STOLON.SceneManager.Current).Board.ZoomIntensity;
+            float zoomIntensity = ((BoardScene)STOLON.SceneManager.Current).Board.ZoomIntensity;
             float lineZoomOffset = zoomIntensity * 30f * (zoomIntensity < 0 ? 0.5f : 1f); // 30 being the max zoom in pixels, the last bit is smoothening the inverted zoom.
 
             lineZoomOffset = Math.Max(0, lineZoomOffset);
 
-            bool mouseIsOnUI = STOLON.Input.Domain == GameInput.MouseDomain.UserInterfaceLow;
+            bool mouseIsOnUI = STOLON.Input.Domain == InputManager.MouseDomain.UserInterfaceLow;
 
             _uiLeftOffset = -lineZoomOffset;
             _uiRightOffset = lineZoomOffset;

@@ -44,6 +44,6 @@
 		<SLBuildAssets Include="static-assets\**\*.*" />
 	</ItemGroup>
 	<Target Name="DepositAssets" AfterTargets="Build">
-		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True"/>
+		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
 	</Target>
 </Project>

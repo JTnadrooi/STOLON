@@ -50,7 +50,7 @@ namespace STOLON
                 : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }
     }
-    public class MenuGameState : Scene
+    public class MenuScene : Scene
     {
         private Texture2D _logoLines;
         private Texture2D _logoMarks;
@@ -110,7 +110,7 @@ namespace STOLON
         private const int LOGO_ROW_COUNT = 5;
         private Player[]? _boardPlayers;
 
-        public MenuGameState() : base("main_menu")
+        public MenuScene() : base("main_menu")
         {
             _logoLines = STOLON.Textures.GetReference("UI\\Logo\\Menu\\lines");
             _logoMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\marks");
@@ -424,7 +424,7 @@ namespace STOLON
                 _onLeave = null;
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
-                STOLON.SceneManager.ChangeScene<EntitySelectGameState>(true);
+                STOLON.SceneManager.ChangeScene<EntitySelectScene>(true);
                 _boardPlayers = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;

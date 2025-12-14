@@ -25,6 +25,7 @@ namespace STOLON
             PushDesired(ref fval, target, elapsedMilliseconds, strength, smoothness);
             value = (int)fval;
         }
+
         /// <summary>
         /// Pushes 
         /// </summary>
@@ -41,6 +42,7 @@ namespace STOLON
             value += MathF.Pow(delta, smoothness) * MathF.Pow(strength, smoothness);
             value = System.Math.Clamp(value, MathF.Min(target, init), MathF.Max(target, init));
         }
+
         /// <summary>
         /// Push a subunitary float (1 to 0) to 1 if <paramref name="push"/> is true, else, it pulls it back to 0 with said <paramref name="strength"/> and <paramref name="smoothness"/>
         /// if <paramref name="invert"/> is true, this whole operation gets inverted.

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,10 +17,5 @@ namespace STOLON
         {
             return new CachedAudio(item, GetId(item));
         }
-    }
-
-    public class CachedAudioResourceCollection : ResourceCollection<CachedAudio>
-    {
-        public CachedAudioResourceCollection() : base(new CachedAudioResourceLoader()) { }
     }
 }

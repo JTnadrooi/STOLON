@@ -16,11 +16,9 @@ using DiscordRPC.Events;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
 
-
-
 namespace STOLON
 {
-    public class GameInput
+    public class InputManager
     {
         public enum MouseButton
         {

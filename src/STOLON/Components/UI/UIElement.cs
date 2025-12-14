@@ -5,8 +5,6 @@ using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
-
-
 namespace STOLON
 {
     /// <summary>

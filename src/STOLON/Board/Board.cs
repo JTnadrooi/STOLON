@@ -28,7 +28,7 @@ namespace STOLON
     /// <summary>
     /// The representor of the board in the STOLON environment.
     /// </summary>
-    public partial class Board : GameComponent
+    public partial class Board : Service
     {
         public Camera2D Camera { get; }
         public float Zoom { get; private set; }
@@ -44,7 +44,7 @@ namespace STOLON
         public BoardState InitialState { get; }
         public Stack<BoardState> History { get; private set; }
 
-        public bool MouseIsOnBoard => STOLON.Input.Domain == GameInput.MouseDomain.Board;
+        public bool MouseIsOnBoard => STOLON.Input.Domain == InputManager.MouseDomain.Board;
         public Vector2 WorldMousePos { get; private set; }
 
         private SpriteBatch _boardSpriteBatch;
@@ -123,7 +123,7 @@ namespace STOLON
                     _desiredCameraPos.Y += 1;
             }
 
-            if (STOLON.Input.IsPressed(GameInput.MouseButton.Right)) _desiredCameraPos += (STOLON.Input.PreviousMouse.Position - STOLON.Input.CurrentMouse.Position).ToVector2();
+            if (STOLON.Input.IsPressed(InputManager.MouseButton.Right)) _desiredCameraPos += (STOLON.Input.PreviousMouse.Position - STOLON.Input.CurrentMouse.Position).ToVector2();
             Zoom += (_desiredZoom - Zoom) * 0.1f + _mouseStateCoefficient * SmoothnessModifier;
             Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (WorldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(_mouseStateCoefficient);
             Camera.Zoom = Zoom;

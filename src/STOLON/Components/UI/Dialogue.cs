@@ -21,6 +21,7 @@ namespace STOLON
         /// </summary>
         public string Name { get; }
     }
+
     /// <summary>
     /// Represent a pushable dialogue prompt.
     /// </summary>
