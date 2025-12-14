@@ -136,7 +136,7 @@ namespace STOLON
             GC.SuppressFinalize(this);
         }
 
-        public static TResourceCollection LoadCollection<TResourceCollection>() where TResourceCollection : ResourceCollection, new()
+        public static TResourceCollection Load<TResourceCollection>() where TResourceCollection : ResourceCollection, new()
         {
             TResourceCollection collection = new TResourceCollection();
             collection.LoadResources();
@@ -144,9 +144,15 @@ namespace STOLON
         }
     }
 
-    public abstract class ResourceCollection<TContent> : ResourceCollection, IEnumerable<TContent>
+    public abstract class ResourceCollection<TContent> : ResourceCollection, IEnumerable<TContent>, IReadOnlyDictionary<string, TContent>
     {
-        public FrozenDictionary<string, TContent>? Resources { get; private set; }
+        public FrozenDictionary<string, TContent>? _resources;
+
+        public FrozenDictionary<string, TContent> Resources
+    {
+            get => _resources ?? throw new InvalidOperationException($"Resources for ResourceCollection<{typeof(TContent)}> are not loaded yet.");
+            private set => _resources = value;
+        }
 
         public IEnumerable<string> Keys => Resources.Keys;
         public IEnumerable<TContent> Values => Resources.Values;
@@ -173,10 +179,10 @@ namespace STOLON
             foreach (TContent item in Resources.Values)
                 if (item is IDisposable disposable)
                     disposable.Dispose();
-            //Resources.();
         }
 
         IEnumerator<TContent> IEnumerable<TContent>.GetEnumerator() => Values.GetEnumerator();
         public IEnumerator GetEnumerator() => ((IEnumerable)Values).GetEnumerator();
+        IEnumerator<KeyValuePair<string, TContent>> IEnumerable<KeyValuePair<string, TContent>>.GetEnumerator() => ((IEnumerable<KeyValuePair<string, TContent>>)Resources).GetEnumerator();
     }
 }
