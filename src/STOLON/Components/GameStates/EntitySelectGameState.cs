@@ -302,10 +302,10 @@ namespace STOLON
         private float[] _entityHoverCoefficients;
         private float _currentEntitySelectedCoefficient;
         private int _hoveredIndex;
-        private TimedState<int> _hoveredState;
+        private TimedState _hoveredState;
 
         private int _lastSelected;
-        private TimedState<int> _selectedState;
+        private TimedState _selectedState;
 
         private readonly Dictionary<int, Vector2> _posCache;
         private readonly Entity[] _entities;
@@ -375,11 +375,10 @@ namespace STOLON
 
             _boardsGraphic = new BoardsGraphic();
 
-            _hoveredState = new TimedState<int>();
-            _selectedState = new TimedState<int>();
+            _hoveredState = new TimedState();
+            _selectedState = new TimedState();
             _boardState = BoardState.GetDefault([new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()]);
             _boardPreview = _boardState.GetPreview();
-
 
             _symbolNotationOffset = _symbolNotationOffsetTarget = TILE_SIZE / 2;
 
