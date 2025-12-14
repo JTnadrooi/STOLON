@@ -1,24 +1,9 @@
 ﻿using AsitLib;
-using Betwixt;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-
-using static STOLON.UIElement;
-using Color = Microsoft.Xna.Framework.Color;
-using Math = System.Math;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-
-
 
 namespace STOLON
 {

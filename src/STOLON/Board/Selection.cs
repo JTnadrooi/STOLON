@@ -27,7 +27,7 @@ namespace STOLON
         public override string ToString() => $"Entity: {Entity.Id}, Allocation: {Allocation}, VAllocation: {(IsPostAllocation ? VAllocation : "<n/a>")}";
     }
 
-    public class EntitySelection
+    public sealed class EntitySelection
     {
         public ReadOnlyDictionary<string, SelectionEntry> Entries { get; }
         public int TotalVAllocation => IsPostAllocation ? _totalVAllocation : throw new InvalidOperationException();
@@ -51,6 +51,7 @@ namespace STOLON
             IsPostAllocation = true;
             MaxEntries = maxEntries;
         }
+
         public bool Add(string id)
         {
             STOLON.Debug.Log(">selecting entity " + id + ".");
@@ -64,6 +65,7 @@ namespace STOLON
             STOLON.Debug.Success();
             return true;
         }
+
         public bool Remove(string id)
         {
             STOLON.Debug.Log(">deselecting entity " + id + ".");
@@ -77,10 +79,12 @@ namespace STOLON
             STOLON.Debug.Success();
             return true;
         }
+
         public bool Contains(string id)
         {
             return Entries.ContainsKey(id);
         }
+
         public int GetSlot(string id) => _toParseEntries.GetFirstIndexWhere(e => e.Id == id);
         private void RecalculateAllocations()
         {

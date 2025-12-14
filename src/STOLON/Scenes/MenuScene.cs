@@ -424,7 +424,7 @@ namespace STOLON
                 _onLeave = null;
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
-                STOLON.SceneManager.ChangeScene<EntitySelectScene>(true);
+                //STOLON.SceneManager.ChangeScene<EntitySelectScene>(true);
                 _boardPlayers = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;

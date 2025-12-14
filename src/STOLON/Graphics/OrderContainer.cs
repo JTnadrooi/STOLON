@@ -158,7 +158,7 @@ namespace STOLON
                 if (clickedId.Length > BACK_PREFIX.Length && clickedId.StartsWith(BACK_PREFIX)) Path = GetParentPath(clickedId.Substring(BACK_PREFIX.Length));
                 else if (_parents.Contains(clickedId)) Path = GetSelfPath(clickedId);
 
-                if (!ReferenceEquals(oldPath, Path))
+                if (!Equals(oldPath, Path))
                 {
                     STOLON.Debug.Log("element clicked: " + clickedId);
                     OnPathChanged(oldPath, Path);
