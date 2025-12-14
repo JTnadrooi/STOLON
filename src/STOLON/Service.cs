@@ -30,7 +30,6 @@ namespace STOLON
     /// </summary>
     public interface IService
     {
-        public Vector2 Position { get; }
         /// <summary>
         /// Update this component so it computes all the calculations.
         /// </summary>
@@ -45,21 +44,19 @@ namespace STOLON
 
     public abstract class Service : IService
     {
-        public virtual Vector2 Position { get; protected set; }
         public IService? Source { get; }
 
         protected Service(IService? source)
         {
-            Position = Vector2.Zero;
             Source = source;
         }
 
-        public virtual void Draw(DrawingContext drawingContext)
+        public virtual void Update(int elapsedMilliseconds)
         {
 
         }
 
-        public virtual void Update(int elapsedMilliseconds)
+        public virtual void Draw(DrawingContext drawingContext)
         {
 
         }
