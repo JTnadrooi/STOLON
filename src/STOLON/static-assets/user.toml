@@ -19,7 +19,7 @@ style = "default" # wip
 
 [debug.skip]
 enable = true
-target = "main_menu"            # allowed values: entity_select | main_menu
+target = "shell"                # allowed values: shell | main_menu
 skip_gamestage_animation = true
 parameters = ["silo"]           # wip
 

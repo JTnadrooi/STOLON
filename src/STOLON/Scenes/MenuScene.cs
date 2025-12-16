@@ -14,6 +14,7 @@ using Betwixt;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using static STOLON.UIElement;
+using STOLON.Scenes;
 
 namespace STOLON
 {
@@ -298,7 +299,7 @@ namespace STOLON
 
             switch (Scene.SkipTarget)
             {
-                case "entity_select":
+                case "shell":
                     if (_millisecondsSinceStartup < 10000)
                     {
                         _millisecondsSinceStartup = 10001;
@@ -424,7 +425,7 @@ namespace STOLON
                 _onLeave = null;
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
-                //STOLON.SceneManager.ChangeScene<EntitySelectScene>(true);
+                STOLON.SceneManager.ChangeScene<ShellScene>(true);
                 _boardPlayers = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
