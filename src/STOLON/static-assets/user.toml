@@ -24,12 +24,14 @@ skip_gamestage_animation = true
 parameters = ["silo"]           # wip
 
 [graphics]
-theme = "default"             # wip
-entities_show_on_menu = false # not fully implemented / wip
+theme = "default"                   # wip
+entities_show_on_menu = false       # not fully implemented / wip
 splashtexts_show = true
-fullscreen = false            # wip
-res_w = 1                     # wip
-res_h = 1                     # wip
+fullscreen = false                  # wip
+res_w = 1                           # wip
+res_h = 1                           # wip
+scaling_method = "nearest_neighbour" # allowed values: nearest_neighbour | integer
+
 
 [graphics.crt]
 enable = true

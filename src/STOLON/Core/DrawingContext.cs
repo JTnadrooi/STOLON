@@ -10,6 +10,13 @@ using System.Linq;
 
 namespace STOLON
 {
+    public enum ScalingMethod
+    {
+        None,
+        Integer,
+        NearestNeighbour,
+    }
+
     public class DrawingContext : IDisposable
     {
         private bool _disposedValue;
@@ -33,6 +40,8 @@ namespace STOLON
         public SpriteBatch SpriteBatch => _spriteBatch;
         public bool SpriteBatchStarted => _spritebatchStarted;
 
+        public ScalingMethod ScalingMethod { get; }
+
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
@@ -43,6 +52,8 @@ namespace STOLON
         //RasterizerState _scissorRasterizerState;
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
+
+        private SamplerState _samplerState;
 
         public DrawingContext()
         {
@@ -55,6 +66,8 @@ namespace STOLON
             _vrt2 = GetVirtual();
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
+
+            _samplerState = SamplerState.PointClamp;
 
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
 
@@ -71,23 +84,54 @@ namespace STOLON
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
             _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.V_WIDTH, STOLON.V_HEIGHT);
 
+            if (!STOLON.Config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
+            ScalingMethod = Enum.Parse<ScalingMethod>(STOLON.Config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
+
             STOLON.Debug.Success();
         }
 
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
-
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
+
+            float scaleX = (float)newRes.X / STOLON.V_WIDTH;
+            float scaleY = (float)newRes.Y / STOLON.V_HEIGHT;
+
+            switch (ScalingMethod)
+            {
+                case ScalingMethod.None:
+                    newRes = STOLON.Instance.GetVirtualDimensions();
+                    break;
+                case ScalingMethod.Integer:
+                    int integerScaleX = (int)scaleX;
+                    int integerScaleY = (int)scaleY;
+                    newRes.X = integerScaleX * STOLON.V_WIDTH;
+                    newRes.Y = integerScaleY * STOLON.V_HEIGHT;
+                    break;
+                case ScalingMethod.NearestNeighbour:
+                    newRes.X = (int)(scaleX * STOLON.V_WIDTH);
+                    newRes.Y = (int)(scaleY * STOLON.V_HEIGHT);
+                    break;
+                default: throw new Exception();
+            }
+
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, newRes.Y, 0);
+
             _rt1.Dispose();
             _rt1 = GetDesired(newRes);
             _rt2.Dispose();
             _rt2 = GetDesired(newRes);
-            foreach (Shader effect in _shaders.Values.Where(e => !e.IsVirtual)) effect.UpdateResolution(newRes);
-            STOLON.Debug.Log($"updated fx pipeline res.");
+
+            foreach (Shader effect in _shaders.Values.Where(e => !e.IsVirtual))
+            {
+                effect.UpdateResolution(newRes);
+            }
+
+            STOLON.Debug.Log($"updated fx pipeline res with new scale '{(newRes.ToVector2() / new Vector2(STOLON.V_WIDTH, STOLON.V_HEIGHT))}'");
         }
+
         public void DisableShader(string name)
         {
             if (!_shaders[name].IsEnabled)
@@ -184,7 +228,7 @@ namespace STOLON
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 _spriteBatch.Draw(_vrt1, Vector2.Zero, Color.White);
                 _spriteBatch.End();
 
@@ -193,7 +237,7 @@ namespace STOLON
             }
 
             _graphics.SetRenderTarget(_rt1); // draw and upscale to normal sized rt.
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, _rt1.Bounds.Size), Color.White);
             _spriteBatch.End();
 
@@ -204,7 +248,7 @@ namespace STOLON
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 _spriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
                 _spriteBatch.End();
 
@@ -213,7 +257,7 @@ namespace STOLON
             }
 
             _graphics.SetRenderTarget(null);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
             _spriteBatch.End();
 
@@ -237,7 +281,7 @@ namespace STOLON
         public void BeginBatch(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Matrix? transformMatrix = null)
         {
             //if (_spritebatchStarted) _spriteBatch.End();
-            _spriteBatch.Begin(sortMode, blendState, samplerState ?? SamplerState.PointClamp, depthStencilState, rasterizerState, null, transformMatrix);
+            _spriteBatch.Begin(sortMode, blendState, samplerState ?? _samplerState, depthStencilState, rasterizerState, null, transformMatrix);
             _spritebatchStarted = true;
         }
         private readonly RasterizerState _scissorRasterizerState = new RasterizerState

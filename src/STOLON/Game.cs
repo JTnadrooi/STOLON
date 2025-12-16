@@ -144,8 +144,6 @@ namespace STOLON
             STOLON.Environment = _environment = new GameEnvironment();
             _environment.Initialize();
 
-            if (!STOLON.Config.GetBool("graphics.crt.enable")) _drawingContext.DisableShader("Effects\\crt.mgfx");
-
 
             bool silenceConsole = !STOLON.Config.GetBool("debug.log.enable");
             if (silenceConsole) STOLON.Debug.Log("console will be silenced.");

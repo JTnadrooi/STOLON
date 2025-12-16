@@ -47,6 +47,7 @@ namespace STOLON
                 {"graphics.fullscreen", false},
                 {"graphics.res_w", 1920},
                 {"graphics.res_h", 1080},
+                {"graphics.scaling_method", "integer"},
                 {"graphics.crt.enable", true},
 
                 {"cli.catch_errors", true},
