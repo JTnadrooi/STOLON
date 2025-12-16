@@ -14,14 +14,12 @@ namespace STOLON
     {
         public const int LINE_WIDTH = 2;
 
-        private Textframe _textframe;
-
         /// <summary>
         /// The <see cref="Textframe"/> managed by the <see cref="Interface"/>.
         /// </summary>
-        public Textframe Textframe => _textframe;
-        public DefaultDictionary<string, UIElementUpdateData> UpdateDump => _updateData;
-        private readonly DefaultDictionary<string, UIElementUpdateData> _updateData;
+        public Textframe Textframe { get; }
+
+        public DefaultDictionary<string, UIElementUpdateData> UpdateDump { get; }
 
         /// <summary>
         /// Main UIInterface contructor.
@@ -30,15 +28,16 @@ namespace STOLON
         {
             STOLON.Debug.Log(">[s]contructing stolon ui");
 
-            _textframe = new Textframe();
-            _updateData = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
+            UpdateDump = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
             STOLON.Debug.Success();
+
+            Textframe = new Textframe();
         }
 
         public override void Update(int elapsedMilliseconds)
         {
-            _textframe.Update(elapsedMilliseconds);
+            Textframe.Update(elapsedMilliseconds);
         }
         //public void PostUpdate(int elapsedMilliseconds)
         //{
@@ -54,7 +53,7 @@ namespace STOLON
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(DrawingContext drawingContext)
         {
-            _textframe.Draw(drawingContext);
+            Textframe.Draw(drawingContext);
             base.Draw(drawingContext);
         }
     }
