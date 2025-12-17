@@ -47,6 +47,7 @@ namespace STOLON.CLI
             {
                 Flags = flaggedCommandAttribute.Flags,
                 PassingPolicies = flaggedCommandAttribute.PassingPolicies,
+                Target = provider,
                 Provider = provider,
             };
         }
