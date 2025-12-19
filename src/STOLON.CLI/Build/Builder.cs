@@ -28,7 +28,7 @@ namespace STOLON.CLI.Build
 
             foreach (BuildItemInfo buildItem in buildItems)
             {
-                if (!BuildHelper.NeedsBuild(buildItem.Source, buildItem.Destination, force)) continue;
+                if (!buildItem.NeedsBuild(force)) continue;
 
                 CLI.Logger.Log($">building '{buildItem.Source}' as '{buildItem.Destination}'.");
 

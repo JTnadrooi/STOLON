@@ -26,6 +26,41 @@ namespace STOLON.CLI.Build
             Destination = dest;
         }
 
+        /// <summary>
+        /// Gets a value indicating if this <see cref="BuildItemInfo"/> needs to be rebuild.
+        /// </summary>
+        /// <param name="force">If <see langword="true"/>, this function will always return <see langword="true"/>.</param>
+        /// <returns>A value indicating if the target item (<paramref name="Destination"/>) needs to be rebuild or <see langword="true"/> if <paramref name="force"/> is set to <see langword="true"/>.</returns>
+        public bool NeedsBuild(bool force)
+        {
+            CLI.Logger.Log($">checking if '{Source}' needs to be rebuild as '{Destination}'.");
+            if (force)
+            {
+                CLI.Logger.Log($"<skipped, '{nameof(force)}' is enabled.");
+                return true;
+            }
+
+            if (!File.Exists(Destination))
+            {
+                CLI.Logger.Success($"<build needed, file at build target does not exist.");
+                return true;
+            }
+
+            DateTime fromModDate = File.GetLastWriteTime(Source);
+            DateTime toModDate = File.GetLastWriteTime(Destination);
+
+            if (fromModDate > toModDate)
+            {
+                CLI.Logger.Success($"rebuild pending.");
+                return true;
+            }
+            else
+            {
+                CLI.Logger.Success($"no rebuild needed.");
+                return false;
+            }
+        }
+
         public static BuildItemInfo[] GetRelativeBuildItems(string src, string searchPattern, Func<string, string>? selector = null)
         {
             Func<string, string> sel = selector ?? (f => f);
