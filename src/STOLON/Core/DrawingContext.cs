@@ -42,6 +42,8 @@ namespace STOLON
 
         public ScalingMethod ScalingMethod { get; }
 
+        public float Scale { get; private set; }
+
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
@@ -86,7 +88,7 @@ namespace STOLON
 
             if (!STOLON.Config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
             ScalingMethod = Enum.Parse<ScalingMethod>(STOLON.Config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
-
+            Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
             STOLON.Debug.Success();
         }
 
@@ -95,7 +97,6 @@ namespace STOLON
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
-
             float scaleX = (float)newRes.X / STOLON.V_WIDTH;
             float scaleY = (float)newRes.Y / STOLON.V_HEIGHT;
 
@@ -105,16 +106,13 @@ namespace STOLON
                     newRes = STOLON.Instance.GetVirtualDimensions();
                     break;
                 case ScalingMethod.Integer:
-                    int integerScaleX = (int)scaleX;
-                    int integerScaleY = (int)scaleY;
-                    newRes.X = integerScaleX * STOLON.V_WIDTH;
-                    newRes.Y = integerScaleY * STOLON.V_HEIGHT;
+                    newRes = new Point((int)(scaleX) * STOLON.V_WIDTH, (int)(scaleY) * STOLON.V_HEIGHT);
                     break;
                 case ScalingMethod.NearestNeighbour:
-                    newRes.X = (int)(scaleX * STOLON.V_WIDTH);
-                    newRes.Y = (int)(scaleY * STOLON.V_HEIGHT);
+                    newRes = new Point((int)(scaleX * STOLON.V_WIDTH), (int)(scaleY * STOLON.V_HEIGHT));
                     break;
-                default: throw new Exception();
+                default:
+                    throw new InvalidOperationException("Unknown scaling method.");
             }
 
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, newRes.Y, 0);
@@ -129,7 +127,9 @@ namespace STOLON
                 effect.UpdateResolution(newRes);
             }
 
-            STOLON.Debug.Log($"updated fx pipeline res with new scale '{(newRes.ToVector2() / new Vector2(STOLON.V_WIDTH, STOLON.V_HEIGHT))}'");
+            Scale = newRes.X / (float)STOLON.V_WIDTH;
+
+            STOLON.Debug.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
 
         public void DisableShader(string name)
