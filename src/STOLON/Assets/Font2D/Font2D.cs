@@ -120,7 +120,7 @@ namespace STOLON
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
                 currentGlyph.CharacterID = unicodeCodePoint;
                 if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
-                    throw new ArgumentNullException("unsupported unicodeCodePoint: " + unicodeCodePoint);
+                    throw new InvalidOperationException($"unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}, char: '{text[i]}'.)");
 
                 currentGlyph.Position = position + positionDelta;
 
