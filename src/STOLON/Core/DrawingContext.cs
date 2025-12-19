@@ -19,25 +19,15 @@ namespace STOLON
 
     public class DrawingContext : IDisposable
     {
-        private bool _disposedValue;
+        public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
-        private readonly GraphicsDevice _graphics;
-        private readonly SpriteBatch _spriteBatch;
-        private readonly Dictionary<string, Shader> _shaders;
-
-        private RenderTarget2D _vrt1;
-        private RenderTarget2D _vrt2;
-        private RenderTarget2D _rt1;
-        private RenderTarget2D _rt2;
-
-        private Matrix _invertYMatrix;
-
-        public ReadOnlyDictionary<string, Shader> Shaders => _shaders.AsReadOnly();
         public Matrix InvertYMatrix => _invertYMatrix;
+
         /// <summary>
         /// Note everything drawn to this will be inverted. Please use the extension methods or call <see cref="InvertY(SpriteEffects)"/> on the input <see cref="SpriteEffects"/> enum.
         /// </summary>
-        public SpriteBatch SpriteBatch => _spriteBatch;
+        public SpriteBatch SpriteBatch { get; }
+
         public bool SpriteBatchStarted => _spritebatchStarted;
 
         public ScalingMethod ScalingMethod { get; }
@@ -47,22 +37,26 @@ namespace STOLON
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
-
+        private bool _disposedValue;
+        private readonly GraphicsDevice _graphics;
+        private readonly Dictionary<string, Shader> _shaders;
+        private RenderTarget2D _vrt1;
+        private RenderTarget2D _vrt2;
+        private RenderTarget2D _rt1;
+        private RenderTarget2D _rt2;
+        private Matrix _invertYMatrix;
         private bool _spritebatchStarted;
         private bool _scissorEnabled;
+        private SamplerState _samplerState;
 
-        //RasterizerState _scissorRasterizerState;
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
-
-        private SamplerState _samplerState;
 
         public DrawingContext()
         {
             STOLON.Debug.Log(">[s]initialising drawing context");
-            _spriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
+            SpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _graphics = STOLON.Instance.GraphicsDevice;
-            //_scissorRasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
             _vrt1 = GetVirtual();
             _vrt2 = GetVirtual();
@@ -74,7 +68,10 @@ namespace STOLON
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
 
             _shaders = new Dictionary<string, Shader>();
+            Shaders = _shaders.AsReadOnly();
+
             Shader[] tempShaders = STOLON.Scan<Shader>();
+
             STOLON.Debug.Log(">searching for effects");
             foreach (Shader shader in tempShaders)
             {
@@ -89,11 +86,14 @@ namespace STOLON
             if (!STOLON.Config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
             ScalingMethod = Enum.Parse<ScalingMethod>(STOLON.Config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
             Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
+
             STOLON.Debug.Success();
         }
 
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
+
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
+
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
@@ -142,7 +142,9 @@ namespace STOLON
             _shaders[name].IsEnabled = false;
             STOLON.Debug.Log($"disabled effect with name '{name}'.");
         }
+
         public bool IsEnabled(string name) => _shaders[name].IsEnabled;
+
         public void EnableShader(string name)
         {
             if (_shaders[name].IsEnabled)
@@ -219,7 +221,7 @@ namespace STOLON
 
         public void EndScene()
         {
-            _spriteBatch.End();
+            SpriteBatch.End();
 
             RenderTarget2D finalVTarget = _vrt1;
 
@@ -228,18 +230,18 @@ namespace STOLON
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
-                _spriteBatch.Draw(_vrt1, Vector2.Zero, Color.White);
-                _spriteBatch.End();
+                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                SpriteBatch.Draw(_vrt1, Vector2.Zero, Color.White);
+                SpriteBatch.End();
 
                 finalVTarget = _vrt2;
                 (_vrt1, _vrt2) = (_vrt2, _vrt1);
             }
 
             _graphics.SetRenderTarget(_rt1); // draw and upscale to normal sized rt.
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
-            _spriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, _rt1.Bounds.Size), Color.White);
-            _spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            SpriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, _rt1.Bounds.Size), Color.White);
+            SpriteBatch.End();
 
             RenderTarget2D finalTarget = _rt1;
 
@@ -248,18 +250,21 @@ namespace STOLON
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
-                _spriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
-                _spriteBatch.End();
+                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                SpriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
+                SpriteBatch.End();
 
                 finalTarget = _rt2;
                 (_rt1, _rt2) = (_rt2, _rt1);
             }
 
+            int offsetX = (STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferWidth - finalTarget.Width) / 2;
+            int offsetY = (STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight - finalTarget.Height) / -2; // because this does not get inverted
+
             _graphics.SetRenderTarget(null);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
-            _spriteBatch.Draw(finalTarget, Vector2.Zero, Color.White);
-            _spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
+            SpriteBatch.Draw(finalTarget, new Vector2(offsetX, offsetY), Color.White);
+            SpriteBatch.End();
 
             _spritebatchStarted = false;
 
@@ -274,16 +279,17 @@ namespace STOLON
 
         public void EndBatch()
         {
-            _spriteBatch.End();
+            SpriteBatch.End();
             _spritebatchStarted = false;
         }
 
         public void BeginBatch(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Matrix? transformMatrix = null)
         {
             //if (_spritebatchStarted) _spriteBatch.End();
-            _spriteBatch.Begin(sortMode, blendState, samplerState ?? _samplerState, depthStencilState, rasterizerState, null, transformMatrix);
+            SpriteBatch.Begin(sortMode, blendState, samplerState ?? _samplerState, depthStencilState, rasterizerState, null, transformMatrix);
             _spritebatchStarted = true;
         }
+
         private readonly RasterizerState _scissorRasterizerState = new RasterizerState
         {
             CullMode = CullMode.None,
@@ -295,24 +301,27 @@ namespace STOLON
             CullMode = CullMode.None,
             ScissorTestEnable = false
         };
+
         public void ResetScissorArea()
         {
             if (!_scissorEnabled) return;
 
             EndBatch();
 
-            _spriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+            SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
             BeginBatch(rasterizerState: _defaultRasterizerState);
             _scissorEnabled = false;
         }
+
         public void SetScissorArea(Rectangle newArea)
         {
             EndBatch();
 
-            _spriteBatch.GraphicsDevice.ScissorRectangle = newArea;
+            SpriteBatch.GraphicsDevice.ScissorRectangle = newArea;
             BeginBatch(rasterizerState: _scissorRasterizerState);
             _scissorEnabled = true;
         }
+
         public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
 
         #region DRAW_FUNCTIONS
@@ -325,7 +334,7 @@ namespace STOLON
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
-            _spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, InvertY(effects), layerDepth);
+            SpriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, InvertY(effects), layerDepth);
         }
 
         private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, float scale)
@@ -338,7 +347,7 @@ namespace STOLON
         public void DrawLine(Vector2 point1, Vector2 point2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawLine(point1.X, point1.Y, point2.X, point2.X, color, thickness, layerDepth);
         public void DrawLine(float x1, float y1, float x2, float y2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
-            => _spriteBatch.DrawLine(x1, y1, x2, y2, color ?? Color.White, thickness, layerDepth);
+            => SpriteBatch.DrawLine(x1, y1, x2, y2, color ?? Color.White, thickness, layerDepth);
 
         public void DrawVerticalLine(Vector2 point1, float amountUp = 1000f, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawVerticalLine(point1.X, point1.Y, amountUp, color, thickness, layerDepth);
@@ -351,10 +360,10 @@ namespace STOLON
             => DrawLine(x1, y1, x1 + amountLeft, y1, color, thickness, layerDepth);
 
         public void DrawLine(Line line, Color color, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
-            => _spriteBatch.DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
+            => SpriteBatch.DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
 
         public void DrawRectangle(Rectangle rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
-            => _spriteBatch.DrawRectangle(rectangle, color ?? Color.White, thickness, layerDepth);
+            => SpriteBatch.DrawRectangle(rectangle, color ?? Color.White, thickness, layerDepth);
         //public void DrawRectangle(RectangleF rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
         //    => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);
 
@@ -393,7 +402,7 @@ namespace STOLON
         {
             if (!_disposedValue)
             {
-                _spriteBatch.Dispose();
+                SpriteBatch.Dispose();
                 _vrt1.Dispose();
                 _vrt2.Dispose();
                 _rt1.Dispose();
@@ -402,6 +411,7 @@ namespace STOLON
                 _disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(disposing: true);
