@@ -20,7 +20,7 @@ namespace STOLON.CLI.Build
             CLI.Logger.Log($">checking if '{from}' needs to be rebuild as '{to}'.");
             if (force)
             {
-                CLI.Logger.Log($"skipped, '{nameof(force)}' is enabled.");
+                CLI.Logger.Log($"<skipped, '{nameof(force)}' is enabled.");
                 return true;
             }
 
