@@ -256,14 +256,18 @@ namespace STOLON
                 "Powered by AsitLib's mild enthusiasm!",
                 "\"Guys.. Guys.. I think this game was made by ONLY ONE DEVELOPER!?!!111!", // reference to a roblox horror game gameplay video (to long probably)
                 "Christmass special!",
-                "ITS BLUE! ITS BLUE!", //limbo verified run.
+                "ITS BLUE! ITS BLUE!", // limbo verification run.
                 "FOCUS", // limbo.
                 "l'n'p's", // lanpi.
                 "A vague sense of purpose.",
+                "Nanoda!", // kemono friends.
+                "Beste reizigers,", // NS (Dutch railways thing).
+                "Unintended but full of intent.", // Thetalore quote.
+                "The stolons seem reluctant.",
+                "JAN43", // Inside joke.
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
-
         }
 
         /// <summary>
