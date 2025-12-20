@@ -49,7 +49,7 @@ namespace STOLON
 
             lineZoomOffset = Math.Max(0, lineZoomOffset);
 
-            bool mouseIsOnUI = STOLON.Input.Domain == InputManager.MouseDomain.UserInterfaceLow;
+            //bool mouseIsOnUI = STOLON.Input.Domain == InputManager.MouseDomain.UserInterfaceLow;
 
             _uiLeftOffset = -lineZoomOffset;
             _uiRightOffset = lineZoomOffset;

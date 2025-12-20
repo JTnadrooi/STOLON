@@ -80,7 +80,7 @@ namespace STOLON
                     default
                 );
 
-                if (STOLON.Input.IsClicked(InputManager.MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
+                if (STOLON.Input.IsClicked(MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
                 {
                     _selectedIndex = i;
                 }

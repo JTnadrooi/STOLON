@@ -168,7 +168,7 @@ namespace STOLON
             }
 
             if (_awaitingMouseDialogueHover) textFrameGoUp = true;
-            if (STOLON.Input.Domain == InputManager.MouseDomain.Dialogue && !_hide)
+            if (DialogueBounds.Contains(STOLON.Input.VirtualMousePos) && !_hide)
             {
                 _awaitingMouseDialogueHover = false;
                 textFrameGoUp = true;

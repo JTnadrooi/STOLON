@@ -166,41 +166,25 @@ namespace STOLON
 
         protected override void Update(GameTime gameTime)
         {
-            //[DllImport("kernel32.dll")]
-            //static extern IntPtr GetConsoleWindow();
-            //[DllImport("user32.dll")]
-            //static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-            //const int SW_HIDE = 0;
-            ////const int SW_SHOW = 5;
-            //if (!Config.GetBool("Debug.console_enable") && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ShowWindow(GetConsoleWindow(), SW_HIDE);
+            int elapsedMilliseconds = gameTime.ElapsedGameTime.Milliseconds;
+
             if (IsActive)
             {
-                STOLON.Input.PreviousMouse = STOLON.Input.CurrentMouse;
-                STOLON.Input.CurrentMouse = Mouse.GetState();
-
-                STOLON.Input.PreviousKeyboard = STOLON.Input.CurrentKeyboard;
-                STOLON.Input.CurrentKeyboard = Keyboard.GetState();
-
-                if (!GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = InputManager.MouseDomain.OfScreen;
-                else if (STOLON.UI.Textframe.DialogueBounds.Contains(STOLON.Input.VirtualMousePos)) STOLON.Input.Domain = InputManager.MouseDomain.Dialogue;
-                else if (STOLON.SceneManager.IsCurrent<BoardScene>() && STOLON.Input.VirtualMousePos.X > (int)STOLON.SceneManager.GetCurrent<BoardScene>().Line1X && STOLON.Input.VirtualMousePos.X < (int)STOLON.SceneManager.GetCurrent<BoardScene>().Line2X) STOLON.Input.Domain = InputManager.MouseDomain.Board;
-                else STOLON.Input.Domain = InputManager.MouseDomain.UserInterfaceLow;
-
-                ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT);
-                //ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.ToVector2() / new Vector2(V_WIDTH, V_HEIGHT)).Y;
+                ScreenScale = GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
-                STOLON.Tasks.Update(gameTime.ElapsedGameTime.Milliseconds);
-                _environment.Update(gameTime.ElapsedGameTime.Milliseconds);
+                STOLON.Input.Update(elapsedMilliseconds);
+                STOLON.Tasks.Update(elapsedMilliseconds);
+                STOLON.Environment.Update(elapsedMilliseconds);
 
                 if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
                 if (STOLON.Input.IsClicked(Keys.S)) _drawingContext.Screenshot();
             }
             base.Update(gameTime);
         }
+
         protected override void Draw(GameTime gameTime)
         {
-            int elapsedMilliseconds = gameTime.ElapsedGameTime.Milliseconds;
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext);
