@@ -108,7 +108,7 @@ namespace STOLON
                 return count;
             }
 
-            if (text == null) throw new ArgumentNullException("text");
+            ArgumentNullException.ThrowIfNull(text);
             //if (!text.StartsWith("IN THE")) return;
 
             BitmapFont.BitmapFontGlyph currentGlyph;
@@ -120,7 +120,7 @@ namespace STOLON
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
                 currentGlyph.CharacterID = unicodeCodePoint;
                 if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
-                    throw new InvalidOperationException($"unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}, char: '{text[i]}'.)");
+                    throw new InvalidOperationException($"unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}', char: '{text[i]}'.)");
 
                 currentGlyph.Position = position + positionDelta;
 
