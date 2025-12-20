@@ -177,8 +177,11 @@ namespace STOLON
                 STOLON.Tasks.Update(elapsedMilliseconds);
                 STOLON.Environment.Update(elapsedMilliseconds);
 
-                if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
-                if (STOLON.Input.IsClicked(Keys.S)) _drawingContext.Screenshot();
+                if (STOLON.Input.Focus == MouseFocus.None)
+                {
+                    if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
+                    if (STOLON.Input.IsClicked(Keys.S)) _drawingContext.Screenshot();
+                }
             }
             base.Update(gameTime);
         }
