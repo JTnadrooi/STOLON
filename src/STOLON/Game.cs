@@ -2,7 +2,7 @@
 
 namespace STOLON
 {
-    public partial class STOLON : Game
+    public sealed class STOLON : Game
     {
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
@@ -186,10 +186,7 @@ namespace STOLON
 
             base.Draw(gameTime);
         }
-    }
 
-    public partial class STOLON
-    {
 #nullable disable
         public static bool IsInitiated { get; private set; }
 
