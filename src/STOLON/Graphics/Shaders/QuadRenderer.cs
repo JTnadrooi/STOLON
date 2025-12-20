@@ -1,14 +1,3 @@
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using DiscordRPC;
-using DiscordRPC.Events;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-
-
-
 namespace STOLON
 {
     public class QuadRenderer

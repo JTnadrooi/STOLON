@@ -1,13 +1,4 @@
-﻿using AsitLib;
-using Betwixt;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Point = Microsoft.Xna.Framework.Point;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public class BoardPreview : IGraphic
     {

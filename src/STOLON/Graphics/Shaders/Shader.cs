@@ -1,16 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.Common;
-using MonoGame.Extended.ECS;
-using System.Collections.ObjectModel;
-using System.Xml.Linq;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public abstract class Shader
     {

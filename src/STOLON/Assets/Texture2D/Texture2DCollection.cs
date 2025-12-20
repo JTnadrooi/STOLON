@@ -1,9 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.IO;
-using Color = Microsoft.Xna.Framework.Color;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public class Texture2DCollection : ResourceCollection<Texture2D>
     {

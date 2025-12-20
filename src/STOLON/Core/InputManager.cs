@@ -1,22 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using AsitLib;
-using AsitLib.Diagnostics;
-using MonoGame.Extended;
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using DiscordRPC;
-using DiscordRPC.Events;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Content;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public enum MouseDomain
     {

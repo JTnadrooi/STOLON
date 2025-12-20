@@ -21,7 +21,7 @@ namespace STOLON.CLI
         public void Main()
         {
             Process.Start("notepad.exe", _userIniPath);
-            CLI.Logger.Log("opened user config file (user.ini).");
+            STOLON.Logger.Log("opened user config file (user.ini).");
         }
 
         [FlaggedCommand("Prints the path to the user.ini file.", Flags = CommandFlags.ReadOnly)]

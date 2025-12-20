@@ -1,8 +1,4 @@
-﻿using System;
-
-
-
-namespace STOLON
+﻿namespace STOLON
 {
     /// <summary>
     /// A base for players.

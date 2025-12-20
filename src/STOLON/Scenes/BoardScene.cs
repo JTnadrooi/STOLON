@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using Point = Microsoft.Xna.Framework.Point;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public class BoardScene : Scene
     {

@@ -63,20 +63,20 @@ namespace STOLON.CLI
         {
             Config = new Configuration();
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
-            STOLON.Logger = Logger = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+            STOLON.Logger = new RichLogger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             InfoFactory = new FlaggedCommandInfoFactory();
 
-            Logger.Log(">creating cli.");
+            STOLON.Logger.Log(">creating cli.");
 
             Engine = new CommandEngine()
                 .AddHook(new DevActionHook())
-                .AddGlobalOption(Logger.GetVerboseGlobalOption())
+                .AddGlobalOption(STOLON.Logger.GetVerboseGlobalOption())
                 .Populate();
 
             Instance = this;
 
-            Logger.Log($"<cli created succesfully.");
+            STOLON.Logger.Log($"<cli created succesfully.");
         }
 
         public void Exit(int exitCode = 0)
@@ -90,7 +90,6 @@ namespace STOLON.CLI
         /// </summary>
         public static CLI Instance { get; private set; }
         public static CommandEngine Engine { get; private set; }
-        public static Logger Logger { get; private set; }
         public static ICommandInfoFactory InfoFactory { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 

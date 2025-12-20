@@ -1,12 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public class Shell : Service
     {

@@ -1,15 +1,4 @@
-﻿
-using AsitLib;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using System;
-using System.Linq;
-using System.Text;
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
+﻿using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 
 namespace STOLON

@@ -1,22 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using DiscordRPC;
-using DiscordRPC.Events;
-
-
-#pragma warning disable
+﻿#pragma warning disable
 
 namespace STOLON
 {
@@ -110,7 +92,7 @@ namespace STOLON
         private float _bloomStrength5 = 1.0f;
 
         public float BloomStrengthMultiplier = 1.0f;
-        
+
         private float _radiusMultiplier = 1.0f;
 
 
@@ -215,7 +197,8 @@ namespace STOLON
         public float BloomThreshold
         {
             get { return _bloomThreshold; }
-            set {
+            set
+            {
                 if (Math.Abs(_bloomThreshold - value) > 0.001f)
                 {
                     _bloomThreshold = value;
@@ -240,11 +223,11 @@ namespace STOLON
         /// <param name="height">initial value for creating the rendertargets</param>
         /// <param name="renderTargetFormat">The intended format for the rendertargets. For normal, non-hdr, applications color or rgba1010102 are fine NOTE: For OpenGL, SurfaceFormat.Color is recommended for non-HDR applications.</param>
         /// <param name="quadRenderer">if you already have quadRenderer you may reuse it here</param>
-        public void Load(GraphicsDevice graphicsDevice, ContentManager content, int width, int height, SurfaceFormat renderTargetFormat = SurfaceFormat.Color,  QuadRenderer quadRenderer = null)
+        public void Load(GraphicsDevice graphicsDevice, ContentManager content, int width, int height, SurfaceFormat renderTargetFormat = SurfaceFormat.Color, QuadRenderer quadRenderer = null)
         {
             _graphicsDevice = graphicsDevice;
             UpdateResolution(width, height);
-    
+
             //if quadRenderer == null -> new, otherwise not
             _quadRenderer = quadRenderer ?? new QuadRenderer(graphicsDevice);
 
@@ -294,10 +277,10 @@ namespace STOLON
         /// <param name="preset">See BloomPresets enums. Example: BloomPresets.Wide</param>
         private void SetBloomPreset(BloomPresets preset)
         {
-            switch(preset)
+            switch (preset)
             {
                 case BloomPresets.Wide:
-                {
+                    {
                         _bloomStrength1 = 0.5f;
                         _bloomStrength2 = 1;
                         _bloomStrength3 = 2;
@@ -311,7 +294,7 @@ namespace STOLON
                         BloomStreakLength = 1;
                         BloomDownsamplePasses = 5;
                         break;
-                }
+                    }
                 case BloomPresets.SuperWide:
                     {
                         _bloomStrength1 = 0.9f;
@@ -401,9 +384,9 @@ namespace STOLON
         /// <param name="height">see: width</param>
         /// <returns></returns>
         public Texture2D Draw(Texture2D inputTexture, int width, int height)
-        { 
+        {
             //Check if we are initialized
-            if(_graphicsDevice==null)
+            if (_graphicsDevice == null)
                 throw new Exception("Module not yet Loaded / Initialized. Use Load() first");
 
             //Change renderTarget resolution if different from what we expected. If lower than the inputTexture we gain performance.
@@ -413,7 +396,7 @@ namespace STOLON
 
                 //Adjust the blur so it looks consistent across diferrent scalings
                 _radiusMultiplier = (float)width / inputTexture.Width;
-                
+
                 //Update our variables with the multiplier
                 SetBloomPreset(BloomPreset);
             }
@@ -427,11 +410,11 @@ namespace STOLON
 
             BloomScreenTexture = inputTexture;
             BloomInverseResolution = new Vector2(1.0f / _width, 1.0f / _height);
-            
-            if (BloomUseLuminance) _bloomPassExtractLuminance.Apply(); 
+
+            if (BloomUseLuminance) _bloomPassExtractLuminance.Apply();
             else _bloomPassExtract.Apply();
             _quadRenderer.RenderQuad(_graphicsDevice, Vector2.One * -1, Vector2.One);
-            
+
             //Now downsample to the next lower mip texture
             if (BloomDownsamplePasses > 0)
             {
@@ -467,7 +450,7 @@ namespace STOLON
                         //Pass
                         _bloomPassDownsample.Apply();
                         _quadRenderer.RenderQuad(_graphicsDevice, Vector2.One * -1, Vector2.One);
-                        
+
                         if (BloomDownsamplePasses > 3)
                         {
                             BloomInverseResolution *= 2;
@@ -493,7 +476,7 @@ namespace STOLON
                                 _quadRenderer.RenderQuad(_graphicsDevice, Vector2.One * -1, Vector2.One);
 
                                 ChangeBlendState();
-                                
+
                                 //UPSAMPLE TO MIP4
                                 _graphicsDevice.SetRenderTarget(_bloomRenderTarget2DMip4);
                                 BloomScreenTexture = _bloomRenderTarget2DMip5;
@@ -506,7 +489,7 @@ namespace STOLON
 
                                 BloomInverseResolution /= 2;
                             }
-                            
+
                             ChangeBlendState();
 
                             //UPSAMPLE TO MIP3
@@ -569,7 +552,7 @@ namespace STOLON
             }
 
             //Note the final step could be done as a blend to the final texture.
-            
+
             return _bloomRenderTarget2DMip0;
         }
 
@@ -595,23 +578,23 @@ namespace STOLON
             }
 
             _bloomRenderTarget2DMip0 = new RenderTarget2D(_graphicsDevice,
-                (int) (width),
-                (int) (height), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+                (int)(width),
+                (int)(height), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
             _bloomRenderTarget2DMip1 = new RenderTarget2D(_graphicsDevice,
-                (int) (width/2),
-                (int) (height/2), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                (int)(width / 2),
+                (int)(height / 2), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip2 = new RenderTarget2D(_graphicsDevice,
-                (int) (width/4),
-                (int) (height/4), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                (int)(width / 4),
+                (int)(height / 4), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip3 = new RenderTarget2D(_graphicsDevice,
-                (int) (width/8),
-                (int) (height/8), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                (int)(width / 8),
+                (int)(height / 8), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip4 = new RenderTarget2D(_graphicsDevice,
-                (int) (width/16),
-                (int) (height/16), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                (int)(width / 16),
+                (int)(height / 16), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip5 = new RenderTarget2D(_graphicsDevice,
-                (int) (width/32),
-                (int) (height/32), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                (int)(width / 32),
+                (int)(height / 32), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
         }
 
         /// <summary>

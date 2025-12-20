@@ -1,12 +1,4 @@
-﻿using AsitLib;
-using Microsoft.Xna.Framework.Input;
-
-using System;
-using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Frozen;
 using Tomlyn;
 using Tomlyn.Model;
 

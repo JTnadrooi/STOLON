@@ -1,19 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-using Betwixt;
-using MonoGame.Extended;
-
-
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+﻿using Betwixt;
 using Math = System.Math;
-using MonoGame.Extended.Tweening;
-using System.Reflection;
-using System.Linq;
 
 
 

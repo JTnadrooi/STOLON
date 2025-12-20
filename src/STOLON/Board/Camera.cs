@@ -1,15 +1,4 @@
-﻿using System;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
-
-
-
-namespace STOLON
+﻿namespace STOLON
 {
     public class Camera2D
     {

@@ -1,15 +1,4 @@
-﻿using AsitLib.Diagnostics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+﻿using System.Reflection;
 
 namespace STOLON
 {
@@ -36,7 +25,6 @@ namespace STOLON
         public Color Color1 => _palette[0];
         public Color Color2 => _palette[1];
 
-
 #pragma warning disable CS8618
         public STOLON()
 #pragma warning restore CS8618
@@ -48,7 +36,7 @@ namespace STOLON
             Content.RootDirectory = string.Empty; // heh
             IsMouseVisible = true;
 
-            Logger = new Logger(header: "STOLON");
+            Logger = new RichLogger(header: "STOLON");
             Logger.Silent = false;
         }
 
@@ -216,7 +204,7 @@ namespace STOLON
             public static EffectResourceCollection _effects;
             public static CachedAudioResourceCollection _audio;
             public static AudioEngine _audioEngine;
-            public static Logger _debug;
+            public static RichLogger _debug;
             public static GameEnvironment _environment;
             public static InputManager _input;
             public static SceneManager _sceneManager;
@@ -233,7 +221,7 @@ namespace STOLON
         public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
         public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
         public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
-        public static Logger Logger { get => BackingFields._debug; set => BackingFields._debug = value; }
+        public static RichLogger Logger { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static InputManager Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
         public static SceneManager SceneManager { get => BackingFields._sceneManager; internal set => BackingFields._sceneManager = value; }

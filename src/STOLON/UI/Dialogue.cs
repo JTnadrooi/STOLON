@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Diagnostics.CodeAnalysis;
 
 
 

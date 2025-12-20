@@ -1,25 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using MonoGame.Extended.BitmapFonts;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using AsitLib;
-
-using MonoGame.Extended;
-
-
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
 using Math = System.Math;
 using RectangleF = MonoGame.Extended.RectangleF;
-using System.Diagnostics;
-using System.Xml.Linq;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.BitmapFonts;
 
 
 

@@ -1,11 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using MonoGame.Extended;
-using System;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-
-namespace STOLON
+﻿namespace STOLON
 {
     /// <summary>
     /// What type the <see cref="UIElement"/> is. When <see cref="Listen"/>, "collisions" with the mouse will be calculated for its hitbox.

@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using AsitLib;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-
-using Point = Microsoft.Xna.Framework.Point;
-using Microsoft.Xna.Framework.Content;
-
-namespace STOLON
+﻿namespace STOLON
 {
     public abstract class Scene
     {
