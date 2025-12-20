@@ -63,7 +63,7 @@ namespace STOLON.CLI
         {
             Config = new Configuration();
             GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
-            STOLON.Debug = Logger = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+            STOLON.Logger = Logger = new Logger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
 
             InfoFactory = new FlaggedCommandInfoFactory();
 

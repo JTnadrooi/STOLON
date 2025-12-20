@@ -55,7 +55,7 @@ namespace STOLON
             {
                 if (_taskWaitDataCollection[taskKvp.Key] < 0)
                 {
-                    STOLON.Debug.Log("(interupt:taskheap) runningtask with id; " + taskKvp.Key);
+                    STOLON.Logger.Log("(interupt:taskheap) runningtask with id; " + taskKvp.Key);
                     ForceRun(taskKvp.Key);
                 }
                 else _taskWaitDataCollection[taskKvp.Key] -= elapsedMilliseconds;
@@ -105,18 +105,18 @@ namespace STOLON
             if (waitTime < 0)
             {
                 object? ret = dynamicTask.Run();
-                STOLON.Debug.Log("insta-ran task with id: " + id);
+                STOLON.Logger.Log("insta-ran task with id: " + id);
                 _frameCompletedTasks.Add(id, ret);
                 _allCompletedTasks.Add(id);
                 return;
             }
 
             if (_taskDictionary.ContainsKey(id))
-                if (overwrite) STOLON.Debug.Log("key already known, overwriting task with id: " + id);
+                if (overwrite) STOLON.Logger.Log("key already known, overwriting task with id: " + id);
                 else return;
             _taskWaitDataCollection[id] = waitTime;
             _taskDictionary[id] = dynamicTask;
-            STOLON.Debug.Log("pushed task with id: " + id);
+            STOLON.Logger.Log("pushed task with id: " + id);
         }
         public void Push(string id, DynamicTask dynamicTask, int waitTime)
         {
@@ -125,13 +125,13 @@ namespace STOLON
         }
         public string EnsurePush(DynamicTask dynamicTask, int waitTime)
         {
-            STOLON.Debug.Log(">ensuring task push.");
+            STOLON.Logger.Log(">ensuring task push.");
             string id = Enumerable.Range(0, int.MaxValue).Select(i => "__" + i).First(key => !_taskDictionary.ContainsKey(key));
 
             Push(id, dynamicTask, waitTime);
 
-            STOLON.Debug.Log("task pushed with id: " + id);
-            STOLON.Debug.Success();
+            STOLON.Logger.Log("task pushed with id: " + id);
+            STOLON.Logger.Success();
 
             return id;
         }

@@ -54,29 +54,29 @@ namespace STOLON
 
         public bool Add(string id)
         {
-            STOLON.Debug.Log(">selecting entity " + id + ".");
+            STOLON.Logger.Log(">selecting entity " + id + ".");
             if (Contains(id))
             {
-                STOLON.Debug.Fail();
+                STOLON.Logger.Fail();
                 return false;
             }
             _toParseEntries.Add(STOLON.Environment.Entities[id]);
             RecalculateAllocations();
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
             return true;
         }
 
         public bool Remove(string id)
         {
-            STOLON.Debug.Log(">deselecting entity " + id + ".");
+            STOLON.Logger.Log(">deselecting entity " + id + ".");
             if (!Contains(id))
             {
-                STOLON.Debug.Fail();
+                STOLON.Logger.Fail();
                 return false;
             }
             _toParseEntries.Remove(STOLON.Environment.Entities[id]);
             RecalculateAllocations();
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
             return true;
         }
 
@@ -88,7 +88,7 @@ namespace STOLON
         public int GetSlot(string id) => _toParseEntries.GetFirstIndexWhere(e => e.Id == id);
         private void RecalculateAllocations()
         {
-            STOLON.Debug.Log(">updating allocations..");
+            STOLON.Logger.Log(">updating allocations..");
 
             IsPostAllocation = false;
             _entries.Clear();
@@ -108,7 +108,7 @@ namespace STOLON
             _totalVAllocation = _entries.Sum(e => e.Value.VAllocation);
             if (_totalVAllocation == 99) _totalVAllocation = 100;
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
         public int GetAllocation(string id) => _entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
         public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation : 0) : throw new InvalidOperationException();

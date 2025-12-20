@@ -35,15 +35,15 @@ namespace STOLON
         }
         public void Initialize()
         {
-            STOLON.Debug.Log(">[s]initialising environment");
-            STOLON.Debug.Log(">searching for entities");
+            STOLON.Logger.Log(">[s]initialising environment");
+            STOLON.Logger.Log(">searching for entities");
             Entity[] entities = STOLON.Scan<Entity>();
             foreach (Entity entity in entities)
             {
-                STOLON.Debug.Log($"found entity with id '{entity.Id}\" and name '{entity.Name}\".");
+                STOLON.Logger.Log($"found entity with id '{entity.Id}\" and name '{entity.Name}\".");
                 RegisterEntity(entity);
             }
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
             STOLON.UI = _userInterface = new Interface();
             STOLON.SceneManager = _sceneManager = new SceneManager();
@@ -55,7 +55,7 @@ namespace STOLON
             //    "debug1",
             //    "debug2"
             //));
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
         public override void Update(int elapsedMilliseconds)
         {

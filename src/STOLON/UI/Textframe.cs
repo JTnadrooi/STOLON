@@ -92,15 +92,15 @@ namespace STOLON
         public void Queue(DialogueInfo dialogue)
         {
             _dialogueQueue.Enqueue(dialogue);
-            STOLON.Debug.Log("dialogue queued with text: " + dialogue.Text);
+            STOLON.Logger.Log("dialogue queued with text: " + dialogue.Text);
         }
         public void Next()
         {
             if (_dialogueQueue.Count == 0) throw new Exception();
 
-            STOLON.Debug.Log(">attempting dequeuing of dialogue with text: " + _dialogueQueue.Peek().Text);
+            STOLON.Logger.Log(">attempting dequeuing of dialogue with text: " + _dialogueQueue.Peek().Text);
             bool providerDiffers = _currentDialogue.HasValue && _currentDialogue.Value.Provider.Name != _dialogueQueue.Peek().Provider.Name;
-            if (providerDiffers) STOLON.Debug.Log("dialogue has new provider of name: " + _dialogueQueue.Peek().Provider.Name);
+            if (providerDiffers) STOLON.Logger.Log("dialogue has new provider of name: " + _dialogueQueue.Peek().Provider.Name);
 
             _currentDialogue = _dialogueQueue.Dequeue();
             _currentDialogueDrawArgs = DialogueDrawArgs.FromInfo(_currentDialogue.Value);
@@ -120,7 +120,7 @@ namespace STOLON
                 _providerTextSizeTweener.Start();
             }
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
 
         //public void Queue(int count, Func<string, int, string>? selector = null)

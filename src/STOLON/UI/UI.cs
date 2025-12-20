@@ -26,11 +26,11 @@ namespace STOLON
         /// </summary>
         public Interface() : base(STOLON.Environment)
         {
-            STOLON.Debug.Log(">[s]contructing stolon ui");
+            STOLON.Logger.Log(">[s]contructing stolon ui");
 
             UpdateDump = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
             Textframe = new Textframe();
         }

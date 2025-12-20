@@ -371,7 +371,7 @@ namespace STOLON
             {
                 _logoEaseTweener.Reverse();
                 _logoEaseTweener.Start();
-                STOLON.Debug.Log("reversed icon tweener.");
+                STOLON.Logger.Log("reversed icon tweener.");
             }
             _logoBoundingBox =
                 new Rectangle(_logoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _logoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
@@ -394,12 +394,12 @@ namespace STOLON
             if (STOLON.UI.UpdateDump["vol_up"].IsClicked)
             {
                 STOLON.AudioEngine.MasterVolume += 0.1001f;
-                STOLON.Debug.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
+                STOLON.Logger.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
             }
             if (STOLON.UI.UpdateDump["vol_down"].IsClicked)
             {
                 STOLON.AudioEngine.MasterVolume -= 0.1001f;
-                STOLON.Debug.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
+                STOLON.Logger.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
             }
             if (STOLON.UI.UpdateDump["story_start"].IsClicked)
             {

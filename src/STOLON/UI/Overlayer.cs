@@ -29,30 +29,30 @@ namespace STOLON
             _overlays = new Dictionary<string, IOverlay>();
             _initialized = new List<string>();
 
-            STOLON.Debug.Log(">searching for overlays");
+            STOLON.Logger.Log(">searching for overlays");
             IOverlay[] overlays = STOLON.Scan<IOverlay>();
             foreach (IOverlay overlay in overlays)
             {
-                STOLON.Debug.Log($"found overlay with id '{overlay.Id}\".");
+                STOLON.Logger.Log($"found overlay with id '{overlay.Id}\".");
                 AddOverlay(overlay);
             }
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
 
         public void AddOverlay<TOverlay>() where TOverlay : IOverlay, new() => AddOverlay(new TOverlay());
         public void AddOverlay(IOverlay overlay)
         {
-            STOLON.Debug.Log(">adding overlay of id " + overlay.Id + ".");
+            STOLON.Logger.Log(">adding overlay of id " + overlay.Id + ".");
             _overlays.Add(overlay.Id, overlay);
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
 
         public void RemoveOverlay(string overlayId)
         {
-            STOLON.Debug.Log(">removing overlay of id " + overlayId + ".");
+            STOLON.Logger.Log(">removing overlay of id " + overlayId + ".");
             Deactivate(overlayId);
             _overlays.Remove(overlayId);
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
 
         public void Activate(string overlayId, params object?[] args)
@@ -60,10 +60,10 @@ namespace STOLON
 
             if (!_initialized.Contains(overlayId))
             {
-                STOLON.Debug.Log(">[s]activating overlay of id " + overlayId + ".");
+                STOLON.Logger.Log(">[s]activating overlay of id " + overlayId + ".");
                 _overlays[overlayId].Initialize(this, args);
                 _initialized.Add(overlayId);
-                STOLON.Debug.Success();
+                STOLON.Logger.Success();
             }
         }
 
@@ -77,9 +77,9 @@ namespace STOLON
         {
             if (_initialized.Contains(overlayId))
             {
-                STOLON.Debug.Log(">deactivating overlay of id " + overlayId + ".");
+                STOLON.Logger.Log(">deactivating overlay of id " + overlayId + ".");
                 _overlays[overlayId].Reset();
-                STOLON.Debug.Success();
+                STOLON.Logger.Success();
             }
             _initialized.Remove(overlayId);
         }
@@ -93,9 +93,9 @@ namespace STOLON
                 overlay.Update(elapsedMilliseconds);
                 if (overlay.Ended)
                 {
-                    STOLON.Debug.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
+                    STOLON.Logger.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
                     Deactivate(overlay.Id);
-                    STOLON.Debug.Success();
+                    STOLON.Logger.Success();
                 }
             }
             base.Update(elapsedMilliseconds);

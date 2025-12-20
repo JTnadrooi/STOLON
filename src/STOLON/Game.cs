@@ -48,13 +48,13 @@ namespace STOLON
             Content.RootDirectory = string.Empty; // heh
             IsMouseVisible = true;
 
-            Debug = new Logger(header: "STOLON");
-            Debug.Silent = false;
+            Logger = new Logger(header: "STOLON");
+            Logger.Silent = false;
         }
 
         protected override void Initialize()
         {
-            Debug.Log(">[s]initializing STOLON");
+            Logger.Log(">[s]initializing STOLON");
             DRP = new DiscordRichPresence();
             DRP.UpdateDetails("Initializing..");
 
@@ -71,7 +71,7 @@ namespace STOLON
 
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
-            Debug.Success();
+            Logger.Success();
             base.Initialize();
         }
         private void Window_ClientSizeChanged(object? sender, EventArgs e)
@@ -123,13 +123,13 @@ namespace STOLON
         }
         protected override void LoadContent()
         {
-            Debug.Log(">[s]loading stolon content");
+            Logger.Log(">[s]loading stolon content");
 
             _palette = [
                 new Color(242, 251, 235), // #f2fbeb
                 new Color(23, 18, 25), // #171219
             ];
-            STOLON.Debug.Log("palette set.");
+            STOLON.Logger.Log("palette set.");
 
             STOLON.Config = new Configuration();
             STOLON.AudioEngine = new AudioEngine();
@@ -146,10 +146,10 @@ namespace STOLON
 
 
             bool silenceConsole = !STOLON.Config.GetBool("debug.log.enable");
-            if (silenceConsole) STOLON.Debug.Log("console will be silenced.");
-            STOLON.Debug.Silent = silenceConsole;
+            if (silenceConsole) STOLON.Logger.Log("console will be silenced.");
+            STOLON.Logger.Silent = silenceConsole;
 
-            Debug.Success();
+            Logger.Success();
             //throw new Exception();
 
             base.LoadContent();
@@ -233,7 +233,7 @@ namespace STOLON
         public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
         public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
         public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
-        public static Logger Debug { get => BackingFields._debug; set => BackingFields._debug = value; }
+        public static Logger Logger { get => BackingFields._debug; set => BackingFields._debug = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static InputManager Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
         public static SceneManager SceneManager { get => BackingFields._sceneManager; internal set => BackingFields._sceneManager = value; }
@@ -261,7 +261,7 @@ namespace STOLON
 
         public static T[] Scan<T>() where T : class
         {
-            Debug.Log($"called assembly scan for type '{typeof(T).FullName}\".");
+            Logger.Log($"called assembly scan for type '{typeof(T).FullName}\".");
             return Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => typeof(T).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
                 .Select(t => (Activator.CreateInstance(t) as T)!).ToArray();

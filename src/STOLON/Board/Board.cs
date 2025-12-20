@@ -171,9 +171,9 @@ namespace STOLON
         }
         public void Undo()
         {
-            STOLON.Debug.Log(">attempting move undo");
+            STOLON.Logger.Log(">attempting move undo");
             _scene.Undo();
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
         }
         public void AfterMove()
@@ -209,7 +209,7 @@ namespace STOLON
             }
             else if (Utils.IsMouseClicked(STOLON.Input.CurrentMouse, STOLON.Input.PreviousMouse) && MouseIsOnBoard)
             {
-                STOLON.Debug.Log(">attempting board alter after mouseclick");
+                STOLON.Logger.Log(">attempting board alter after mouseclick");
                 Move? move = null;
                 for (int x = 0; x < _scene.Tiles.GetLength(0); x++)
                     for (int y = 0; y < _scene.Tiles.GetLength(1); y++)
@@ -223,22 +223,22 @@ namespace STOLON
                     History.Push(State.DeepCopy());
                     State.Alter(move!.Value, true);
                     AfterMove();
-                    STOLON.Debug.Success();
+                    STOLON.Logger.Success();
                     return true;
                 }
-                else STOLON.Debug.Fail();
+                else STOLON.Logger.Fail();
             }
             return false;
         }
         public void Reset()
         {
-            STOLON.Debug.Log(">resetting board");
+            STOLON.Logger.Log(">resetting board");
 
             _computerMoveTask = null;
             State = InitialState.DeepCopy();
 
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
         public void EndMove()
         {
@@ -277,10 +277,10 @@ namespace STOLON
         public void EndGame(int winner)
         {
             bool draw = winner < 0;
-            STOLON.Debug.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
+            STOLON.Logger.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
 
             STOLON.Environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
     }
 
@@ -306,7 +306,7 @@ namespace STOLON
             TurnsRemaining = turnsRemaining;
             Id = id;
 
-            STOLON.Debug.Log("searchTarget with nodes {" + Nodes.ToJoinedString(", ") + "} created.");
+            STOLON.Logger.Log("searchTarget with nodes {" + Nodes.ToJoinedString(", ") + "} created.");
         }
         public bool DecrementTurn()
         {

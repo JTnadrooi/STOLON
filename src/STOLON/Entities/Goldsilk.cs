@@ -56,7 +56,7 @@ namespace STOLON
         }
         public NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
         {
-            STOLON.Debug.Log(">[s]initializing parallel alpha-beta algorithm..");
+            STOLON.Logger.Log(">[s]initializing parallel alpha-beta algorithm..");
 
             ConcurrentDictionary<int, TTEntry> tt = new ConcurrentDictionary<int, TTEntry>();
             List<Move> moves = map.GetAllMoves(state);
@@ -78,12 +78,12 @@ namespace STOLON
 
                 lock (lockObj)
                 {
-                    STOLON.Debug.Log("evaluated move " + moves[i] + ", winstate score: " + score + ".");
+                    STOLON.Logger.Log("evaluated move " + moves[i] + ", winstate score: " + score + ".");
                     negaMaxedMoves.Add((score, moves[i]));
                 }
             });
 
-            STOLON.Debug.Log(">attemting further move ordering");
+            STOLON.Logger.Log(">attemting further move ordering");
 
             negaMaxedMoves = negaMaxedMoves.Select((x, i) => new { Index = i, Value = x })
                 .Where(x => x.Value.score == negaMaxedMoves.Select(t => t.score).Max())
@@ -93,21 +93,21 @@ namespace STOLON
                 int score = MoveEvaluate(state, moveTuple.move, moveTuple.score);
                 evaluatedMoves.Add((score, moveTuple.move));
 
-                STOLON.Debug.Log("move " + moveTuple.move + " has an evaluated score of " + score + ".");
+                STOLON.Logger.Log("move " + moveTuple.move + " has an evaluated score of " + score + ".");
             }
-            STOLON.Debug.Success();
-            STOLON.Debug.Log(">attempting best move selection");
+            STOLON.Logger.Success();
+            STOLON.Logger.Log(">attempting best move selection");
             (int score, Move move) bestItem = evaluatedMoves.Where(t => t.score == evaluatedMoves.Select(t => t.score).Max()).First();
 
             stopwatch.Stop();
-            STOLON.Debug.Log("bestMove found with a score of: " + bestItem.score + " and move " + bestItem.move);
-            STOLON.Debug.Success();
-            STOLON.Debug.Success();
+            STOLON.Logger.Log("bestMove found with a score of: " + bestItem.score + " and move " + bestItem.move);
+            STOLON.Logger.Success();
+            STOLON.Logger.Success();
             return new NegamaxEndResult(bestItem.move, negaCount, (int)stopwatch.ElapsedMilliseconds);
         }
         public int MoveEvaluate(BoardState state, Move move, int score)
         {
-            STOLON.Debug.Log(">starting eval of move " + move + "..");
+            STOLON.Logger.Log(">starting eval of move " + move + "..");
 
             int connectScore;
             int positionalScore;
@@ -118,22 +118,22 @@ namespace STOLON
             state.Alter(move, true);
 
             connectScore = state.DeepSearchFrom(sim.TiledPosition, out _, null).Score;
-            STOLON.Debug.Log("move has a connectScore of " + connectScore);
+            STOLON.Logger.Log("move has a connectScore of " + connectScore);
 
             int distanceFromCenter = (int)MathF.Abs((sim.TiledPosition.X - (state.Dimensions.X / 2f))); // more = bad
             int distanceFromGround = Math.Abs(move.Origin.Y - sim.TiledPosition.Y); // more = bad
             positionalScore = distanceFromCenter * distanceFromCenter * -1 * distanceFromGround * distanceFromGround;
-            STOLON.Debug.Log("move has a positionalScore of " + positionalScore + ", xDelta: " + distanceFromCenter + ", yDelta: " + distanceFromGround);
+            STOLON.Logger.Log("move has a positionalScore of " + positionalScore + ", xDelta: " + distanceFromCenter + ", yDelta: " + distanceFromGround);
 
             Random random = new Random();
             randomScore = random.Next(1, 40);
-            STOLON.Debug.Log("move has a randomScore of " + randomScore);
+            STOLON.Logger.Log("move has a randomScore of " + randomScore);
 
             state.Undo();
             outScore = score + connectScore + positionalScore + randomScore;
 
-            STOLON.Debug.Log("total: " + outScore);
-            STOLON.Debug.Success();
+            STOLON.Logger.Log("total: " + outScore);
+            STOLON.Logger.Success();
 
             return outScore;
         }

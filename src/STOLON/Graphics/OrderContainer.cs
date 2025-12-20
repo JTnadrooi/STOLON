@@ -160,7 +160,7 @@ namespace STOLON
 
                 if (!Equals(oldPath, Path))
                 {
-                    STOLON.Debug.Log("element clicked: " + clickedId);
+                    STOLON.Logger.Log("element clicked: " + clickedId);
                     OnPathChanged(oldPath, Path);
                 }
             }

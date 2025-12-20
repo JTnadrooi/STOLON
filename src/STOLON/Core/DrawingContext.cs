@@ -56,7 +56,7 @@ namespace STOLON
 
         public DrawingContext()
         {
-            STOLON.Debug.Log(">[s]initialising drawing context");
+            STOLON.Logger.Log(">[s]initialising drawing context");
             SpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _graphics = STOLON.Instance.GraphicsDevice;
 
@@ -74,13 +74,13 @@ namespace STOLON
 
             Shader[] tempShaders = STOLON.Scan<Shader>();
 
-            STOLON.Debug.Log(">searching for effects");
+            STOLON.Logger.Log(">searching for effects");
             foreach (Shader shader in tempShaders)
             {
-                STOLON.Debug.Log($"found effect with name '{shader.Effect.Name}'.");
+                STOLON.Logger.Log($"found effect with name '{shader.Effect.Name}'.");
                 _shaders.Add(shader.Effect.Name, shader);
             }
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
             _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.V_WIDTH, STOLON.V_HEIGHT);
@@ -89,7 +89,7 @@ namespace STOLON
             ScalingMethod = Enum.Parse<ScalingMethod>(STOLON.Config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
             Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
         }
 
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
@@ -131,18 +131,18 @@ namespace STOLON
 
             Scale = newRes.X / (float)STOLON.V_WIDTH;
 
-            STOLON.Debug.Log($"updated fx pipeline res with new scale '{Scale}'");
+            STOLON.Logger.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
 
         public void DisableShader(string name)
         {
             if (!_shaders[name].IsEnabled)
             {
-                STOLON.Debug.Log($"effect '{name}' already disabled.");
+                STOLON.Logger.Log($"effect '{name}' already disabled.");
                 return;
             }
             _shaders[name].IsEnabled = false;
-            STOLON.Debug.Log($"disabled effect with name '{name}'.");
+            STOLON.Logger.Log($"disabled effect with name '{name}'.");
         }
 
         public bool IsEnabled(string name) => _shaders[name].IsEnabled;
@@ -151,11 +151,11 @@ namespace STOLON
         {
             if (_shaders[name].IsEnabled)
             {
-                STOLON.Debug.Log($"effect '{name}' already enabled.");
+                STOLON.Logger.Log($"effect '{name}' already enabled.");
                 return;
             }
             _shaders[name].IsEnabled = true;
-            STOLON.Debug.Log($"enabled effect with name '{name}'.");
+            STOLON.Logger.Log($"enabled effect with name '{name}'.");
         }
 
         #region SCREENSHOT
@@ -163,28 +163,28 @@ namespace STOLON
         public void Screenshot()
         {
             _screenshotPending = true;
-            STOLON.Debug.Log("screenshot request submitted.");
+            STOLON.Logger.Log("screenshot request submitted.");
         }
 
         private string ScreenshotFrom(RenderTarget2D virtualFinal)
         {
-            STOLON.Debug.Log(">attempting screenshot.");
+            STOLON.Logger.Log(">attempting screenshot.");
 
             STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Directory.CreateDirectory("Screenshots");
 
-            STOLON.Debug.Log(">getting screenshot file index.");
+            STOLON.Logger.Log(">getting screenshot file index.");
 
             int screenshotIndex = 0;
             for (; true; screenshotIndex++)
                 if (!File.Exists($"Screenshots\\sl_screenshot{screenshotIndex}.png")) break;
 
-            STOLON.Debug.Log("<found avalible with id: " + screenshotIndex);
+            STOLON.Logger.Log("<found avalible with id: " + screenshotIndex);
 
             string path = $"Screenshots\\sl_screenshot{screenshotIndex}.png";
 
-            STOLON.Debug.Log(">reading and flipping screentexture data.");
+            STOLON.Logger.Log(">reading and flipping screentexture data.");
             Color[] data = new Color[virtualFinal.Width * virtualFinal.Height];
             virtualFinal.GetData(data);
 
@@ -200,13 +200,13 @@ namespace STOLON
             }
 
             _screenshotCache.SetData(data);
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
-            STOLON.Debug.Log(">saving screentexture to file.");
+            STOLON.Logger.Log(">saving screentexture to file.");
             using (FileStream stream = File.Create(path)) _screenshotCache.SaveAsPng(stream, STOLON.V_WIDTH, STOLON.V_HEIGHT);
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
 
-            STOLON.Debug.Success();
+            STOLON.Logger.Success();
             return path;
         }
 
