@@ -34,6 +34,8 @@ namespace STOLON
 
         public float Scale { get; private set; }
 
+        internal Vector2 GameWindowDrawOffsetWithCorrectedY { get; private set; }
+
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
@@ -260,6 +262,7 @@ namespace STOLON
 
             int offsetX = (STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferWidth - finalTarget.Width) / 2;
             int offsetY = (STOLON.Instance.GraphicsDeviceManager.PreferredBackBufferHeight - finalTarget.Height) / -2; // because this does not get inverted
+            GameWindowDrawOffsetWithCorrectedY = new Vector2(offsetX, -offsetY);
 
             _graphics.SetRenderTarget(null);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);

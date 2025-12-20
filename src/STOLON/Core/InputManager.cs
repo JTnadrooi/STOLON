@@ -58,6 +58,8 @@ namespace STOLON
 
         public MouseDomain Domain { get; private set; }
 
+        public MouseFocus Focus { get; private set; }
+
         public MouseState PreviousMouse { get; private set; }
 
         public MouseState CurrentMouse { get; private set; }
@@ -67,7 +69,7 @@ namespace STOLON
         public KeyboardState PreviousKeyboard { get; private set; }
 
         public Vector2 VirtualMousePos
-            => Vector2.Transform(CurrentMouse.Position.ToVector2(), STOLON.DrawingContext.InvertYMatrix) / STOLON.Instance.ScreenScale;
+            => Vector2.Transform(CurrentMouse.Position.ToVector2() - STOLON.DrawingContext.GameWindowDrawOffsetWithCorrectedY, STOLON.DrawingContext.InvertYMatrix) / STOLON.DrawingContext.Scale;
 
         public int MouseScrollValue => CurrentMouse.ScrollWheelValue;
         /// <summary>
