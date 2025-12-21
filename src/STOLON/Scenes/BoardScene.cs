@@ -40,7 +40,7 @@
         }
         protected override void UpdateUI(int elapsedMilliseconds)
         {
-            float zoomIntensity = ((BoardScene)STOLON.SceneManager.Current).Board.ZoomIntensity;
+            float zoomIntensity = ((BoardScene)STOLON.Scenes.Current).Board.ZoomIntensity;
             float lineZoomOffset = zoomIntensity * 30f * (zoomIntensity < 0 ? 0.5f : 1f); // 30 being the max zoom in pixels, the last bit is smoothening the inverted zoom.
 
             lineZoomOffset = Math.Max(0, lineZoomOffset);

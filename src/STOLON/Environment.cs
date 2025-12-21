@@ -42,8 +42,8 @@
             STOLON.Logger.Success();
 
             STOLON.UI = _userInterface = new Interface();
-            STOLON.SceneManager = _sceneManager = new SceneManager();
-            STOLON.SceneManager.ChangeScene<MenuScene>();
+            STOLON.Scenes = _sceneManager = new SceneManager();
+            STOLON.Scenes.ChangeScene<MenuScene>();
 
 
             _overlayer = new OverlayManager();
@@ -57,7 +57,7 @@
         {
             _userInterface.Update(elapsedMilliseconds);
 
-            STOLON.SceneManager.Update(elapsedMilliseconds);
+            STOLON.Scenes.Update(elapsedMilliseconds);
 
             //_userInterface.PostUpdate(elapsedMilliseconds);
             STOLON.AudioEngine.Update(elapsedMilliseconds);
@@ -68,7 +68,7 @@
         }
         public override void Draw(DrawingContext drawingContext)
         {
-            STOLON.SceneManager.Draw(drawingContext);
+            STOLON.Scenes.Draw(drawingContext);
             _userInterface.Draw(drawingContext);
 
             _overlayer.Draw(drawingContext);

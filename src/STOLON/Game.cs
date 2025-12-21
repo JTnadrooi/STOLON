@@ -201,10 +201,10 @@ namespace STOLON
             public static EffectResourceCollection _effects;
             public static CachedAudioResourceCollection _audio;
             public static AudioEngine _audioEngine;
-            public static RichLogger _debug;
+            public static RichLogger _logger;
             public static GameEnvironment _environment;
             public static InputManager _input;
-            public static SceneManager _sceneManager;
+            public static SceneManager _scenes;
             public static Interface _ui;
             public static Configuration _config;
             public static DrawingContext _drawingContext;
@@ -218,10 +218,10 @@ namespace STOLON
         public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
         public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
         public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
-        public static RichLogger Logger { get => BackingFields._debug; set => BackingFields._debug = value; }
+        public static RichLogger Logger { get => BackingFields._logger; set => BackingFields._logger = value; }
         public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
         public static InputManager Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
-        public static SceneManager SceneManager { get => BackingFields._sceneManager; internal set => BackingFields._sceneManager = value; }
+        public static SceneManager Scenes { get => BackingFields._scenes; internal set => BackingFields._scenes = value; }
         public static Interface UI { get => BackingFields._ui; internal set => BackingFields._ui = value; }
         public static Configuration Config { get => BackingFields._config; internal set => BackingFields._config = value; }
         public static DrawingContext DrawingContext { get => BackingFields._drawingContext; internal set => BackingFields._drawingContext = value; }
