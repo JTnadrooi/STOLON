@@ -30,6 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Autofac" Version="9.0.0" />
 		<PackageReference Include="Betwixt" Version="1.4.1">
 			<NoWarn>NU1701</NoWarn>
 		</PackageReference>

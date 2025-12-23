@@ -13,7 +13,7 @@ namespace STOLON
     /// <summary>
     /// The main <see cref="AudioEngine"/> for the <see cref="STOLON"/> environment. <i>Moderately thread-safe.</i>
     /// </summary>
-    public class AudioEngine : IDisposable // NOT DEBUG SAFE
+    public class AudioEngine : IDisposable, IAudioEngine, ISingletonDependency // NOT DEBUG SAFE
     {
         public Playlist? Current => _currentPlaylist;
 
@@ -68,15 +68,22 @@ namespace STOLON
             set => _ostVolumeSampleProvider.Volume = Math.Clamp(value, 0f, 1f);
         }
         public const int FadeTimeMilliseconds = 2000;
-        /// <summary>
-        /// Initialize a new <see cref="AudioEngine"/>.
-        /// </summary>
-        public AudioEngine()
+
+        private readonly IRichLogger _logger;
+        private readonly Configuration _config;
+        private readonly TaskHeap _tasks;
+        private readonly ICachedAudioResourceCollection _audio;
+
+        public AudioEngine(IRichLogger logger, Configuration config, TaskHeap tasks, ICachedAudioResourceCollection audio)
         {
-            STOLON.Logger.Log(">initiating AudioEngine");
+            _logger = logger;
+            _config = config;
+            _tasks = tasks;
+            _audio = audio;
+
+            _logger.Log(">initiating AudioEngine");
             _outputDevice = new DirectSoundOut(40);
             WaveFormat waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-
 
             _masterMixer = new MixingSampleProvider(waveFormat);
             _masterMixer.ReadFully = true;
@@ -100,14 +107,14 @@ namespace STOLON
 
             _outputDevice.Init(_masterVolumeSampleProvider);
             _outputDevice.Play();
-            STOLON.Logger.Log(">getting config values");
-            FxVolume = STOLON.Config.GetFloat("audio.vol.fx");
-            OstVolume = STOLON.Config.GetFloat("audio.vol.ost");
-            MasterVolume = STOLON.Config.GetFloat("audio.vol.master");
-            STOLON.Logger.Log($"found as: Fx={FxVolume}, OST={OstVolume}, Master={MasterVolume}");
+            _logger.Log(">getting config values");
+            FxVolume = _config.GetFloat("audio.vol.fx");
+            OstVolume = _config.GetFloat("audio.vol.ost");
+            MasterVolume = _config.GetFloat("audio.vol.master");
+            _logger.Log($"found as: Fx={FxVolume}, OST={OstVolume}, Master={MasterVolume}");
 
-            STOLON.Logger.Success();
-            STOLON.Logger.Success();
+            _logger.Success();
+            _logger.Success();
         }
         ///// <summary>
         ///// Play an filename. <br/> <br/><i>Very slow.</i>
@@ -176,18 +183,18 @@ namespace STOLON
         /// <param name="id">The ost id from the <see cref="Library"/>.</param>
         public void SetTrack(string id, bool fade = true)
         {
-            STOLON.Logger.Log(">track changing to " + id);
+            _logger.Log(">track changing to " + id);
 
             string ostProviderId = "__ost_provider";
             string ostTaskId = "ost_change";
             bool alreadyPlaying = _fadeInOutSampleProvider != null;
 
             if (alreadyPlaying && fade) _fadeInOutSampleProvider.BeginFadeOut(FadeTimeMilliseconds);
-            STOLON.Tasks.SafePush(ostTaskId, new DynamicTask(() => // fire and forget game logic ftw
+            _tasks.SafePush(ostTaskId, new DynamicTask(() => // fire and forget game logic ftw
             {
                 TryRemoveMixerInput(ostProviderId, AudioDomain.OST);
-                STOLON.Logger.Log("\ttrack changed to " + id);
-                _fadeInOutSampleProviderSource = STOLON.Audio[id].GetAsSampleProvider();
+                _logger.Log("\ttrack changed to " + id);
+                _fadeInOutSampleProviderSource = _audio[id].GetAsSampleProvider();
                 _fadeInOutSampleProvider = new FadeInOutSampleProvider(_fadeInOutSampleProviderSource);
 
                 AddMixerInput(_fadeInOutSampleProvider, ostProviderId, AudioDomain.OST);
@@ -197,7 +204,7 @@ namespace STOLON
         }
         public void SetPlayList(Playlist newPlaylist, bool fade = true)
         {
-            STOLON.Logger.Log(">changing audio playlist.");
+            _logger.Log(">changing audio playlist.");
             _currentPlaylist = newPlaylist;
             _trackQueue = new Queue<string>(newPlaylist.Get());
 
@@ -236,11 +243,11 @@ namespace STOLON
                 {
                     nextTrack = _trackQueue.Dequeue();
                     SetTrack(nextTrack, false); // no fade nessesairy.
-                    STOLON.Logger.Log("dequeued next track; " + nextTrack);
+                    _logger.Log("dequeued next track; " + nextTrack);
                 }
                 else if (_currentPlaylist != null && _currentPlaylist.Loop)
                 {
-                    STOLON.Logger.Log(">refreshing loopable playlist queue");
+                    _logger.Log(">refreshing loopable playlist queue");
                     _trackQueue = new Queue<string>(_currentPlaylist.Get());
                     SetTrack(_trackQueue.Dequeue(), false); // no fade nessesairy.
                 }
@@ -249,7 +256,7 @@ namespace STOLON
 
         public void Dispose()
         {
-            STOLON.Logger.Log("disposing audio engine..");
+            _logger.Log("disposing audio engine..");
             _outputDevice.Dispose();
         }
     }

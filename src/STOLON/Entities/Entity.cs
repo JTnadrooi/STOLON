@@ -20,10 +20,10 @@
         public Point Focus { get => _focus; set => _focus = value; }
         public Point MenuOffset { get => _menuOffset; set => _menuOffset = value; }
 
-        public EntityProfile(string entityName, Point? focus = null, Point? menuOffset = null) : this(
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : throw new Exception(),
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
-            STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
+        public EntityProfile(string entityName, ITexture2DCollection textures, Point? focus = null, Point? menuOffset = null) : this(
+            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : throw new Exception(),
+            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
+            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus)
         { }
         public EntityProfile(Texture2D t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
@@ -36,23 +36,19 @@
             _menuOffset = menuOffset ?? Point.Zero;
         }
 
-        public static EntityProfile Debug => new EntityProfile(
-            STOLON.Textures[$"Debug\\temp-512"],
-            null,
-            STOLON.Textures[$"Debug\\profile-128"]);
-        public static EntityProfile GetDebug(Texture2D? t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
-            => new EntityProfile(t512 ?? STOLON.Textures[$"Debug\\temp-512"], t256, t128, focus, menuOffset);
-        public static EntityProfile GetDebug(string entityName, Point? focus = null, Point? menuOffset = null)
+        public static EntityProfile GetDebug(Texture2D? t512, Texture2D? t256 = null, Texture2D? t128 = null, ITexture2DCollection? textures = null, Point? focus = null, Point? menuOffset = null)
+            => new EntityProfile(t512 ?? textures[$"Debug\\temp-512"] ?? throw new InvalidOperationException(), t256, t128, focus, menuOffset);
+        public static EntityProfile GetDebug(string entityName, ITexture2DCollection textures, Point? focus = null, Point? menuOffset = null)
             => new EntityProfile(
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : STOLON.Textures[$"Debug\\temp-512"],
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
-                STOLON.Textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
+                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : textures[$"Debug\\temp-512"],
+                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
+                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus);
     }
     /// <summary>
     /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
-    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
+    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>, ISingletonDependency
     {
 
         public string FullName { get; }
@@ -70,7 +66,7 @@
         public ConditionalNote[] AbilityNotes { get; }
         public ConditionalNote[] AllocationNotes { get; }
 
-        public Entity(string id, string name, string symbolNotation, string? description = null, string? fullName = null)
+        public Entity(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null)
         {
             Id = id;
             Name = name;
@@ -78,12 +74,12 @@
             FullName = fullName ?? name;
             Description = description ?? string.Empty;
 
-            Profile = ResolveProfile();
+            Profile = ResolveProfile(textures);
             (AllocationNotes, AbilityNotes) = ResolveNotes();
         }
 
-        protected virtual EntityProfile ResolveProfile()
-            => new EntityProfile(Id);
+        protected virtual EntityProfile ResolveProfile(ITexture2DCollection textures)
+            => new EntityProfile(Id, textures);
 
         protected virtual (ConditionalNote[] allocationNotes, ConditionalNote[] abilityNotes) ResolveNotes()
             => (Array.Empty<ConditionalNote>(), Array.Empty<ConditionalNote>());
@@ -132,15 +128,15 @@
                 }
             }
         }
-        public static void DrawSymbolNotation(this DrawingContext context, string symbolNotationStr, Rectangle bounds)
+        public static void DrawSymbolNotation(this DrawingContext context, Font2D font, string symbolNotationStr, Rectangle bounds)
         {
             context.DrawArea(bounds, Color.Black);
             context.DrawRectangle(bounds, Color.White, Interface.LINE_WIDTH);
-            Vector2 dimensions = STOLON.Fonts.Medium.FastMeasure(symbolNotationStr);
+            Vector2 dimensions = font.FastMeasure(symbolNotationStr);
             Vector2 scale = Vector2.One;
             if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);
             dimensions *= scale;
-            context.DrawString(STOLON.Fonts.Medium, symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
+            context.DrawString(font, symbolNotationStr, Centering.Center(dimensions.ToPoint(), bounds).PixelLock(), scale: scale);
         }
 
     }
@@ -161,7 +157,7 @@
         /// Do a move best for the <see cref="Source"/> <see cref="Entity"/> on the <paramref name="board"/>.
         /// </summary>
         /// <param name="board">The <see cref="Board"/> to do a move on.</param>
-        public abstract void DoMove(Board board);
+        //public abstract void DoMove(Board board);
 
         /// <summary>
         /// Gets the <see cref="Player"/> this <see cref="Computer"/> plays for.

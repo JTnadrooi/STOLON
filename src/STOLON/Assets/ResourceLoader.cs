@@ -17,37 +17,41 @@ namespace STOLON
         private readonly bool _multicore;
         private readonly ConcurrentDictionary<string, TContent> _resources;
 
-        public ParallelResourceLoader(bool multicore = true)
+        private readonly IThreadSafeRichLogger _logger;
+
+        public ParallelResourceLoader(IThreadSafeRichLogger logger, bool multicore = true)
         {
+            _logger = logger;
+
             _multicore = multicore;
             _resources = new ConcurrentDictionary<string, TContent>();
         }
 
         public FrozenDictionary<string, TContent> GetResources()
         {
-            STOLON.Logger.Log($">[s]loading data of type '{typeof(TContent).Name}' in parallel.");
-            STOLON.Logger.Log($">getting items..");
+            _logger.Log($">[s]loading data of type '{typeof(TContent).Name}' in parallel.");
+            _logger.Log($">getting items..");
 
             string[] items = GetItems();
             foreach (string item in items)
             {
-                STOLON.Logger.Log("found item: " + item);
+                _logger.Log("found item: " + item);
             }
 
-            STOLON.Logger.Success();
-            STOLON.Logger.Log($">loading resources.");
+            _logger.Success();
+            _logger.Log($">loading resources.");
 
             Parallel.ForEach(items, item =>
             {
                 string toLoadId = GetId(item);
-                STOLON.Logger.LogThreadSafe($"loading resource from '{item}' as '{toLoadId}'.");
+                _logger.LogThreadSafe($"loading resource from '{item}' as '{toLoadId}'.");
                 TContent loaderResult = LoadItem(item);
                 _resources[toLoadId] = loaderResult;
-                STOLON.Logger.LogThreadSafe($"succesfully loaded resource from '{item}' as '{toLoadId}'.");
+                _logger.LogThreadSafe($"succesfully loaded resource from '{item}' as '{toLoadId}'.");
             });
 
-            STOLON.Logger.Success();
-            STOLON.Logger.Success(_resources.Values.Count + " assets loaded.");
+            _logger.Success();
+            _logger.Success(_resources.Values.Count + " assets loaded.");
 
             return _resources.ToFrozenDictionary();
         }
@@ -62,37 +66,41 @@ namespace STOLON
         private readonly bool _multicore;
         private readonly Dictionary<string, TContent> _resources;
 
-        public SequentialResourceLoader(bool multicore = true)
+        private readonly IRichLogger _logger;
+
+        public SequentialResourceLoader(IRichLogger logger, bool multicore = true)
         {
+            _logger = logger;
+
             _multicore = multicore;
             _resources = new Dictionary<string, TContent>();
         }
 
         public FrozenDictionary<string, TContent> GetResources()
         {
-            STOLON.Logger.Log($">[s]loading data of type '{typeof(TContent).Name}' in sequence.");
-            STOLON.Logger.Log($">getting items..");
+            _logger.Log($">[s]loading data of type '{typeof(TContent).Name}' in sequence.");
+            _logger.Log($">getting items..");
 
             string[] items = GetItems();
             foreach (string item in items)
             {
-                STOLON.Logger.Log("found item: " + item);
+                _logger.Log("found item: " + item);
             }
 
-            STOLON.Logger.Success();
-            STOLON.Logger.Log($">loading resources.");
+            _logger.Success();
+            _logger.Log($">loading resources.");
 
             foreach (string item in items)
             {
                 string toLoadId = GetId(item);
-                STOLON.Logger.Log($">loading resource from '{item}' as '{toLoadId}'.");
+                _logger.Log($">loading resource from '{item}' as '{toLoadId}'.");
                 TContent loaderResult = LoadItem(item);
                 _resources[toLoadId] = loaderResult;
-                STOLON.Logger.Success();
+                _logger.Success();
             }
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            STOLON.Logger.Success(_resources.Values.Count + " assets loaded.");
+            _logger.Success(_resources.Values.Count + " assets loaded.");
 
             return _resources.ToFrozenDictionary();
         }

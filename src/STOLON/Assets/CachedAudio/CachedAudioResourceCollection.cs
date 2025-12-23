@@ -1,7 +1,7 @@
 ﻿namespace STOLON
 {
-    public class CachedAudioResourceCollection : ResourceCollection<CachedAudio>
+    public class CachedAudioResourceCollection : ResourceCollection<CachedAudio>, ICachedAudioResourceCollection, ISingletonDependency
     {
-        public CachedAudioResourceCollection() : base(new CachedAudioResourceLoader()) { }
+        public CachedAudioResourceCollection(IResourceLoader<CachedAudio> loader) : base(loader) { }
     }
 }

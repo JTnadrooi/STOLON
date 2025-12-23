@@ -1,44 +1,49 @@
 ﻿using Betwixt;
-using Math = System.Math;
+using System.Numerics;
 
 
 
 namespace STOLON
 {
-    public class OverlayManager : Service
+    public class OverlayManager : Service, IOverlayManager, ISingletonDependency
     {
-        private Dictionary<string, IOverlay> _overlays;
+        private Dictionary<string, IOverlay> _overlayDict;
         private List<string> _initialized;
 
-        public OverlayManager() : base(STOLON.Environment)
+        private readonly IRichLogger _logger;
+        private readonly IEnumerable<IOverlay> _overlays;
+
+        public OverlayManager(IRichLogger logger, IEnumerable<IOverlay> overlays) : base(null)
         {
-            _overlays = new Dictionary<string, IOverlay>();
+            _logger = logger;
+            _overlays = overlays;
+
+            _overlayDict = new Dictionary<string, IOverlay>();
             _initialized = new List<string>();
 
-            STOLON.Logger.Log(">searching for overlays");
-            IOverlay[] overlays = STOLON.Scan<IOverlay>();
+            _logger.Log(">searching for overlays");
             foreach (IOverlay overlay in overlays)
             {
-                STOLON.Logger.Log($"found overlay with id '{overlay.Id}\".");
+                _logger.Log($"found overlay with id '{overlay.Id}\".");
                 AddOverlay(overlay);
             }
-            STOLON.Logger.Success();
+            _logger.Success();
         }
 
         public void AddOverlay<TOverlay>() where TOverlay : IOverlay, new() => AddOverlay(new TOverlay());
         public void AddOverlay(IOverlay overlay)
         {
-            STOLON.Logger.Log(">adding overlay of id " + overlay.Id + ".");
-            _overlays.Add(overlay.Id, overlay);
-            STOLON.Logger.Success();
+            _logger.Log(">adding overlay of id " + overlay.Id + ".");
+            _overlayDict.Add(overlay.Id, overlay);
+            _logger.Success();
         }
 
         public void RemoveOverlay(string overlayId)
         {
-            STOLON.Logger.Log(">removing overlay of id " + overlayId + ".");
+            _logger.Log(">removing overlay of id " + overlayId + ".");
             Deactivate(overlayId);
-            _overlays.Remove(overlayId);
-            STOLON.Logger.Success();
+            _overlayDict.Remove(overlayId);
+            _logger.Success();
         }
 
         public void Activate(string overlayId, params object?[] args)
@@ -46,10 +51,10 @@ namespace STOLON
 
             if (!_initialized.Contains(overlayId))
             {
-                STOLON.Logger.Log(">[s]activating overlay of id " + overlayId + ".");
-                _overlays[overlayId].Initialize(this, args);
+                _logger.Log(">[s]activating overlay of id " + overlayId + ".");
+                _overlayDict[overlayId].Initialize(this, args);
                 _initialized.Add(overlayId);
-                STOLON.Logger.Success();
+                _logger.Success();
             }
         }
 
@@ -63,9 +68,9 @@ namespace STOLON
         {
             if (_initialized.Contains(overlayId))
             {
-                STOLON.Logger.Log(">deactivating overlay of id " + overlayId + ".");
-                _overlays[overlayId].Reset();
-                STOLON.Logger.Success();
+                _logger.Log(">deactivating overlay of id " + overlayId + ".");
+                _overlayDict[overlayId].Reset();
+                _logger.Success();
             }
             _initialized.Remove(overlayId);
         }
@@ -75,13 +80,13 @@ namespace STOLON
             IOverlay overlay;
             for (int i = 0; i < _initialized.Count; i++) // for all initialized overlays
             {
-                overlay = _overlays[_initialized[i]];
+                overlay = _overlayDict[_initialized[i]];
                 overlay.Update(elapsedMilliseconds);
                 if (overlay.Ended)
                 {
-                    STOLON.Logger.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
+                    _logger.Log(">deactivating and resetting ended overlay of id " + overlay.Id + ".");
                     Deactivate(overlay.Id);
-                    STOLON.Logger.Success();
+                    _logger.Success();
                 }
             }
             base.Update(elapsedMilliseconds);
@@ -90,7 +95,7 @@ namespace STOLON
         {
             for (int i = 0; i < _initialized.Count; i++)
             {
-                _overlays[_initialized[i]].Draw(drawingContext);
+                _overlayDict[_initialized[i]].Draw(drawingContext);
             }
             base.Draw(drawingContext);
         }
@@ -119,9 +124,9 @@ namespace STOLON
         private Vector2 _pos;
         private float _scale;
 
-        public LoadOverlay()
+        public LoadOverlay(ITexture2DCollection textures)
         {
-            lineTexture = STOLON.Textures.GetReference("loading1");
+            lineTexture = textures.GetReference("loading1");
             _rotation = 0f;
             _scale = 0.20f;
             _rotationSpeed = 40f;
@@ -170,8 +175,14 @@ namespace STOLON
         private int _height;
         private Tweener<float> _tweener;
 
-        public TransitionDitherOverlay()
+        private readonly ICachedAudioResourceCollection _audio;
+        private readonly IAudioEngine _audioEngine;
+
+        public TransitionDitherOverlay(ICachedAudioResourceCollection audio, IAudioEngine audioEngine)
         {
+            _audio = audio;
+            _audioEngine = audioEngine;
+
             this._graphicsDevice = STOLON.Instance.GraphicsDevice;
             this._resolution = RESOLUTION;
             _random = new Random();
@@ -189,7 +200,7 @@ namespace STOLON
 
         public void Initialize(OverlayManager overlayer, params object?[] args)
         {
-            STOLON.AudioEngine.Play(STOLON.Audio["randomize_4"]);
+            _audioEngine.Play(_audio["randomize_4"]);
         }
 
         public void ResetTexture()
@@ -255,8 +266,12 @@ namespace STOLON
 
         private bool _hasHitMax;
 
-        public TransitionOverlay()
+        private readonly IFont2DCollection _fonts;
+
+        public TransitionOverlay(IFont2DCollection fonts)
         {
+            _fonts = fonts;
+
             _area = Rectangle.Empty;
             _drawArea = Rectangle.Empty;
             _overlayer = null!; // I know I know
@@ -284,8 +299,8 @@ namespace STOLON
             _heightCoefficient = _tweener.Value;
 
             _drawArea = new Rectangle(_area.Location, new Point(_area.Width, (int)(desiredHeight * _heightCoefficient)));
-            _textPos = Centering.Center((STOLON.Fonts.Small.FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
-            _textPos = new Vector2(_textPos.X, Math.Min(_textPos.Y, _drawArea.Height - STOLON.Fonts.Small.Dimensions.Y * TextSizeMod));
+            _textPos = Centering.Center((_fonts.Small.FastMeasure(_text) * TextSizeMod).ToPoint(), _drawArea);
+            _textPos = new Vector2(_textPos.X, Math.Min(_textPos.Y, _drawArea.Height - _fonts.Small.Dimensions.Y * TextSizeMod));
 
             Centering.OnPixel(ref _textPos);
         }
@@ -294,7 +309,7 @@ namespace STOLON
         {
             drawingContext.DrawArea(_drawArea, Color.Black);
             drawingContext.DrawRectangle(_drawArea, Color.White);
-            drawingContext.DrawString(STOLON.Fonts.Small, _text, _textPos, TextSizeMod);
+            drawingContext.DrawString(_fonts.Small, _text, _textPos, TextSizeMod);
         }
 
         public void Initialize(OverlayManager overlayer, params object?[] args)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace STOLON.CLI.Build
+﻿namespace STOLON.CLI.Build
 {
     /// <summary>
     /// Represents a single needing to be build item.
@@ -33,16 +27,13 @@ namespace STOLON.CLI.Build
         /// <returns>A value indicating if the target item (<paramref name="Destination"/>) needs to be rebuild or <see langword="true"/> if <paramref name="force"/> is set to <see langword="true"/>.</returns>
         public bool NeedsBuild(bool force)
         {
-            CLI.Logger.Log($">checking if '{Source}' needs to be rebuild as '{Destination}'.");
             if (force)
             {
-                CLI.Logger.Log($"<skipped, '{nameof(force)}' is enabled.");
                 return true;
             }
 
             if (!File.Exists(Destination))
             {
-                CLI.Logger.Success($"<build needed, file at build target does not exist.");
                 return true;
             }
 
@@ -51,12 +42,10 @@ namespace STOLON.CLI.Build
 
             if (fromModDate > toModDate)
             {
-                CLI.Logger.Success($"rebuild pending.");
                 return true;
             }
             else
             {
-                CLI.Logger.Success($"no rebuild needed.");
                 return false;
             }
         }

@@ -1,6 +1,4 @@
-﻿using Vector2 = Microsoft.Xna.Framework.Vector2;
-
-
+﻿
 namespace STOLON
 {
     public static class CompactibilityConversionExtensions

@@ -79,7 +79,7 @@ namespace STOLON
         public Collection<UndoObj> undoSet;
 
         public int NextPlayer => CurrentPlayerId == 0 ? 1 : 0; //NONPOLYPLAYER
-        public BoardPreview GetPreview() => new BoardPreview(this);
+        public BoardPreview GetPreview(Font2D font) => new BoardPreview(this, font);
 
         private readonly Tile[,] tiles;
         private readonly Player[] players;

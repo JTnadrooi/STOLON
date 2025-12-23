@@ -28,7 +28,7 @@
 
         //public static ConditionalNote GetEntityDependent<TOtherEntity>(string text, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral) where TOtherEntity : Entity
         //{
-        //    string _entityId = STOLON.Environment.GetEntityInstance<TOtherEntity>().Id;
+        //    string _entityId = _environment.GetEntityInstance<TOtherEntity>().Id;
         //    return new ConditionalNote($"{text} when {_entityId} is selected.", i => i.IsSelected(_entityId), domain, polarity);
         //}
         public static ConditionalNoteBuilder Build() => new ConditionalNoteBuilder();

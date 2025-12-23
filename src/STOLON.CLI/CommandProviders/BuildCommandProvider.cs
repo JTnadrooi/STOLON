@@ -1,16 +1,5 @@
-﻿using AsitLib;
-using AsitLib.CommandLine;
-using AsitLib.Stele;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Graphics.Effects;
+﻿using AsitLib.CommandLine;
 using STOLON.CLI.Build;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {

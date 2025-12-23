@@ -2,8 +2,12 @@
 
 namespace STOLON
 {
-    public class Font2DResourceLoader : SequentialResourceLoader<Font2D>
+    public class Font2DResourceLoader : SequentialResourceLoader<Font2D>, ITransientDependency
     {
+        public Font2DResourceLoader(IRichLogger logger) : base(logger)
+        {
+        }
+
         public override string[] GetItems() => Directory.GetFiles("Fonts", "*.fnt", SearchOption.AllDirectories);
 
         public override string GetId(string item) => item["Fonts\\".Length..^".fnt".Length];

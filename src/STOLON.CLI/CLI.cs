@@ -1,18 +1,5 @@
-﻿using AsitLib;
-using AsitLib.CommandLine;
-using AsitLib.Diagnostics;
-using STOLON.CLI;
-
-using System;
-using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
+﻿using AsitLib.CommandLine;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
@@ -55,33 +42,35 @@ namespace STOLON.CLI
 
     public sealed class CLI
     {
-        public Configuration Config { get; }
-
         public HashSet<string> GlobalFlags { get; }
 
-        public CLI(string[] args)
+        private readonly IRichLogger _logger;
+        private readonly IConfiguration _config;
+        private readonly CommandEngine _commandEngine;
+
+        public CLI()
         {
-            Config = new Configuration();
-            GlobalFlags = Config.Get<string[]>("cli.global_flags").ToHashSet();
-            STOLON.Logger = new RichLogger(header: "STOLON.CLI") { Silent = !(GlobalFlags.Contains("v") || args.Contains("-v")) };
+            _logger = Services.Resolve<IRichLogger>();
+            _config = Services.Resolve<IConfiguration>();
+            _commandEngine = Services.Resolve<CommandEngine>();
+
+            //Console.WriteLine(Services.AvailableServices.ToJoinedString("\n"));
+
+            GlobalFlags = _config.Get<string[]>("cli.global_flags").ToHashSet();
 
             InfoFactory = new FlaggedCommandInfoFactory();
 
-            STOLON.Logger.Log(">creating cli.");
-
-            Engine = new CommandEngine()
-                .AddHook(new DevActionHook())
-                .AddGlobalOption(STOLON.Logger.GetVerboseGlobalOption())
-                .Populate();
+            _commandEngine.Populate(activator: t =>
+                {
+                    return (CommandProvider)Services.Resolve(t);
+                });
 
             Instance = this;
-
-            STOLON.Logger.Log($"<cli created succesfully.");
         }
 
         public void Exit(int exitCode = 0)
         {
-            Environment.Exit(exitCode);
+            System.Environment.Exit(exitCode);
         }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -89,7 +78,6 @@ namespace STOLON.CLI
         /// Gets the only <see cref="CLI"/> instance.
         /// </summary>
         public static CLI Instance { get; private set; }
-        public static CommandEngine Engine { get; private set; }
         public static ICommandInfoFactory InfoFactory { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
@@ -99,7 +87,7 @@ namespace STOLON.CLI
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
         //public static bool IsDev => false;
-        public static bool IsDev => !CLI.Instance.Config.Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY); // can't be in static().
+        public static bool IsDev { get; } = !STOLON.Services.Resolve<IConfiguration>().Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY);
         /// <summary>
         /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>

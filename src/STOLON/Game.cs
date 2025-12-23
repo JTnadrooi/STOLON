@@ -1,22 +1,19 @@
-﻿using System.Reflection;
+﻿using Autofac;
+using DiscordRPC.Logging;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace STOLON
 {
-    public sealed class STOLON : Game
+    public sealed class STOLON : Game, ISingletonDependency
     {
         private GraphicsDeviceManager _graphics;
-        private InputManager _input;
         private DrawingContext _drawingContext;
-
-        private GameEnvironment _environment;
         private int _desiredModifier;
         private Color[] _palette;
-        private Texture2DCollection _textures;
-        private Font2DCollection _fonts;
         private Point _oldWindowSize;
 
         public DiscordRichPresence DRP { get; private set; }
-        //public Point VirtualDimensions => new Point(ASPECT_RATIO_X * VIRTUAL_MODIFIER, ASPECT_RATIO_Y * VIRTUAL_MODIFIER); //  (912, 513) (if vM = 57) - (480, 270) (if vM = 30)
         public Point DesiredDimensions => new Point(ASPECT_RATIO_X * _desiredModifier, ASPECT_RATIO_Y * _desiredModifier);
         public Point ScreenCenter => new Point(V_WIDTH / 2, V_HEIGHT / 2);
         public float ScreenScale { get; private set; }
@@ -25,26 +22,35 @@ namespace STOLON
         public Color Color1 => _palette[0];
         public Color Color2 => _palette[1];
 
+        private readonly IRichLogger _logger;
+        private readonly IInputManager _input;
+        private readonly ITaskHeap _tasks;
+        private readonly IConfiguration _config;
+        private Environment _environment;
+
 #pragma warning disable CS8618
-        public STOLON()
+        public STOLON(IRichLogger logger,
+            IInputManager input,
+            ITaskHeap tasks,
+            IConfiguration config)
 #pragma warning restore CS8618
         {
+            _logger = logger;
+            _input = input;
+            _tasks = tasks;
+            _config = config;
+
             Instance = this;
             IsInitiated = true;
 
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = string.Empty; // heh
             IsMouseVisible = true;
-
-            Logger = new RichLogger(header: "STOLON");
-            Logger.Silent = false;
         }
 
         protected override void Initialize()
         {
-            Logger.Log(">[s]initializing STOLON");
             DRP = new DiscordRichPresence();
-            DRP.UpdateDetails("Initializing..");
 
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
@@ -59,9 +65,9 @@ namespace STOLON
 
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
-            Logger.Success();
             base.Initialize();
         }
+
         private void Window_ClientSizeChanged(object? sender, EventArgs e)
         {
             Window.ClientSizeChanged -= Window_ClientSizeChanged;
@@ -109,46 +115,49 @@ namespace STOLON
             _graphics.PreferredBackBufferWidth = size.X;
             _graphics.PreferredBackBufferHeight = size.Y;
         }
+
         protected override void LoadContent()
         {
-            Logger.Log(">[s]loading stolon content");
+            _logger.Log(">[s]loading stolon content");
 
             _palette = [
                 new Color(242, 251, 235), // #f2fbeb
                 new Color(23, 18, 25), // #171219
             ];
-            STOLON.Logger.Log("palette set.");
 
-            STOLON.Config = new Configuration();
-            STOLON.AudioEngine = new AudioEngine();
+            int loadCount = 0;
+            foreach (IResourceCollection resourceCollection in Services.Resolve<IEnumerable<IResourceCollection>>())
+            {
+                if (resourceCollection.IsLoaded) continue;
 
-            STOLON.Textures = _textures = ResourceCollection.Load<Texture2DCollection>();
-            STOLON.Fonts = _fonts = ResourceCollection.Load<Font2DCollection>();
-            STOLON.Effects = ResourceCollection.Load<EffectResourceCollection>();
-            STOLON.Audio = ResourceCollection.Load<CachedAudioResourceCollection>();
-            STOLON.DrawingContext = _drawingContext = new DrawingContext();
-            STOLON.Input = _input = new InputManager();
-            STOLON.Tasks = new TaskHeap();
-            STOLON.Environment = _environment = new GameEnvironment();
+                resourceCollection.LoadResources();
+                loadCount++;
+            }
+            if (loadCount != 4) throw new Exception(loadCount.ToString());  // 4 because of the differnt asset types, ignore this. This is just checking if nothing is loaded more than once.
+
+            Console.WriteLine(Services.Resolve<IEnumerable<IResourceCollection>>().All(c => c.IsLoaded)); // true, rest below is false. (even though the texture collection implements all these, and of course IResourceCollection) 
+            Console.WriteLine(Services.Resolve<ITexture2DCollection>().IsLoaded);
+            Console.WriteLine(Services.Resolve<Texture2DCollection>().IsLoaded);
+            Console.WriteLine(Services.Resolve<IResourceCollection<Texture2D>>().IsLoaded);
+
+            STOLON.DrawingContext = _drawingContext = Services.Resolve<DrawingContext>();
+
+            _environment = Services.Resolve<Environment>();
             _environment.Initialize();
 
-
-            bool silenceConsole = !STOLON.Config.GetBool("debug.log.enable");
-            if (silenceConsole) STOLON.Logger.Log("console will be silenced.");
-            STOLON.Logger.Silent = silenceConsole;
-
-            Logger.Success();
-            //throw new Exception();
+            bool silenceConsole = !_config.GetBool("debug.log.enable");
+            if (silenceConsole) _logger.Log("console will be silenced.");
+            _logger.Silent = silenceConsole;
 
             base.LoadContent();
+            _logger.Success();
         }
 
         protected override void UnloadContent()
         {
-            AudioEngine.Dispose();
             MediaPlayer.Stop();
-            Textures.UnloadResources();
-            Fonts.UnloadResources();
+
+
             base.UnloadContent();
         }
 
@@ -161,14 +170,14 @@ namespace STOLON
                 ScreenScale = GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT;
                 _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
 
-                STOLON.Input.Update(elapsedMilliseconds);
-                STOLON.Tasks.Update(elapsedMilliseconds);
-                STOLON.Environment.Update(elapsedMilliseconds);
+                _input.Update(elapsedMilliseconds);
+                _tasks.Update(elapsedMilliseconds);
+                _environment.Update(elapsedMilliseconds);
 
-                if (STOLON.Input.Focus == MouseFocus.None)
+                if (_input.Focus == MouseFocus.None)
                 {
-                    if (STOLON.Input.IsClicked(Keys.F)) GoFullscreen();
-                    if (STOLON.Input.IsClicked(Keys.S)) _drawingContext.Screenshot();
+                    if (_input.IsClicked(Keys.F)) GoFullscreen();
+                    if (_input.IsClicked(Keys.S)) _drawingContext.Screenshot();
                 }
             }
             base.Update(gameTime);
@@ -179,7 +188,7 @@ namespace STOLON
             _drawingContext.BeginScene();
 
             _environment.Draw(_drawingContext);
-            _drawingContext.DrawString(STOLON.Fonts.Small, Version, new Vector2(V_WIDTH / 2 - STOLON.Fonts.Small.FastMeasure(Version).X / 2, 500));
+            //_drawingContext.DrawString(_fonts.Small, Version, new Vector2(V_WIDTH / 2 - _fonts.Small.FastMeasure(Version).X / 2, 500));
             _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
             _drawingContext.EndScene();
@@ -190,47 +199,24 @@ namespace STOLON
 #nullable disable
         public static bool IsInitiated { get; private set; }
 
-        #region INSTANCE
+        public static STOLON Instance { get; private set; }
 
-        private static T ThrowIfNotInitiated<T>(T value) => IsInitiated ? value : throw new InvalidOperationException("Instance is not initiated.");
+        public static DrawingContext DrawingContext { get; private set; }
 
-        private static class BackingFields
+        private static IContainer _container;
+        public new static IContainer Services
         {
-            public static Texture2DCollection _textures;
-            public static Font2DCollection _fonts;
-            public static EffectResourceCollection _effects;
-            public static CachedAudioResourceCollection _audio;
-            public static AudioEngine _audioEngine;
-            public static RichLogger _logger;
-            public static GameEnvironment _environment;
-            public static InputManager _input;
-            public static SceneManager _scenes;
-            public static Interface _ui;
-            public static Configuration _config;
-            public static DrawingContext _drawingContext;
-            public static TaskHeap _tasks;
-            public static STOLON _instance;
+            get => _container;
+            set
+            {
+                if (_container is not null) throw new InvalidOperationException("Container can only be set once.");
+                _container = value;
+            }
         }
 
-        public static STOLON Instance { get => ThrowIfNotInitiated(BackingFields._instance); private set => BackingFields._instance = value; }
-        public static Texture2DCollection Textures { get => ThrowIfNotInitiated(BackingFields._textures); set => BackingFields._textures = value; }
-        public static Font2DCollection Fonts { get => ThrowIfNotInitiated(BackingFields._fonts); private set => BackingFields._fonts = value; }
-        public static EffectResourceCollection Effects { get => ThrowIfNotInitiated(BackingFields._effects); private set => BackingFields._effects = value; }
-        public static CachedAudioResourceCollection Audio { get => ThrowIfNotInitiated(BackingFields._audio); private set => BackingFields._audio = value; }
-        public static AudioEngine AudioEngine { get => ThrowIfNotInitiated(BackingFields._audioEngine); private set => BackingFields._audioEngine = value; }
-        public static RichLogger Logger { get => BackingFields._logger; set => BackingFields._logger = value; }
-        public static GameEnvironment Environment { get => ThrowIfNotInitiated(BackingFields._environment); private set => BackingFields._environment = value; }
-        public static InputManager Input { get => ThrowIfNotInitiated(BackingFields._input); private set => BackingFields._input = value; }
-        public static SceneManager Scenes { get => BackingFields._scenes; internal set => BackingFields._scenes = value; }
-        public static Interface UI { get => BackingFields._ui; internal set => BackingFields._ui = value; }
-        public static Configuration Config { get => BackingFields._config; internal set => BackingFields._config = value; }
-        public static DrawingContext DrawingContext { get => BackingFields._drawingContext; internal set => BackingFields._drawingContext = value; }
-        public static TaskHeap Tasks { get => BackingFields._tasks; internal set => BackingFields._tasks = value; }
-
-        #endregion
 #nullable enable
 
-        public static string Version { get; }
+        public static string Version { get; } = File.ReadAllText(".version");
 
         public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
         public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;
@@ -239,17 +225,5 @@ namespace STOLON
         public const int VIRTUAL_MODIFIER = 57;
         public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / (float)ASPECT_RATIO_Y;
 
-        static STOLON()
-        {
-            Version = File.ReadAllText(".version");
-        }
-
-        public static T[] Scan<T>() where T : class
-        {
-            Logger.Log($"called assembly scan for type '{typeof(T).FullName}\".");
-            return Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => typeof(T).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-                .Select(t => (Activator.CreateInstance(t) as T)!).ToArray();
-        }
     }
 }

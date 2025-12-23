@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STOLON.CLI
 {
@@ -12,7 +7,7 @@ namespace STOLON.CLI
     {
         public static void OpenDirectory(string path)
         {
-            using Process p = Process.Start(Environment.OSVersion.Platform switch
+            using Process p = Process.Start(System.Environment.OSVersion.Platform switch
             {
                 PlatformID.Win32NT => "explorer.exe",
                 PlatformID.Unix => "xdg-open",

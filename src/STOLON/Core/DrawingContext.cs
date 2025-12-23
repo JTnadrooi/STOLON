@@ -7,7 +7,7 @@
         NearestNeighbour,
     }
 
-    public class DrawingContext : IDisposable
+    public class DrawingContext : IDisposable, ISingletonDependency
     {
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
@@ -31,7 +31,7 @@
         private bool _screenshotPending;
         private bool _disposedValue;
         private readonly GraphicsDevice _graphics;
-        private readonly Dictionary<string, Shader> _shaders;
+        private readonly Dictionary<string, Shader> _shaderDict;
         private RenderTarget2D _vrt1;
         private RenderTarget2D _vrt2;
         private RenderTarget2D _rt1;
@@ -44,9 +44,21 @@
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
 
-        public DrawingContext()
+        private readonly IRichLogger _logger;
+        private readonly IConfiguration _config;
+        private readonly IFont2DCollection _fonts;
+        private readonly ITexture2DCollection _textures;
+        private readonly IEnumerable<Shader> _shaders;
+
+        public DrawingContext(IRichLogger logger, IConfiguration config, IFont2DCollection fonts, ITexture2DCollection textures, IEnumerable<Shader> shaders)
         {
-            STOLON.Logger.Log(">[s]initialising drawing context");
+            _logger = logger;
+            _config = config;
+            _fonts = fonts;
+            _textures = textures;
+            _shaders = shaders;
+
+            _logger.Log(">[s]initialising drawing context");
             SpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _graphics = STOLON.Instance.GraphicsDevice;
 
@@ -59,27 +71,25 @@
 
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
 
-            _shaders = new Dictionary<string, Shader>();
-            Shaders = _shaders.AsReadOnly();
+            _shaderDict = new Dictionary<string, Shader>();
+            Shaders = _shaderDict.AsReadOnly();
 
-            Shader[] tempShaders = STOLON.Scan<Shader>();
-
-            STOLON.Logger.Log(">searching for effects");
-            foreach (Shader shader in tempShaders)
+            _logger.Log(">searching for effects");
+            foreach (Shader shader in _shaders)
             {
-                STOLON.Logger.Log($"found effect with name '{shader.Effect.Name}'.");
-                _shaders.Add(shader.Effect.Name, shader);
+                _logger.Log($"found effect with name '{shader.Effect.Name}'.");
+                _shaderDict.Add(shader.Effect.Name, shader);
             }
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            _ditherAtlas = Texture2DAtlas.Create("dither_tile", STOLON.Textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
+            _ditherAtlas = Texture2DAtlas.Create("dither_tile", _textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
             _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.V_WIDTH, STOLON.V_HEIGHT);
 
-            if (!STOLON.Config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
-            ScalingMethod = Enum.Parse<ScalingMethod>(STOLON.Config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
+            if (!_config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
+            ScalingMethod = Enum.Parse<ScalingMethod>(_config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
             Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
 
-            STOLON.Logger.Success();
+            _logger.Success();
         }
 
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
@@ -114,38 +124,38 @@
             _rt2.Dispose();
             _rt2 = GetDesired(newRes);
 
-            foreach (Shader effect in _shaders.Values.Where(e => !e.IsVirtual))
+            foreach (Shader effect in _shaderDict.Values.Where(e => !e.IsVirtual))
             {
                 effect.UpdateResolution(newRes);
             }
 
             Scale = newRes.X / (float)STOLON.V_WIDTH;
 
-            STOLON.Logger.Log($"updated fx pipeline res with new scale '{Scale}'");
+            _logger.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
 
         public void DisableShader(string name)
         {
-            if (!_shaders[name].IsEnabled)
+            if (!_shaderDict[name].IsEnabled)
             {
-                STOLON.Logger.Log($"effect '{name}' already disabled.");
+                _logger.Log($"effect '{name}' already disabled.");
                 return;
             }
-            _shaders[name].IsEnabled = false;
-            STOLON.Logger.Log($"disabled effect with name '{name}'.");
+            _shaderDict[name].IsEnabled = false;
+            _logger.Log($"disabled effect with name '{name}'.");
         }
 
-        public bool IsEnabled(string name) => _shaders[name].IsEnabled;
+        public bool IsEnabled(string name) => _shaderDict[name].IsEnabled;
 
         public void EnableShader(string name)
         {
-            if (_shaders[name].IsEnabled)
+            if (_shaderDict[name].IsEnabled)
             {
-                STOLON.Logger.Log($"effect '{name}' already enabled.");
+                _logger.Log($"effect '{name}' already enabled.");
                 return;
             }
-            _shaders[name].IsEnabled = true;
-            STOLON.Logger.Log($"enabled effect with name '{name}'.");
+            _shaderDict[name].IsEnabled = true;
+            _logger.Log($"enabled effect with name '{name}'.");
         }
 
         #region SCREENSHOT
@@ -153,28 +163,28 @@
         public void Screenshot()
         {
             _screenshotPending = true;
-            STOLON.Logger.Log("screenshot request submitted.");
+            _logger.Log("screenshot request submitted.");
         }
 
         private string ScreenshotFrom(RenderTarget2D virtualFinal)
         {
-            STOLON.Logger.Log(">attempting screenshot.");
+            _logger.Log(">attempting screenshot.");
 
             STOLON.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Directory.CreateDirectory("Screenshots");
 
-            STOLON.Logger.Log(">getting screenshot file index.");
+            _logger.Log(">getting screenshot file index.");
 
             int screenshotIndex = 0;
             for (; true; screenshotIndex++)
                 if (!File.Exists($"Screenshots\\sl_screenshot{screenshotIndex}.png")) break;
 
-            STOLON.Logger.Log("<found avalible with id: " + screenshotIndex);
+            _logger.Log("<found avalible with id: " + screenshotIndex);
 
             string path = $"Screenshots\\sl_screenshot{screenshotIndex}.png";
 
-            STOLON.Logger.Log(">reading and flipping screentexture data.");
+            _logger.Log(">reading and flipping screentexture data.");
             Color[] data = new Color[virtualFinal.Width * virtualFinal.Height];
             virtualFinal.GetData(data);
 
@@ -190,13 +200,13 @@
             }
 
             _screenshotCache.SetData(data);
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            STOLON.Logger.Log(">saving screentexture to file.");
+            _logger.Log(">saving screentexture to file.");
             using (FileStream stream = File.Create(path)) _screenshotCache.SaveAsPng(stream, STOLON.V_WIDTH, STOLON.V_HEIGHT);
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            STOLON.Logger.Success();
+            _logger.Success();
             return path;
         }
 
@@ -217,7 +227,7 @@
 
             RenderTarget2D finalVTarget = _vrt1;
 
-            foreach (Shader shader in _shaders.Values.Where(e => e.IsVirtual && e.IsEnabled)) // apply virtual effects.
+            foreach (Shader shader in _shaderDict.Values.Where(e => e.IsVirtual && e.IsEnabled)) // apply virtual effects.
             {
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -237,7 +247,7 @@
 
             RenderTarget2D finalTarget = _rt1;
 
-            foreach (Shader shader in _shaders.Values.Where(e => !e.IsVirtual && e.IsEnabled)) // apply normal effects.
+            foreach (Shader shader in _shaderDict.Values.Where(e => !e.IsVirtual && e.IsEnabled)) // apply normal effects.
             {
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
@@ -320,7 +330,7 @@
         #region DRAW_FUNCTIONS
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
-            => Draw(STOLON.Textures.Pixel, destinationRectangle, color: color);
+            => Draw(_textures.Pixel, destinationRectangle, color: color);
         public void Draw(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
             => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
         public void Draw(Texture2D texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
@@ -400,7 +410,7 @@
                 _vrt2.Dispose();
                 _rt1.Dispose();
                 _rt2.Dispose();
-                foreach (Shader shader in _shaders.Values) (shader as IDisposable)?.Dispose();
+                foreach (Shader shader in _shaderDict.Values) (shader as IDisposable)?.Dispose();
                 _disposedValue = true;
             }
         }

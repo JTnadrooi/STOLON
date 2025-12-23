@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace STOLON.CLI.Build
+﻿namespace STOLON.CLI.Build
 {
     public class FontsBuilder : IBuilder
     {

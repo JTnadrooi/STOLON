@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides a way to "fire and forget" simple game logic.
     /// </summary>
-    public class TaskHeap
+    public class TaskHeap : ITaskHeap, ISingletonDependency
     {
         public ReadOnlyDictionary<string, DynamicTask> Functions { get; }
         public ReadOnlyDictionary<string, object?> FrameCompletedTasks { get; }
@@ -13,8 +13,12 @@
         private Dictionary<string, int> _taskWaitDataCollection;
         private List<string> _allCompletedTasks;
 
-        public TaskHeap()
+        private readonly IRichLogger _logger;
+
+        public TaskHeap(IRichLogger logger)
         {
+            _logger = logger;
+
             _taskDictionary = new Dictionary<string, DynamicTask>();
             _frameCompletedTasks = new Dictionary<string, object?>();
             _taskWaitDataCollection = new Dictionary<string, int>();
@@ -31,7 +35,7 @@
             {
                 if (_taskWaitDataCollection[taskKvp.Key] < 0)
                 {
-                    STOLON.Logger.Log("(interupt:taskheap) runningtask with id; " + taskKvp.Key);
+                    _logger.Log("(interupt:taskheap) runningtask with id; " + taskKvp.Key);
                     ForceRun(taskKvp.Key);
                 }
                 else _taskWaitDataCollection[taskKvp.Key] -= elapsedMilliseconds;
@@ -81,18 +85,18 @@
             if (waitTime < 0)
             {
                 object? ret = dynamicTask.Run();
-                STOLON.Logger.Log("insta-ran task with id: " + id);
+                _logger.Log("insta-ran task with id: " + id);
                 _frameCompletedTasks.Add(id, ret);
                 _allCompletedTasks.Add(id);
                 return;
             }
 
             if (_taskDictionary.ContainsKey(id))
-                if (overwrite) STOLON.Logger.Log("key already known, overwriting task with id: " + id);
+                if (overwrite) _logger.Log("key already known, overwriting task with id: " + id);
                 else return;
             _taskWaitDataCollection[id] = waitTime;
             _taskDictionary[id] = dynamicTask;
-            STOLON.Logger.Log("pushed task with id: " + id);
+            _logger.Log("pushed task with id: " + id);
         }
         public void Push(string id, DynamicTask dynamicTask, int waitTime)
         {
@@ -101,13 +105,13 @@
         }
         public string EnsurePush(DynamicTask dynamicTask, int waitTime)
         {
-            STOLON.Logger.Log(">ensuring task push.");
+            _logger.Log(">ensuring task push.");
             string id = Enumerable.Range(0, int.MaxValue).Select(i => "__" + i).First(key => !_taskDictionary.ContainsKey(key));
 
             Push(id, dynamicTask, waitTime);
 
-            STOLON.Logger.Log("task pushed with id: " + id);
-            STOLON.Logger.Success();
+            _logger.Log("task pushed with id: " + id);
+            _logger.Success();
 
             return id;
         }

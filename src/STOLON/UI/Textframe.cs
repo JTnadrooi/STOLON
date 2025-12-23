@@ -1,8 +1,5 @@
 
 using Betwixt;
-using Math = System.Math;
-
-
 
 namespace STOLON
 {
@@ -27,7 +24,7 @@ namespace STOLON
             }).ToArray(), info.PostMilliseconds);
         }
     }
-    public class Textframe : Service
+    public class Textframe : Service, ITextframe, ISingletonDependency
     {
         private Queue<DialogueInfo> _dialogueQueue;
         private Rectangle _dialoguebounds;
@@ -62,8 +59,15 @@ namespace STOLON
         public const int BOX_H = 96;
         public const int BOX_OFFSET_Y = 10;
 
-        public Textframe() : base(STOLON.UI)
+        private readonly IRichLogger _logger;
+        private readonly IFont2DCollection _fonts;
+        private readonly IInputManager _input;
+
+        public Textframe(IRichLogger logger, IFont2DCollection fonts, IInputManager input) : base(null)
         {
+            _logger = logger;
+            _fonts = fonts;
+
             _dialogueQueue = new Queue<DialogueInfo>();
             _dialogueTextPos = Point.Zero;
             _currentDialogue = null;
@@ -72,7 +76,8 @@ namespace STOLON
             _msSinceLastChar = 0;
             _charsRead = 0;
             _toDrawDialogueText = string.Empty;
-            _font = STOLON.Fonts.Medium;
+            _font = _fonts.Medium;
+            _input = input;
         }
         public void Queue(DialogueInfo[] dialogue)
         {
@@ -82,15 +87,15 @@ namespace STOLON
         public void Queue(DialogueInfo dialogue)
         {
             _dialogueQueue.Enqueue(dialogue);
-            STOLON.Logger.Log("dialogue queued with text: " + dialogue.Text);
+            _logger.Log("dialogue queued with text: " + dialogue.Text);
         }
         public void Next()
         {
             if (_dialogueQueue.Count == 0) throw new Exception();
 
-            STOLON.Logger.Log(">attempting dequeuing of dialogue with text: " + _dialogueQueue.Peek().Text);
+            _logger.Log(">attempting dequeuing of dialogue with text: " + _dialogueQueue.Peek().Text);
             bool providerDiffers = _currentDialogue.HasValue && _currentDialogue.Value.Provider.Name != _dialogueQueue.Peek().Provider.Name;
-            if (providerDiffers) STOLON.Logger.Log("dialogue has new provider of name: " + _dialogueQueue.Peek().Provider.Name);
+            if (providerDiffers) _logger.Log("dialogue has new provider of name: " + _dialogueQueue.Peek().Provider.Name);
 
             _currentDialogue = _dialogueQueue.Dequeue();
             _currentDialogueDrawArgs = DialogueDrawArgs.FromInfo(_currentDialogue.Value);
@@ -110,7 +115,7 @@ namespace STOLON
                 _providerTextSizeTweener.Start();
             }
 
-            STOLON.Logger.Success();
+            _logger.Success();
         }
 
         //public void Queue(int count, Func<string, int, string>? selector = null)
@@ -158,7 +163,7 @@ namespace STOLON
             }
 
             if (_awaitingMouseDialogueHover) textFrameGoUp = true;
-            if (DialogueBounds.Contains(STOLON.Input.VirtualMousePos) && !_hide)
+            if (DialogueBounds.Contains(_input.VirtualMousePos) && !_hide)
             {
                 _awaitingMouseDialogueHover = false;
                 textFrameGoUp = true;

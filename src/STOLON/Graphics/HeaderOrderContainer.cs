@@ -10,9 +10,9 @@
         private const int PADDING_X = 8;
         private const int PADDING_Y = 4;
 
-        public HeaderOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
+        public HeaderOrderContainer(IEnumerable<UIElement> elements, Font2D font, IInputManager input, Vector2? position = null) : base(elements, input, position)
         {
-            _font = STOLON.Fonts.Medium;
+            _font = font;
             _leftSpace = 0;
         }
 
@@ -25,7 +25,7 @@
         public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(32 / 2 - _font.Dimensions.Y / 2 - PADDING_Y), out Point textPos);
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), PADDING_X, PADDING_Y, 5, (int)(32 / 2 - _font.Dimensions.Y / 2 - PADDING_Y), _font, out Point textPos);
             _leftSpace += bounds.Width + 5;
 
             isHovered = false;

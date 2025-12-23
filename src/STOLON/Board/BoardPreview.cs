@@ -1,4 +1,6 @@
-﻿namespace STOLON
+﻿using Autofac;
+
+namespace STOLON
 {
     public class BoardPreview : IGraphic
     {
@@ -20,11 +22,15 @@
 
         public const int TILE_SIZE = 16;
 
-        public BoardPreview(BoardState state)
+        private readonly Font2D _font;
+
+        public BoardPreview(BoardState state, Font2D font)
         {
             SourceState = state;
 
-            _tileTexure = STOLON.Textures["Debug\\temp-" + TILE_SIZE];
+            _font = font;
+
+            _tileTexure = STOLON.Services.Resolve<ITexture2DCollection>()["Debug\\temp-" + TILE_SIZE];
         }
         public void Draw(DrawingContext drawingContext)
         {
@@ -32,7 +38,7 @@
                 for (int y = 0; y < SourceState.Dimensions.Y; y++)
                 {
                     //drawingContext.Draw(_tileTexure, Pos + new Vector2(x, y) * TILE_SIZE);
-                    drawingContext.DrawString(STOLON.Fonts.Small, "?", Pos + new Vector2(x, y) * TILE_SIZE + new Vector2(7, 3));
+                    drawingContext.DrawString(_font, "?", Pos + new Vector2(x, y) * TILE_SIZE + new Vector2(7, 3));
                 }
             drawingContext.DrawRectangle(Bounds, Color.White, 2);
         }

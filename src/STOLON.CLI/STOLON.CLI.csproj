@@ -21,6 +21,9 @@
 		<None Include="..\STOLON\resources\**\*.*" Link="resources\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Autofac" Version="9.0.0" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\STOLON\STOLON.csproj" />
 	</ItemGroup>
 

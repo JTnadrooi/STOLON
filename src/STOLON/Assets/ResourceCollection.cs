@@ -1,12 +1,15 @@
-﻿using System.Collections;
+﻿using Autofac;
+using System.Collections;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 
 namespace STOLON
 {
-    public abstract class ResourceCollection : IDisposable
+    public abstract class ResourceCollection : IDisposable, IResourceCollection
     {
         private bool _disposedValue;
+
+        public abstract bool IsLoaded { get; }
 
         public abstract void LoadResources();
         public abstract void UnloadResources();
@@ -29,15 +32,15 @@ namespace STOLON
             GC.SuppressFinalize(this);
         }
 
-        public static TResourceCollection Load<TResourceCollection>() where TResourceCollection : ResourceCollection, new()
+        public static TResourceCollection Load<TResourceCollection>(IContainer container) where TResourceCollection : ResourceCollection
         {
-            TResourceCollection collection = new TResourceCollection();
+            TResourceCollection collection = container.Resolve<TResourceCollection>();
             collection.LoadResources();
             return collection;
         }
     }
 
-    public abstract class ResourceCollection<TContent> : ResourceCollection, IEnumerable<TContent>, IReadOnlyDictionary<string, TContent>
+    public abstract class ResourceCollection<TContent> : ResourceCollection, IResourceCollection<TContent>
     {
         public FrozenDictionary<string, TContent>? _resources;
 
@@ -46,6 +49,8 @@ namespace STOLON
             get => _resources ?? throw new InvalidOperationException($"Resources for ResourceCollection<{typeof(TContent)}> are not loaded yet.");
             private set => _resources = value;
         }
+
+        public override bool IsLoaded => _resources is not null;
 
         public IEnumerable<string> Keys => Resources.Keys;
         public IEnumerable<TContent> Values => Resources.Values;

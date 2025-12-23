@@ -45,7 +45,7 @@
         //public static Player[] PlayersCom => new Player[]
         //                {
         //                    new Player("player0"),
-        //                    STOLON.Environment.Entities["goldsilk"].GetPlayer()
+        //                    _environment.Entities["goldsilk"].GetPlayer()
         //                };
     }
 }

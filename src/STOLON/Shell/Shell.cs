@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public class Shell : Service
+    public class Shell : Service, ISingletonDependency
     {
         private string _text;
         private Font2D _font;
@@ -12,10 +12,20 @@
 
         public bool IsFocus { get; set; }
 
-        public Shell() : base(STOLON.Environment)
+        private readonly IRichLogger _logger;
+        private readonly Environment _environment;
+        private readonly IFont2DCollection _fonts;
+        private readonly IInputManager _input;
+
+        public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input) : base(null)
         {
+            _logger = logger;
+            _environment = environment;
+            _fonts = fonts;
+            _input = input;
+
             _text = string.Empty;
-            _font = STOLON.Fonts.Medium;
+            _font = _fonts.Medium;
             _textScale = Vector2.One;
             _debugCursorPos = Vector2.Zero;
 
@@ -42,9 +52,9 @@
             _textPos = new Vector2(10, STOLON.V_HEIGHT - _font.Dimensions.Y - _font.Dimensions.Y * lines);
 
 
-            if (STOLON.Input.IsClicked(MouseButton.Left))
+            if (_input.IsClicked(MouseButton.Left))
             {
-                int index = GetCharacterIndexAt(STOLON.Input.VirtualMousePos);
+                int index = GetCharacterIndexAt(_input.VirtualMousePos);
 
                 Console.WriteLine(index);
 
@@ -85,7 +95,7 @@
         public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawString(_font, _text, _textPos, scale: _textScale);
-            drawingContext.DrawLine(STOLON.Input.VirtualMousePos, STOLON.Input.VirtualMousePos);
+            drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
         }
 
         #region TEMP_UTILS

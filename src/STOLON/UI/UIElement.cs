@@ -20,7 +20,6 @@
     public class UIElement
     {
         public bool IsTop => ParentId == TOP_ID;
-        public CachedAudio ClickSound { get; }
         public const string TOP_ID = "_";
         /// <summary>
         /// The type of the <see cref="UIElement"/>.
@@ -56,14 +55,11 @@
             Order = order;
             ParentId = parentId;
             DrawArguments = drawArgs;
-            ClickSound = clickSound ?? STOLON.Audio["select_3"];
             Skip = false;
         }
-        public Rectangle GetBounds(Point pos, int padding, int margin, out Point textPos, Font2D? font = null) => GetBounds(pos, padding, padding, margin, margin, out textPos, font);
-        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, out Point textPos, Font2D? font = null)
+        public Rectangle GetBounds(Point pos, int padding, int margin, Font2D font, out Point textPos) => GetBounds(pos, padding, padding, margin, margin, font, out textPos);
+        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, Font2D font, out Point textPos)
         {
-            font ??= STOLON.Fonts.Medium;
-
             Vector2 contentSize = font.FastMeasure(Text);
             int recW = (int)contentSize.X + 2 * paddingX;
             int recH = (int)contentSize.Y + 2 * paddingY;
@@ -125,9 +121,8 @@
             Hide = hide;
             DrawBackground = drawBg;
         }
-        public override string ToString() => $"{{Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
 
-        public static UIElementDrawData Empty = new UIElementDrawData(null, string.Empty, STOLON.Fonts.Medium, UIElementType.Ignore, default, default, false, true);
+        public override string ToString() => $"{{Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
     }
     /// <summary>
     /// The data element relevant for update methods. <i>(Knowing when an <see cref="UIElement"/> is clicked.)</i>
@@ -141,11 +136,11 @@
         /// <summary>
         /// A value indicating if the source <see cref="UIElement"/> is pressed by the mouse.
         /// </summary>
-        public bool IsPressed => IsHovered && STOLON.Input.CurrentMouse.LeftButton == ButtonState.Pressed;
+        public bool IsPressed(IInputManager input) => IsHovered && input.CurrentMouse.LeftButton == ButtonState.Pressed;
         /// <summary>
         /// A value indicating if the source <see cref="UIElement"/> is clicked by the mouse.
         /// </summary>
-        public bool IsClicked => IsPressed && STOLON.Input.PreviousMouse.LeftButton == ButtonState.Released;
+        public bool IsClicked(IInputManager input) => IsPressed(input) && input.PreviousMouse.LeftButton == ButtonState.Released;
         public bool IsEmpty => Source == null;
         public UIElement? Source { get; }
         /// <summary>

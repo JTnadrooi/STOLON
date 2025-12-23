@@ -1,224 +1,235 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using Math = System.Math;
+﻿//using Autofac;
+//using System.Collections.Concurrent;
+//using System.Diagnostics;
+//using Math = System.Math;
 
 
 
-namespace STOLON
-{
-    /// <summary>
-    /// Goldsilk hates the player.
-    /// </summary>
-    public class GoldsilkEntity : Entity
-    {
-        public override Computer Computer => _computer;
+//namespace STOLON
+//{
+//    /// <summary>
+//    /// Goldsilk hates the player.
+//    /// </summary>
+//    public class GoldsilkEntity : Entity
+//    {
+//        public override Computer Computer => _computer;
 
-        private GoldsilkComputer _computer;
+//        private GoldsilkComputer _computer;
 
-        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl")
-        {
-            _computer = new GoldsilkComputer(this);
-        }
-        protected override EntityProfile ResolveProfile()
-            => EntityProfile.GetDebug("goldsilk");
-    }
-    /// <summary>
-    /// The computer <see cref="GoldsilkEntity"/> uses to play.
-    /// </summary>
-    public class GoldsilkComputer : Computer
-    {
-        private int negaCount = 0;
-        private const int EVAL_SCORE = 10000;
-        public GoldsilkComputer(GoldsilkEntity source) : base(source) { }
-        public override void DoMove(Board board)
-        {
-            int current = board.State.CurrentPlayerId;
-            board.State.Alter(Search(board.State, board.UniqueMoveBoardMap, 3).Move, true);
+//        public GoldsilkEntity() : base("goldsilk", "Goldsilk", "Gl")
+//        {
+//            _computer = STOLON.Container.GetInstance<GoldsilkComputer>();
+//        }
+//        protected override EntityProfile ResolveProfile()
+//            => EntityProfile.GetDebug("goldsilk");
+//    }
+//    /// <summary>
+//    /// The computer <see cref="GoldsilkEntity"/> uses to play.
+//    /// </summary>
+//    public class GoldsilkComputer : Computer
+//    {
+//        private int negaCount = 0;
+//        private const int EVAL_SCORE = 10000;
 
-            int ret = board.State.SearchAny();
-            if (ret == current) // this makes it so when goldsilk finds a connect four right after the player does, she wins. This is a bug but I'm calling it a feature.
-                STOLON.Environment.Overlayer.Activate("transition", null, () =>
-                {
-                    board.Reset();
-                }, "4 Connected found for player " + board.GetPlayerTile(ret) + "!");
-        }
-        public NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
-        {
-            STOLON.Logger.Log(">[s]initializing parallel alpha-beta algorithm..");
+//        private readonly IRichLogger _logger;
+//        private readonly Environment _environment;
 
-            ConcurrentDictionary<int, TTEntry> tt = new ConcurrentDictionary<int, TTEntry>();
-            List<Move> moves = map.GetAllMoves(state);
-            int color = state.CurrentPlayerId == 1 ? 1 : -1;
-            List<(int score, Move move)> negaMaxedMoves = new List<(int score, Move move)>();
-            List<(int score, Move move)> evaluatedMoves = new List<(int score, Move move)>();
-            Stopwatch stopwatch = Stopwatch.StartNew();
+//        public GoldsilkComputer(GoldsilkEntity source, IRichLogger logger, Environment environment) : base(source)
+//        {
+//            _logger = logger;
+//            _environment = environment;
+//        }
 
-            negaCount = 0;
-            object lockObj = new object();
-            object copyLockObj = new object();
+//        public override void DoMove(Board board)
+//        {
+//            int current = board.State.CurrentPlayerId;
+//            board.State.Alter(Search(board.State, board.UniqueMoveBoardMap, 3).Move, true);
 
-            Parallel.For(0, moves.Count, i =>
-            {
-                BoardState child = state.DeepCopy();
-                Point sim = child.Alter(moves[i], true);
+//            int ret = board.State.SearchAny();
+//            if (ret == current) // this makes it so when goldsilk finds a connect four right after the player does, she wins. This is a bug but I'm calling it a feature.
+//                _environment.Overlayer.Activate("transition", null, () =>
+//                {
+//                    board.Reset();
+//                }, "4 Connected found for player " + board.GetPlayerTile(ret) + "!");
+//        }
 
-                int score = -Negamax(child, sim, map, tt, depth, -EVAL_SCORE, EVAL_SCORE, color);
+//        public NegamaxEndResult Search(BoardState state, UniqueMoveBoardMap map, int depth)
+//        {
+//            _logger.Log(">[s]initializing parallel alpha-beta algorithm..");
 
-                lock (lockObj)
-                {
-                    STOLON.Logger.Log("evaluated move " + moves[i] + ", winstate score: " + score + ".");
-                    negaMaxedMoves.Add((score, moves[i]));
-                }
-            });
+//            ConcurrentDictionary<int, TTEntry> tt = new ConcurrentDictionary<int, TTEntry>();
+//            List<Move> moves = map.GetAllMoves(state);
+//            int color = state.CurrentPlayerId == 1 ? 1 : -1;
+//            List<(int score, Move move)> negaMaxedMoves = new List<(int score, Move move)>();
+//            List<(int score, Move move)> evaluatedMoves = new List<(int score, Move move)>();
+//            Stopwatch stopwatch = Stopwatch.StartNew();
 
-            STOLON.Logger.Log(">attemting further move ordering");
+//            negaCount = 0;
+//            object lockObj = new object();
+//            object copyLockObj = new object();
 
-            negaMaxedMoves = negaMaxedMoves.Select((x, i) => new { Index = i, Value = x })
-                .Where(x => x.Value.score == negaMaxedMoves.Select(t => t.score).Max())
-                .Select(x => x.Value).ToList();
-            foreach ((int score, Move move) moveTuple in negaMaxedMoves)
-            {
-                int score = MoveEvaluate(state, moveTuple.move, moveTuple.score);
-                evaluatedMoves.Add((score, moveTuple.move));
+//            Parallel.For(0, moves.Count, i =>
+//            {
+//                BoardState child = state.DeepCopy();
+//                Point sim = child.Alter(moves[i], true);
 
-                STOLON.Logger.Log("move " + moveTuple.move + " has an evaluated score of " + score + ".");
-            }
-            STOLON.Logger.Success();
-            STOLON.Logger.Log(">attempting best move selection");
-            (int score, Move move) bestItem = evaluatedMoves.Where(t => t.score == evaluatedMoves.Select(t => t.score).Max()).First();
+//                int score = -Negamax(child, sim, map, tt, depth, -EVAL_SCORE, EVAL_SCORE, color);
 
-            stopwatch.Stop();
-            STOLON.Logger.Log("bestMove found with a score of: " + bestItem.score + " and move " + bestItem.move);
-            STOLON.Logger.Success();
-            STOLON.Logger.Success();
-            return new NegamaxEndResult(bestItem.move, negaCount, (int)stopwatch.ElapsedMilliseconds);
-        }
-        public int MoveEvaluate(BoardState state, Move move, int score)
-        {
-            STOLON.Logger.Log(">starting eval of move " + move + "..");
+//                lock (lockObj)
+//                {
+//                    _logger.Log("evaluated move " + moves[i] + ", winstate score: " + score + ".");
+//                    negaMaxedMoves.Add((score, moves[i]));
+//                }
+//            });
 
-            int connectScore;
-            int positionalScore;
-            int randomScore;
-            int outScore;
+//            _logger.Log(">attemting further move ordering");
 
-            Tile sim = move.ToTile(state.CurrentPlayerId, state).Simulate(state);
-            state.Alter(move, true);
+//            negaMaxedMoves = negaMaxedMoves.Select((x, i) => new { Index = i, Value = x })
+//                .Where(x => x.Value.score == negaMaxedMoves.Select(t => t.score).Max())
+//                .Select(x => x.Value).ToList();
+//            foreach ((int score, Move move) moveTuple in negaMaxedMoves)
+//            {
+//                int score = MoveEvaluate(state, moveTuple.move, moveTuple.score);
+//                evaluatedMoves.Add((score, moveTuple.move));
 
-            connectScore = state.DeepSearchFrom(sim.TiledPosition, out _, null).Score;
-            STOLON.Logger.Log("move has a connectScore of " + connectScore);
+//                _logger.Log("move " + moveTuple.move + " has an evaluated score of " + score + ".");
+//            }
+//            _logger.Success();
+//            _logger.Log(">attempting best move selection");
+//            (int score, Move move) bestItem = evaluatedMoves.Where(t => t.score == evaluatedMoves.Select(t => t.score).Max()).First();
 
-            int distanceFromCenter = (int)MathF.Abs((sim.TiledPosition.X - (state.Dimensions.X / 2f))); // more = bad
-            int distanceFromGround = Math.Abs(move.Origin.Y - sim.TiledPosition.Y); // more = bad
-            positionalScore = distanceFromCenter * distanceFromCenter * -1 * distanceFromGround * distanceFromGround;
-            STOLON.Logger.Log("move has a positionalScore of " + positionalScore + ", xDelta: " + distanceFromCenter + ", yDelta: " + distanceFromGround);
+//            stopwatch.Stop();
+//            _logger.Log("bestMove found with a score of: " + bestItem.score + " and move " + bestItem.move);
+//            _logger.Success();
+//            _logger.Success();
+//            return new NegamaxEndResult(bestItem.move, negaCount, (int)stopwatch.ElapsedMilliseconds);
+//        }
+//        public int MoveEvaluate(BoardState state, Move move, int score)
+//        {
+//            _logger.Log(">starting eval of move " + move + "..");
 
-            Random random = new Random();
-            randomScore = random.Next(1, 40);
-            STOLON.Logger.Log("move has a randomScore of " + randomScore);
+//            int connectScore;
+//            int positionalScore;
+//            int randomScore;
+//            int outScore;
 
-            state.Undo();
-            outScore = score + connectScore + positionalScore + randomScore;
+//            Tile sim = move.ToTile(state.CurrentPlayerId, state).Simulate(state);
+//            state.Alter(move, true);
 
-            STOLON.Logger.Log("total: " + outScore);
-            STOLON.Logger.Success();
+//            connectScore = state.DeepSearchFrom(sim.TiledPosition, out _, null).Score;
+//            _logger.Log("move has a connectScore of " + connectScore);
 
-            return outScore;
-        }
-        public struct MinMaxResult
-        {
-            public int Score { get; }
-            public Move Move { get; }
-            public MinMaxResult(int score, Move move)
-            {
-                Score = score;
-                Move = move;
-            }
+//            int distanceFromCenter = (int)MathF.Abs((sim.TiledPosition.X - (state.Dimensions.X / 2f))); // more = bad
+//            int distanceFromGround = Math.Abs(move.Origin.Y - sim.TiledPosition.Y); // more = bad
+//            positionalScore = distanceFromCenter * distanceFromCenter * -1 * distanceFromGround * distanceFromGround;
+//            _logger.Log("move has a positionalScore of " + positionalScore + ", xDelta: " + distanceFromCenter + ", yDelta: " + distanceFromGround);
 
-            public MinMaxResult InvertScore() => new MinMaxResult(-Score, Move);
-            public override string ToString() => $"{{Score: {Score}, Move: {Move}}}";
-            public static MinMaxResult operator -(MinMaxResult result) => result.InvertScore();
-        }
+//            Random random = new Random();
+//            randomScore = random.Next(1, 40);
+//            _logger.Log("move has a randomScore of " + randomScore);
 
-        public int Negamax(BoardState node, Point sim, UniqueMoveBoardMap map, IDictionary<int, TTEntry> tt, int depth, int alpha, int beta, int color)
-        {
+//            state.Undo();
+//            outScore = score + connectScore + positionalScore + randomScore;
 
-            //int alphaOrig = alpha;
-            //int stateCode = node.GetStateCode();
-            //if (tt.TryGetValue(stateCode, out TTEntry ttEntry) && ttEntry.Depth >= depth)
-            //{
-            //    //Console.WriteLine(ttEntry);
-            //    if (ttEntry.Flag == NodeState.EXACT) return ttEntry.Value;
-            //    else if (ttEntry.Flag == NodeState.LOWERBOUND)
-            //        alpha = Math.Max(alpha, ttEntry.Value);
-            //    else beta = Math.Min(beta, ttEntry.Value); // UPPERBOUND
+//            _logger.Log("total: " + outScore);
+//            _logger.Success();
+
+//            return outScore;
+//        }
+//        public struct MinMaxResult
+//        {
+//            public int Score { get; }
+//            public Move Move { get; }
+//            public MinMaxResult(int score, Move move)
+//            {
+//                Score = score;
+//                Move = move;
+//            }
+
+//            public MinMaxResult InvertScore() => new MinMaxResult(-Score, Move);
+//            public override string ToString() => $"{{Score: {Score}, Move: {Move}}}";
+//            public static MinMaxResult operator -(MinMaxResult result) => result.InvertScore();
+//        }
+
+//        public int Negamax(BoardState node, Point sim, UniqueMoveBoardMap map, IDictionary<int, TTEntry> tt, int depth, int alpha, int beta, int color)
+//        {
+
+//            //int alphaOrig = alpha;
+//            //int stateCode = node.GetStateCode();
+//            //if (tt.TryGetValue(stateCode, out TTEntry ttEntry) && ttEntry.Depth >= depth)
+//            //{
+//            //    //Console.WriteLine(ttEntry);
+//            //    if (ttEntry.Flag == NodeState.EXACT) return ttEntry.Value;
+//            //    else if (ttEntry.Flag == NodeState.LOWERBOUND)
+//            //        alpha = Math.Max(alpha, ttEntry.Value);
+//            //    else beta = Math.Min(beta, ttEntry.Value); // UPPERBOUND
 
 
-            //    if (alpha >= beta) return ttEntry.Value;
-            //}
+//            //    if (alpha >= beta) return ttEntry.Value;
+//            //}
 
-            negaCount++;
-            if (node.SearchFrom(sim, null, true).Succes) return -EVAL_SCORE;
-            if (depth == 0) return 0;
-            List<Move> moves = map.GetAllMoves(node);
-            int value = -EVAL_SCORE;
-            for (int i = 0; i < moves.Count; i++)
-            {
-                sim = node.Alter(moves[i], true);
-                value = Math.Max(value, -Negamax(node, sim, map, tt, depth - 1, -beta, -alpha, -color));
-                node.Undo();
+//            negaCount++;
+//            if (node.SearchFrom(sim, null, true).Succes) return -EVAL_SCORE;
+//            if (depth == 0) return 0;
+//            List<Move> moves = map.GetAllMoves(node);
+//            int value = -EVAL_SCORE;
+//            for (int i = 0; i < moves.Count; i++)
+//            {
+//                sim = node.Alter(moves[i], true);
+//                value = Math.Max(value, -Negamax(node, sim, map, tt, depth - 1, -beta, -alpha, -color));
+//                node.Undo();
 
-                alpha = Math.Max(alpha, value);
-                if (alpha >= beta) break;
-            }
+//                alpha = Math.Max(alpha, value);
+//                if (alpha >= beta) break;
+//            }
 
-            //ttEntry.Value = value;
-            //if (value <= alphaOrig) ttEntry.Flag = NodeState.LOWERBOUND;
-            //else if (value >= beta) ttEntry.Flag = NodeState.UPPERBOUND;
-            //else ttEntry.Flag = NodeState.EXACT;
-            //ttEntry.Depth = depth;
+//            //ttEntry.Value = value;
+//            //if (value <= alphaOrig) ttEntry.Flag = NodeState.LOWERBOUND;
+//            //else if (value >= beta) ttEntry.Flag = NodeState.UPPERBOUND;
+//            //else ttEntry.Flag = NodeState.EXACT;
+//            //ttEntry.Depth = depth;
 
-            //tt[stateCode] = ttEntry;
+//            //tt[stateCode] = ttEntry;
 
-            return value;
-        }
+//            return value;
+//        }
 
-        public struct TTEntry
-        {
-            public NodeState Flag;
-            public int Value;
-            public int Depth;
-            public TTEntry(NodeState flag, int value, int depth)
-            {
-                Flag = flag;
-                Value = value;
-                Depth = depth;
-            }
-            public override string ToString() => $"{{Flag: {Flag}, Value: {Value}, Depth: {Depth}}}";
-        }
-        public struct NegamaxEndResult
-        {
-            public Move Move { get; }
-            public int Items { get; }
-            public int TotalTimeElapsed { get; }
-            public float MsAItem { get; }
+//        public struct TTEntry
+//        {
+//            public NodeState Flag;
+//            public int Value;
+//            public int Depth;
+//            public TTEntry(NodeState flag, int value, int depth)
+//            {
+//                Flag = flag;
+//                Value = value;
+//                Depth = depth;
+//            }
+//            public override string ToString() => $"{{Flag: {Flag}, Value: {Value}, Depth: {Depth}}}";
+//        }
+//        public struct NegamaxEndResult
+//        {
+//            public Move Move { get; }
+//            public int Items { get; }
+//            public int TotalTimeElapsed { get; }
+//            public float MsAItem { get; }
 
-            public NegamaxEndResult(Move move, int items, int totalTimeElapsed) : this(move, items, totalTimeElapsed, (items > 0) ? (float)totalTimeElapsed / items : 0) { }
-            public NegamaxEndResult(Move move, int items, int totalTimeElapsed, float msAItem)
-            {
-                Move = move;
-                Items = items;
-                TotalTimeElapsed = totalTimeElapsed;
-                MsAItem = msAItem;
-            }
+//            public NegamaxEndResult(Move move, int items, int totalTimeElapsed) : this(move, items, totalTimeElapsed, (items > 0) ? (float)totalTimeElapsed / items : 0) { }
+//            public NegamaxEndResult(Move move, int items, int totalTimeElapsed, float msAItem)
+//            {
+//                Move = move;
+//                Items = items;
+//                TotalTimeElapsed = totalTimeElapsed;
+//                MsAItem = msAItem;
+//            }
 
-            public override string ToString() => $"{{Move: {Move}, Items: {Items}, Total Time Elapsed: {TotalTimeElapsed} ms, Ms/Item: ~{MsAItem}}}";
-        }
-        public enum NodeState
-        {
-            EXACT,
-            LOWERBOUND,
-            UPPERBOUND,
-        }
-    }
-}
+//            public override string ToString() => $"{{Move: {Move}, Items: {Items}, Total Time Elapsed: {TotalTimeElapsed} ms, Ms/Item: ~{MsAItem}}}";
+//        }
+//        public enum NodeState
+//        {
+//            EXACT,
+//            LOWERBOUND,
+//            UPPERBOUND,
+//        }
+//    }
+//}

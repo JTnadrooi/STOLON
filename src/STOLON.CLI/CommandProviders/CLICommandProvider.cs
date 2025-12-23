@@ -1,25 +1,21 @@
-﻿using AsitLib;
-using AsitLib.CommandLine;
-using STOLON.CLI;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AsitLib.CommandLine;
 
 namespace STOLON.CLI
 {
     public class CLICommandProvider : CommandProvider
     {
-        public CLICommandProvider() : base("cli") { }
+        private readonly CommandEngine _commandEngine;
+
+        public CLICommandProvider(CommandEngine commandEngine) : base("cli")
+        {
+            _commandEngine = commandEngine;
+        }
 
         [FlaggedCommand("Displays info about the STOLON.CLI.", Id = "cli", Aliases = ["info"], Flags = CommandFlags.ReadOnly)]
         public void Info()
         {
-            Console.WriteLine($"Command_Count={CLI.Engine.UniqueCommands.Count}");
-            Console.WriteLine($"Provider_Count={CLI.Engine.Providers.Count}");
+            Console.WriteLine($"Command_Count={_commandEngine.UniqueCommands.Count}");
+            Console.WriteLine($"Provider_Count={_commandEngine.Providers.Count}");
             Console.WriteLine($"Is_Dev={CLI.IsDev}");
             Console.WriteLine($"STOLON_Version={STOLON.Version}");
         }

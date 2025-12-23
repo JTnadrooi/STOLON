@@ -19,8 +19,14 @@
 
         public EntitySelection? Selection { get; set; }
 
-        public ConditionalNoteEnumerationGraphic(Vector2 pos, int textWidth)
+        private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
+
+        public ConditionalNoteEnumerationGraphic(Vector2 pos, int textWidth, ITexture2DCollection textures, IFont2DCollection fonts)
         {
+            _textures = textures;
+            _fonts = fonts;
+
             Notes = Array.Empty<ConditionalNote>();
             Pos = pos;
             TextWidth = textWidth;
@@ -49,15 +55,15 @@
                 bool isPosOrNeutral = note.IsPositiveOrNeutral;
 
                 if (isActive)
-                    noteSign = STOLON.Textures[
+                    noteSign = _textures[
                         isPosOrNeutral ? "UI\\note_sign_pos_enabled" : "UI\\note_sign_neg_enabled"
                     ];
-                else noteSign = STOLON.Textures["UI\\note_sign_disabled"];
+                else noteSign = _textures["UI\\note_sign_disabled"];
 
                 if (isPosOrNeutral) Count(ref activePosCount, ref totalPosCount);
                 else Count(ref activeNegCount, ref totalNegCount);
 
-                _cachedNotes[i] = new CachedNoteData(STOLON.Fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
+                _cachedNotes[i] = new CachedNoteData(_fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
                     lc,
                     isActive,
                     noteSign
@@ -65,30 +71,30 @@
             }
 
             _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
-            _counterPos = Centering.CenterX((int)STOLON.Fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
+            _counterPos = Centering.CenterX((int)_fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
         }
 
         public void Draw(DrawingContext drawingContext)
         {
             int notesClearingUp = 7;
-            int noteSpacing = STOLON.Fonts.Small.CoreFont.LineHeight / 2;
+            int noteSpacing = _fonts.Small.CoreFont.LineHeight / 2;
 
             for (int i = 0; i < _cachedNotes.Length; i++)
             {
                 CachedNoteData note = _cachedNotes[i];
-                drawingContext.DrawString(STOLON.Fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight));
-                //drawingContext.DrawString(STOLON.Fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
-                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - STOLON.Fonts.Small.CoreFont.LineHeight));
+                drawingContext.DrawString(_fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * _fonts.Small.CoreFont.LineHeight));
+                //drawingContext.DrawString(_fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - _fonts.Small.CoreFont.LineHeight));
+                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - _fonts.Small.CoreFont.LineHeight));
 
                 if (note.IsActive)
-                    drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
+                    drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * _fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * _fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
 
-                notesClearingUp += note.LineCount * STOLON.Fonts.Small.CoreFont.LineHeight + noteSpacing;
+                notesClearingUp += note.LineCount * _fonts.Small.CoreFont.LineHeight + noteSpacing;
             }
 
-            drawingContext.Draw(STOLON.Textures["UI\\dotted_line-128"], new Vector2(Pos.X, STOLON.Fonts.Small.CoreFont.LineHeight + 20 - 1));
+            drawingContext.Draw(_textures["UI\\dotted_line-128"], new Vector2(Pos.X, _fonts.Small.CoreFont.LineHeight + 20 - 1));
 
-            drawingContext.DrawString(STOLON.Fonts.Small, _counterStr, _counterPos);
+            drawingContext.DrawString(_fonts.Small, _counterStr, _counterPos);
         }
     }
 }

@@ -6,7 +6,7 @@
 
         public readonly record struct BoardTemplate(string Name, string Description, Texture2D Texture)
         {
-            public static BoardTemplate Empty { get; } = new BoardTemplate("[REDACTED]", "[REDACTED]", STOLON.Textures["UI\\profile_question-128"]);
+            public static BoardTemplate GetEmpty(ITexture2DCollection textures) => new BoardTemplate("[REDACTED]", "[REDACTED]", textures["UI\\profile_question-128"]);
         }
 
         public readonly record struct OptionDrawData(string Title, string Description, Texture2D Texture, Rectangle Bounds);
@@ -28,12 +28,20 @@
         private int _selectedIndex;
         private Rectangle _viewport;
 
-        public BoardsGraphic()
+        private readonly IInputManager _input;
+        private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
+
+        public BoardsGraphic(IInputManager inputManager, ITexture2DCollection textures, IFont2DCollection fonts)
         {
+            _input = inputManager;
+            _textures = textures;
+            _fonts = fonts;
+
             Boards = [
-                new BoardTemplate("STAGE", "STOLON test level.", STOLON.Textures["UI\\profile_question-128"]),
-                    BoardTemplate.Empty,
-                    BoardTemplate.Empty,
+                new BoardTemplate("STAGE", "STOLON test level.", _textures["UI\\profile_question-128"]),
+                    BoardTemplate.GetEmpty(textures),
+                    BoardTemplate.GetEmpty(textures),
                 ];
             _optionDraws = new OptionDrawData[Boards.Length];
             _pos = new Vector2(TILE_SIZE * 3, 0);
@@ -48,7 +56,7 @@
 
         public void Update(int elapsedMilliseconds)
         {
-            int scrollDelta = Math.Sign(STOLON.Input.MouseScrollDelta);
+            int scrollDelta = Math.Sign(_input.MouseScrollDelta);
             if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
 
             float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
@@ -72,7 +80,7 @@
                     default
                 );
 
-                if (STOLON.Input.IsClicked(MouseButton.Left) && _optionDraws[i].Bounds.Contains(STOLON.Input.VirtualMousePos) && _viewport.Contains(STOLON.Input.VirtualMousePos))
+                if (_input.IsClicked(MouseButton.Left) && _optionDraws[i].Bounds.Contains(_input.VirtualMousePos) && _viewport.Contains(_input.VirtualMousePos))
                 {
                     _selectedIndex = i;
                 }
@@ -88,20 +96,20 @@
                 {
                     drawingContext.Draw(_optionDraws[i].Texture, _optionDraws[i].Bounds.Location.ToVector2());
                     drawingContext.DrawRectangle(_optionDraws[i].Bounds, Color.White);
-                    drawingContext.DrawString(STOLON.Fonts.Medium,
+                    drawingContext.DrawString(_fonts.Medium,
                         _optionDraws[i].Title.ToString().ToUpper(),
                         _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
-                            (int)STOLON.Fonts.Medium.FastMeasure(_optionDraws[i].Title).X,
-                            -STOLON.Fonts.Medium.CoreFont.LineHeight,
+                            (int)_fonts.Medium.FastMeasure(_optionDraws[i].Title).X,
+                            -_fonts.Medium.CoreFont.LineHeight,
                             TILE_SIZE
                         )
                     );
-                    drawingContext.DrawHorizontalLine(_optionDraws[i].Bounds.Location.ToVector2() + new Vector2((TILE_SIZE - DIV_LINE_LENGHT) / 2f, -STOLON.Fonts.Medium.CoreFont.LineHeight), DIV_LINE_LENGHT, thickness: 1);
-                    drawingContext.DrawString(STOLON.Fonts.Small,
+                    drawingContext.DrawHorizontalLine(_optionDraws[i].Bounds.Location.ToVector2() + new Vector2((TILE_SIZE - DIV_LINE_LENGHT) / 2f, -_fonts.Medium.CoreFont.LineHeight), DIV_LINE_LENGHT, thickness: 1);
+                    drawingContext.DrawString(_fonts.Small,
                         _optionDraws[i].Description.ToUpper(),
                         _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(
-                            (int)STOLON.Fonts.Small.FastMeasure(_optionDraws[i].Description).X,
-                            -STOLON.Fonts.Medium.CoreFont.LineHeight * 2,
+                            (int)_fonts.Small.FastMeasure(_optionDraws[i].Description).X,
+                            -_fonts.Medium.CoreFont.LineHeight * 2,
                             TILE_SIZE
                         )
                     );

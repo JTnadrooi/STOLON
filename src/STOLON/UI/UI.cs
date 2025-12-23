@@ -4,36 +4,36 @@ using System.Diagnostics.CodeAnalysis;
 namespace STOLON
 {
     /// <summary>
-    /// The user interface for the <see cref="GameEnvironment"/>.
+    /// The user interface for the <see cref="Environment"/>.
     /// </summary>
-    public class Interface : Service
+    public class Interface : Service, ISingletonDependency
     {
         public const int LINE_WIDTH = 2;
 
-        /// <summary>
-        /// The <see cref="Textframe"/> managed by the <see cref="Interface"/>.
-        /// </summary>
-        public Textframe Textframe { get; }
-
         public DefaultDictionary<string, UIElementUpdateData> UpdateDump { get; }
+
+        private readonly IRichLogger _logger;
+        private readonly ITextframe _textframe;
 
         /// <summary>
         /// Main UIInterface contructor.
         /// </summary>
-        public Interface() : base(STOLON.Environment)
+        public Interface(IRichLogger logger, ITextframe textframe) : base(null)
         {
-            STOLON.Logger.Log(">[s]contructing stolon ui");
+            _logger = logger;
+
+            _logger.Log(">[s]contructing stolon ui");
 
             UpdateDump = new DefaultDictionary<string, UIElementUpdateData>(s => new UIElementUpdateData(false, null));
 
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            Textframe = new Textframe();
+            _textframe = textframe;
         }
 
         public override void Update(int elapsedMilliseconds)
         {
-            Textframe.Update(elapsedMilliseconds);
+            _textframe.Update(elapsedMilliseconds);
         }
         //public void PostUpdate(int elapsedMilliseconds)
         //{
@@ -49,7 +49,7 @@ namespace STOLON
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
         public override void Draw(DrawingContext drawingContext)
         {
-            Textframe.Draw(drawingContext);
+            _textframe.Draw(drawingContext);
             base.Draw(drawingContext);
         }
     }

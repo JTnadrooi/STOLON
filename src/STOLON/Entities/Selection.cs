@@ -34,8 +34,14 @@
         public SelectionEntry this[string id] => Entries[id];
         public SelectionEntry this[int i] => _entries[_toParseEntries[i].Id];
 
-        public EntitySelection(int maxEntries)
+        private readonly Environment _environment;
+        private readonly IRichLogger _logger;
+
+        public EntitySelection(int maxEntries, IRichLogger logger, Environment environment)
         {
+            _logger = logger;
+            _environment = environment;
+
             _entries = new Dictionary<string, SelectionEntry>(maxEntries);
             Entries = _entries.AsReadOnly();
             _toParseEntries = new List<Entity>(maxEntries);
@@ -46,29 +52,29 @@
 
         public bool Add(string id)
         {
-            STOLON.Logger.Log(">selecting entity " + id + ".");
+            _logger.Log(">selecting entity " + id + ".");
             if (Contains(id))
             {
-                STOLON.Logger.Fail();
+                _logger.Fail();
                 return false;
             }
-            _toParseEntries.Add(STOLON.Environment.Entities[id]);
+            _toParseEntries.Add(_environment.Entities[id]);
             RecalculateAllocations();
-            STOLON.Logger.Success();
+            _logger.Success();
             return true;
         }
 
         public bool Remove(string id)
         {
-            STOLON.Logger.Log(">deselecting entity " + id + ".");
+            _logger.Log(">deselecting entity " + id + ".");
             if (!Contains(id))
             {
-                STOLON.Logger.Fail();
+                _logger.Fail();
                 return false;
             }
-            _toParseEntries.Remove(STOLON.Environment.Entities[id]);
+            _toParseEntries.Remove(_environment.Entities[id]);
             RecalculateAllocations();
-            STOLON.Logger.Success();
+            _logger.Success();
             return true;
         }
 
@@ -80,7 +86,7 @@
         public int GetSlot(string id) => _toParseEntries.GetFirstIndexWhere(e => e.Id == id);
         private void RecalculateAllocations()
         {
-            STOLON.Logger.Log(">updating allocations..");
+            _logger.Log(">updating allocations..");
 
             IsPostAllocation = false;
             _entries.Clear();
@@ -100,7 +106,7 @@
             _totalVAllocation = _entries.Sum(e => e.Value.VAllocation);
             if (_totalVAllocation == 99) _totalVAllocation = 100;
 
-            STOLON.Logger.Success();
+            _logger.Success();
         }
         public int GetAllocation(string id) => _entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
         public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation : 0) : throw new InvalidOperationException();

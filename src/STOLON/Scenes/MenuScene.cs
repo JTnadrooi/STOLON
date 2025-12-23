@@ -1,15 +1,20 @@
 ﻿using Betwixt;
+using Autofac;
 
 namespace STOLON
 {
     public class MenuOrderContainer : OrderContainer
     {
-        private Font2D _font;
         private bool _capitalize = true;
         private Vector2 _origin;
-        public MenuOrderContainer(IEnumerable<UIElement> elements, Vector2? position = null) : base(elements, position)
+
+        private readonly Font2D _font;
+        private readonly InputManager _input;
+
+        public MenuOrderContainer(IEnumerable<UIElement> elements, Font2D font, IInputManager input, Vector2? position = null) : base(elements, input, position)
         {
-            _font = STOLON.Fonts.Medium;
+            _font = font;
+            _input = STOLON.Services.Resolve<InputManager>();
         }
         public override void PrepareOrdering(Vector2 origin, int elementCount) => _origin = origin;
         public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
@@ -29,10 +34,10 @@ namespace STOLON
                 "specialThanks" => "!",
                 _ => ">",
             };
-            isHovered = elementBounds.Contains(STOLON.Input.VirtualMousePos);
+            isHovered = elementBounds.Contains(_input.VirtualMousePos);
             return new UIElementDrawData(element, isHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
-                : elementText, STOLON.Fonts.Medium, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
+                : elementText, _font, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }
     }
     public class MenuScene : Scene
@@ -95,13 +100,51 @@ namespace STOLON
         private const int LOGO_ROW_COUNT = 5;
         private Player[]? _boardPlayers;
 
-        public MenuScene() : base("main_menu")
+        private readonly ICachedAudioResourceCollection _audio;
+        private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
+        private readonly IAudioEngine _audioEngine;
+        private readonly IConfiguration _config;
+        private readonly Environment _environment;
+        private readonly IRichLogger _logger;
+        private readonly Interface _ui;
+        private readonly ITaskHeap _tasks;
+        private readonly ISceneManager _sceneManager;
+        private readonly ITextframe _textframe;
+        private readonly IInputManager _input;
+
+        public MenuScene(
+            IRichLogger logger,
+            Interface ui,
+            ITexture2DCollection textures,
+            ICachedAudioResourceCollection audio,
+            IFont2DCollection fonts,
+            IConfiguration config,
+            Environment environment,
+            IAudioEngine audioEngine,
+            ISceneManager sceneManager,
+            ITaskHeap tasks,
+            ITextframe textframe,
+            IInputManager input) : base("main_menu")
         {
-            _logoLines = STOLON.Textures.GetReference("UI\\Logo\\Menu\\lines");
-            _logoMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\marks");
-            _logoFilledMarks = STOLON.Textures.GetReference("UI\\Logo\\Menu\\filled_marks");
-            _logoFonted = STOLON.Textures.GetReference("UI\\Logo\\Menu\\fonted");
-            _dither32 = STOLON.Textures.GetReference("dither-32");
+            _logger = logger;
+            _ui = ui;
+            _audio = audio;
+            _textures = textures;
+            _fonts = fonts;
+            _audioEngine = audioEngine;
+            _config = config;
+            _environment = environment;
+            _tasks = tasks;
+            _sceneManager = sceneManager;
+            _textframe = textframe;
+            _input = input;
+
+            _logoLines = _textures.GetReference("UI\\Logo\\Menu\\lines");
+            _logoMarks = _textures.GetReference("UI\\Logo\\Menu\\marks");
+            _logoFilledMarks = _textures.GetReference("UI\\Logo\\Menu\\filled_marks");
+            _logoFonted = _textures.GetReference("UI\\Logo\\Menu\\fonted");
+            _dither32 = _textures.GetReference("dither-32");
             _drawLogoLines = true;
             _drawLogoDummyTiles = true;
             _drawLogoFilledTiles = false;
@@ -114,23 +157,23 @@ namespace STOLON
 
             _depthPath = new List<UIElement>();
 
-            _showSplashtexts = STOLON.Config.GetBool("graphics.splashtexts_show");
-            _showEntityProfiles = STOLON.Config.GetBool("graphics.entities_show_on_menu");
+            _showSplashtexts = _config.GetBool("graphics.splashtexts_show");
+            _showEntityProfiles = _config.GetBool("graphics.entities_show_on_menu");
 
-            _entityProfiles = [STOLON.Environment.Entities.Values.First().Profile, STOLON.Environment.Entities.Values.Last().Profile];
+            _entityProfiles = [_environment.Entities.Values.First().Profile, _environment.Entities.Values.Last().Profile];
 
             _mainOrderContainer = new MenuOrderContainer([
-                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: STOLON.Audio["exit_3"]),
-                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: STOLON.Audio["coin_4"]),
-                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: STOLON.Audio["coin_4"]),
+                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
+                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: _audio["coin_4"]),
+                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: _audio["coin_4"]),
                 new UIElement("options", UIElement.TOP_ID, "Options", UIElementType.Listen),
                 new UIElement("special_thanks", UIElement.TOP_ID, "Special Thanks", UIElementType.Listen),
                 new UIElement("quit", UIElement.TOP_ID, "Quit", UIElementType.Listen),
                 new UIElement("sound", "options", "Sound", UIElementType.Listen),
-                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: STOLON.Audio["exit_3"]),
+                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: _audio["exit_3"]),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
                 new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
-            ]);
+            ], _fonts.Medium, _input);
 
             //switch (_skipTo)
             //{
@@ -146,7 +189,7 @@ namespace STOLON
             _logoEaseTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
             _removeTweener = new Tweener<float>(0f, 1f, 2f, Ease.Quad.InOut);
 
-            //Console.WriteLine(STOLON.UI.UIElements.ToJoinedString(", "));
+            //Console.WriteLine(_ui.UIElements.ToJoinedString(", "));
 
             _splashTexts = new string[]
             {
@@ -249,6 +292,7 @@ namespace STOLON
                 "Unintended but full of intent.", // Thetalore quote.
                 "The stolons seem reluctant.",
                 "JAN43", // Inside joke.
+                "Drop asimetrico. Preparate!", // Duelo Maestro gd level.
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
@@ -355,7 +399,7 @@ namespace STOLON
             {
                 _logoEaseTweener.Reverse();
                 _logoEaseTweener.Start();
-                STOLON.Logger.Log("reversed icon tweener.");
+                _logger.Log("reversed icon tweener.");
             }
             _logoBoundingBox =
                 new Rectangle(_logoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _logoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
@@ -368,37 +412,37 @@ namespace STOLON
 
             _mainOrderContainer.Position = new Vector2(0, uiElementOffsetY);
             _mainOrderContainer.Update(elapsedMilliseconds);
-            //UIOrdering.Order(STOLON.UI.Elements.Values.ToArray(), STOLON.UI.MenuPath, STOLON.UI.DrawData, STOLON.UI.UpdateData, , );
+            //UIOrdering.Order(_ui.Elements.Values.ToArray(), _ui.MenuPath, _ui.DrawData, _ui.UpdateData, , );
 
-            if (STOLON.UI.UpdateDump["xp_start"].IsClicked)
+            if (_ui.UpdateDump["xp_start"].IsClicked(_input))
             {
                 _boardPlayers = [new Player("player0"), new Player("player1")];
                 Leave();
             }
-            if (STOLON.UI.UpdateDump["vol_up"].IsClicked)
+            if (_ui.UpdateDump["vol_up"].IsClicked(_input))
             {
-                STOLON.AudioEngine.MasterVolume += 0.1001f;
-                STOLON.Logger.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
+                _audioEngine.MasterVolume += 0.1001f;
+                _logger.Log("new volume: " + _audioEngine.MasterVolume);
             }
-            if (STOLON.UI.UpdateDump["vol_down"].IsClicked)
+            if (_ui.UpdateDump["vol_down"].IsClicked(_input))
             {
-                STOLON.AudioEngine.MasterVolume -= 0.1001f;
-                STOLON.Logger.Log("new volume: " + STOLON.AudioEngine.MasterVolume);
+                _audioEngine.MasterVolume -= 0.1001f;
+                _logger.Log("new volume: " + _audioEngine.MasterVolume);
             }
-            if (STOLON.UI.UpdateDump["story_start"].IsClicked)
+            if (_ui.UpdateDump["story_start"].IsClicked(_input))
             {
-                STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Not yet implemented."));
+                _textframe.Queue(new DialogueInfo(_environment, "Not yet implemented."));
             }
-            if (STOLON.UI.UpdateDump["com_start"].IsClicked)
+            if (_ui.UpdateDump["com_start"].IsClicked(_input))
             {
-                _boardPlayers = [new Player("player0"), STOLON.Environment.Entities["goldsilk"].GetPlayer()];
+                _boardPlayers = [new Player("player0"), _environment.Entities["goldsilk"].GetPlayer()];
                 Leave();
             }
-            if (STOLON.UI.UpdateDump["special_thanks"].IsClicked)
+            if (_ui.UpdateDump["special_thanks"].IsClicked(_input))
             {
-                STOLON.UI.Textframe.Queue(new DialogueInfo(STOLON.Environment, "Please read the github README."));
+                _textframe.Queue(new DialogueInfo(_environment, "Please read the github README."));
             }
-            if (STOLON.UI.UpdateDump["quit"].IsClicked)
+            if (_ui.UpdateDump["quit"].IsClicked(_input))
             {
                 STOLON.Instance.Exit();
             }
@@ -407,19 +451,19 @@ namespace STOLON
             #endregion
 
             _removeTweener.Update(elapsedMilliseconds / 1000f);
-            STOLON.Tasks.SafePush("menu_logo_disapear", new DynamicTask(() => // fire and forget game logic ftw
+            _tasks.SafePush("menu_logo_disapear", new DynamicTask(() => // fire and forget game logic ftw
             {
                 _onLeave?.Invoke();
                 _onLeave = null;
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
-                STOLON.Scenes.ChangeScene<ShellScene>(true);
+                _sceneManager.ChangeScene<ShellScene>();
                 _boardPlayers = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
-            _splashTextPos = Centering.CenterX((int)(STOLON.Fonts.Small.FastMeasure(_splashText).X),
-                _logoDrawPos.Y - STOLON.Fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
+            _splashTextPos = Centering.CenterX((int)(_fonts.Small.FastMeasure(_splashText).X),
+                _logoDrawPos.Y - _fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
 
             _removeLineYAmount = STOLON.V_HEIGHT - (int)(_removeTweener.Value * STOLON.V_HEIGHT);
             int lDelta = (int)(_logoDrawPos.X - 8);
@@ -432,7 +476,7 @@ namespace STOLON
         {
             drawingContext.DrawLine(_divLine1X, -10f, _divLine1X, _divLineLenght, Color.White, _divLineWidth);
             drawingContext.DrawLine(_divLine2X, -10f, _divLine2X, _divLineLenght, Color.White, _divLineWidth);
-            if (_done && _showSplashtexts) drawingContext.DrawString(STOLON.Fonts.Small, _splashText, _splashTextPos);
+            if (_done && _showSplashtexts) drawingContext.DrawString(_fonts.Small, _splashText, _splashTextPos);
 
             if (_drawLogoLowResFonted)
             {

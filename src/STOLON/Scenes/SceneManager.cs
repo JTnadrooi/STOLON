@@ -1,6 +1,8 @@
-﻿namespace STOLON
+﻿using Autofac;
+
+namespace STOLON
 {
-    public abstract class Scene
+    public abstract class Scene : ISingletonDependency
     {
         public string Id { get; }
 
@@ -35,28 +37,28 @@
 
         static Scene()
         {
-            SkipTarget = STOLON.Config.GetString("debug.skip.target");
-            SkipSceneAnimation = STOLON.Config.GetBool("debug.skip.skip_gamestage_animation");
-            SkipParameters = STOLON.Config.Get<string[]>("debug.skip.parameters").AsReadOnly();
+            Configuration config = STOLON.Services.Resolve<Configuration>();
+
+            SkipTarget = config.GetString("debug.skip.target");
+            SkipSceneAnimation = config.GetBool("debug.skip.skip_gamestage_animation");
+            SkipParameters = config.Get<string[]>("debug.skip.parameters").AsReadOnly();
         }
     }
 
-    public sealed class SceneManager
+    public sealed class SceneManager : ISceneManager, ISingletonDependency
     {
         private Scene? _currentScene;
-        private readonly Dictionary<string, Scene> _sceneMemory;
 
         public Scene Current => _currentScene ?? throw new Exception();
 
         public SceneManager()
         {
-            _sceneMemory = new Dictionary<string, Scene>();
+
         }
 
-        public void ChangeScene<T>(bool @override = false) where T : Scene, new()
+        public void ChangeScene<T>() where T : Scene
         {
-            if (@override) _currentScene = _sceneMemory[Scene.GetId<T>()] = new T();
-            else _currentScene = _sceneMemory[Scene.GetId<T>()] = _sceneMemory.GetValueOrDefault(Scene.GetId<T>()) ?? new T();
+            _currentScene = STOLON.Services.Resolve<T>();
         }
 
         public void Update(int elapsedMilliseconds)
@@ -71,7 +73,5 @@
 
         public TScene GetCurrent<TScene>() where TScene : Scene => (TScene)Current;
         public bool IsCurrent<TScene>() where TScene : Scene => Current is TScene;
-        public bool TryGetState<TScene>(out TScene? state) where TScene : Scene
-            => _sceneMemory.TryGetValue(Scene.GetId<TScene>(), out var s) & (state = (TScene?)s) != null;
     }
 }

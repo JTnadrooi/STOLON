@@ -1,19 +1,19 @@
-﻿using AsitLib;
-using AsitLib.CommandLine;
-using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
+﻿using AsitLib.CommandLine;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tomlyn.Model;
 
 namespace STOLON.CLI
 {
     public class ConfigCommandProvider : CommandGroup
     {
-        public ConfigCommandProvider() : base("conf", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
+        private readonly IRichLogger _logger;
+        private readonly IConfiguration _config;
+
+        public ConfigCommandProvider(IRichLogger logger, IConfiguration config) : base("conf", CLI.InfoFactory, nameOfMainMethod: nameof(Main))
+        {
+            _logger = logger;
+            _config = config;
+        }
 
         private string _userIniPath = "user.ini";
 
@@ -21,7 +21,7 @@ namespace STOLON.CLI
         public void Main()
         {
             Process.Start("notepad.exe", _userIniPath);
-            STOLON.Logger.Log("opened user config file (user.ini).");
+            _logger.Log("opened user config file (user.ini).");
         }
 
         [FlaggedCommand("Prints the path to the user.ini file.", Flags = CommandFlags.ReadOnly)]
@@ -39,31 +39,31 @@ namespace STOLON.CLI
                 if (o is TomlTable tomlTable) return $"[{tomlTable.ToJoinedString(", ")}]";
                 return o.ToString()!;
             }
-            Console.WriteLine(Represent(CLI.Instance.Config.Get(key)));
+            Console.WriteLine(Represent(_config.Get(key)));
         }
 
         [FlaggedCommand("Sets the value of a key.")]
         public void Set(string key, string value)
         {
-            CLI.Instance.Config.Set(key, value);
+            _config.Set(key, value);
         }
 
         [FlaggedCommand("Resets a specific key.")]
         public void Reset(string key)
         {
-            CLI.Instance.Config.Reset(key);
+            _config.Reset(key);
         }
 
         [FlaggedCommand("Resets a specific key.", Flags = CommandFlags.ReadOnly)]
         public void Keys()
         {
             string Format(string key, object value, object defaultValue) => $"Key = {key}, Value = {value ?? "null"}, DefaultValue = {defaultValue ?? "null"}";
-            foreach (KeyValuePair<string, object> kvp in CLI.Instance.Config.TomlValues)
+            foreach (KeyValuePair<string, object> kvp in _config.TomlValues)
             {
                 Console.WriteLine(kvp.Value switch
                 {
-                    TomlArray a => Format(kvp.Key, $"[{a.ToJoinedString(", ")}]", $"[{((Array)CLI.Instance.Config.Defaults[kvp.Key]).Cast<object>().ToJoinedString(", ")}]"),
-                    _ => Format(kvp.Key, kvp.Value, CLI.Instance.Config.Defaults[kvp.Key]),
+                    TomlArray a => Format(kvp.Key, $"[{a.ToJoinedString(", ")}]", $"[{((Array)_config.Defaults[kvp.Key]).Cast<object>().ToJoinedString(", ")}]"),
+                    _ => Format(kvp.Key, kvp.Value, _config.Defaults[kvp.Key]),
                 });
             }
         }

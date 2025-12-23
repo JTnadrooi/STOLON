@@ -1,16 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Collections;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace STOLON.CLI.Build
+﻿namespace STOLON.CLI.Build
 {
     public static class Builder
     {
+        private static readonly IRichLogger _logger = STOLON.Services.Resolve<IRichLogger>();
+
         /// <summary>
         /// Builds assets using the specified <paramref name="builder"/>.
         /// </summary>
@@ -21,8 +14,8 @@ namespace STOLON.CLI.Build
         {
             BuildItemInfo[] buildItems = builder.GetBuildItems();
 
-            STOLON.Logger.Log($">{(force ? "force-" : string.Empty)}building for Builder of type '{typeof(TBuilder).Name}'.");
-            STOLON.Logger.Log($"found {buildItems.Length} files.");
+            _logger.Log($">{(force ? "force-" : string.Empty)}building for Builder of type '{typeof(TBuilder).Name}'.");
+            _logger.Log($"found {buildItems.Length} files.");
 
             builder.PreBuild();
 
@@ -30,16 +23,16 @@ namespace STOLON.CLI.Build
             {
                 if (!buildItem.NeedsBuild(force)) continue;
 
-                STOLON.Logger.Log($">building '{buildItem.Source}' as '{buildItem.Destination}'.");
+                _logger.Log($">building '{buildItem.Source}' as '{buildItem.Destination}'.");
 
                 builder.Build(buildItem.Source, buildItem.Destination);
 
-                STOLON.Logger.Success();
+                _logger.Success();
             }
 
             builder.PostBuild();
 
-            STOLON.Logger.Success();
+            _logger.Success();
         }
     }
 }

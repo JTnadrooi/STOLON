@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AsitLib.CommandLine;
+﻿using AsitLib.CommandLine;
 namespace STOLON.CLI
 {
     public class DiscordCommandProvider : CommandGroup

@@ -1,7 +1,12 @@
-﻿namespace STOLON
+﻿
+namespace STOLON
 {
-    public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>
+    public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>, ITransientDependency
     {
+        public Texture2DResourceLoader(IRichLogger logger) : base(logger)
+        {
+        }
+
         public override string[] GetItems() => Directory.GetFiles("Textures", "*.png", SearchOption.AllDirectories);
 
         public override string GetId(string item) => item["Textures\\".Length..^".png".Length];

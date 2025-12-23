@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public abstract class Shader
+    public abstract class Shader : ISingletonDependency
     {
         public bool IsEnabled { get; set; }
         public bool IsVirtual { get; }
@@ -17,7 +17,7 @@
 
     public class StolonReplaceColorShader : Shader
     {
-        public StolonReplaceColorShader() : base(STOLON.Effects["apply_palette"], true)
+        public StolonReplaceColorShader(IEffectResourceCollection effects) : base(effects["apply_palette"], true)
         {
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
             Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
@@ -28,7 +28,7 @@
 
     public class CRTShader : Shader
     {
-        public CRTShader() : base(STOLON.Effects["crt"], false)
+        public CRTShader(IEffectResourceCollection effects) : base(effects["crt"], false)
         {
             Effect.Parameters["brightboost"].SetValue(0.92f);
             Effect.Parameters["textureSize"].SetValue(STOLON.Instance.DesiredDimensions.ToVector2());

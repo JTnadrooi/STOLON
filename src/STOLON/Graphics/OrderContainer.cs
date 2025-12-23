@@ -21,10 +21,13 @@
         private readonly Dictionary<string, UIElement> _elementMap;
         private readonly HashSet<string> _parents;
         private readonly List<int> _visibleIndices;
+        private readonly IInputManager _input;
 
-        protected OrderContainer(IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        protected OrderContainer(IEnumerable<UIElement> elements, IInputManager input, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
+
+            _input = input;
 
             List<UIElement> baseElements = new List<UIElement>();
             HashSet<string> idSet = new HashSet<string>();
@@ -135,7 +138,7 @@
                 int idx = _visibleIndices[v];
                 string id = _elements[idx].Id;
 
-                if (_updateDump.TryGetValue(id, out UIElementUpdateData data) && data.IsClicked)
+                if (_updateDump.TryGetValue(id, out UIElementUpdateData data) && data.IsClicked(_input))
                 {
                     clickedId = id;
                     break;
@@ -151,7 +154,6 @@
 
                 if (!Equals(oldPath, Path))
                 {
-                    STOLON.Logger.Log("element clicked: " + clickedId);
                     OnPathChanged(oldPath, Path);
                 }
             }

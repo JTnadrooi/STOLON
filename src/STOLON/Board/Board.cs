@@ -1,270 +1,267 @@
-﻿using MonoGame.Extended.BitmapFonts;
+﻿using Autofac;
+using MonoGame.Extended.BitmapFonts;
 using System.Diagnostics.CodeAnalysis;
-using Math = System.Math;
-using RectangleF = MonoGame.Extended.RectangleF;
-
-
 
 namespace STOLON
 {
-    /// <summary>
-    /// The representor of the board in the STOLON environment.
-    /// </summary>
-    public partial class Board : Service
-    {
-        public Camera2D Camera { get; }
-        public float Zoom { get; private set; }
-        public const int TILE_SIZE = 96;
+    ///// <summary>
+    ///// The representor of the board in the STOLON environment.
+    ///// </summary>
+    //public partial class Board : Service
+    //{
+    //    public Camera2D Camera { get; }
+    //    public float Zoom { get; private set; }
+    //    public const int TILE_SIZE = 96;
 
-        public float MaxDeltaZoom => SmoothnessModifier * 10f;
-        public float ZoomIntensity => (Zoom - _desiredZoom) / MaxDeltaZoom;
-        public Vector2 BoardCenter => _scene.Tiles[_scene.Tiles.GetLength(0) / 2, _scene.Tiles.GetLength(1) / 2].BoardPosition;
-        public float SmoothnessModifier => 0.003f;
-        public int TurnNumber { get; private set; }
-        public ref BoardState State => ref _scene;
-        public ReadOnlyDictionary<string, SearchTarget> SearchTargets => new ReadOnlyDictionary<string, SearchTarget>(_searchTargets);
-        public BoardState InitialState { get; }
-        public Stack<BoardState> History { get; private set; }
+    //    public float MaxDeltaZoom => SmoothnessModifier * 10f;
+    //    public float ZoomIntensity => (Zoom - _desiredZoom) / MaxDeltaZoom;
+    //    public Vector2 BoardCenter => _scene.Tiles[_scene.Tiles.GetLength(0) / 2, _scene.Tiles.GetLength(1) / 2].BoardPosition;
+    //    public float SmoothnessModifier => 0.003f;
+    //    public int TurnNumber { get; private set; }
+    //    public ref BoardState State => ref _scene;
+    //    public ReadOnlyDictionary<string, SearchTarget> SearchTargets => new ReadOnlyDictionary<string, SearchTarget>(_searchTargets);
+    //    public BoardState InitialState { get; }
+    //    public Stack<BoardState> History { get; private set; }
 
-        //public bool MouseIsOnBoard => STOLON.Input.Domain == InputManager.MouseDomain.Board;
-        public bool MouseIsOnBoard => true;
-        public Vector2 WorldMousePos { get; private set; }
+    //    //public bool MouseIsOnBoard => _input.Domain == InputManager.MouseDomain.Board;
+    //    public bool MouseIsOnBoard => true;
+    //    public Vector2 WorldMousePos { get; private set; }
 
-        private SpriteBatch _boardSpriteBatch;
-        private BoardState _scene;
+    //    private SpriteBatch _boardSpriteBatch;
+    //    private BoardState _scene;
 
-        int _mouseStateCoefficient;
-        private float _desiredZoom;
-        private Vector2 _desiredCameraPos;
-        bool _firstFrame;
+    //    int _mouseStateCoefficient;
+    //    private float _desiredZoom;
+    //    private Vector2 _desiredCameraPos;
+    //    bool _firstFrame;
 
-        private Task? _computerMoveTask;
-        private bool _locked;
+    //    private Task? _computerMoveTask;
+    //    private bool _locked;
 
-        private BoardState.SearchTargetCollection _searchTargets;
-        private const float CONF_ZOOM_COEFFICIENT = 0.98f; // 0.98f
+    //    private BoardState.SearchTargetCollection _searchTargets;
+    //    private const float CONF_ZOOM_COEFFICIENT = 0.98f; // 0.98f
 
-        public UniqueMoveBoardMap UniqueMoveBoardMap { get; }
+    //    public UniqueMoveBoardMap UniqueMoveBoardMap { get; }
 
-        public Board(BoardState conf) : base(STOLON.Environment)
-        {
-            Camera = new Camera2D();
-            TurnNumber = 0;
+    //    public Board(BoardState conf) : base(null)
+    //    {
+    //        Camera = new Camera2D();
+    //        TurnNumber = 0;
 
-            _scene = conf;
-            _boardSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
-            _desiredZoom = MathF.Max(0.45f, CONF_ZOOM_COEFFICIENT * (4f / conf.Dimensions.X)); // does not change.
-            _desiredCameraPos = BoardCenter;
-            Camera.Position = _desiredCameraPos;
-            _searchTargets = conf.WinSearchTargets;
-            _computerMoveTask = null!;
-            _firstFrame = false;
+    //        _scene = conf;
+    //        _boardSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
+    //        _desiredZoom = MathF.Max(0.45f, CONF_ZOOM_COEFFICIENT * (4f / conf.Dimensions.X)); // does not change.
+    //        _desiredCameraPos = BoardCenter;
+    //        Camera.Position = _desiredCameraPos;
+    //        _searchTargets = conf.WinSearchTargets;
+    //        _computerMoveTask = null!;
+    //        _firstFrame = false;
 
-            Zoom = 1f;
-            InitialState = conf.DeepCopy();
-            History = new Stack<BoardState>();
-            History.Push(InitialState);
-            UniqueMoveBoardMap = new UniqueMoveBoardMap();
+    //        Zoom = 1f;
+    //        InitialState = conf.DeepCopy();
+    //        History = new Stack<BoardState>();
+    //        History.Push(InitialState);
+    //        UniqueMoveBoardMap = new UniqueMoveBoardMap();
 
-            for (int x = 0; x < conf.Dimensions.X; x++)
-            {
-                Vector2 topleft = new Vector2(x * Board.TILE_SIZE, 0);
-            }
-        }
+    //        for (int x = 0; x < conf.Dimensions.X; x++)
+    //        {
+    //            Vector2 topleft = new Vector2(x * Board.TILE_SIZE, 0);
+    //        }
+    //    }
 
-        public void Lock()
-        {
-            _locked = true;
-        }
-        public void Unlock()
-        {
-            _locked = false;
-        }
+    //    public void Lock()
+    //    {
+    //        _locked = true;
+    //    }
+    //    public void Unlock()
+    //    {
+    //        _locked = false;
+    //    }
 
-        /// <summary>
-        /// Update method. 
-        /// </summary>
-        /// <param name="elapsedMilliseconds"></param>
-        public override void Update(int elapsedMilliseconds)
-        {
-            if (!_firstFrame) _firstFrame = true;
+    //    /// <summary>
+    //    /// Update method. 
+    //    /// </summary>
+    //    /// <param name="elapsedMilliseconds"></param>
+    //    public override void Update(int elapsedMilliseconds)
+    //    {
+    //        if (!_firstFrame) _firstFrame = true;
 
-            WorldMousePos = Camera.Unproject(STOLON.Input.VirtualMousePos);
+    //        WorldMousePos = Camera.Unproject(_input.VirtualMousePos);
 
-            _mouseStateCoefficient = STOLON.Input.CurrentMouse.GetMouseStateCoefficient();
+    //        _mouseStateCoefficient = _input.CurrentMouse.GetMouseStateCoefficient();
 
-            if (STOLON.Input.IsPressed(Keys.LeftShift))
-            {
-                if (_mouseStateCoefficient == 0) _mouseStateCoefficient = 1;
-                if (STOLON.Input.IsPressed(Keys.A))
-                    _desiredCameraPos.X -= 1;
-                if (STOLON.Input.IsPressed(Keys.D))
-                    _desiredCameraPos.X += 1;
-                if (STOLON.Input.IsPressed(Keys.W))
-                    _desiredCameraPos.Y -= 1;
-                if (STOLON.Input.IsPressed(Keys.S))
-                    _desiredCameraPos.Y += 1;
-            }
+    //        if (_input.IsPressed(Keys.LeftShift))
+    //        {
+    //            if (_mouseStateCoefficient == 0) _mouseStateCoefficient = 1;
+    //            if (_input.IsPressed(Keys.A))
+    //                _desiredCameraPos.X -= 1;
+    //            if (_input.IsPressed(Keys.D))
+    //                _desiredCameraPos.X += 1;
+    //            if (_input.IsPressed(Keys.W))
+    //                _desiredCameraPos.Y -= 1;
+    //            if (_input.IsPressed(Keys.S))
+    //                _desiredCameraPos.Y += 1;
+    //        }
 
-            if (STOLON.Input.IsPressed(MouseButton.Right)) _desiredCameraPos += (STOLON.Input.PreviousMouse.Position - STOLON.Input.CurrentMouse.Position).ToVector2();
-            Zoom += (_desiredZoom - Zoom) * 0.1f + _mouseStateCoefficient * SmoothnessModifier;
-            Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (WorldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(_mouseStateCoefficient);
-            Camera.Zoom = Zoom;
+    //        if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2();
+    //        Zoom += (_desiredZoom - Zoom) * 0.1f + _mouseStateCoefficient * SmoothnessModifier;
+    //        Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (WorldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(_mouseStateCoefficient);
+    //        Camera.Zoom = Zoom;
 
-            Listen();
+    //        Listen();
 
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["restartBoard"].IsClicked)
-            //{
-            //    StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
-            //            {
-            //                Reset();
-            //            }, "Resetting the Board..");
-            //}
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["skipMove"].IsClicked) EndMove();
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["boardSearch"].IsClicked)
-            //{
-            //    int ret = State.SearchAny();
-            //    if (ret != -1)
-            //        StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
-            //            {
-            //                Reset();
-            //            }, "4 Connected found for player " + GetPlayerTile(ret) + "!");
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["restartBoard"].IsClicked)
+    //        //{
+    //        //    StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
+    //        //            {
+    //        //                Reset();
+    //        //            }, "Resetting the Board..");
+    //        //}
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["skipMove"].IsClicked) EndMove();
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["boardSearch"].IsClicked)
+    //        //{
+    //        //    int ret = State.SearchAny();
+    //        //    if (ret != -1)
+    //        //        StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
+    //        //            {
+    //        //                Reset();
+    //        //            }, "4 Connected found for player " + GetPlayerTile(ret) + "!");
 
-            //}
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["centerCamera"].IsClicked) desiredCameraPos = BoardCenter;
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["undoMove"].IsClicked)
-            //{
-            //    if (state.Players.Any(p => p.IsComputer))
-            //    {
-            //        StolonGame.Instance.Environment.UI.Textframe.Queue(new DialogueInfo(StolonGame.Instance.Environment, "Not valid when against AI but coming soon!"));
-            //    }
-            //    Undo();
-            //}
-            if (STOLON.Input.IsClicked(Keys.Z)) // debug keys
-            {
-            }
-            if (STOLON.Input.IsClicked(Keys.X)) { }
-            if (STOLON.Input.IsClicked(Keys.C)) { }
-            //if (StolonGame.Instance.UserInterface.UIElementUpdateData["exitGame"].IsClicked) StolonGame.Instance.SLExit();
+    //        //}
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["centerCamera"].IsClicked) desiredCameraPos = BoardCenter;
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["undoMove"].IsClicked)
+    //        //{
+    //        //    if (state.Players.Any(p => p.IsComputer))
+    //        //    {
+    //        //        StolonGame.Instance.Environment.UI.Textframe.Queue(new DialogueInfo(StolonGame.Instance.Environment, "Not valid when against AI but coming soon!"));
+    //        //    }
+    //        //    Undo();
+    //        //}
+    //        if (_input.IsClicked(Keys.Z)) // debug keys
+    //        {
+    //        }
+    //        if (_input.IsClicked(Keys.X)) { }
+    //        if (_input.IsClicked(Keys.C)) { }
+    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["exitGame"].IsClicked) StolonGame.Instance.SLExit();
 
-            //Instance.UserInterface.UIElements["currentPlayer"].Text = "Current: " + state.CurrentPlayer.Name + " " + GetPlayerTile(state.CurrentPlayerID);
+    //        //Instance.UserInterface.UIElements["currentPlayer"].Text = "Current: " + state.CurrentPlayer.Name + " " + GetPlayerTile(state.CurrentPlayerID);
 
-            base.Update(elapsedMilliseconds);
-        }
-        public void Undo()
-        {
-            STOLON.Logger.Log(">attempting move undo");
-            _scene.Undo();
-            STOLON.Logger.Success();
+    //        base.Update(elapsedMilliseconds);
+    //    }
+    //    public void Undo()
+    //    {
+    //        _logger.Log(">attempting move undo");
+    //        _scene.Undo();
+    //        _logger.Success();
 
-        }
-        public void AfterMove()
-        {
-            STOLON.AudioEngine.Play(STOLON.Audio["select_4"]);
-        }
-        public bool Listen()
-        {
-            if (_locked)
-            {
-                _computerMoveTask = null;
-                STOLON.Environment.Overlayer.Deactivate("loading");
-                return false;
-            }
-            if (_computerMoveTask != null && _computerMoveTask.IsCompletedSuccessfully)
-            {
-                STOLON.Environment.Overlayer.Deactivate("loading");
-                _computerMoveTask = null;
-            }
-            if (State.CurrentPlayer.IsComputer)
-            {
-                _computerMoveTask ??= new Task(() =>
-                {
-                    State.CurrentPlayer.Computer!.DoMove(this);
-                    AfterMove();
-                });
+    //    }
+    //    public void AfterMove()
+    //    {
+    //        _audioEngine.Play(STOLON.Audio["select_4"]);
+    //    }
+    //    public bool Listen()
+    //    {
+    //        if (_locked)
+    //        {
+    //            _computerMoveTask = null;
+    //            _environment.Overlayer.Deactivate("loading");
+    //            return false;
+    //        }
+    //        if (_computerMoveTask != null && _computerMoveTask.IsCompletedSuccessfully)
+    //        {
+    //            _environment.Overlayer.Deactivate("loading");
+    //            _computerMoveTask = null;
+    //        }
+    //        if (State.CurrentPlayer.IsComputer)
+    //        {
+    //            _computerMoveTask ??= new Task(() =>
+    //            {
+    //                State.CurrentPlayer.Computer!.DoMove(this);
+    //                AfterMove();
+    //            });
 
-                if (_computerMoveTask.Status == TaskStatus.Created)
-                {
-                    _computerMoveTask.Start();
-                    STOLON.Environment.Overlayer.Activate("loading");
-                }
-            }
-            else if (Utils.IsMouseClicked(STOLON.Input.CurrentMouse, STOLON.Input.PreviousMouse) && MouseIsOnBoard)
-            {
-                STOLON.Logger.Log(">attempting board alter after mouseclick");
-                Move? move = null;
-                for (int x = 0; x < _scene.Tiles.GetLength(0); x++)
-                    for (int y = 0; y < _scene.Tiles.GetLength(1); y++)
-                        if (_scene.Tiles[x, y].HitBox.Contains(WorldMousePos) && !_scene.Tiles[x, y].IsSolid())
-                        {
-                            move = new Move(x, y);
-                            break;
-                        }
-                if (move.HasValue)
-                {
-                    History.Push(State.DeepCopy());
-                    State.Alter(move!.Value, true);
-                    AfterMove();
-                    STOLON.Logger.Success();
-                    return true;
-                }
-                else STOLON.Logger.Fail();
-            }
-            return false;
-        }
-        public void Reset()
-        {
-            STOLON.Logger.Log(">resetting board");
+    //            if (_computerMoveTask.Status == TaskStatus.Created)
+    //            {
+    //                _computerMoveTask.Start();
+    //                _environment.Overlayer.Activate("loading");
+    //            }
+    //        }
+    //        else if (Utils.IsMouseClicked(_input.CurrentMouse, _input.PreviousMouse) && MouseIsOnBoard)
+    //        {
+    //            _logger.Log(">attempting board alter after mouseclick");
+    //            Move? move = null;
+    //            for (int x = 0; x < _scene.Tiles.GetLength(0); x++)
+    //                for (int y = 0; y < _scene.Tiles.GetLength(1); y++)
+    //                    if (_scene.Tiles[x, y].HitBox.Contains(WorldMousePos) && !_scene.Tiles[x, y].IsSolid())
+    //                    {
+    //                        move = new Move(x, y);
+    //                        break;
+    //                    }
+    //            if (move.HasValue)
+    //            {
+    //                History.Push(State.DeepCopy());
+    //                State.Alter(move!.Value, true);
+    //                AfterMove();
+    //                _logger.Success();
+    //                return true;
+    //            }
+    //            else _logger.Fail();
+    //        }
+    //        return false;
+    //    }
+    //    public void Reset()
+    //    {
+    //        _logger.Log(">resetting board");
 
-            _computerMoveTask = null;
-            State = InitialState.DeepCopy();
+    //        _computerMoveTask = null;
+    //        State = InitialState.DeepCopy();
 
 
-            STOLON.Logger.Success();
-        }
-        public void EndMove()
-        {
-            State.GoNextPlayer();
-        }
-        public override void Draw(DrawingContext drawingContext)
-        {
-            _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
-            for (int x = 0; x < _scene.Dimensions.X; x++)
-                for (int y = 0; y < _scene.Dimensions.Y; y++)
-                {
-                    Tile tile = _scene.Tiles[x, y];
-                    _boardSpriteBatch.Draw(tile.TileType.Texture, tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    int playerid = tile.GetOccupiedByPlayerId();
-                    if (playerid != -1)
-                    {
-                        _boardSpriteBatch.Draw(STOLON.Textures.GetReference("player" + playerid + "_item-96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    }
-                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(STOLON.Fonts.Small, string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
-                    else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(STOLON.Fonts.Small, "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
-                    else _boardSpriteBatch.DrawString(STOLON.Fonts.Small, "Z", tile.BoardPosition + new Vector2(10), Color.White);
-                }
-            _boardSpriteBatch.End();
-            base.Draw(drawingContext);
-        }
-        public string GetPlayerTile(int playerIndex) => playerIndex switch
-        {
-            0 => "[o]",
-            1 => "[x]",
-            2 => "[.]",
-            3 => "[-]",
-            4 => "[v]",
-            5 => "[~]",
-            _ => throw new Exception()
-        };
-        public void EndGame(int winner)
-        {
-            bool draw = winner < 0;
-            STOLON.Logger.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
+    //        _logger.Success();
+    //    }
+    //    public void EndMove()
+    //    {
+    //        State.GoNextPlayer();
+    //    }
+    //    public override void Draw(DrawingContext drawingContext)
+    //    {
+    //        _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
+    //        for (int x = 0; x < _scene.Dimensions.X; x++)
+    //            for (int y = 0; y < _scene.Dimensions.Y; y++)
+    //            {
+    //                Tile tile = _scene.Tiles[x, y];
+    //                _boardSpriteBatch.Draw(tile.TileType.Texture, tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+    //                int playerid = tile.GetOccupiedByPlayerId();
+    //                if (playerid != -1)
+    //                {
+    //                    _boardSpriteBatch.Draw(_textures.GetReference("player" + playerid + "_item-96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+    //                }
+    //                else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(_fonts.Small, string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
+    //                else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(_fonts.Small, "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
+    //                else _boardSpriteBatch.DrawString(_fonts.Small, "Z", tile.BoardPosition + new Vector2(10), Color.White);
+    //            }
+    //        _boardSpriteBatch.End();
+    //        base.Draw(drawingContext);
+    //    }
+    //    public string GetPlayerTile(int playerIndex) => playerIndex switch
+    //    {
+    //        0 => "[o]",
+    //        1 => "[x]",
+    //        2 => "[.]",
+    //        3 => "[-]",
+    //        4 => "[v]",
+    //        5 => "[~]",
+    //        _ => throw new Exception()
+    //    };
+    //    public void EndGame(int winner)
+    //    {
+    //        bool draw = winner < 0;
+    //        _logger.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
 
-            STOLON.Environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
-            STOLON.Logger.Success();
-        }
-    }
+    //        _environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
+    //        _logger.Success();
+    //    }
+    //}
 
     public struct SearchTarget
     {
@@ -287,8 +284,6 @@ namespace STOLON
             PlayerBound = playerBound;
             TurnsRemaining = turnsRemaining;
             Id = id;
-
-            STOLON.Logger.Log("searchTarget with nodes {" + Nodes.ToJoinedString(", ") + "} created.");
         }
         public bool DecrementTurn()
         {
@@ -428,7 +423,8 @@ namespace STOLON
         }
 
 
-        public static float BoardMultiplier => Board.TILE_SIZE;
+        //public static float BoardMultiplier => Board.TILE_SIZE;
+        public static float BoardMultiplier => 1;
         public static Tile[,] GetTiles(Point dimensions, bool random = false)
         {
             Tile[,] tiles = new Tile[dimensions.X, dimensions.Y];
@@ -467,7 +463,7 @@ namespace STOLON
             Texture = texture;
         }
 
-        public static TileType Void => new TileType("void", STOLON.Textures.GetReference("box-96"));
+        public static TileType Void { get; } = new TileType("void", STOLON.Services.Resolve<ITexture2DCollection>().GetReference("box-96"));
     }
 
 }

@@ -3,7 +3,7 @@ using DiscordRPC;
 
 namespace STOLON
 {
-    public class DiscordRichPresence
+    public class DiscordRichPresence : IDiscordRichPresence, ISingletonDependency
     {
         public DiscordRpcClient _client;
         private RichPresence _presence;

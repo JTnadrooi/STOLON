@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AsitLib.CommandLine;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AsitLib.CommandLine;
 
 
 namespace STOLON.CLI
 {
     public class GameCommandProvider : CommandGroup
     {
-        public GameCommandProvider() : base("sl") { }
+        private readonly IRichLogger _logger;
+
+        public GameCommandProvider() : base("sl")
+        {
+            _logger = STOLON.Services.Resolve<IRichLogger>();
+        }
 
         [FlaggedCommand("Starts STOLON.")]
         public void Start()
         {
             using Process p = Process.Start("STOLON.exe");
-            CLI.Logger.Log($"started STOLON as '{p.ProcessName}'.");
+            _logger.Log($"started STOLON as '{p.ProcessName}'.");
         }
 
         [FlaggedCommand("Exits STOLON.")]
@@ -31,7 +31,7 @@ namespace STOLON.CLI
                     {
                         process.Kill();
                         process.WaitForExit();
-                        CLI.Logger.Log($"STOLON process with PID {process.Id} has been terminated.");
+                        _logger.Log($"STOLON process with PID {process.Id} has been terminated.");
                     }
                 }
             else Console.WriteLine("No running STOLON processes found.");

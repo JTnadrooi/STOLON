@@ -1,12 +1,12 @@
 ﻿namespace STOLON
 {
-    public class Texture2DCollection : ResourceCollection<Texture2D>
+    public class Texture2DCollection : ResourceCollection<Texture2D>, ITexture2DCollection, ISingletonDependency
     {
         private Texture2D? _pixel;
 
         public Texture2D Pixel => _pixel ?? throw new Exception();
 
-        public Texture2DCollection() : base(new Texture2DResourceLoader()) { }
+        public Texture2DCollection(IResourceLoader<Texture2D> loader) : base(loader) { }
 
         public override void LoadResources()
         {

@@ -2,11 +2,11 @@
 {
     public class NorthEntity : Entity
     {
-        public NorthEntity() : base("north", "North", "Nth", fullName: "Noria-aeth")
+        public NorthEntity(ITexture2DCollection textures) : base("north", "North", "Nth", textures, fullName: "Noria-aeth")
         {
         }
-        protected override EntityProfile ResolveProfile()
-            => EntityProfile.GetDebug("north");
+        protected override EntityProfile ResolveProfile(ITexture2DCollection textures)
+            => EntityProfile.GetDebug("north", textures);
 
         public override Computer? Computer => null;
     }

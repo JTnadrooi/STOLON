@@ -19,7 +19,7 @@
         Right,
     }
 
-    public class InputManager : Service
+    public class InputManager : Service, IInputManager, ISingletonDependency
     {
         public InputManager() : base(null)
         {
@@ -28,14 +28,14 @@
 
         public override void Update(int elapsedMilliseconds)
         {
-            PreviousMouse = STOLON.Input.CurrentMouse;
+            PreviousMouse = CurrentMouse;
             CurrentMouse = Mouse.GetState();
 
-            if (!STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(STOLON.Input.CurrentMouse.Position)) STOLON.Input.Domain = MouseDomain.None;
-            else STOLON.Input.Domain = MouseDomain.OnScreen;
+            if (!STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(CurrentMouse.Position)) Domain = MouseDomain.None;
+            else Domain = MouseDomain.OnScreen;
 
-            STOLON.Input.PreviousKeyboard = STOLON.Input.CurrentKeyboard;
-            STOLON.Input.CurrentKeyboard = Keyboard.GetState();
+            PreviousKeyboard = CurrentKeyboard;
+            CurrentKeyboard = Keyboard.GetState();
         }
 
         public MouseDomain Domain { get; private set; }

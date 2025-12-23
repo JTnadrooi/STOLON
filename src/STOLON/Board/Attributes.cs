@@ -1,3 +1,4 @@
+using Autofac;
 using System.Collections.Frozen;
 
 
@@ -42,7 +43,6 @@ namespace STOLON
         /// A <see cref="FrozenSet"/>
         /// </summary>
         public static FrozenSet<TileAttributeBase> DefaultAttributes { get; }
-
 
         static TileAttributes()
         {
@@ -102,6 +102,7 @@ namespace STOLON
         /// <param name="tile">The <see cref="Tile"/> to check.</param>
         /// <returns>Returns a value indicating if the <paramref name="tile"/> is solid.</returns>
         public static bool IsSolid(this Tile tile) => tile.HasAttribute<TileAttributeSolid>();
+
         /// <summary>
         /// Replace a <see cref="TileAttributeBase"/> in a <see cref="HashSet{T}"/> of <see cref="TileAttributeBase"/> objects.
         /// </summary>
@@ -111,12 +112,11 @@ namespace STOLON
         /// <returns>The <paramref name="attributes"/> <see cref="HashSet{T}"/>.</returns>
         public static HashSet<TileAttributeBase> ReplaceAttribute<TFrom, TTo>(this HashSet<TileAttributeBase> attributes) where TFrom : TileAttributeBase where TTo : TileAttributeBase
         {
-            STOLON.Logger.Log(">attempting the replacement of attribute " + GetName<TFrom>() + " to " + GetName<TTo>());
             if (!attributes.Remove(Get<TFrom>())) throw new Exception();
             if (!attributes.Add(Get<TTo>())) throw new Exception();
-            STOLON.Logger.Success();
             return attributes;
         }
+
         /// <summary>
         /// Get the name of a <see cref="TileAttributeBase"/> type.
         /// </summary>

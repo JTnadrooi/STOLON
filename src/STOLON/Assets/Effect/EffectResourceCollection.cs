@@ -1,7 +1,7 @@
 ﻿namespace STOLON
 {
-    public class EffectResourceCollection : ResourceCollection<Effect>
+    public class EffectResourceCollection : ResourceCollection<Effect>, IEffectResourceCollection, ISingletonDependency
     {
-        public EffectResourceCollection() : base(new EffectResourceLoader()) { }
+        public EffectResourceCollection(IResourceLoader<Effect> loader) : base(loader) { }
     }
 }

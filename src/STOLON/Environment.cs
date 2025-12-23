@@ -3,75 +3,74 @@
     /// <summary>
     /// The enviroment of the <see cref="STOLON"/> game.
     /// </summary>
-    public class GameEnvironment : Service, IDialogueProvider
+    public class Environment : Service, IDialogueProvider, ISingletonDependency
     {
-        /// <summary>
-        /// The <see cref="OverlayManager"/>.
-        /// </summary>
-        public OverlayManager Overlayer => _overlayer;
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="Entity"/> objects and their <see cref="Entity.Id"/>.
         /// </summary>
-        public ReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_entities);
+        public ReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_entityDict);
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
 
-        private Interface _userInterface;
-        private OverlayManager _overlayer;
-        private Dictionary<string, Entity> _entities;
-        private SceneManager _sceneManager;
+        private Dictionary<string, Entity> _entityDict;
 
-        public GameEnvironment() : base(null)
+        private readonly IRichLogger _logger;
+        private readonly IAudioEngine _audioEngine;
+        private readonly ISceneManager _sceneManager;
+        private readonly IOverlayManager _overlayManager;
+        private readonly Interface _ui;
+        private readonly IEnumerable<Entity> _entities;
+
+        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, IEnumerable<Entity> entities) : base(null)
         {
-            _entities = new Dictionary<string, Entity>();
-            _userInterface = null!;
-            _sceneManager = null!;
-            _overlayer = null!;
+            _logger = logger;
+            _audioEngine = audioEngine;
+            _sceneManager = sceneManager;
+            _overlayManager = overlayManager;
+            _ui = ui;
+            _entities = entities;
 
+            _entityDict = new Dictionary<string, Entity>();
+            _sceneManager = sceneManager;
         }
         public void Initialize()
         {
-            STOLON.Logger.Log(">[s]initialising environment");
-            STOLON.Logger.Log(">searching for entities");
-            Entity[] entities = STOLON.Scan<Entity>();
-            foreach (Entity entity in entities)
+            _logger.Log(">[s]initialising environment");
+            _logger.Log(">searching for entities");
+            foreach (Entity entity in _entities)
             {
-                STOLON.Logger.Log($"found entity with id '{entity.Id}\" and name '{entity.Name}\".");
+                _logger.Log($"found entity with id '{entity.Id}\" and name '{entity.Name}\".");
                 RegisterEntity(entity);
             }
-            STOLON.Logger.Success();
+            _logger.Success();
 
-            STOLON.UI = _userInterface = new Interface();
-            STOLON.Scenes = _sceneManager = new SceneManager();
-            STOLON.Scenes.ChangeScene<MenuScene>();
+            _sceneManager.ChangeScene<MenuScene>();
 
-
-            _overlayer = new OverlayManager();
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
             //    "debug2"
             //));
-            STOLON.Logger.Success();
+            _logger.Success();
         }
         public override void Update(int elapsedMilliseconds)
         {
-            _userInterface.Update(elapsedMilliseconds);
+            _ui.Update(elapsedMilliseconds);
 
-            STOLON.Scenes.Update(elapsedMilliseconds);
+            _sceneManager.Update(elapsedMilliseconds);
 
             //_userInterface.PostUpdate(elapsedMilliseconds);
-            STOLON.AudioEngine.Update(elapsedMilliseconds);
+            _audioEngine.Update(elapsedMilliseconds);
             //STOLON.Instance.DRP.UpdateDetails(STOLON.SceneManager.Current.DRPStatus);
 
-            _overlayer.Update(elapsedMilliseconds);
+            _overlayManager.Update(elapsedMilliseconds);
             base.Update(elapsedMilliseconds);
         }
         public override void Draw(DrawingContext drawingContext)
         {
-            STOLON.Scenes.Draw(drawingContext);
-            _userInterface.Draw(drawingContext);
+            _sceneManager.Draw(drawingContext);
+            _ui.Draw(drawingContext);
 
-            _overlayer.Draw(drawingContext);
+            _overlayManager.Draw(drawingContext);
             base.Draw(drawingContext);
         }
 
@@ -81,7 +80,7 @@
         /// <param name="entity">The entity to register.</param>
         public void RegisterEntity(Entity entity)
         {
-            _entities.Add(entity.Id, entity);
+            _entityDict.Add(entity.Id, entity);
         }
         /// <summary>
         /// Deregister a new <see cref="Entity"/>. <strong>Should never be used.</strong>
@@ -89,7 +88,7 @@
         /// <param name="entity">The entity to deregister.</param>
         public void DeregisterEntity(string characterId)
         {
-            _entities.Remove(characterId);
+            _entityDict.Remove(characterId);
         }
 
         public Entity GetEntityInstance<TEntity>() => Entities.First(kvp => kvp.Value is TEntity).Value;

@@ -2,11 +2,11 @@
 {
     public class SiloEntity : Entity
     {
-        public SiloEntity() : base("silo", "Silo", "Sl", "Silo desc", "Silo 28SHA")
+        public SiloEntity(ITexture2DCollection textures) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA")
         { }
 
-        protected override EntityProfile ResolveProfile()
-            => new EntityProfile("silo", new Point(245, 180));
+        protected override EntityProfile ResolveProfile(ITexture2DCollection textures)
+            => new EntityProfile("silo", textures, new Point(245, 180));
 
         protected override (ConditionalNote[] allocationNotes, ConditionalNote[] abilityNotes) ResolveNotes()
             => (
