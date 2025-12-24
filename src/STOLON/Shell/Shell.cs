@@ -2,6 +2,14 @@
 {
     public class Shell : Service, ISingletonDependency
     {
+        private readonly IRichLogger _logger;
+        private readonly Environment _environment;
+        private readonly IFont2DCollection _fonts;
+        private readonly ITexture2DCollection _textures;
+        private readonly IInputManager _input;
+
+        public bool IsFocus { get; set; }
+
         private string _text;
         private Font2D _font;
         private Vector2 _textScale;
@@ -10,19 +18,17 @@
 
         private const string NewLine = "\n";
 
-        public bool IsFocus { get; set; }
+        private int _cursorIndex;
+        private int _lineCount;
+        private int _cursorLifetime;
 
-        private readonly IRichLogger _logger;
-        private readonly Environment _environment;
-        private readonly IFont2DCollection _fonts;
-        private readonly IInputManager _input;
-
-        public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input) : base(null)
+        public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(null)
         {
             _logger = logger;
             _environment = environment;
             _fonts = fonts;
             _input = input;
+            _textures = textures;
 
             _text = string.Empty;
             _font = _fonts.Medium;
@@ -48,32 +54,42 @@
         public override void Update(int elapsedMilliseconds)
         {
             _textScale = Vector2.One;
-            int lines = _text.Count(c => c == '\n') + 1;
-            _textPos = new Vector2(10, STOLON.V_HEIGHT - _font.Dimensions.Y - _font.Dimensions.Y * lines);
-
+            _lineCount = _text.Count(c => c == '\n') + 1;
+            _textPos = new Vector2(10, STOLON.V_HEIGHT - _font.Dimensions.Y - _font.Dimensions.Y * _lineCount);
+            _cursorLifetime++;
 
             if (_input.IsClicked(MouseButton.Left))
             {
-                int index = GetCharacterIndexAt(_input.VirtualMousePos);
+                _cursorIndex = GetCharacterIndexAt(_input.VirtualMousePos);
+                _cursorLifetime = 0;
 
-                Console.WriteLine(index);
+                Console.WriteLine(_cursorIndex);
 
-                if (index != -1) _text = ReplaceAt(_text, index, '_');
+                if (_cursorIndex != -1) _text = ReplaceAt(_text, _cursorIndex, '_');
             }
         }
 
         private int GetCharacterIndexAt(Vector2 pos)
         {
             int charWidth = (int)_font.Dimensions.X;
-            //int charHeight = (int)_font.Dimensions.Y;
 
             int result = (int)((pos.X - _textPos.X) / charWidth);
 
             string firstLine = _text.Split(NewLine).First();
 
             if (result > firstLine.Length) return -1;
+            if (result < 0) return -1;
 
             return result;
+        }
+
+        private Vector2 GetCharacterPosAt(int index)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(index, 0);
+
+            int line = 1;
+
+            return new Vector2(_textPos.X + index * _font.Dimensions.X, _textPos.Y + _lineCount * _font.Dimensions.Y - line * _font.Dimensions.Y);
         }
 
         private void OnTextInput(object? sender, TextInputEventArgs e)
@@ -95,7 +111,9 @@
         public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawString(_font, _text, _textPos, scale: _textScale);
-            drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
+            if (_cursorIndex > 0 && ((int)(_cursorLifetime * 0.03f)) % 2 == 0)
+                drawingContext.Draw(_textures["UI\\cursor"], GetCharacterPosAt(_cursorIndex) + new Vector2(0, 2));
+            //drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
         }
 
         #region TEMP_UTILS
@@ -103,10 +121,6 @@
 
         private static string ReplaceAt(string input, int index, char newChar)
         {
-            if (input == null)
-            {
-                throw new ArgumentNullException("input");
-            }
             char[] chars = input.ToCharArray();
             chars[index] = newChar;
             return new string(chars);
