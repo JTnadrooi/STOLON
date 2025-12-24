@@ -1,4 +1,5 @@
 ﻿using AsitLib.CommandLine;
+using Autofac.Features.ResolveAnything;
 using System.Reflection;
 
 namespace STOLON.CLI
@@ -11,29 +12,26 @@ namespace STOLON.CLI
         {
             ContainerBuilder builder = new ContainerBuilder();
 
+            builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
+
             builder.RegisterType<RichLogger>().As<IRichLogger>().SingleInstance();
             builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 
-            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
-                .AsImplementedInterfaces()
-                .As(t =>
+            RegisteredTypeInfo[] registeredTypes = builder.RegisterMarkedAssemblyTypes(Assembly.GetExecutingAssembly());
+
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (typeof(CommandProvider).IsAssignableFrom(type)
+                    && type != typeof(CommandProvider)
+                    && !type.IsAbstract)
                 {
-                    List<Type> baseTypes = new List<Type>();
-                    Type current = t.BaseType!;
-                    while (current is not null && current != typeof(object))
-                    {
-                        baseTypes.Add(current);
-                        current = current.BaseType!;
-                    }
-                    return baseTypes;
-                })
-                .AsSelf()
-                .SingleInstance();
+                    builder.RegisterType(type).AsImplemented().SingleInstance();
+                }
+            }
 
             builder.Register<CommandEngine>(i => new CommandEngine()
                 .AddHook(new DevActionHook())
                 .AddGlobalOption(i.Resolve<IRichLogger>().GetVerboseGlobalOption())).SingleInstance();
-            builder.Register<CommandEngine>(i => true ? throw new InvalidOperationException() : new CommandEngine()).SingleInstance();
 
             _services = STOLON.Services = builder.Build();
         }

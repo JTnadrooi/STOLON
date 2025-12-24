@@ -17,18 +17,9 @@ namespace STOLON
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             builder.RegisterType<RichLogger>()
-                   .As<IRichLogger>()
+                   .AsImplemented()
                    .SingleInstance()
                    .OnActivating(e => e.Instance.Silent = false);
-
-            //builder.RegisterType<Environment>().SingleInstance();
-            //builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
-            //builder.RegisterType<AudioEngine>().SingleInstance();
-            //builder.RegisterType<InputManager>().As<IInputManager>().SingleInstance();
-            //builder.RegisterType<TaskHeap>().SingleInstance();
-            //builder.RegisterType<Interface>().SingleInstance();
-            //builder.RegisterType<SceneManager>().SingleInstance();
-            //builder.RegisterType<STOLON>().SingleInstance();
 
             Type[] interfaces = { typeof(ISingletonDependency), typeof(IScopedDependency), typeof(ITransientDependency) };
             Type[] assemblyTypes = Assembly.GetExecutingAssembly().GetTypes();
@@ -43,35 +34,12 @@ namespace STOLON
             }
 #endif
 
-            foreach (Type serviceInterface in interfaces)
-                foreach (Type type in assemblyTypes)
-                {
-                    if (!type.IsClass || type.IsAbstract) continue;
+            RegisteredTypeInfo[] registeredTypes = builder.RegisterMarkedAssemblyTypes(Assembly.GetExecutingAssembly());
 
-                    Type[] implementedInterfaces = type.GetInterfaces().Where(i => interfaces.Contains(i)).ToArray();
-                    if (!implementedInterfaces.Contains(serviceInterface)) continue;
-                    if (implementedInterfaces.Length > 1) throw new InvalidOperationException();
-                    if (type.Namespace?.StartsWith("System") == true) continue;
-
-                    List<Type> baseTypes = new List<Type>();
-                    Type current = type.BaseType!; // not null bc of the IsClass above.
-                    while (current != typeof(object))
-                    {
-                        baseTypes.Add(current);
-                        current = current.BaseType!;
-                    }
-
-                    Console.WriteLine($"type '{type}' for interface '{serviceInterface}'.");
-
-                    IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registration = builder.RegisterType(type)
-                        .AsImplementedInterfaces()
-                        .As(baseTypes.ToArray())
-                        .AsSelf();
-
-                    if (serviceInterface == typeof(IScopedDependency)) registration.InstancePerLifetimeScope();
-                    else if (serviceInterface == typeof(ITransientDependency)) registration.InstancePerDependency();
-                    else registration.SingleInstance();
-                }
+            for (int i = 0; i < registeredTypes.Length; i++)
+            {
+                Console.WriteLine($"type '{registeredTypes[i].RegisteredType}' for lifetime marker interface '{registeredTypes[i].MarkerInterface}'.");
+            }
 
             _services = STOLON.Services = builder.Build();
 
