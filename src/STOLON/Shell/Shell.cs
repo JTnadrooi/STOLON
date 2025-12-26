@@ -84,9 +84,48 @@ namespace STOLON
             UpdateText();
         }
 
-        public void RemoveChar(int pos)
+        public void PutAtCursor(char character) => PutAtCursor(character.ToString());
+        public void PutAtCursor(string str)
         {
+            if (!IsCursorOnText) throw new InvalidOperationException();
 
+            if (_cursorPostText) Write(str);
+            else Put(str, _cursorIndex);
+
+            if (!_cursorPostText) _cursorIndex += str.Length;
+        }
+
+        public void Put(string str, int pos)
+        {
+            _text = _text.Insert(pos, str);
+
+            UpdateText();
+        }
+
+        public bool RemoveAtCursor()
+        {
+            if (!IsCursorOnText) throw new InvalidOperationException();
+
+            if (_text.Length == 0 || _cursorIndex == 0) return false;
+
+            if (_cursorPostText)
+            {
+                RemoveAt(_text.Length - 1);
+            }
+            else
+            {
+                RemoveAt(_cursorIndex - 1);
+                _cursorIndex--;
+            }
+
+            return true;
+        }
+
+        public void RemoveAt(int pos)
+        {
+            _text = _text.Remove(pos, 1);
+
+            UpdateText();
         }
 
         public void UpdateText()
@@ -106,7 +145,7 @@ namespace STOLON
             if (_input.IsPressed(MouseButton.Left))
             {
                 SetCursorPos(GetCharacterIndexAt(_input.VirtualMousePos, true));
-                Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
+                //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
                 if (_cursorIndex != -1 && _cursorLastClickIndex != -1)
                     _cursorSelection = NormalizedRange.GetFromValues(_cursorLastClickIndex, _cursorIndex);
@@ -176,7 +215,7 @@ namespace STOLON
         private Vector2 GetCharacterPosAt(int charIndex)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(charIndex);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(charIndex, _text.Length);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(charIndex, _text.Length);
 
             int charLine = 0;
             int charIndexOnLine = 0;
@@ -209,7 +248,6 @@ namespace STOLON
                 if (_text.Length == 0) return _textPos; //  + new Vector2(0, -_font.Dimensions.Y);
 
                 char selectedChar = _text[_text.Length - 1];
-                Console.WriteLine(selectedChar == NewLine);
                 if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterPosAt(_text.Length - 1) - _textPos).Y);
                 else return GetCharacterPosAt(_text.Length - 1) + new Vector2(_font.Dimensions.X, 0);
             }
@@ -229,7 +267,7 @@ namespace STOLON
         private void SetCursorPos(int pos)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(pos);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(pos, _text.Length);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(pos, _text.Length);
 
             _cursorIndex = pos;
             _cursorPostText = false;
@@ -243,6 +281,8 @@ namespace STOLON
 
         private void OnKeyDown(object? sender, InputKeyEventArgs e)
         {
+            if (!IsCursorOnText) return;
+
             switch (e.Key)
             {
                 case Keys.Left:
@@ -273,18 +313,18 @@ namespace STOLON
 
         private void OnTextInput(object? sender, TextInputEventArgs e)
         {
+            if (!IsCursorOnText) return;
+
             switch (e.Character)
             {
                 case '\b':
-                    if (_text.Length == 0) break;
-                    _text = _text[..^1];
-                    UpdateText();
+                    RemoveAtCursor();
                     break;
                 case '\r':
-                    Write(NewLine);
+                    PutAtCursor(NewLine);
                     return;
                 default:
-                    Write(e.Character);
+                    PutAtCursor(e.Character);
                     break;
             }
 
