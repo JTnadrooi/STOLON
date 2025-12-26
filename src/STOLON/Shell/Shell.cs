@@ -84,6 +84,11 @@ namespace STOLON
             UpdateText();
         }
 
+        public void RemoveChar(int pos)
+        {
+
+        }
+
         public void UpdateText()
         {
             _lines = SplitWithNewline(_text).ToList();
@@ -201,6 +206,8 @@ namespace STOLON
         {
             if (_cursorPostText)
             {
+                if (_text.Length == 0) return _textPos; //  + new Vector2(0, -_font.Dimensions.Y);
+
                 char selectedChar = _text[_text.Length - 1];
                 Console.WriteLine(selectedChar == NewLine);
                 if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterPosAt(_text.Length - 1) - _textPos).Y);
@@ -269,7 +276,9 @@ namespace STOLON
             switch (e.Character)
             {
                 case '\b':
+                    if (_text.Length == 0) break;
                     _text = _text[..^1];
+                    UpdateText();
                     break;
                 case '\r':
                     Write(NewLine);
