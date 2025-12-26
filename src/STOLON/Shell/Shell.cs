@@ -30,6 +30,7 @@ namespace STOLON
         private readonly IInputManager _input;
 
         public bool IsFocus { get; set; }
+        private bool IsCursorOnText => _cursorIndex != -1 || _cursorPostText;
 
         private string _text;
         private List<string> _lines;
@@ -43,7 +44,7 @@ namespace STOLON
         private int _cursorIndex;
         private int _cursorLastClickIndex;
         private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
-        private bool _cursorPosText;
+        private bool _cursorPostText;
 
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
@@ -63,6 +64,7 @@ namespace STOLON
             _debugCursorPos = Vector2.Zero;
 
             STOLON.Instance.Window.TextInput += OnTextInput;
+            STOLON.Instance.Window.KeyDown += OnKeyDown;
 
             IsFocus = true;
         }
@@ -94,9 +96,11 @@ namespace STOLON
             _textPos = new Vector2(10, STOLON.V_HEIGHT - _font.Dimensions.Y - _font.Dimensions.Y * _lines.Count);
             _cursorLifetime++;
 
+            #region HANDLE_MOUSE
+
             if (_input.IsPressed(MouseButton.Left))
             {
-                (_cursorIndex, _cursorPosText) = GetCharacterIndexAt(_input.VirtualMousePos, true);
+                SetCursorPos(GetCharacterIndexAt(_input.VirtualMousePos, true));
                 Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
                 if (_cursorIndex != -1 && _cursorLastClickIndex != -1)
@@ -114,6 +118,13 @@ namespace STOLON
 
                 if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
             }
+
+            #endregion
+
+            #region HANDLE_ARROWS
+
+
+            #endregion
         }
 
         private GetCharacterIndexAtReturnArgs GetCharacterIndexAt(Vector2 pos, bool clamp = false)
@@ -135,7 +146,7 @@ namespace STOLON
             {
                 if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // why I need this check with x but not y remains a mystery.
                 {
-                    return new GetCharacterIndexAtReturnArgs(clamp ? (_text.Length - 1) : -1, true);
+                    return new GetCharacterIndexAtReturnArgs(-1, true);
                 }
                 charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
             }
@@ -146,7 +157,7 @@ namespace STOLON
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            if (result == _text.Length) return new GetCharacterIndexAtReturnArgs(clamp ? (_text.Length - 1) : -1, true);
+            if (result == _text.Length) return new GetCharacterIndexAtReturnArgs(-1, true);
 
             //result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
 
@@ -159,7 +170,7 @@ namespace STOLON
 
         private Vector2 GetCharacterPosAt(int charIndex)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(charIndex, 0);
+            ArgumentOutOfRangeException.ThrowIfNegative(charIndex);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(charIndex, _text.Length);
 
             int charLine = 0;
@@ -188,8 +199,7 @@ namespace STOLON
 
         private Vector2 GetCursorPos()
         {
-
-            if (_cursorPosText)
+            if (_cursorPostText)
             {
                 char selectedChar = _text[_text.Length - 1];
                 Console.WriteLine(selectedChar == NewLine);
@@ -199,6 +209,60 @@ namespace STOLON
             else return GetCharacterPosAt(_cursorIndex);
         }
 
+        private void SetCursorPos(GetCharacterIndexAtReturnArgs pos)
+        {
+            if (pos.PostText && pos.Pos != -1) throw new ArgumentException(nameof(pos));
+            if (pos.Pos < -1) throw new ArgumentException(nameof(pos));
+            if (pos.Pos > _text.Length - 1) throw new ArgumentException(nameof(pos));
+
+            _cursorIndex = pos.Pos;
+            _cursorPostText = pos.PostText;
+        }
+
+        private void SetCursorPos(int pos)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(pos);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(pos, _text.Length);
+
+            _cursorIndex = pos;
+            _cursorPostText = false;
+        }
+
+        private void ResetCursorPos(bool postText = false)
+        {
+            _cursorIndex = -1;
+            _cursorPostText = postText;
+        }
+
+        private void OnKeyDown(object? sender, InputKeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Keys.Left:
+                    if (_cursorPostText)
+                    {
+                        _cursorPostText = false;
+                        _cursorIndex = _text.Length - 1;
+                    }
+                    else if (_cursorIndex != 0)
+                    {
+                        _cursorIndex--;
+                    }
+                    break;
+                case Keys.Right:
+                    if (!_cursorPostText && _cursorIndex < _text.Length)
+                    {
+                        _cursorIndex++;
+
+                        if (_cursorIndex == _text.Length)
+                        {
+                            _cursorIndex = -1;
+                            _cursorPostText = true;
+                        }
+                    }
+                    break;
+            }
+        }
 
         private void OnTextInput(object? sender, TextInputEventArgs e)
         {
