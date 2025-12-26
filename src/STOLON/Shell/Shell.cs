@@ -5,6 +5,24 @@ namespace STOLON
 {
     public class Shell : Service, ISingletonDependency
     {
+        //[Flags]
+        //public enum GetCharacterIndexAtNotOnTextDomain
+        //{
+        //    None = 0,
+        //    Above = 1,
+        //    Below = 2,
+        //    Left = 4,
+        //    Right = 8,
+        //}
+
+        public readonly record struct GetCharacterIndexAtReturnArgs(int Pos, bool PostText) // "just use a tuple" dont want to
+        {
+            public static implicit operator int(GetCharacterIndexAtReturnArgs src)
+            {
+                return src.Pos;
+            }
+        }
+
         private readonly IRichLogger _logger;
         private readonly Environment _environment;
         private readonly IFont2DCollection _fonts;
@@ -25,7 +43,7 @@ namespace STOLON
         private int _cursorIndex;
         private int _cursorLastClickIndex;
         private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
-
+        private bool _cursorPosText;
 
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
@@ -78,7 +96,7 @@ namespace STOLON
 
             if (_input.IsPressed(MouseButton.Left))
             {
-                _cursorIndex = GetCharacterIndexAt(_input.VirtualMousePos, true);
+                (_cursorIndex, _cursorPosText) = GetCharacterIndexAt(_input.VirtualMousePos, true);
                 Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
                 if (_cursorIndex != -1 && _cursorLastClickIndex != -1)
@@ -98,7 +116,7 @@ namespace STOLON
             }
         }
 
-        private int GetCharacterIndexAt(Vector2 pos, bool clamp = false)
+        private GetCharacterIndexAtReturnArgs GetCharacterIndexAt(Vector2 pos, bool clamp = false)
         {
             int charWidth = (int)_font.Dimensions.X;
             int charHeight = (int)_font.Dimensions.Y;
@@ -109,27 +127,34 @@ namespace STOLON
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
             if (clamp) charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
-            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return -1;
-
-            //if (charLineIndex == _lines.Count) return _text.Length - 1;
+            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return new GetCharacterIndexAtReturnArgs(-1, false);
 
             string charLine = _lines[charLineIndex];
 
-            if (clamp) charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines. I could check for lines not empty somewhere above but this is faster.
-            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return -1;
+            if (clamp)
+            {
+                if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // why I need this check with x but not y remains a mystery.
+                {
+                    return new GetCharacterIndexAtReturnArgs(clamp ? (_text.Length - 1) : -1, true);
+                }
+                charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
+            }
+            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return new GetCharacterIndexAtReturnArgs(-1, false);
 
             int result = charIndexOnLine;
 
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
+            if (result == _text.Length) return new GetCharacterIndexAtReturnArgs(clamp ? (_text.Length - 1) : -1, true);
+
+            //result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
 
             //Console.WriteLine($"{charLineIndex}:{charIndexOnLine} = {result}");
             //Console.WriteLine($"out of {_text.Length}");
             //Console.WriteLine($"char {_text[result]}");
 
-            return result;
+            return new GetCharacterIndexAtReturnArgs(result, false);
         }
 
         private Vector2 GetCharacterPosAt(int charIndex)
@@ -163,15 +188,15 @@ namespace STOLON
 
         private Vector2 GetCursorPos()
         {
-            //char selectedChar = _text[_cursorIndex];
-            //Console.WriteLine(selectedChar == NewLine);
 
-            //if (selectedChar == NewLine)
-            //{
-            //    return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterPosAt(_cursorIndex) - _textPos).Y);
-            //}
-
-            return GetCharacterPosAt(_cursorIndex);
+            if (_cursorPosText)
+            {
+                char selectedChar = _text[_text.Length - 1];
+                Console.WriteLine(selectedChar == NewLine);
+                if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterPosAt(_text.Length - 1) - _textPos).Y);
+                else return GetCharacterPosAt(_text.Length - 1) + new Vector2(_font.Dimensions.X, 0);
+            }
+            else return GetCharacterPosAt(_cursorIndex);
         }
 
 
@@ -196,7 +221,7 @@ namespace STOLON
         public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawString(_font, ReplaceAt(_text, _cursorSelection, '_'), _textPos, scale: _textScale);
-            if (_cursorIndex > 0 && ((int)(_cursorLifetime * 0.03f)) % 2 == 0)
+            if (((int)(_cursorLifetime * 0.03f)) % 2 == 0)
                 drawingContext.Draw(_textures["UI\\cursor"], GetCursorPos() + new Vector2(0, 2));
             //drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
         }
