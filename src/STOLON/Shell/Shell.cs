@@ -149,13 +149,26 @@ namespace STOLON
             return index >= 0 && index < _text.Length;
         }
 
-        public void WriteLine(string text)
+        public void WriteLine(string str)
         {
-            Write(text + NewLine);
+            string line = str + NewLine;
+
+            _lines.Insert(_lines.Count - 1, line);
+
+            _text = _lines.ToJoinedString();
+
+            UpdateText();
+
+            _cursor = _cursor.Offset(line.Length, true);
         }
 
-        public void Write(char character) => Write(character.ToString());
-        public void Write(string str)
+        public void AppendLine(string str)
+        {
+            Append(str + NewLine);
+        }
+
+        public void Append(char character) => Append(character.ToString());
+        public void Append(string str)
         {
             if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str)); // newline is \n char
 
@@ -169,7 +182,7 @@ namespace STOLON
         {
             if (!_cursor.IsOnText) throw new InvalidOperationException();
 
-            if (_cursor.IsPostText) Write(str);
+            if (_cursor.IsPostText) Append(str);
             else
             {
                 Put(str, _cursor.Index);
@@ -253,6 +266,7 @@ namespace STOLON
 
             #region HANDLE_ARROWS
 
+            // done in event handler.
 
             #endregion
         }
@@ -411,6 +425,21 @@ namespace STOLON
         static string[] SplitWithNewline(string input)
         {
             return Regex.Split(input, @"(?<=\n)(?=\S)|(?<=\n)(?=\n)");
+        }
+
+        public static string InsertLine(string input, int lineNumber, string lineToInsert, char newLine)
+        {
+            string[] lines = input.Split(newLine, StringSplitOptions.RemoveEmptyEntries);
+
+            if (lineNumber < 1 || lineNumber > lines.Length + 1)
+                throw new ArgumentOutOfRangeException(nameof(lineNumber), "Line number is out of range.");
+
+            string result = string.Join(newLine,
+                new string[] { string.Join(newLine, lines.Take(lineNumber - 1)) }
+                .Concat(new[] { lineToInsert })
+                .Concat(lines.Skip(lineNumber - 1)));
+
+            return result;
         }
 
         #endregion
