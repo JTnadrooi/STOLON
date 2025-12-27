@@ -149,6 +149,25 @@ namespace STOLON
             return index >= 0 && index < _text.Length;
         }
 
+        public void Write<T>(T item) => Write(item.ToString()!);
+        public void Write(string str)
+        {
+            string line = _lines[_lines.Count - 2];
+
+            if (!line.EndsWith(NewLine)) throw new InvalidObjectException("Invalid line found (missing newline).");
+
+            _lines[_lines.Count - 2] =
+                _lines[_lines.Count - 2][..^1] + // remove newline.
+                str + // add str.
+                NewLine; // readd newline.
+
+            _text = _lines.ToJoinedString();
+
+            UpdateText();
+
+            _cursor = _cursor.Offset(str.Length, true);
+        }
+
         public void WriteLine<T>(T item) => WriteLine(item.ToString()!);
         public void WriteLine(string str)
         {
@@ -163,6 +182,7 @@ namespace STOLON
             _cursor = _cursor.Offset(line.Length, true);
         }
 
+        public void AppendLine<T>(T item) => AppendLine(item.ToString()!);
         public void AppendLine(string str)
         {
             Append(str + NewLine);
