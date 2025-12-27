@@ -1,25 +1,96 @@
-﻿using System.Security.Claims;
+﻿using NAudio.CoreAudioApi;
 using System.Text.RegularExpressions;
 
 namespace STOLON
 {
     public class Shell : Service, ISingletonDependency
     {
-        //[Flags]
-        //public enum GetCharacterIndexAtNotOnTextDomain
-        //{
-        //    None = 0,
-        //    Above = 1,
-        //    Below = 2,
-        //    Left = 4,
-        //    Right = 8,
-        //}
-
-        public readonly record struct GetCharacterIndexAtReturnArgs(int Pos, bool PostText) // "just use a tuple" dont want to
+        private readonly struct CharacterInfo
         {
-            public static implicit operator int(GetCharacterIndexAtReturnArgs src)
+            public static Shell? s_shell;
+
+            private readonly int _index;
+
+            public readonly int Index
             {
-                return src.Pos;
+                get => _index < 0 ? throw new InvalidOperationException() : _index;
+            }
+
+            public readonly bool IsPostText { get; }
+
+            public readonly bool IsOnText => IsPostText || Index != -1;
+            public readonly bool IsOnCharacter => Index != -1;
+            public readonly int ClampedPos => IsPostText ? s_shell._text.Length - 1 : Index;
+
+            public CharacterInfo(int index) : this(index, false)
+            {
+                ArgumentOutOfRangeException.ThrowIfNegative(index);
+                ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, s_shell._text.Length);
+            }
+
+            private CharacterInfo(int index, bool isPostText)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(index, -1);
+
+                _index = index;
+                IsPostText = isPostText;
+            }
+
+            public CharacterInfo Offset(int amount, bool allowPostText = false)
+            {
+                if (!allowPostText && IsPostText) throw new InvalidOperationException($"Cannot offset post text pos if '{nameof(allowPostText)}' is false.");
+                if (amount == 0) return this;
+
+                if (allowPostText)
+                {
+                    if (IsPostText)
+                    {
+                        if (amount > 0)
+                        {
+                            return CharacterInfo.PostText;
+                        }
+                        else
+                        {
+                            return new CharacterInfo(s_shell._text.Length + amount); // amount is negative here.
+                        }
+                    }
+                    else
+                    {
+                        int newPos = Index + amount;
+
+                        if (newPos >= s_shell._text.Length)
+                        {
+                            return CharacterInfo.PostText;
+                        }
+                        else return new CharacterInfo(newPos);
+                    }
+                }
+                else
+                {
+                    int newPos = Index + amount;
+
+                    if (s_shell.IsValidCursorIndex(newPos))
+                    {
+                        return new CharacterInfo(newPos);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid newPos.");
+                    }
+                }
+            }
+
+            public static CharacterInfo PostText { get; } = new CharacterInfo(-1, true);
+            public static CharacterInfo OutOfBounds { get; } = new CharacterInfo(-1, false);
+
+            public static NormalizedRange GetRange(CharacterInfo info1, CharacterInfo info2)
+            {
+                return NormalizedRange.GetFromValues(info1.ClampedPos, info2.ClampedPos);
+            }
+
+            public static explicit operator int(CharacterInfo src)
+            {
+                return src.Index;
             }
         }
 
@@ -30,7 +101,6 @@ namespace STOLON
         private readonly IInputManager _input;
 
         public bool IsFocus { get; set; }
-        private bool IsCursorOnText => _cursorIndex != -1 || _cursorPostText;
 
         private string _text;
         private List<string> _lines;
@@ -41,16 +111,17 @@ namespace STOLON
 
         private const char NewLine = '\n';
 
-        private int _cursorIndex;
-        private int _cursorLastClickIndex;
+        private CharacterInfo _cursor;
+        private CharacterInfo _lastClickCursor;
         private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
-        private bool _cursorPostText;
 
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
 
         public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(null)
         {
+            CharacterInfo.s_shell = this;
+
             _logger = logger;
             _environment = environment;
             _fonts = fonts;
@@ -67,6 +138,11 @@ namespace STOLON
             STOLON.Instance.Window.KeyDown += OnKeyDown;
 
             IsFocus = true;
+        }
+
+        private bool IsValidCursorIndex(int index)
+        {
+            return index >= 0 && index < _text.Length;
         }
 
         public void WriteLine(string text)
@@ -87,12 +163,14 @@ namespace STOLON
         public void PutAtCursor(char character) => PutAtCursor(character.ToString());
         public void PutAtCursor(string str)
         {
-            if (!IsCursorOnText) throw new InvalidOperationException();
+            if (!_cursor.IsOnText) throw new InvalidOperationException();
 
-            if (_cursorPostText) Write(str);
-            else Put(str, _cursorIndex);
-
-            if (!_cursorPostText) _cursorIndex += str.Length;
+            if (_cursor.IsPostText) Write(str);
+            else
+            {
+                Put(str, _cursor.Index);
+                _cursor = _cursor.Offset(str.Length);
+            }
         }
 
         public void Put(string str, int pos)
@@ -104,18 +182,22 @@ namespace STOLON
 
         public bool RemoveAtCursor()
         {
-            if (!IsCursorOnText) throw new InvalidOperationException();
+            if (!_cursor.IsOnText) throw new InvalidOperationException();
 
-            if (_text.Length == 0 || _cursorIndex == 0) return false;
+            if (_text.Length == 0) return false;
 
-            if (_cursorPostText)
+            if (_cursor.IsPostText)
             {
                 RemoveAt(_text.Length - 1);
             }
             else
             {
-                RemoveAt(_cursorIndex - 1);
-                _cursorIndex--;
+                int newPos = _cursor.Index - 1;
+
+                if (!IsValidCursorIndex(newPos)) return false;
+
+                RemoveAt(newPos);
+                _cursor = new CharacterInfo(newPos);
             }
 
             return true;
@@ -144,11 +226,11 @@ namespace STOLON
 
             if (_input.IsPressed(MouseButton.Left))
             {
-                SetCursorPos(GetCharacterIndexAt(_input.VirtualMousePos, true));
+                _cursor = GetCharacterPosAt(_input.VirtualMousePos, true);
                 //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
-                if (_cursorIndex != -1 && _cursorLastClickIndex != -1)
-                    _cursorSelection = NormalizedRange.GetFromValues(_cursorLastClickIndex, _cursorIndex);
+                if (_cursor.IsOnText && _lastClickCursor.IsOnText)
+                    _cursorSelection = CharacterInfo.GetRange(_cursor, _lastClickCursor);
             }
             else
             {
@@ -157,7 +239,7 @@ namespace STOLON
 
             if (_input.IsClicked(MouseButton.Left))
             {
-                _cursorLastClickIndex = _cursorIndex;
+                _lastClickCursor = _cursor;
                 _cursorLifetime = 0;
 
                 if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
@@ -171,7 +253,7 @@ namespace STOLON
             #endregion
         }
 
-        private GetCharacterIndexAtReturnArgs GetCharacterIndexAt(Vector2 pos, bool clamp = false)
+        private CharacterInfo GetCharacterPosAt(Vector2 pos, bool clamp = false)
         {
             int charWidth = (int)_font.Dimensions.X;
             int charHeight = (int)_font.Dimensions.Y;
@@ -182,7 +264,7 @@ namespace STOLON
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
             if (clamp) charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
-            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return new GetCharacterIndexAtReturnArgs(-1, false);
+            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return CharacterInfo.OutOfBounds;
 
             string charLine = _lines[charLineIndex];
 
@@ -190,18 +272,18 @@ namespace STOLON
             {
                 if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // why I need this check with x but not y remains a mystery.
                 {
-                    return new GetCharacterIndexAtReturnArgs(-1, true);
+                    return CharacterInfo.PostText;
                 }
                 charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
             }
-            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return new GetCharacterIndexAtReturnArgs(-1, false);
+            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return CharacterInfo.OutOfBounds;
 
             int result = charIndexOnLine;
 
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            if (result == _text.Length) return new GetCharacterIndexAtReturnArgs(-1, true);
+            if (result == _text.Length) return CharacterInfo.PostText;
 
             //result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
 
@@ -209,10 +291,10 @@ namespace STOLON
             //Console.WriteLine($"out of {_text.Length}");
             //Console.WriteLine($"char {_text[result]}");
 
-            return new GetCharacterIndexAtReturnArgs(result, false);
+            return new CharacterInfo(result);
         }
 
-        private Vector2 GetCharacterPosAt(int charIndex)
+        private Vector2 GetCharacterScreenPosAt(int charIndex)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(charIndex);
             ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(charIndex, _text.Length);
@@ -241,79 +323,37 @@ namespace STOLON
             return new Vector2(x, y);
         }
 
-        private Vector2 GetCursorPos()
+        private Vector2 GetCursorScreenPos()
         {
-            if (_cursorPostText)
+            if (_cursor.IsPostText)
             {
                 if (_text.Length == 0) return _textPos; //  + new Vector2(0, -_font.Dimensions.Y);
 
                 char selectedChar = _text[_text.Length - 1];
-                if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterPosAt(_text.Length - 1) - _textPos).Y);
-                else return GetCharacterPosAt(_text.Length - 1) + new Vector2(_font.Dimensions.X, 0);
+                if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterScreenPosAt(_text.Length - 1) - _textPos).Y);
+                else return GetCharacterScreenPosAt(_text.Length - 1) + new Vector2(_font.Dimensions.X, 0);
             }
-            else return GetCharacterPosAt(_cursorIndex);
-        }
-
-        private void SetCursorPos(GetCharacterIndexAtReturnArgs pos)
-        {
-            if (pos.PostText && pos.Pos != -1) throw new ArgumentException(nameof(pos));
-            if (pos.Pos < -1) throw new ArgumentException(nameof(pos));
-            if (pos.Pos > _text.Length - 1) throw new ArgumentException(nameof(pos));
-
-            _cursorIndex = pos.Pos;
-            _cursorPostText = pos.PostText;
-        }
-
-        private void SetCursorPos(int pos)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(pos);
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(pos, _text.Length);
-
-            _cursorIndex = pos;
-            _cursorPostText = false;
-        }
-
-        private void ResetCursorPos(bool postText = false)
-        {
-            _cursorIndex = -1;
-            _cursorPostText = postText;
+            else return GetCharacterScreenPosAt(_cursor.Index);
         }
 
         private void OnKeyDown(object? sender, InputKeyEventArgs e)
         {
-            if (!IsCursorOnText) return;
+            if (!_cursor.IsOnText) return;
 
             switch (e.Key)
             {
                 case Keys.Left:
-                    if (_cursorPostText)
-                    {
-                        _cursorPostText = false;
-                        _cursorIndex = _text.Length - 1;
-                    }
-                    else if (_cursorIndex != 0)
-                    {
-                        _cursorIndex--;
-                    }
+                    _cursor = _cursor.Offset(-1, true);
                     break;
                 case Keys.Right:
-                    if (!_cursorPostText && _cursorIndex < _text.Length)
-                    {
-                        _cursorIndex++;
-
-                        if (_cursorIndex == _text.Length)
-                        {
-                            _cursorIndex = -1;
-                            _cursorPostText = true;
-                        }
-                    }
+                    _cursor = _cursor.Offset(1, true);
                     break;
             }
         }
 
         private void OnTextInput(object? sender, TextInputEventArgs e)
         {
-            if (!IsCursorOnText) return;
+            if (!_cursor.IsOnText) return;
 
             switch (e.Character)
             {
@@ -335,7 +375,7 @@ namespace STOLON
         {
             drawingContext.DrawString(_font, ReplaceAt(_text, _cursorSelection, '_'), _textPos, scale: _textScale);
             if (((int)(_cursorLifetime * 0.03f)) % 2 == 0)
-                drawingContext.Draw(_textures["UI\\cursor"], GetCursorPos() + new Vector2(0, 2));
+                drawingContext.Draw(_textures["UI\\cursor"], GetCursorScreenPos() + new Vector2(0, 2));
             //drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
         }
 
