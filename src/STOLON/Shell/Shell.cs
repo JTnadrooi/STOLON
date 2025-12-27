@@ -149,6 +149,7 @@ namespace STOLON
             return index >= 0 && index < _text.Length;
         }
 
+        public void WriteLine<T>(T item) => WriteLine(item.ToString()!);
         public void WriteLine(string str)
         {
             string line = str + NewLine;
@@ -167,7 +168,7 @@ namespace STOLON
             Append(str + NewLine);
         }
 
-        public void Append(char character) => Append(character.ToString());
+        public void Append<T>(T item) => Append(item.ToString()!);
         public void Append(string str)
         {
             if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str)); // newline is \n char
