@@ -85,7 +85,11 @@ namespace STOLON
 
             public static NormalizedRange GetRange(CharacterInfo info1, CharacterInfo info2)
             {
-                return NormalizedRange.GetFromValues(info1.ClampedPos, info2.ClampedPos);
+                NormalizedRange temp = NormalizedRange.GetFromValues(info1.ClampedPos, info2.ClampedPos);
+
+                if (info1.IsPostText ^ info2.IsPostText) return new NormalizedRange(temp.Start, s_shell._text.Length);
+
+                return temp;
             }
 
             public static explicit operator int(CharacterInfo src)
