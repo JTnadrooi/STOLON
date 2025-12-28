@@ -1,4 +1,6 @@
-﻿namespace STOLON
+﻿using System.Runtime.InteropServices;
+
+namespace STOLON
 {
     public class ShellScene : Scene
     {
@@ -9,14 +11,16 @@
         private readonly Interface _ui;
         private readonly Shell _shell;
         private readonly ITextframe _textframe;
+        private readonly IInputManager _input;
 
-        public ShellScene(IRichLogger logger, Interface ui, ITexture2DCollection textures, Shell shell, ITextframe textframe) : base("shell")
+        public ShellScene(IRichLogger logger, Interface ui, ITexture2DCollection textures, Shell shell, ITextframe textframe, IInputManager input) : base("shell")
         {
             _logger = logger;
             _ui = ui;
             _textures = textures;
             _shell = shell;
             _textframe = textframe;
+            _input = input;
 
             _textframe.Hide = true;
             _textures = textures;
@@ -25,10 +29,17 @@
 
             Shell.WriteLine("Hello. This is a long first line no?");
             Shell.WriteLine("This is on the second line.");
+            Shell.HasInputLine = true;
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)
         {
+            if (_input.IsPressed(Keys.LeftControl))
+            {
+                if (_input.IsClicked(Keys.W)) Shell.WriteLine(new Random().Next().ToString());
+                if (_input.IsClicked(Keys.E)) Shell.Write(new Random().Next().ToString());
+            }
+
             Shell.Update(elapsedMilliseconds);
         }
 

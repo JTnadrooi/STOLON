@@ -1,11 +1,11 @@
-﻿using NAudio.CoreAudioApi;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace STOLON
 {
     public class Shell : Service, ISingletonDependency
     {
-        private readonly struct CharacterInfo
+        private readonly struct CharacterInfo : IEquatable<CharacterInfo>
         {
             public static Shell? s_shell;
 
@@ -18,9 +18,10 @@ namespace STOLON
 
             public readonly bool IsPostText { get; }
 
-            public readonly bool IsOnText => IsPostText || Index != -1;
-            public readonly bool IsOnCharacter => Index != -1;
-            public readonly int ClampedPos => IsPostText ? s_shell._text.Length - 1 : Index;
+            public readonly bool IsOnText => IsPostText || _index != -1;
+            public readonly bool IsOnCharacter => _index != -1;
+            public readonly int ClampedIndex => IsPostText ? s_shell._text.Length - 1 : Index;
+            public readonly int BorderingIndex => IsPostText ? s_shell._text.Length : Index;
 
             public CharacterInfo(int index) : this(index, false)
             {
@@ -67,17 +68,16 @@ namespace STOLON
                 }
                 else
                 {
-                    int newPos = Index + amount;
-
-                    if (s_shell.IsValidCursorIndex(newPos))
-                    {
-                        return new CharacterInfo(newPos);
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Invalid newPos.");
-                    }
+                    return new CharacterInfo(Index + amount);
                 }
+            }
+
+            public bool IsValidCursorIndex()
+            {
+                if (IsPostText) return s_shell._hasInputLine;
+                if (!IsOnCharacter) throw new InvalidOperationException("Can't check if valid if pos isnt on a character.");
+
+                return !s_shell.ReadonlyRange.Contains(Index);
             }
 
             public static CharacterInfo PostText { get; } = new CharacterInfo(-1, true);
@@ -85,7 +85,7 @@ namespace STOLON
 
             public static NormalizedRange GetRange(CharacterInfo info1, CharacterInfo info2)
             {
-                NormalizedRange temp = NormalizedRange.GetFromValues(info1.ClampedPos, info2.ClampedPos);
+                NormalizedRange temp = NormalizedRange.FromValues(info1.ClampedIndex, info2.ClampedIndex);
 
                 if (info1.IsPostText ^ info2.IsPostText) return new NormalizedRange(temp.Start, s_shell._text.Length);
 
@@ -96,6 +96,25 @@ namespace STOLON
             {
                 return src.Index;
             }
+
+            public static bool operator ==(CharacterInfo item1, CharacterInfo item2) => item1.Equals(item2);
+            public static bool operator !=(CharacterInfo item1, CharacterInfo item2) => !item1.Equals(item2);
+
+            public override bool Equals(object? obj)
+            {
+                return obj is CharacterInfo other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(_index, IsPostText);
+            }
+
+            public bool Equals(CharacterInfo other)
+            {
+                return _index == other._index && IsPostText == other.IsPostText;
+            }
+
         }
 
         private readonly IRichLogger _logger;
@@ -110,21 +129,76 @@ namespace STOLON
         private List<string> _lines;
         private Font2D _font;
         private Vector2 _textScale;
-        private Vector2 _debugCursorPos;
         private Vector2 _textPos;
 
         private const char NewLine = '\n';
+        private const string InputLinePrefix = "> ";
+
+        private NormalizedRange _readonlyRange;
+        private NormalizedRange ReadonlyRange
+        {
+            get
+            {
+                return _readonlyRange;
+            }
+            set
+            {
+                ValidateTextRange(value);
+
+                _readonlyRange = value;
+            }
+        }
 
         private CharacterInfo _cursor;
+        private CharacterInfo Cursor
+        {
+            get => _cursor;
+            set
+            {
+                if (!value.IsOnText)
+                {
+                    Debug.Assert(value == CharacterInfo.OutOfBounds);
+                    _cursor = value;
+                }
+                else if (value.IsValidCursorIndex()) _cursor = value;
+                else if (_hasInputLine && value.IsPostText) throw new InvalidOperationException($"Cursor cannot be placed post text if '{nameof(_hasInputLine)}' is true.");
+                else if (!value.IsOnText) throw new InvalidOperationException($"Cursor '{value}' is not on text.");
+                else throw new InvalidOperationException($"Cursor cannot be placed at '{value}'.");
+            }
+        }
+
         private CharacterInfo _lastClickCursor;
         private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
+
+        private bool _hasInputLine;
+        public bool HasInputLine
+        {
+            get => _hasInputLine;
+            set
+            {
+                if (value && !_hasInputLine)
+                {
+                    Debug.Assert(!Cursor.IsOnText, "Cursor is on text even though there is no input line.");
+
+                    _hasInputLine = true;
+
+                    Input(InputLinePrefix); // append to prevent _readonlyRange from extending.
+                    ExtendReadonlyRange(InputLinePrefix.Length);
+                }
+                else if (!value && _hasInputLine)
+                {
+                    throw new NotImplementedException();
+                    //_hasInputLine = false;
+                }
+            }
+        }
 
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
 
         public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(null)
         {
-            CharacterInfo.s_shell = this;
+            CharacterInfo.s_shell = this; // singleton soo..
 
             _logger = logger;
             _environment = environment;
@@ -136,22 +210,52 @@ namespace STOLON
             _lines = new List<string>();
             _font = _fonts.Medium;
             _textScale = Vector2.One;
-            _debugCursorPos = Vector2.Zero;
+            ReadonlyRange = NormalizedRange.Empty;
 
             STOLON.Instance.Window.TextInput += OnTextInput;
             STOLON.Instance.Window.KeyDown += OnKeyDown;
 
+            _lastClickCursor = CharacterInfo.OutOfBounds;
+            Cursor = CharacterInfo.OutOfBounds;
+            ReadonlyRange = NormalizedRange.Empty;
+
             IsFocus = true;
         }
 
-        private bool IsValidCursorIndex(int index)
+        private bool TrySetCursor(CharacterInfo newPos)
         {
-            return index >= 0 && index < _text.Length;
+            if (newPos.IsValidCursorIndex())
+            {
+                Cursor = newPos;
+                return true;
+            }
+
+            return false;
         }
+
+        private void ExtendReadonlyRange(int amount)
+        {
+            ReadonlyRange = new NormalizedRange(ReadonlyRange.Start, ReadonlyRange.End + amount);
+        }
+
+        private void ValidateTextRange(NormalizedRange range)
+        {
+            if (range.IsNegative) throw new InvalidOperationException("negative range");
+            if (range.End > _text.Length) throw new InvalidOperationException("maxend");
+        }
+
+        #region WRITE_METHODS
 
         public void Write<T>(T item) => Write(item.ToString()!);
         public void Write(string str)
         {
+            if (!_hasInputLine)
+            {
+                Append(str);
+                ExtendReadonlyRange(str.Length);
+                return;
+            }
+
             string line = _lines[_lines.Count - 2];
 
             if (!line.EndsWith(NewLine)) throw new InvalidObjectException("Invalid line found (missing newline).");
@@ -159,18 +263,26 @@ namespace STOLON
             _lines[_lines.Count - 2] =
                 _lines[_lines.Count - 2][..^1] + // remove newline.
                 str + // add str.
-                NewLine; // readd newline.
+                NewLine; // re-add newline.
 
             _text = _lines.ToJoinedString();
 
             UpdateText();
 
-            _cursor = _cursor.Offset(str.Length, true);
+            Cursor = Cursor.Offset(str.Length, true);
+            ExtendReadonlyRange(str.Length);
         }
 
         public void WriteLine<T>(T item) => WriteLine(item.ToString()!);
         public void WriteLine(string str)
         {
+            if (!_hasInputLine)
+            {
+                AppendLine(str);
+                ExtendReadonlyRange(str.Length + 1);
+                return;
+            }
+
             string line = str + NewLine;
 
             _lines.Insert(_lines.Count - 1, line);
@@ -179,66 +291,49 @@ namespace STOLON
 
             UpdateText();
 
-            _cursor = _cursor.Offset(line.Length, true);
+            Cursor = Cursor.Offset(line.Length, true);
+            ExtendReadonlyRange(line.Length);
         }
+
 
         public void AppendLine<T>(T item) => AppendLine(item.ToString()!);
         public void AppendLine(string str)
         {
-            Append(str + NewLine);
+            Input(str + NewLine);
         }
 
-        public void Append<T>(T item) => Append(item.ToString()!);
+        public void Append<T>(T item) => Input(item.ToString()!);
         public void Append(string str)
         {
             if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str)); // newline is \n char
 
-            _text += str;
-
-            UpdateText();
+            Put(str, _text.Length);
         }
 
-        public void PutAtCursor(char character) => PutAtCursor(character.ToString());
-        public void PutAtCursor(string str)
+        public void Input<T>(T item) => Input(item.ToString()!);
+        public void Input(string str)
         {
-            if (!_cursor.IsOnText) throw new InvalidOperationException();
+            if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str));
 
-            if (_cursor.IsPostText) Append(str);
-            else
-            {
-                Put(str, _cursor.Index);
-                _cursor = _cursor.Offset(str.Length);
-            }
+            Put(str, _text.Length);
         }
 
+        #endregion
+
+        private void Put<T>(T item, CharacterInfo pos) => Put(item.ToString()!, pos);
+        private void Put(string str, CharacterInfo pos)
+        {
+            if (!pos.IsOnText) throw new InvalidOperationException();
+            if (pos.IsPostText) Put(str, _text.Length);
+            else Put(str, pos.ClampedIndex);
+        }
+
+        public void Put<T>(T item, int pos) => Put(item.ToString()!, pos);
         public void Put(string str, int pos)
         {
             _text = _text.Insert(pos, str);
 
             UpdateText();
-        }
-
-        public bool RemoveAtCursor()
-        {
-            if (!_cursor.IsOnText) throw new InvalidOperationException();
-
-            if (_text.Length == 0) return false;
-
-            if (_cursor.IsPostText)
-            {
-                RemoveAt(_text.Length - 1);
-            }
-            else
-            {
-                int newPos = _cursor.Index - 1;
-
-                if (!IsValidCursorIndex(newPos)) return false;
-
-                RemoveAt(newPos);
-                _cursor = new CharacterInfo(newPos);
-            }
-
-            return true;
         }
 
         public void RemoveAt(int pos)
@@ -264,11 +359,13 @@ namespace STOLON
 
             if (_input.IsPressed(MouseButton.Left))
             {
-                _cursor = GetCharacterPosAt(_input.VirtualMousePos, true);
+                CharacterInfo character = GetCharacterPosAt(_input.VirtualMousePos, true);
+
+                TrySetCursor(character);
                 //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
-                if (_cursor.IsOnText && _lastClickCursor.IsOnText)
-                    _cursorSelection = CharacterInfo.GetRange(_cursor, _lastClickCursor);
+                if (character.IsOnText && _lastClickCursor.IsOnText)
+                    _cursorSelection = CharacterInfo.GetRange(character, _lastClickCursor);
             }
             else
             {
@@ -277,7 +374,7 @@ namespace STOLON
 
             if (_input.IsClicked(MouseButton.Left))
             {
-                _lastClickCursor = _cursor;
+                _lastClickCursor = GetCharacterPosAt(_input.VirtualMousePos, true);
                 _cursorLifetime = 0;
 
                 if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
@@ -364,7 +461,9 @@ namespace STOLON
 
         private Vector2 GetCursorScreenPos()
         {
-            if (_cursor.IsPostText)
+            if (!Cursor.IsOnText) throw new InvalidOperationException($"Cursor is not on text.");
+
+            if (Cursor.IsPostText)
             {
                 if (_text.Length == 0) return _textPos; //  + new Vector2(0, -_font.Dimensions.Y);
 
@@ -372,48 +471,74 @@ namespace STOLON
                 if (selectedChar == NewLine) return _textPos + new Vector2(0, -_font.Dimensions.Y + (GetCharacterScreenPosAt(_text.Length - 1) - _textPos).Y);
                 else return GetCharacterScreenPosAt(_text.Length - 1) + new Vector2(_font.Dimensions.X, 0);
             }
-            else return GetCharacterScreenPosAt(_cursor.Index);
+            else return GetCharacterScreenPosAt(Cursor.Index);
         }
+
+        #region INPUT_EVENTS
 
         private void OnKeyDown(object? sender, InputKeyEventArgs e)
         {
-            if (!_cursor.IsOnText) return;
-
+            if (!Cursor.IsOnText) return;
             switch (e.Key)
             {
                 case Keys.Left:
-                    _cursor = _cursor.Offset(-1, true);
+                    TrySetCursor(Cursor.Offset(-1, true));
                     break;
                 case Keys.Right:
-                    _cursor = _cursor.Offset(1, true);
+                    TrySetCursor(Cursor.Offset(1, true));
                     break;
+                default: return;
             }
         }
 
         private void OnTextInput(object? sender, TextInputEventArgs e)
         {
-            if (!_cursor.IsOnText) return;
+            if (!Cursor.IsOnText) return;
+
+            void PutAndOffset(char c)
+            {
+                Put(c, Cursor);
+                if (!Cursor.IsPostText) Cursor = Cursor.Offset(1, true);
+            }
 
             switch (e.Character)
             {
                 case '\b':
-                    RemoveAtCursor();
+                    if (_text.Length == 0) break;
+
+                    if (Cursor.IsPostText)
+                    {
+                        if (!ReadonlyRange.Contains(_text.Length - 1)) RemoveAt(_text.Length - 1);
+                    }
+                    else
+                    {
+                        int newPos = Cursor.Index - 1;
+
+                        if (!ReadonlyRange.Contains(newPos))
+                        {
+                            RemoveAt(newPos);
+                            Cursor = new CharacterInfo(newPos);
+                        }
+                    }
+
                     break;
                 case '\r':
-                    PutAtCursor(NewLine);
+                    PutAndOffset(NewLine);
                     return;
                 default:
-                    PutAtCursor(e.Character);
+                    PutAndOffset(e.Character);
                     break;
             }
 
             _cursorSelection = NormalizedRange.Empty;
         }
 
+        #endregion
+
         public override void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawString(_font, ReplaceAt(_text, _cursorSelection, '_'), _textPos, scale: _textScale);
-            if (((int)(_cursorLifetime * 0.03f)) % 2 == 0)
+            if (((int)(_cursorLifetime * 0.03f)) % 2 == 0 && Cursor.IsOnText)
                 drawingContext.Draw(_textures["UI\\cursor"], GetCursorScreenPos() + new Vector2(0, 2));
             //drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);
         }
