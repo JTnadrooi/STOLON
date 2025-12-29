@@ -7,7 +7,7 @@ namespace STOLON
     {
         private readonly struct CharacterInfo : IEquatable<CharacterInfo>
         {
-            public static Shell? s_shell;
+            private readonly Shell _shell;
 
             private readonly int _index;
 
@@ -20,19 +20,20 @@ namespace STOLON
 
             public readonly bool IsOnText => IsPostText || _index != -1;
             public readonly bool IsOnCharacter => _index != -1;
-            public readonly int ClampedIndex => IsPostText ? s_shell._text.Length - 1 : Index;
-            public readonly int BorderingIndex => IsPostText ? s_shell._text.Length : Index;
+            public readonly int ClampedIndex => IsPostText ? _shell._text.Length - 1 : Index;
+            public readonly int BorderingIndex => IsPostText ? _shell._text.Length : Index;
 
-            public CharacterInfo(int index) : this(index, false)
+            public CharacterInfo(Shell shell, int index) : this(shell, index, false)
             {
                 ArgumentOutOfRangeException.ThrowIfNegative(index);
-                ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, s_shell._text.Length);
+                ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _shell._text.Length);
             }
 
-            private CharacterInfo(int index, bool isPostText)
+            private CharacterInfo(Shell shell, int index, bool isPostText)
             {
                 ArgumentOutOfRangeException.ThrowIfLessThan(index, -1);
 
+                _shell = shell;
                 _index = index;
                 IsPostText = isPostText;
             }
@@ -48,46 +49,46 @@ namespace STOLON
                     {
                         if (amount > 0)
                         {
-                            return CharacterInfo.PostText;
+                            return CharacterInfo.GetPostText(_shell);
                         }
                         else
                         {
-                            return new CharacterInfo(s_shell._text.Length + amount); // amount is negative here.
+                            return new CharacterInfo(_shell, _shell._text.Length + amount); // amount is negative here.
                         }
                     }
                     else
                     {
                         int newPos = Index + amount;
 
-                        if (newPos >= s_shell._text.Length)
+                        if (newPos >= _shell._text.Length)
                         {
-                            return CharacterInfo.PostText;
+                            return CharacterInfo.GetPostText(_shell);
                         }
-                        else return new CharacterInfo(newPos);
+                        else return new CharacterInfo(_shell, newPos);
                     }
                 }
                 else
                 {
-                    return new CharacterInfo(Index + amount);
+                    return new CharacterInfo(_shell, Index + amount);
                 }
             }
 
             public bool IsValidCursorInfo()
             {
-                if (IsPostText) return s_shell._hasInputLine;
-                if (!IsOnCharacter) throw new InvalidOperationException("Can't check if valid if pos isnt on a character.");
+                if (IsPostText) return _shell._hasInputLine;
+                if (!IsOnCharacter) throw new InvalidOperationException("Can't check if valid if pos isn't on a character.");
 
-                return !s_shell.ReadonlyRange.Contains(Index);
+                return !_shell.ReadonlyRange.Contains(Index);
             }
 
-            public static CharacterInfo PostText { get; } = new CharacterInfo(-1, true);
-            public static CharacterInfo OutOfBounds { get; } = new CharacterInfo(-1, false);
+            public static CharacterInfo GetPostText(Shell shell) => new CharacterInfo(shell, -1, true);
+            public static CharacterInfo GetOutOfBounds(Shell shell) => new CharacterInfo(shell, -1, false);
 
             public static NormalizedRange GetRange(CharacterInfo info1, CharacterInfo info2)
             {
                 NormalizedRange temp = NormalizedRange.FromValues(info1.ClampedIndex, info2.ClampedIndex);
 
-                if (info1.IsPostText ^ info2.IsPostText) return new NormalizedRange(temp.Start, s_shell._text.Length);
+                if (info1.IsPostText ^ info2.IsPostText) return new NormalizedRange(temp.Start, info1._shell._text.Length);
 
                 return temp;
             }
@@ -107,14 +108,13 @@ namespace STOLON
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(_index, IsPostText);
+                return HashCode.Combine(HashCode.Combine(_index, IsPostText), _shell);
             }
 
             public bool Equals(CharacterInfo other)
             {
-                return _index == other._index && IsPostText == other.IsPostText;
+                return _index == other._index && IsPostText == other.IsPostText && _shell == other._shell;
             }
-
         }
 
         private readonly IRichLogger _logger;
@@ -157,7 +157,7 @@ namespace STOLON
             {
                 if (!value.IsOnText)
                 {
-                    Debug.Assert(value == CharacterInfo.OutOfBounds);
+                    Debug.Assert(value == CharacterInfo.GetOutOfBounds(this));
                     _cursor = value;
                 }
                 else if (value.IsValidCursorInfo()) _cursor = value;
@@ -198,8 +198,6 @@ namespace STOLON
 
         public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(null)
         {
-            CharacterInfo.s_shell = this; // singleton soo..
-
             _logger = logger;
             _environment = environment;
             _fonts = fonts;
@@ -215,8 +213,8 @@ namespace STOLON
             STOLON.Instance.Window.TextInput += OnTextInput;
             STOLON.Instance.Window.KeyDown += OnKeyDown;
 
-            _lastClickCursor = CharacterInfo.OutOfBounds;
-            Cursor = CharacterInfo.OutOfBounds;
+            _lastClickCursor = CharacterInfo.GetOutOfBounds(this);
+            Cursor = CharacterInfo.GetOutOfBounds(this);
             ReadonlyRange = NormalizedRange.Empty;
 
             IsFocus = true;
@@ -365,7 +363,7 @@ namespace STOLON
 
                 if (!TrySetCursor(character))
                 {
-                    Cursor = CharacterInfo.OutOfBounds;
+                    Cursor = CharacterInfo.GetOutOfBounds(this);
                 }
                 //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
@@ -406,7 +404,7 @@ namespace STOLON
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
             if (clamp) charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
-            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return CharacterInfo.OutOfBounds;
+            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return CharacterInfo.GetOutOfBounds(this);
 
             string charLine = _lines[charLineIndex];
 
@@ -414,18 +412,18 @@ namespace STOLON
             {
                 if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // why I need this check with x but not y remains a mystery.
                 {
-                    return CharacterInfo.PostText;
+                    return CharacterInfo.GetPostText(this);
                 }
                 charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
             }
-            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return CharacterInfo.OutOfBounds;
+            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return CharacterInfo.GetOutOfBounds(this);
 
             int result = charIndexOnLine;
 
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            if (result == _text.Length) return CharacterInfo.PostText;
+            if (result == _text.Length) return CharacterInfo.GetPostText(this);
 
             //result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
 
@@ -433,7 +431,7 @@ namespace STOLON
             //Console.WriteLine($"out of {_text.Length}");
             //Console.WriteLine($"char {_text[result]}");
 
-            return new CharacterInfo(result);
+            return new CharacterInfo(this, result);
         }
 
         private Vector2 GetCharacterScreenPosAt(int charIndex)
@@ -523,7 +521,7 @@ namespace STOLON
                         if (!ReadonlyRange.Contains(newPos))
                         {
                             RemoveAt(newPos);
-                            Cursor = new CharacterInfo(newPos);
+                            Cursor = new CharacterInfo(this, newPos);
                         }
                     }
 
