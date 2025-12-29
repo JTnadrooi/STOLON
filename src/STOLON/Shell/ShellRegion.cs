@@ -297,12 +297,12 @@ namespace STOLON
                 return;
             }
 
-            string line = _lines[_lines.Count - 2];
+            string line = _lines[^2];
 
             if (!line.EndsWith(NewLine)) throw new InvalidObjectException("Invalid line found (missing newline).");
 
-            _lines[_lines.Count - 2] =
-                _lines[_lines.Count - 2][..^1] + // remove newline.
+            _lines[^2] = // second last
+                _lines[^2][..^1] + // remove newline.
                 str + // add str.
                 NewLine; // re-add newline.
 

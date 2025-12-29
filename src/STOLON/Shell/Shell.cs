@@ -64,7 +64,6 @@ namespace STOLON
                 y -= r.Height + RegionClearance;
                 if (r == region)
                 {
-
                     return new Vector2(x, y);
                 }
                 y += r.VerticalOverlap;
