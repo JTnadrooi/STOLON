@@ -72,7 +72,7 @@ namespace STOLON
                 }
             }
 
-            public bool IsValidCursorIndex()
+            public bool IsValidCursorInfo()
             {
                 if (IsPostText) return s_shell._hasInputLine;
                 if (!IsOnCharacter) throw new InvalidOperationException("Can't check if valid if pos isnt on a character.");
@@ -160,7 +160,7 @@ namespace STOLON
                     Debug.Assert(value == CharacterInfo.OutOfBounds);
                     _cursor = value;
                 }
-                else if (value.IsValidCursorIndex()) _cursor = value;
+                else if (value.IsValidCursorInfo()) _cursor = value;
                 else if (_hasInputLine && value.IsPostText) throw new InvalidOperationException($"Cursor cannot be placed post text if '{nameof(_hasInputLine)}' is true.");
                 else if (!value.IsOnText) throw new InvalidOperationException($"Cursor '{value}' is not on text.");
                 else throw new InvalidOperationException($"Cursor cannot be placed at '{value}'.");
@@ -224,7 +224,7 @@ namespace STOLON
 
         private bool TrySetCursor(CharacterInfo newPos)
         {
-            if (newPos.IsValidCursorIndex())
+            if (newPos.IsValidCursorInfo())
             {
                 Cursor = newPos;
                 return true;
@@ -299,10 +299,10 @@ namespace STOLON
         public void AppendLine<T>(T item) => AppendLine(item.ToString()!);
         public void AppendLine(string str)
         {
-            Input(str + NewLine);
+            Append(str + NewLine);
         }
 
-        public void Append<T>(T item) => Input(item.ToString()!);
+        public void Append<T>(T item) => Append(item.ToString()!);
         public void Append(string str)
         {
             if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str)); // newline is \n char
@@ -313,6 +313,8 @@ namespace STOLON
         public void Input<T>(T item) => Input(item.ToString()!);
         public void Input(string str)
         {
+            if (!_hasInputLine) throw new InvalidOperationException("No input is allowed at this time.");
+
             if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str));
 
             Put(str, _text.Length);
@@ -359,9 +361,12 @@ namespace STOLON
 
             if (_input.IsPressed(MouseButton.Left))
             {
-                CharacterInfo character = GetCharacterPosAt(_input.VirtualMousePos, true);
+                CharacterInfo character = GetCharacterInfoAt(_input.VirtualMousePos, true);
 
-                TrySetCursor(character);
+                if (!TrySetCursor(character))
+                {
+                    Cursor = CharacterInfo.OutOfBounds;
+                }
                 //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
                 _cursorSelecting = true;
                 if (character.IsOnText && _lastClickCursor.IsOnText)
@@ -374,8 +379,9 @@ namespace STOLON
 
             if (_input.IsClicked(MouseButton.Left))
             {
-                _lastClickCursor = GetCharacterPosAt(_input.VirtualMousePos, true);
-                _cursorLifetime = 0;
+                _lastClickCursor = GetCharacterInfoAt(_input.VirtualMousePos, true);
+                if (_lastClickCursor.IsValidCursorInfo())
+                    _cursorLifetime = 0;
 
                 if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
             }
@@ -389,7 +395,7 @@ namespace STOLON
             #endregion
         }
 
-        private CharacterInfo GetCharacterPosAt(Vector2 pos, bool clamp = false)
+        private CharacterInfo GetCharacterInfoAt(Vector2 pos, bool clamp = false)
         {
             int charWidth = (int)_font.Dimensions.X;
             int charHeight = (int)_font.Dimensions.Y;
