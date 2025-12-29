@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -77,10 +78,17 @@ namespace STOLON
                 IsPostText = isPostText;
             }
 
-            public CharacterInfo Offset(int amount, bool allowPostText = false)
+            public bool TryOffset(int amount, [NotNullWhen(true)] out CharacterInfo? characterInfo, bool allowPostText = false)
             {
-                if (!allowPostText && IsPostText) throw new InvalidOperationException($"Cannot offset post text pos if '{nameof(allowPostText)}' is false.");
-                if (amount == 0) return this;
+                characterInfo = null;
+
+                if (!allowPostText && IsPostText) return false;
+
+                if (amount == 0)
+                {
+                    characterInfo = this;
+                    return true;
+                }
 
                 if (allowPostText)
                 {
@@ -88,11 +96,13 @@ namespace STOLON
                     {
                         if (amount > 0)
                         {
-                            return CharacterInfo.GetPostText(_region);
+                            characterInfo = CharacterInfo.GetPostText(_region);
+                            return true;
                         }
                         else
                         {
-                            return new CharacterInfo(_region, _region._text.Length + amount); // amount is negative here.
+                            characterInfo = new CharacterInfo(_region, _region._text.Length + amount); // amount is negative here.
+                            return true;
                         }
                     }
                     else
@@ -101,15 +111,26 @@ namespace STOLON
 
                         if (newPos >= _region._text.Length)
                         {
-                            return CharacterInfo.GetPostText(_region);
+                            characterInfo = CharacterInfo.GetPostText(_region);
+                            return true;
                         }
-                        else return new CharacterInfo(_region, newPos);
+                        characterInfo = new CharacterInfo(_region, newPos);
+                        return true;
                     }
                 }
                 else
                 {
-                    return new CharacterInfo(_region, Index + amount);
+                    characterInfo = new CharacterInfo(_region, Index + amount);
+                    return true;
                 }
+            }
+
+            public CharacterInfo Offset(int amount, bool allowPostText = false)
+            {
+                //if (!allowPostText && IsPostText) throw new InvalidOperationException($"Cannot offset post text pos if '{nameof(allowPostText)}' is false.");
+
+                if (TryOffset(amount, out CharacterInfo? characterInfo, allowPostText)) return characterInfo.Value;
+                else throw new InvalidOperationException($"Offset '{this}' by {amount} on text lenght of '{_region._text.Length}' failed.");
             }
 
             public bool IsValidCursorInfo()
@@ -219,7 +240,22 @@ namespace STOLON
             get => _hasInputLine;
             set
             {
-                if (value && !_hasInputLine)
+                if (value == _hasInputLine) return;
+
+                if (_hasInputLine)
+                {
+                    _lines = _lines[..^1];
+                    _text = _lines.ToJoinedString();
+
+                    _hasInputLine = false;
+
+                    Cursor = CharacterInfo.GetOutOfBounds(this);
+                    _readonlyRange = new NormalizedRange(0, _text.Length);
+
+                    UpdateText();
+                    //_hasInputLine = false;
+                }
+                else
                 {
                     Debug.Assert(!Cursor.IsOnText, "Cursor is on text even though there is no input line.");
 
@@ -227,11 +263,6 @@ namespace STOLON
 
                     Input(InputLinePrefix); // append to prevent _readonlyRange from extending.
                     ExtendReadonlyRange(InputLinePrefix.Length);
-                }
-                else if (!value && _hasInputLine)
-                {
-                    throw new NotImplementedException();
-                    //_hasInputLine = false;
                 }
             }
         }
@@ -310,7 +341,8 @@ namespace STOLON
 
             UpdateText();
 
-            Cursor = Cursor.Offset(str.Length, true);
+            if (Cursor.IsOnText)
+                Cursor = Cursor.Offset(str.Length, true);
             ExtendReadonlyRange(str.Length);
         }
 
@@ -332,7 +364,8 @@ namespace STOLON
 
             UpdateText();
 
-            Cursor = Cursor.Offset(line.Length, true);
+            if (Cursor.IsOnText)
+                Cursor = Cursor.Offset(line.Length, true);
             ExtendReadonlyRange(line.Length);
         }
 

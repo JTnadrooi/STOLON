@@ -30,8 +30,10 @@ namespace STOLON
             Shell.WriteLine("Hello. This is a long first line no?");
             Shell.WriteLine("This is on the second line.");
             Shell.WriteTexture(_textures["Entities\\north\\north-128"]);
-            Shell.WriteLine("This is on the THIRD line!");
             Shell.HasInputLine = true;
+            Shell.WriteLine("This is on the THIRD line!");
+            Shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
+            Shell.WriteTexture(_textures["Entities\\north\\north-128"]);
         }
 
         protected override void UpdateUI(int elapsedMilliseconds)

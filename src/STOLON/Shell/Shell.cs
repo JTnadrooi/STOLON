@@ -88,11 +88,36 @@ namespace STOLON
             }
         }
 
+        private bool IsLastSectionAcceptingInput()
+        {
+            if (_regions.Count == 0) return false;
+            switch (_regions[^1])
+            {
+                case TextShellRegion textRegion:
+                    return textRegion.HasInputLine;
+                default:
+                    return false;
+            }
+        }
+
         public void Write<T>(T item) => EnsureLastRegionIsTextRegion().Write(item);
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
         public void WriteTexture(Texture2D texture)
         {
+            bool reAddInputLine = false;
+
+            if (IsLastSectionAcceptingInput())
+            {
+                (_regions[^1] as TextShellRegion).HasInputLine = false;
+                reAddInputLine = true;
+            }
+
             _regions.Add(new ImageShellRegion(this, texture));
+
+            if (reAddInputLine)
+            {
+                HasInputLine = true;
+            }
         }
 
         public void WriteLine<T>(T item) => EnsureLastRegionIsTextRegion().WriteLine(item);
