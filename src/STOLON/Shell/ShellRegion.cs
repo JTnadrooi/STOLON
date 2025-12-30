@@ -15,6 +15,8 @@ namespace STOLON
 
         protected Vector2 Pos => Shell.GetRegionPos(this);
 
+        //protected bool HasMouse =>
+
         public virtual int VerticalOverlap => 0;
 
         public ShellRegion(Shell shell)
@@ -500,14 +502,21 @@ namespace STOLON
             int charLineIndex = (int)((pos.Y - Pos.Y) / charHeight);
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
-            if (clamp) charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
+            if (clamp)
+            {
+                if (charLineIndex < 0) // pretext check.
+                {
+                    return new CharacterInfo(this, 0);
+                }
+                charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
+            }
             else if (charLineIndex >= _lines.Count || charLineIndex < 0) return CharacterInfo.GetOutOfBounds(this);
 
             string charLine = _lines[charLineIndex];
 
             if (clamp)
             {
-                if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // why I need this check with x but not y remains a mystery.
+                if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // posttext check.
                 {
                     return CharacterInfo.GetPostText(this);
                 }
@@ -521,8 +530,6 @@ namespace STOLON
                 result += _lines[lineIndex].Length; // newline is already in line.
 
             if (result == _text.Length) return CharacterInfo.GetPostText(this);
-
-            //result = Math.Clamp(result, 0, _text.Length - 1); // because adding line lenghts requires this to prevent ex.
 
             //Console.WriteLine($"{charLineIndex}:{charIndexOnLine} = {result}");
             //Console.WriteLine($"out of {_text.Length}");
