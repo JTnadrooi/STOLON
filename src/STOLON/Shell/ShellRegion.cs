@@ -412,6 +412,26 @@ namespace STOLON
             UpdateText();
         }
 
+        private string GetInput()
+        {
+            if (!_hasInputLine) throw new InvalidOperationException("Cannot get input for textregion without an input line.");
+
+            string inputLine = _lines[^1];
+
+            return inputLine[InputLinePrefix.Length..];
+        }
+
+        private void ClearInput()
+        {
+            if (!_hasInputLine) throw new InvalidOperationException("Cannot clear input for textregion without an input line.");
+
+            _lines[^1] = InputLinePrefix;
+
+            _text = _lines.ToJoinedString();
+
+            UpdateText();
+        }
+
         public void RemoveAt(int pos)
         {
             _text = _text.Remove(pos, 1);
@@ -604,7 +624,10 @@ namespace STOLON
 
                     break;
                 case '\r':
-                    PutAndOffset(NewLine);
+                    //PutAndOffset(NewLine);
+
+                    WriteLine(GetInput());
+                    ClearInput();
                     return;
                 default:
                     PutAndOffset(e.Character);
