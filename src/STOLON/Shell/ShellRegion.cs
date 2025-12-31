@@ -180,7 +180,6 @@ namespace STOLON
         }
 
         private readonly IRichLogger _logger;
-        private readonly Environment _environment;
         private readonly IFont2DCollection _fonts;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
@@ -272,10 +271,9 @@ namespace STOLON
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
 
-        public TextShellRegion(Shell shell, IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(shell)
+        public TextShellRegion(Shell shell, IRichLogger logger, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(shell)
         {
             _logger = logger;
-            _environment = environment;
             _fonts = fonts;
             _input = input;
             _textures = textures;
@@ -402,6 +400,7 @@ namespace STOLON
         private void Put(string str, CharacterInfo pos)
         {
             if (!pos.IsOnText) throw new InvalidOperationException();
+
             if (pos.IsPostText) Put(str, _text.Length);
             else Put(str, pos.ClampedIndex);
         }
@@ -635,6 +634,12 @@ namespace STOLON
 
                     WriteLine(GetInput());
                     ClearInput();
+                    return;
+                case '\t':
+                    string input = GetInput().Split(" ").Last();
+
+                    //Console.WriteLine(Autocomplete.Complete(input, Shell.Words).Options.ToJoinedString(", "));
+                    Input(Autocomplete.Complete(input, Shell.Words).BestOption?[input.Length..] ?? string.Empty);
                     return;
                 default:
                     PutAndOffset(e.Character);

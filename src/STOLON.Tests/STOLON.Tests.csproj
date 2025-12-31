@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<RollForward>Major</RollForward>
+		<TieredCompilation>false</TieredCompilation>
+		<BaseOutputPath>..\..\build</BaseOutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<EnableMSTestRunner>true</EnableMSTestRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+		<!--
+      Displays error on console in addition to the log file. Note that this feature comes with a performance impact.
+      For more information, visit https://learn.microsoft.com/dotnet/core/testing/unit-testing-platform-integration-dotnet-test#show-failure-per-test
+      -->
+		<TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.12.6" />
+		<PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="1.4.3" />
+		<PackageReference Include="MSTest" Version="3.6.4" />
+		<PackageReference Include="AwesomeAssertions" Version="9.3.0" />
+		<PackageReference Include="Autofac" Version="9.0.0" />
+		<PackageReference Include="Betwixt" Version="1.4.1">
+			<NoWarn>NU1701</NoWarn>
+		</PackageReference>
+		<PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
+		<PackageReference Include="MonoGame.Extended" Version="4.1.0" />
+		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
+		<PackageReference Include="Tomlyn" Version="0.19.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\STOLON.CLI\STOLON.CLI.csproj" />
+		<ProjectReference Include="..\STOLON\STOLON.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="AsitLib">
+			<HintPath>..\..\lib\AsitLib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+</Project>

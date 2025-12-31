@@ -6,7 +6,6 @@ namespace STOLON
     public sealed class Shell : Service, ISingletonDependency
     {
         private readonly IRichLogger _logger;
-        private readonly Environment _environment;
         private readonly IFont2DCollection _fonts;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
@@ -15,6 +14,8 @@ namespace STOLON
         private readonly Vector2 _origin;
 
         internal IReadOnlyList<ShellRegion> Regions => _regions;
+
+        public static string[] Words { get; } = ["write", "read", "region", "shell", "stolon"]; // temp for autocomplete tests.
 
         //internal Vector2 Pos { get; }
 
@@ -26,10 +27,9 @@ namespace STOLON
 
         public const int RegionClearance = 5;
 
-        public Shell(IRichLogger logger, Environment environment, IFont2DCollection fonts, IInputManager input, ITexture2DCollection textures) : base(null)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input) : base(null)
         {
             _logger = logger;
-            _environment = environment;
             _fonts = fonts;
             _input = input;
             _textures = textures;
@@ -39,7 +39,7 @@ namespace STOLON
             _origin = new Vector2(10, 0);
         }
 
-        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, _environment, _fonts, _input, _textures));
+        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, _fonts, _input, _textures));
 
         private TRegion EnsureLastRegionIs<TRegion>(Func<TRegion> regionFactory) where TRegion : TextShellRegion
         {
@@ -54,7 +54,7 @@ namespace STOLON
             }
         }
 
-        internal Vector2 GetRegionPos(ShellRegion region)
+        internal Vector2 GetRegionPos(ShellRegion region) // VERY SLOW, make regioninfo record and do in Update().
         {
             float x = _origin.X;
             float y = STOLON.V_HEIGHT - RegionClearance;
@@ -71,6 +71,11 @@ namespace STOLON
 
             throw new InvalidOperationException();
         }
+
+        //internal ShellRegion GetRegionUnderMouse()
+        //{
+
+        //}
 
         public override void Update(int elapsedMilliseconds)
         {
