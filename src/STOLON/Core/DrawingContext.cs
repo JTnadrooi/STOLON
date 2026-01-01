@@ -347,6 +347,8 @@
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
+        public void DrawLine(Line line, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+            => DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
         public void DrawLine(Vector2 point1, Vector2 point2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
             => DrawLine(point1.X, point1.Y, point2.X, point2.X, color, thickness, layerDepth);
         public void DrawLine(float x1, float y1, float x2, float y2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
