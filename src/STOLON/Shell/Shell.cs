@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace STOLON
@@ -17,6 +18,15 @@ namespace STOLON
 
         public static string[] Words { get; } = ["write", "read", "region", "shell", "stolon"]; // temp for autocomplete tests.
 
+        private string[]? _autocompletions;
+        private int _selectedAutocompletion;
+        private Rectangle _autocompletionRect;
+        private Line[]? _autocompletionDividerLines;
+        private string[]? _displayedAutocompletions;
+
+        private ShellCharacterInfo? _cursor; // null when out of bounds of any region.
+
+
         //internal Vector2 Pos { get; }
 
         public bool HasInputLine
@@ -25,7 +35,10 @@ namespace STOLON
             set => EnsureLastRegionIsTextRegion().HasInputLine = value;
         }
 
+        public Font2D Font { get; }
+
         public const int RegionClearance = 5;
+        public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
         public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input) : base(null)
         {
@@ -37,9 +50,37 @@ namespace STOLON
             _regions = new List<ShellRegion>();
 
             _origin = new Vector2(10, 0);
+
+            _autocompletions = null;
+
+            Font = fonts.Medium;
+
+            STOLON.Instance.Window.KeyDown += OnKeyDown;
         }
 
-        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, _fonts, _input, _textures));
+        private void OnKeyDown(object? sender, InputKeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Keys.Up:
+                    _selectedAutocompletion--;
+                    break;
+                case Keys.Down:
+                    _selectedAutocompletion++;
+                    break;
+                case Keys.Tab:
+                    if (_autocompletions is not null && _regions.Last() is TextShellRegion textRegion && textRegion.HasInputLine)
+                    {
+                        textRegion.Input(_autocompletions[_selectedAutocompletion]);
+                    }
+                    break;
+                default: return;
+            }
+
+            _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
+        }
+
+        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, Font, _input, _textures));
 
         private TRegion EnsureLastRegionIs<TRegion>(Func<TRegion> regionFactory) where TRegion : TextShellRegion
         {
@@ -72,6 +113,33 @@ namespace STOLON
             throw new InvalidOperationException();
         }
 
+        private bool TryGetCursor([NotNullWhen(true)] out ShellCharacterInfo? cursor)
+        {
+            ShellCharacterInfo? result = null;
+
+            foreach (ShellRegion region in _regions)
+            {
+                if (region is TextShellRegion textRegion)
+                {
+                    if (textRegion.Cursor.IsOnText)
+                    {
+                        if (result.HasValue) throw new InvalidOperationException("Cursor cannot be on multiple textregion's at once.");
+
+                        result = textRegion.Cursor;
+                    }
+                }
+            }
+
+            if (result.HasValue)
+            {
+                cursor = result.Value;
+                return true;
+            }
+
+            cursor = null;
+            return false;
+        }
+
         //internal ShellRegion GetRegionUnderMouse()
         //{
 
@@ -83,6 +151,44 @@ namespace STOLON
             {
                 region.Update(elapsedMilliseconds);
             }
+
+            if (TryGetCursor(out _cursor))
+            {
+                _autocompletions = Autocomplete.Complete(_cursor.Value.Region.GetInput().Split(' ').Last(), Words).Options.Take(3).ToArray();
+
+                if (_autocompletions.Length == 0) _selectedAutocompletion = -1;
+                else _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
+
+                if (_autocompletions.Length > 0)
+                {
+                    int visibleOptions = Math.Min(3, _autocompletions.Length);
+                    int entryHeight = (int)(Font.Dimensions.Y + 2);
+                    int rectHeight = visibleOptions * entryHeight;
+                    int rectWidth = (int)(10 * (Font.Dimensions.X + 4) + 4);
+
+                    Point rectPos = (_cursor.Value.Region.GetCursorScreenPos() + new Vector2(0, Shell.CursorHeight + 2)).ToPoint();
+
+                    _autocompletionRect = new Rectangle(rectPos, new Point(rectWidth, rectHeight));
+
+                    _autocompletionDividerLines = new Line[visibleOptions];
+                    for (int i = 0; i < visibleOptions; i++)
+                    {
+                        _autocompletionDividerLines[i] = Line.CreateHorizontal(rectPos.X, rectPos.X + rectWidth, (rectPos.Y + entryHeight * i) + 1);
+                    }
+
+                    _autocompletionDividerLines = _autocompletionDividerLines.Reverse().ToArray();
+
+                    _displayedAutocompletions = new string[visibleOptions];
+                    for (int i = 0; i < visibleOptions; i++)
+                    {
+                        _displayedAutocompletions[i] = _selectedAutocompletion == i ? "> " + _autocompletions[i] : _autocompletions[i];
+                    }
+                }
+            }
+            else
+            {
+                _autocompletions = null;
+            }
         }
 
         public override void Draw(DrawingContext drawingContext)
@@ -90,6 +196,18 @@ namespace STOLON
             foreach (ShellRegion region in _regions)
             {
                 region.Draw(drawingContext);
+            }
+
+            if (_autocompletions is not null && _autocompletions.Length != 0)
+            {
+                drawingContext.DrawArea(_autocompletionRect, Color.Black);
+                drawingContext.DrawRectangle(_autocompletionRect, thickness: 1);
+
+                for (int i = 0; i < _autocompletionDividerLines!.Length; i++)
+                {
+                    drawingContext.DrawLine(_autocompletionDividerLines![i], thickness: 1);
+                    drawingContext.DrawString(Font, _displayedAutocompletions![i], _autocompletionDividerLines![i].Start.ToVector2() + new Vector2(5, 0));
+                }
             }
         }
 
