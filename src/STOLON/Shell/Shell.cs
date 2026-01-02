@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Text.RegularExpressions;
 
 namespace STOLON
@@ -69,9 +71,9 @@ namespace STOLON
                     _selectedAutocompletion++;
                     break;
                 case Keys.Tab:
-                    if (_autocompletions is not null && _regions.Last() is TextShellRegion textRegion && textRegion.HasInputLine)
+                    if (_autocompletions is not null)
                     {
-                        textRegion.Input(_autocompletions[_selectedAutocompletion]);
+                        AutoComplete(_selectedAutocompletion);
                     }
                     break;
                 default: return;
@@ -145,6 +147,22 @@ namespace STOLON
 
         //}
 
+        private string GetAutoCompleteTarget()
+        {
+            Debug.Assert(_cursor is not null, $"{nameof(_cursor)} is null while {nameof(GetAutoCompleteTarget)} got called.");
+
+            return _cursor.Value.Region.GetInput().Split(' ').Last();
+        }
+
+        private void AutoComplete(int index)
+        {
+            Debug.Assert(_autocompletions is not null, $"{nameof(_autocompletions)} is null while {nameof(AutoComplete)} got called.");
+
+            string target = GetAutoCompleteTarget();
+
+            ((TextShellRegion)_regions.Last()).Input(_autocompletions[index][target.Length..]);
+        }
+
         public override void Update(int elapsedMilliseconds)
         {
             foreach (ShellRegion region in _regions)
@@ -152,9 +170,25 @@ namespace STOLON
                 region.Update(elapsedMilliseconds);
             }
 
+            if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.VirtualMousePos))
+            {
+                for (int i = 0; i < _autocompletionDividerLines.Length; i++)
+                {
+                    Line line = _autocompletionDividerLines[i];
+
+                    if (_input.VirtualMousePos.Y >= line.Start.Y)
+                    {
+                        Console.WriteLine(i);
+                        AutoComplete(i);
+
+                        break;
+                    }
+                }
+            }
+
             if (TryGetCursor(out _cursor))
             {
-                _autocompletions = Autocomplete.Complete(_cursor.Value.Region.GetInput().Split(' ').Last(), Words).Options.Take(3).ToArray();
+                _autocompletions = Autocomplete.Complete(GetAutoCompleteTarget(), Words).Options.Take(3).ToArray();
 
                 if (_autocompletions.Length == 0) _selectedAutocompletion = -1;
                 else _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
