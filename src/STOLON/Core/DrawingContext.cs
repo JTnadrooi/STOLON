@@ -331,14 +331,42 @@
 
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(_textures.Pixel, destinationRectangle, color: color);
-        public void Draw(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-            => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
+
         public void Draw(Texture2D texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
-            => Draw(texture, GetDestinationRectangle(texture, position, scale), sourceRectangle, color, rotation, origin, effects, layerDepth);
-        public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => Draw(texture, position, new Vector2(scale), rotation, origin, sourceRectangle, color, effects, layerDepth);
+        public void Draw(Texture2D texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
-            SpriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, InvertY(effects), layerDepth);
+            SpriteBatch.Draw(texture, position, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, InvertY(effects), layerDepth);
         }
+        public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        {
+            SpriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, 0f, Vector2.Zero, InvertY(effects), layerDepth);
+        }
+
+        public void Draw(Texture2DRegion region, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => Draw(region, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
+        public void Draw(Texture2DRegion region, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => Draw(region.Texture, position, scale, rotation, origin, region.Bounds, color, effects, layerDepth);
+        public void Draw(Texture2DRegion region, Rectangle destinationRectangle, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+            => Draw(region.Texture, destinationRectangle, region.Bounds, color, effects, layerDepth);
+
+        //public void Draw(Texture2DRegion texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        //    => Draw(texture, position, new Vector2(scale), rotation, origin, sourceRectangle, color, effects, layerDepth);
+        //public void Draw(Texture2DRegion texture, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        //{
+        //    SpriteBatch.Draw(texture, position, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, InvertY(effects), layerDepth, null);
+        //}
+        //public void Draw(Texture2DRegion texture, Rectangle destinationRectangle, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        //{
+        //    Draw(texture, ResolveFromDestinationRectangle(destinationRectangle, texture.Bounds, out Vector2 scale), scale, 0, null, sourceRectangle, color, effects, layerDepth); // FIX
+        //}
+
+        //private Vector2 ResolveFromDestinationRectangle(in Rectangle destinationRectangle, in Rectangle textureBounds, out Vector2 scale)
+        //{
+        //    scale = new Vector2(destinationRectangle.Width / (float)textureBounds.Width, destinationRectangle.Height / (float)textureBounds.Height);
+
+        //    return destinationRectangle.Location.ToVector2();
+        //}
 
         private Rectangle GetDestinationRectangle(Texture2D texture, Vector2 position, float scale)
             => GetDestinationRectangle(texture, position, new Vector2(scale));
