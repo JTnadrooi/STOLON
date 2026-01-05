@@ -65,10 +65,12 @@ namespace STOLON
             switch (e.Key)
             {
                 case Keys.Up:
-                    _selectedAutocompletion--;
+                    if (_selectedAutocompletion != 0)
+                        _selectedAutocompletion--;
                     break;
                 case Keys.Down:
-                    _selectedAutocompletion++;
+                    if (_selectedAutocompletion != _autocompletions.Length - 1)
+                        _selectedAutocompletion++;
                     break;
                 case Keys.Tab:
                     if (_autocompletions is not null)
@@ -79,7 +81,9 @@ namespace STOLON
                 default: return;
             }
 
-            _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
+            if (_autocompletions is null || _autocompletions.Length == 0) _selectedAutocompletion = -1;
+            else
+                _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
         }
 
         private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, Font, _input, _textures));
