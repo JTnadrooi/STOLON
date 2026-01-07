@@ -30,11 +30,11 @@ splashtexts_show = true
 fullscreen = false                  # wip
 res_w = 1                           # wip
 res_h = 1                           # wip
-scaling_method = "nearest_neighbour" # allowed values: nearest_neighbour | integer
+scaling_method = "integer" # allowed values: nearest_neighbour | integer
 
 
 [graphics.crt]
-enable = true
+enable = false
 
 [cli]
 catch_errors = false
