@@ -15,7 +15,7 @@
         public ImageShellRegion(ITexture2DCollection textures, Shell shell, Texture2D texture, string? title = null) : base(shell)
         {
             _texture = texture;
-            _border = new Border(textures["UI\\Borders\\shell_image-border"], 7, 1, 1, 1);
+            _border = new Border(textures["UI\\Borders\\shell_image-border_larger"], 11, 1, 1, 1);
         }
 
         public override void Update(int elapsedMilliseconds)
