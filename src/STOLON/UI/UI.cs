@@ -6,7 +6,7 @@ namespace STOLON
     /// <summary>
     /// The user interface for the <see cref="Environment"/>.
     /// </summary>
-    public class Interface : Service, ISingletonDependency
+    public class Interface : IComponent, ISingletonDependency
     {
         public const int LINE_WIDTH = 2;
 
@@ -18,7 +18,7 @@ namespace STOLON
         /// <summary>
         /// Main UIInterface contructor.
         /// </summary>
-        public Interface(IRichLogger logger, ITextframe textframe) : base(null)
+        public Interface(IRichLogger logger, ITextframe textframe)
         {
             _logger = logger;
 
@@ -31,7 +31,7 @@ namespace STOLON
             _textframe = textframe;
         }
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             _textframe.Update(elapsedMilliseconds);
         }
@@ -47,10 +47,9 @@ namespace STOLON
         //        }
         //}
         //public string ShowPercentage(string text, float coefficient) => text.Substring(0, (int)(text.Length * coefficient));
-        public override void Draw(DrawingContext drawingContext)
+        public void Draw(DrawingContext drawingContext)
         {
             _textframe.Draw(drawingContext);
-            base.Draw(drawingContext);
         }
     }
 

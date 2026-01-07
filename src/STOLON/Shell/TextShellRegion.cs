@@ -598,8 +598,8 @@ namespace STOLON
                 case '\r':
                     //PutAndOffset(NewLine);
 
-                    WriteLine(GetInput());
-                    ClearInput();
+                    //WriteLine(GetInput());
+                    //ClearInput();
                     return;
                 case '\t':
                     string input = GetInput().Split(" ").Last();

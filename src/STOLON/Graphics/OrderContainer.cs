@@ -1,7 +1,7 @@
 ﻿namespace STOLON
 {
 
-    public abstract class OrderContainer : IGraphic
+    public abstract class OrderContainer : IComponent, IGraphic
     {
         private const string BACK_PREFIX = "_back_";
 

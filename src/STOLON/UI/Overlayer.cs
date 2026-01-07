@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace STOLON
 {
-    public class OverlayManager : Service, IOverlayManager, ISingletonDependency
+    public class OverlayManager : IComponent, IOverlayManager, ISingletonDependency
     {
         private Dictionary<string, IOverlay> _overlayDict;
         private List<string> _initialized;
@@ -13,7 +13,7 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly IEnumerable<IOverlay> _overlays;
 
-        public OverlayManager(IRichLogger logger, IEnumerable<IOverlay> overlays) : base(null)
+        public OverlayManager(IRichLogger logger, IEnumerable<IOverlay> overlays)
         {
             _logger = logger;
             _overlays = overlays;
@@ -75,7 +75,7 @@ namespace STOLON
             _initialized.Remove(overlayId);
         }
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             IOverlay overlay;
             for (int i = 0; i < _initialized.Count; i++) // for all initialized overlays
@@ -89,15 +89,13 @@ namespace STOLON
                     _logger.Success();
                 }
             }
-            base.Update(elapsedMilliseconds);
         }
-        public override void Draw(DrawingContext drawingContext)
+        public void Draw(DrawingContext drawingContext)
         {
             for (int i = 0; i < _initialized.Count; i++)
             {
                 _overlayDict[_initialized[i]].Draw(drawingContext);
             }
-            base.Draw(drawingContext);
         }
     }
 

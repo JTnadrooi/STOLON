@@ -3,7 +3,7 @@
     /// <summary>
     /// The enviroment of the <see cref="STOLON"/> game.
     /// </summary>
-    public class Environment : Service, IDialogueProvider, ISingletonDependency
+    public class Environment : IComponent, IDialogueProvider, ISingletonDependency
     {
         private readonly IRichLogger _logger;
         private readonly IAudioEngine _audioEngine;
@@ -21,7 +21,7 @@
 
         private Dictionary<string, Entity> _entityDict;
 
-        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, IEnumerable<Entity> entities) : base(null)
+        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, IEnumerable<Entity> entities)
         {
             _logger = logger;
             _audioEngine = audioEngine;
@@ -52,7 +52,7 @@
             _logger.Success();
         }
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             _ui.Update(elapsedMilliseconds);
 
@@ -62,16 +62,14 @@
             //STOLON.Instance.DRP.UpdateDetails(STOLON.SceneManager.Current.DRPStatus);
 
             _overlayManager.Update(elapsedMilliseconds);
-            base.Update(elapsedMilliseconds);
         }
 
-        public override void Draw(DrawingContext drawingContext)
+        public void Draw(DrawingContext drawingContext)
         {
             _sceneManager.Draw(drawingContext);
             _ui.Draw(drawingContext);
 
             _overlayManager.Draw(drawingContext);
-            base.Draw(drawingContext);
         }
     }
 }

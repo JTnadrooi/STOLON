@@ -2,7 +2,7 @@
 
 namespace STOLON
 {
-    public abstract class Scene : ISingletonDependency
+    public abstract class Scene : IComponent, ISingletonDependency
     {
         public string Id { get; }
 
@@ -26,10 +26,10 @@ namespace STOLON
 
         protected virtual void UpdateEnvironment(int elapsedMilliseconds) { }
 
-        public abstract void Draw(DrawingContext drawingContext);
-
         public static string GetId<T>() where T : Scene => GetId(typeof(T));
         public static string GetId(Type type) => type.FullName ?? throw new Exception();
+
+        public abstract void Draw(DrawingContext drawingContext);
 
         public static string SkipTarget { get; }
         public static bool SkipSceneAnimation { get; }

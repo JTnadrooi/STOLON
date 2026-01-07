@@ -1,7 +1,7 @@
 ﻿
 namespace STOLON
 {
-    public interface ITaskHeap
+    public interface ITaskHeap : IUpdatable
     {
         ReadOnlyDictionary<string, object?> FrameCompletedTasks { get; }
         ReadOnlyDictionary<string, DynamicTask> Functions { get; }
@@ -14,6 +14,5 @@ namespace STOLON
         bool IsQueued(string id);
         void Push(string id, DynamicTask dynamicTask, int waitTime);
         void SafePush(string id, DynamicTask dynamicTask, int waitTime, bool overwrite = true);
-        void Update(int elapsedMilliseconds);
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 namespace STOLON
 {
-    public interface IInputManager
+    public interface IInputManager : IUpdatable
     {
         KeyboardState CurrentKeyboard { get; }
         MouseState CurrentMouse { get; }
@@ -17,6 +17,5 @@ namespace STOLON
         bool IsClicked(MouseButton button);
         bool IsPressed(Keys key);
         bool IsPressed(MouseButton button);
-        void Update(int elapsedMilliseconds);
     }
 }

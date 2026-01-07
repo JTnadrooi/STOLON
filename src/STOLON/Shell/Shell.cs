@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace STOLON
 {
-    public sealed class Shell : Service, ISingletonDependency
+    public sealed class Shell : IComponent, ISingletonDependency
     {
         private readonly IRichLogger _logger;
         private readonly IFont2DCollection _fonts;
@@ -42,7 +42,7 @@ namespace STOLON
         public const int RegionClearance = 5;
         public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
-        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input) : base(null)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input)
         {
             _logger = logger;
             _fonts = fonts;
@@ -129,7 +129,7 @@ namespace STOLON
                 {
                     if (textRegion.Cursor.IsOnText)
                     {
-                        if (result.HasValue) throw new InvalidOperationException("Cursor cannot be on multiple textregion's at once.");
+                        Debug.Assert(!result.HasValue, "Cursor cannot be on multiple textregion's at once.");
 
                         result = textRegion.Cursor;
                     }
@@ -167,7 +167,7 @@ namespace STOLON
             ((TextShellRegion)_regions.Last()).Input(_autocompletions[index][target.Length..]);
         }
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             foreach (ShellRegion region in _regions)
             {
@@ -229,7 +229,7 @@ namespace STOLON
             }
         }
 
-        public override void Draw(DrawingContext drawingContext)
+        public void Draw(DrawingContext drawingContext)
         {
             foreach (ShellRegion region in _regions)
             {

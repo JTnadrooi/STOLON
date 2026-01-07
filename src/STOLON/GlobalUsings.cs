@@ -22,6 +22,7 @@ global using Color = Microsoft.Xna.Framework.Color;
 global using Point = Microsoft.Xna.Framework.Point;
 global using Rectangle = Microsoft.Xna.Framework.Rectangle;
 global using Environment = STOLON.Environment;
+//global using IDrawable = STOLON.IDrawable;
 global using Math = System.Math;
 global using Vector2 = Microsoft.Xna.Framework.Vector2;
 global using RectangleF = MonoGame.Extended.RectangleF;

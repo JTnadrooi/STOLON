@@ -24,7 +24,7 @@ namespace STOLON
             }).ToArray(), info.PostMilliseconds);
         }
     }
-    public class Textframe : Service, ITextframe, ISingletonDependency
+    public class Textframe : ITextframe, ISingletonDependency
     {
         private Queue<DialogueInfo> _dialogueQueue;
         private Rectangle _dialoguebounds;
@@ -63,7 +63,7 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly IInputManager _input;
 
-        public Textframe(IRichLogger logger, IFont2DCollection fonts, IInputManager input) : base(null)
+        public Textframe(IRichLogger logger, IFont2DCollection fonts, IInputManager input)
         {
             _logger = logger;
             _fonts = fonts;
@@ -79,16 +79,19 @@ namespace STOLON
             _font = _fonts.Medium;
             _input = input;
         }
+
         public void Queue(DialogueInfo[] dialogue)
         {
             for (int i = 0; i < dialogue.Length; i++)
                 Queue(dialogue[i]);
         }
+
         public void Queue(DialogueInfo dialogue)
         {
             _dialogueQueue.Enqueue(dialogue);
             _logger.Log("dialogue queued with text: " + dialogue.Text);
         }
+
         public void Next()
         {
             if (_dialogueQueue.Count == 0) throw new Exception();
@@ -127,7 +130,7 @@ namespace STOLON
         //    STOLON.Debug.Success();
         //}
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             bool textFrameGoUp = false;
 
@@ -186,7 +189,7 @@ namespace STOLON
         {
             return text.Length * CHAR_READ_MILLISECONDS;
         }
-        public override void Draw(DrawingContext drawingContext)
+        public void Draw(DrawingContext drawingContext)
         {
             drawingContext.DrawArea(_dialoguebounds, Color.Black);
             if (_currentDialogue.HasValue)
@@ -195,8 +198,6 @@ namespace STOLON
                 drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), _providerTextScaleCoefficient);
             }
             drawingContext.DrawRectangle(_dialoguebounds, Color.White, Interface.LINE_WIDTH);
-
-            base.Draw(drawingContext);
         }
     }
 }

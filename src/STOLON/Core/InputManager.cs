@@ -19,14 +19,14 @@
         Right,
     }
 
-    public class InputManager : Service, IInputManager, ISingletonDependency
+    public class InputManager : IInputManager, ISingletonDependency
     {
-        public InputManager() : base(null)
+        public InputManager()
         {
 
         }
 
-        public override void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             PreviousMouse = CurrentMouse;
             CurrentMouse = Mouse.GetState();
