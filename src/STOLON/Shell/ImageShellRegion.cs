@@ -1,35 +1,35 @@
-﻿namespace STOLON
+﻿using Microsoft.Xna.Framework.Graphics;
+
+namespace STOLON
 {
     public class ImageShellRegion : ShellRegion
     {
-        public override int Height => _texture.Height + _border.AddedHeight;
+        private readonly ITexture2DCollection _textures;
+        private readonly Kernel _kernel;
 
-        private readonly Texture2D _texture;
-        private readonly string? _title;
+        public override int Height => _window.Dimensions.Y;
 
-        private Rectangle _bounds;
-        private Border _border;
+        private ImageWindow _window;
 
         private Vector2 _borderCompensatingOffset;
 
-        public ImageShellRegion(ITexture2DCollection textures, Shell shell, Texture2D texture, string? title = null) : base(shell)
+        public ImageShellRegion(ITexture2DCollection textures, Kernel kernel, Shell shell, Texture2D texture, string? title = null) : base(shell)
         {
-            _texture = texture;
-            _border = new Border(textures["UI\\Borders\\shell_image-border_larger"], 11, 1, 1, 1);
+            _textures = textures;
+            _kernel = kernel;
+
+            _window = new ImageWindow(_textures, _kernel, texture, title);
         }
 
         public override void Update(int elapsedMilliseconds)
         {
-            _borderCompensatingOffset = _border.GetCompensatingOffset();
-            _bounds = new Rectangle((Pos + _borderCompensatingOffset).ToPoint(), _texture.Bounds.Size);
-
+            _window.Position = this.Position;
+            _window.Update(elapsedMilliseconds);
         }
 
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.Draw(_texture, Pos + _borderCompensatingOffset);
-            //drawingContext.DrawRectangle(_bounds, thickness: 1);
-            drawingContext.DrawBorderAround(_border, _bounds);
+            // window drawing is done by kernel.
         }
     }
 }

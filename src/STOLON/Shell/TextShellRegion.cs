@@ -462,9 +462,9 @@ namespace STOLON
             int charWidth = (int)Font.Dimensions.X;
             int charHeight = (int)Font.Dimensions.Y;
 
-            int charIndexOnLine = (int)((pos.X - Pos.X) / charWidth);
+            int charIndexOnLine = (int)((pos.X - Position.X) / charWidth);
 
-            int charLineIndex = (int)((pos.Y - Pos.Y) / charHeight);
+            int charLineIndex = (int)((pos.Y - Position.Y) / charHeight);
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
             if (clamp)
@@ -526,8 +526,8 @@ namespace STOLON
                 seenChars += lineLength;
             }
 
-            float x = Pos.X + charIndexOnLine * Font.Dimensions.X;
-            float y = Pos.Y + (_lines.Count - charLine - 1) * Font.Dimensions.Y;
+            float x = Position.X + charIndexOnLine * Font.Dimensions.X;
+            float y = Position.Y + (_lines.Count - charLine - 1) * Font.Dimensions.Y;
 
             return new Vector2(x, y);
         }
@@ -538,10 +538,10 @@ namespace STOLON
 
             if (Cursor.IsPostText)
             {
-                if (_text.Length == 0) return Pos; //  + new Vector2(0, -_font.Dimensions.Y);
+                if (_text.Length == 0) return Position; //  + new Vector2(0, -_font.Dimensions.Y);
 
                 char selectedChar = _text[_text.Length - 1];
-                if (selectedChar == NewLine) return Pos + new Vector2(0, -Font.Dimensions.Y + (GetCharacterScreenPosAt(_text.Length - 1) - Pos).Y);
+                if (selectedChar == NewLine) return Position + new Vector2(0, -Font.Dimensions.Y + (GetCharacterScreenPosAt(_text.Length - 1) - Position).Y);
                 else return GetCharacterScreenPosAt(_text.Length - 1) + new Vector2(Font.Dimensions.X, 0);
             }
             else return GetCharacterScreenPosAt(Cursor.Index);
@@ -619,7 +619,7 @@ namespace STOLON
 
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawString(Font, ReplaceAt(_text, _cursorSelection, '_'), Pos, scale: _textScale);
+            drawingContext.DrawString(Font, ReplaceAt(_text, _cursorSelection, '_'), Position, scale: _textScale);
             if (((int)(_cursorLifetime * 0.03f)) % 2 == 0 && Cursor.IsOnText)
                 drawingContext.Draw(_textures["UI\\cursor"], GetCursorScreenPos() + new Vector2(0, 2));
             //drawingContext.DrawLine(_input.VirtualMousePos, _input.VirtualMousePos);

@@ -6,7 +6,7 @@
 
         protected Shell Shell { get; }
 
-        protected Vector2 Pos => Shell.GetRegionPos(this);
+        protected Vector2 Position => Shell.GetRegionPos(this);
 
         //protected bool HasMouse =>
 

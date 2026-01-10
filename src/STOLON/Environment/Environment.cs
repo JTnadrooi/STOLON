@@ -11,6 +11,7 @@
         private readonly IOverlayManager _overlayManager;
         private readonly Interface _ui;
         private readonly IEnumerable<Entity> _entities;
+        private readonly Kernel _kernel;
 
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="Entity"/> objects and their <see cref="Entity.Id"/>.
@@ -21,7 +22,7 @@
 
         private Dictionary<string, Entity> _entityDict;
 
-        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, IEnumerable<Entity> entities)
+        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, Kernel kernel, IEnumerable<Entity> entities)
         {
             _logger = logger;
             _audioEngine = audioEngine;
@@ -29,6 +30,7 @@
             _overlayManager = overlayManager;
             _ui = ui;
             _entities = entities;
+            _kernel = kernel;
 
             _entityDict = new Dictionary<string, Entity>();
             _sceneManager = sceneManager;
@@ -55,18 +57,16 @@
         public void Update(int elapsedMilliseconds)
         {
             _ui.Update(elapsedMilliseconds);
-
             _sceneManager.Update(elapsedMilliseconds);
-
+            _kernel.Update(elapsedMilliseconds);
             _audioEngine.Update(elapsedMilliseconds);
-            //STOLON.Instance.DRP.UpdateDetails(STOLON.SceneManager.Current.DRPStatus);
-
             _overlayManager.Update(elapsedMilliseconds);
         }
 
         public void Draw(DrawingContext drawingContext)
         {
             _sceneManager.Draw(drawingContext);
+            _kernel.Draw(drawingContext);
             _ui.Draw(drawingContext);
 
             _overlayManager.Draw(drawingContext);

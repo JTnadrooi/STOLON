@@ -12,6 +12,7 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
+        private readonly Kernel _kernel;
 
         private readonly List<ShellRegion> _regions;
         private readonly Vector2 _origin;
@@ -42,12 +43,13 @@ namespace STOLON
         public const int RegionClearance = 5;
         public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
-        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel)
         {
             _logger = logger;
             _fonts = fonts;
             _input = input;
             _textures = textures;
+            _kernel = kernel;
 
             _regions = new List<ShellRegion>();
 
@@ -123,6 +125,8 @@ namespace STOLON
         {
             ShellCharacterInfo? result = null;
 
+#if DEBUG
+
             foreach (ShellRegion region in _regions)
             {
                 if (region is TextShellRegion textRegion)
@@ -135,6 +139,22 @@ namespace STOLON
                     }
                 }
             }
+
+#else
+
+            foreach (ShellRegion region in _regions)
+            {
+                if (region is TextShellRegion textRegion)
+                {
+                    if (textRegion.Cursor.IsOnText)
+                    {
+                        result = textRegion.Cursor;
+                        break;
+                    }
+                }
+            }
+
+#endif
 
             if (result.HasValue)
             {
@@ -273,7 +293,7 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new ImageShellRegion(_textures, this, texture));
+            _regions.Add(new ImageShellRegion(_textures, _kernel, this, texture));
 
             if (reAddInputLine)
             {
