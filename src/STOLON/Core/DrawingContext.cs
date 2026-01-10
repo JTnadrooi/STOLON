@@ -1,4 +1,6 @@
-﻿namespace STOLON
+﻿using Microsoft.Xna.Framework.Graphics;
+
+namespace STOLON
 {
     public enum ScalingMethod
     {
@@ -11,6 +13,10 @@
     {
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
+        /// <summary>
+        /// Gets the <see cref="Matrix"/> used for inverting coordinates. Drawing is not done through this, it makes use of the <see cref="SpriteEffects.FlipVertically"/> sprite effect.
+        /// <br/>Current only usecase: Transforming <see cref="MouseState.Position"/>.
+        /// </summary>
         public Matrix InvertYMatrix => _invertYMatrix;
 
         /// <summary>
@@ -26,6 +32,200 @@
 
         internal Vector2 GameWindowDrawOffsetWithCorrectedY { get; private set; }
 
+        #region BATCH_PROPERTIES
+
+        private BlendState? _blendState = null;
+        public BlendState? BlendState
+        {
+            get => _blendState;
+            set
+            {
+                if (_blendState != value)
+                {
+                    _blendState = value;
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private SamplerState? _samplerState = null;
+        public SamplerState? SamplerState
+        {
+            get => _samplerState;
+            set
+            {
+                if (_samplerState != value)
+                {
+                    _samplerState = value;
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private DepthStencilState? _depthStencilState = null;
+        public DepthStencilState? DepthStencilState
+        {
+            get => _depthStencilState;
+            set
+            {
+                if (_depthStencilState != value)
+                {
+                    _depthStencilState = value;
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private RasterizerState? _rasterizerState = null;
+        //public RasterizerState? RasterizerState
+        //{
+        //    get => _rasterizerState;
+        //    set
+        //    {
+        //        if (_scissorArea.HasValue && !value.ScissorTestEnable) throw new InvalidOperationException("Value does not allow ScissorArea even though scissordrawing is active.");
+
+        //        if (_rasterizerState != value)
+        //        {
+        //            _rasterizerState = value;
+        //            UpdateDrawingParameters();
+        //        }
+        //    }
+        //}
+
+        private Matrix? _transformMatrix = null;
+        public Matrix? TransformMatrix
+        {
+            get => _transformMatrix;
+            set
+            {
+                if (_transformMatrix != value)
+                {
+                    _transformMatrix = value;
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private SpriteSortMode _sortMode = SpriteSortMode.Deferred;
+        public SpriteSortMode SortMode
+        {
+            get => _sortMode;
+            set
+            {
+                if (_sortMode != value)
+                {
+                    _sortMode = value;
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private Rectangle? _scissorArea = null;
+        public Rectangle? ScissorArea
+        {
+            get => _scissorArea;
+            set
+            {
+                if (_scissorArea != value)
+                {
+                    _scissorArea = value;
+
+                    if (value.HasValue)
+                    {
+                        SpriteBatch.GraphicsDevice.ScissorRectangle = value.Value;
+                        _rasterizerState = s_scissorRasterizerState;
+                    }
+                    else
+                    {
+                        SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+                        _rasterizerState = s_defaultRasterizerState;
+                    }
+
+                    UpdateDrawingParameters();
+                }
+            }
+        }
+
+        private void UpdateDrawingParameters()
+        {
+            if (_spritebatchStarted)
+            {
+                EndBatch();
+                BeginBatch();
+            }
+
+            // if not started, the next begin call will handle it.
+        }
+
+        public void SetDrawingParameters( // for bulk changes.
+            SpriteSortMode sortMode,
+            BlendState? blendState = null,
+            SamplerState? samplerState = null,
+            DepthStencilState? depthStencilState = null,
+            RasterizerState? rasterizerState = null,
+            Matrix? transformMatrix = null,
+            bool forceUpdate = false)
+        {
+            bool changed = false;
+
+            if (_sortMode != sortMode)
+            {
+                _sortMode = sortMode;
+                changed = true;
+            }
+
+            if (_blendState != blendState)
+            {
+                _blendState = blendState;
+                changed = true;
+            }
+
+            if (_samplerState != samplerState)
+            {
+                _samplerState = samplerState;
+                changed = true;
+            }
+
+            if (_depthStencilState != depthStencilState)
+            {
+                _depthStencilState = depthStencilState;
+                changed = true;
+            }
+
+            if (_rasterizerState != rasterizerState)
+            {
+                _rasterizerState = rasterizerState;
+                changed = true;
+            }
+
+            if (_transformMatrix != transformMatrix)
+            {
+                _transformMatrix = transformMatrix;
+                changed = true;
+            }
+
+            if (changed || forceUpdate)
+            {
+                UpdateDrawingParameters();
+            }
+        }
+
+        #endregion
+
+        private static readonly RasterizerState s_scissorRasterizerState = new RasterizerState
+        {
+            CullMode = CullMode.None,
+            ScissorTestEnable = true
+        };
+
+        private static readonly RasterizerState s_defaultRasterizerState = new RasterizerState
+        {
+            CullMode = CullMode.None,
+            ScissorTestEnable = false
+        };
+
+        private Matrix _invertYMatrix;
+
         private Texture2DAtlas _ditherAtlas;
         private Texture2D _screenshotCache;
         private bool _screenshotPending;
@@ -36,10 +236,8 @@
         private RenderTarget2D _vrt2;
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
-        private Matrix _invertYMatrix;
         private bool _spritebatchStarted;
-        private bool _scissorEnabled;
-        private SamplerState _samplerState;
+        private readonly SamplerState _defaultSamplerState;
 
         public const int DITHER_FRAME_COUNT = 5;
         public const int DITHER_TEXTURE_SIZE = 32;
@@ -67,9 +265,8 @@
             _rt1 = GetDesired(STOLON.Instance.DesiredDimensions);
             _rt2 = GetDesired(STOLON.Instance.DesiredDimensions);
 
-            _samplerState = SamplerState.PointClamp;
-
             _invertYMatrix = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(0, STOLON.Instance.DesiredDimensions.Y, 0);
+            _defaultSamplerState = SamplerState.PointClamp;
 
             _shaderDict = new Dictionary<string, Shader>();
             Shaders = _shaderDict.AsReadOnly();
@@ -232,7 +429,7 @@
                 _graphics.SetRenderTarget(_vrt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _defaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 SpriteBatch.Draw(_vrt1, Vector2.Zero, Color.White);
                 SpriteBatch.End();
 
@@ -241,7 +438,7 @@
             }
 
             _graphics.SetRenderTarget(_rt1); // draw and upscale to normal sized rt.
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _defaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             SpriteBatch.Draw(finalVTarget, new Rectangle(Point.Zero, _rt1.Bounds.Size), Color.White);
             SpriteBatch.End();
 
@@ -252,7 +449,7 @@
                 _graphics.SetRenderTarget(_rt2);
                 _graphics.Clear(Color.LightSeaGreen);
 
-                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
+                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _defaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Effect);
                 SpriteBatch.Draw(_rt1, Vector2.Zero, Color.White);
                 SpriteBatch.End();
 
@@ -265,7 +462,7 @@
             GameWindowDrawOffsetWithCorrectedY = new Vector2(offsetX, -offsetY);
 
             _graphics.SetRenderTarget(null);
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _samplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, _defaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, _invertYMatrix);
             SpriteBatch.Draw(finalTarget, new Vector2(offsetX, offsetY), Color.White);
             SpriteBatch.End();
 
@@ -286,44 +483,14 @@
             _spritebatchStarted = false;
         }
 
-        public void BeginBatch(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Matrix? transformMatrix = null)
+        public void BeginBatch()
         {
             //if (_spritebatchStarted) _spriteBatch.End();
-            SpriteBatch.Begin(sortMode, blendState, samplerState ?? _samplerState, depthStencilState, rasterizerState, null, transformMatrix);
+
+            SpriteBatch.Begin(SortMode, BlendState, SamplerState, DepthStencilState, _rasterizerState, null, TransformMatrix);
             _spritebatchStarted = true;
         }
 
-        private readonly RasterizerState _scissorRasterizerState = new RasterizerState
-        {
-            CullMode = CullMode.None,
-            ScissorTestEnable = true
-        };
-
-        private readonly RasterizerState _defaultRasterizerState = new RasterizerState
-        {
-            CullMode = CullMode.None,
-            ScissorTestEnable = false
-        };
-
-        public void ResetScissorArea()
-        {
-            if (!_scissorEnabled) return;
-
-            EndBatch();
-
-            SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
-            BeginBatch(rasterizerState: _defaultRasterizerState);
-            _scissorEnabled = false;
-        }
-
-        public void SetScissorArea(Rectangle newArea)
-        {
-            EndBatch();
-
-            SpriteBatch.GraphicsDevice.ScissorRectangle = newArea;
-            BeginBatch(rasterizerState: _scissorRasterizerState);
-            _scissorEnabled = true;
-        }
 
         public SpriteEffects InvertY(SpriteEffects effect) => effect ^ SpriteEffects.FlipVertically;
 

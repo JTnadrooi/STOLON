@@ -89,7 +89,7 @@
 
         public void Draw(DrawingContext drawingContext)
         {
-            drawingContext.SetScissorArea(_viewport);
+            drawingContext.ScissorArea = _viewport;
 
             for (int i = 0; i < _optionDraws.Length; i++)
                 if (_viewport.Intersects(_optionDraws[i].Bounds))
@@ -115,7 +115,7 @@
                     );
                 }
 
-            drawingContext.ResetScissorArea();
+            drawingContext.ScissorArea = null;
         }
     }
 }
