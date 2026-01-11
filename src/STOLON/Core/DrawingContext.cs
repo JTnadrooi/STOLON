@@ -129,18 +129,6 @@ namespace STOLON
                 if (_scissorArea != value)
                 {
                     _scissorArea = value;
-
-                    if (value.HasValue)
-                    {
-                        SpriteBatch.GraphicsDevice.ScissorRectangle = value.Value;
-                        _rasterizerState = s_scissorRasterizerState;
-                    }
-                    else
-                    {
-                        SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
-                        _rasterizerState = s_defaultRasterizerState;
-                    }
-
                     UpdateDrawingParameters();
                 }
             }
@@ -148,6 +136,17 @@ namespace STOLON
 
         private void UpdateDrawingParameters()
         {
+            if (_scissorArea.HasValue)
+            {
+                SpriteBatch.GraphicsDevice.ScissorRectangle = _scissorArea.Value;
+                _rasterizerState = s_scissorRasterizerState;
+            }
+            else
+            {
+                SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+                _rasterizerState = s_defaultRasterizerState;
+            }
+
             if (_spritebatchStarted)
             {
                 EndBatch();
@@ -162,7 +161,7 @@ namespace STOLON
             BlendState? blendState = null,
             SamplerState? samplerState = null,
             DepthStencilState? depthStencilState = null,
-            RasterizerState? rasterizerState = null,
+            Rectangle? scissorArea = null,
             Matrix? transformMatrix = null,
             bool forceUpdate = false)
         {
@@ -192,9 +191,9 @@ namespace STOLON
                 changed = true;
             }
 
-            if (_rasterizerState != rasterizerState)
+            if (_scissorArea != scissorArea)
             {
-                _rasterizerState = rasterizerState;
+                _scissorArea = scissorArea;
                 changed = true;
             }
 
