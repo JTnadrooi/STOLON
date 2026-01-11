@@ -34,7 +34,7 @@ namespace STOLON
 
         #region BATCH_PROPERTIES
 
-        private BlendState? _blendState = null;
+        private BlendState? _blendState;
         public BlendState? BlendState
         {
             get => _blendState;
@@ -48,7 +48,7 @@ namespace STOLON
             }
         }
 
-        private SamplerState? _samplerState = null;
+        private SamplerState? _samplerState;
         public SamplerState? SamplerState
         {
             get => _samplerState;
@@ -62,7 +62,7 @@ namespace STOLON
             }
         }
 
-        private DepthStencilState? _depthStencilState = null;
+        private DepthStencilState? _depthStencilState;
         public DepthStencilState? DepthStencilState
         {
             get => _depthStencilState;
@@ -76,7 +76,7 @@ namespace STOLON
             }
         }
 
-        private RasterizerState? _rasterizerState = null;
+        private RasterizerState? _rasterizerState;
         //public RasterizerState? RasterizerState
         //{
         //    get => _rasterizerState;
@@ -92,7 +92,7 @@ namespace STOLON
         //    }
         //}
 
-        private Matrix? _transformMatrix = null;
+        private Matrix? _transformMatrix;
         public Matrix? TransformMatrix
         {
             get => _transformMatrix;
@@ -106,7 +106,7 @@ namespace STOLON
             }
         }
 
-        private SpriteSortMode _sortMode = SpriteSortMode.Deferred;
+        private SpriteSortMode _sortMode;
         public SpriteSortMode SortMode
         {
             get => _sortMode;
@@ -120,7 +120,7 @@ namespace STOLON
             }
         }
 
-        private Rectangle? _scissorArea = null;
+        private Rectangle? _scissorArea;
         public Rectangle? ScissorArea
         {
             get => _scissorArea;
@@ -158,7 +158,7 @@ namespace STOLON
         }
 
         public void SetDrawingParameters( // for bulk changes.
-            SpriteSortMode sortMode,
+            SpriteSortMode sortMode = SpriteSortMode.Deferred,
             BlendState? blendState = null,
             SamplerState? samplerState = null,
             DepthStencilState? depthStencilState = null,
@@ -285,6 +285,8 @@ namespace STOLON
             if (!_config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
             ScalingMethod = Enum.Parse<ScalingMethod>(_config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
             Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
+
+            SetDrawingParameters(); // just sets defaults, doesnt do anything with the spritebatch if its not started yet. (it isn't right now)
 
             _logger.Success();
         }
