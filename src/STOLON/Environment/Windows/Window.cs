@@ -81,13 +81,11 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            drawingContext.ScissorArea = InnerBounds;
-            drawingContext.TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
+            drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0));
 
             DrawContents(drawingContext);
 
-            drawingContext.TransformMatrix = null;
-            drawingContext.ScissorArea = null;
+            drawingContext.SetDrawingParameters();
 
             drawingContext.DrawBorderAround(Border, InnerBounds);
         }
