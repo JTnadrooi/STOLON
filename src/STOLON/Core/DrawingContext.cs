@@ -24,7 +24,7 @@ namespace STOLON
         /// </summary>
         public SpriteBatch SpriteBatch { get; }
 
-        public bool SpriteBatchStarted => _spritebatchStarted;
+        public bool IsSpriteBatchStarted => _isSpriteBatchActive;
 
         public ScalingMethod ScalingMethod { get; }
 
@@ -136,7 +136,11 @@ namespace STOLON
 
         private void UpdateDrawingParameters()
         {
-            if (_scissorArea.HasValue)
+            bool isSpriteBatchInitiallyActive = _isSpriteBatchActive; // because it will not be active after the EndBatch call so this has to be stored for a sec.
+
+            if (isSpriteBatchInitiallyActive) EndBatch();
+
+            if (_scissorArea.HasValue) // I cannot put this before the EndBatch call for reasons unknown.
             {
                 SpriteBatch.GraphicsDevice.ScissorRectangle = _scissorArea.Value;
                 _rasterizerState = s_scissorRasterizerState;
@@ -147,11 +151,7 @@ namespace STOLON
                 _rasterizerState = s_defaultRasterizerState;
             }
 
-            if (_spritebatchStarted)
-            {
-                EndBatch();
-                BeginBatch();
-            }
+            if (isSpriteBatchInitiallyActive) BeginBatch();
 
             // if not started, the next begin call will handle it.
         }
@@ -235,7 +235,7 @@ namespace STOLON
         private RenderTarget2D _vrt2;
         private RenderTarget2D _rt1;
         private RenderTarget2D _rt2;
-        private bool _spritebatchStarted;
+        private bool _isSpriteBatchActive;
         private readonly SamplerState _defaultSamplerState;
 
         public const int DITHER_FRAME_COUNT = 5;
@@ -467,7 +467,7 @@ namespace STOLON
             SpriteBatch.Draw(finalTarget, new Vector2(offsetX, offsetY), Color.White);
             SpriteBatch.End();
 
-            _spritebatchStarted = false;
+            _isSpriteBatchActive = false;
 
             if (_screenshotPending)
             {
@@ -481,7 +481,7 @@ namespace STOLON
         public void EndBatch()
         {
             SpriteBatch.End();
-            _spritebatchStarted = false;
+            _isSpriteBatchActive = false;
         }
 
         public void BeginBatch()
@@ -489,7 +489,7 @@ namespace STOLON
             //if (_spritebatchStarted) _spriteBatch.End();
 
             SpriteBatch.Begin(SortMode, BlendState, SamplerState, DepthStencilState, _rasterizerState, null, TransformMatrix);
-            _spritebatchStarted = true;
+            _isSpriteBatchActive = true;
         }
 
 
