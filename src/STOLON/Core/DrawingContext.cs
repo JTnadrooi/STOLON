@@ -497,6 +497,11 @@ namespace STOLON
 
         #region DRAW_FUNCTIONS
 
+        public void DrawPoint(Vector2 position, Color? color = null, int size = 1)
+        {
+            SpriteBatch.DrawPoint(position, color ?? Color.White, size);
+        }
+
         public void DrawArea(Rectangle destinationRectangle, Color color)
             => Draw(_textures.Pixel, destinationRectangle, color: color);
 
