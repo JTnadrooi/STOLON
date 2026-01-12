@@ -502,7 +502,7 @@ namespace STOLON
             SpriteBatch.DrawPoint(position, color ?? Color.White, size);
         }
 
-        public void DrawArea(Rectangle destinationRectangle, Color color)
+        public void DrawArea(Rectangle destinationRectangle, Color? color = null)
             => Draw(_textures.Pixel, destinationRectangle, color: color);
 
         public void Draw(Texture2D texture, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, Rectangle? sourceRectangle = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
