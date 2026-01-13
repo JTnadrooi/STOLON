@@ -45,7 +45,7 @@ namespace STOLON
         //    get => _innerBounds.Location.ToVector2();
         //    set
         //    {
-        //        _innerBounds.Location = value.ToPoint();
+        //        _innerBounds.Location = value.ToPoint(); wont work
         //    }
         //}
 
@@ -71,7 +71,7 @@ namespace STOLON
 
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
 
-            Border = new Border(_textures["UI\\Borders\\shell_image-border_larger"], 11, 1, 1, 1);
+            Border = new Border(_textures["UI\\Borders\\window-border"], 11, 4, 4, 4);
 
             kernel.RegisterWindow(this);
         }
