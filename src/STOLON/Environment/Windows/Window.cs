@@ -58,6 +58,8 @@ namespace STOLON
             }
         }
 
+        public Matrix TransformMatrix { get; private set; }
+
         public Border Border { get; }
 
         private Rectangle _innerBounds;
@@ -82,12 +84,14 @@ namespace STOLON
 
         public virtual void Update(int elapsedMilliseconds)
         {
+            TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
         }
 
         public void Draw(DrawingContext drawingContext)
         {
             drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0));
+            drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: TransformMatrix);
 
             DrawContents(drawingContext);
 
