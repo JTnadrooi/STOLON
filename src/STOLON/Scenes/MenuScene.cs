@@ -276,7 +276,7 @@ namespace STOLON
                 "The BOULDER.", // that one cavevideo meme maker.
                 "Merde.",
                 "Seven-eyed wonders.", // Cenci reference.
-                "Antartica is not the answer.", // random meme.
+                "Antartica is not the answer.", // random meme about people going to antartica as escape from life for some reason.
                 "Alloclassified.",
                 "Envi states but doesn't inform.", // im trying to make envi helpfull...
                 "Powered by AsitLib!", // STOLON makes heavy use of one of my libaries named AsitLib.
@@ -289,10 +289,17 @@ namespace STOLON
                 "A vague sense of purpose.",
                 "Nanoda!", // kemono friends.
                 "Beste reizigers,", // NS (Dutch railways thing).
-                "Unintended but full of intent.", // Thetalore quote.
+                //"Unintended but full of intent.", // Thetalore quote.
                 "The stolons seem reluctant.",
                 "JAN43", // Inside joke.
                 "Drop asimetrico. Preparate!", // Duelo Maestro gd level.
+                "You have been Noticed.",
+                "I put that there.",
+                "Powered by hopes and whimsy.",
+                "Dual warning!", // reference to one of my geometry dash levels.
+                "You world has been blessed with cobalt!", // terraria reference.
+                "Drawing vegitation..",
+                "FLORA.",
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
