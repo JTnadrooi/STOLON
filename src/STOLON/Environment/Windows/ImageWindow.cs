@@ -19,7 +19,12 @@ namespace STOLON
             Image = image;
         }
 
-        public override void DrawContents(DrawingContext drawingContext)
+        protected override void UpdateContents(int elapsedMilliseconds)
+        {
+
+        }
+
+        protected override void DrawContents(DrawingContext drawingContext)
         {
             drawingContext.Draw(Image, Vector2.Zero + new Vector2(20));
         }

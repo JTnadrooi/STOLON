@@ -86,7 +86,10 @@ namespace STOLON
         {
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
+            UpdateContents(elapsedMilliseconds);
         }
+
+        protected virtual void UpdateContents(int elapsedMilliseconds) { }
 
         public void Draw(DrawingContext drawingContext)
         {
@@ -100,6 +103,6 @@ namespace STOLON
             drawingContext.DrawBorderAround(Border, InnerBounds);
         }
 
-        public abstract void DrawContents(DrawingContext drawingContext);
+        protected abstract void DrawContents(DrawingContext drawingContext);
     }
 }
