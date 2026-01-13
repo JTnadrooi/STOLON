@@ -74,7 +74,13 @@ namespace STOLON
             kernel.RegisterWindow(this);
         }
 
-        public void Update(int elapsedMilliseconds)
+        protected Vector2 ScreenToLocal(Point screenPosition) => ScreenToLocal(screenPosition.ToVector2());
+        protected Vector2 ScreenToLocal(Vector2 screenPosition)
+        {
+            return screenPosition - InnerBounds.Location.ToVector2();
+        }
+
+        public virtual void Update(int elapsedMilliseconds)
         {
 
         }
