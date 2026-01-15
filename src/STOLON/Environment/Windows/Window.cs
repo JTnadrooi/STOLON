@@ -18,7 +18,7 @@ namespace STOLON
         /// <summary>
         /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
         /// </summary>
-        public bool IsManaged { get; protected set; }
+        public bool IsManaged { get; set; }
 
         public Rectangle InnerBounds
         {
@@ -74,6 +74,8 @@ namespace STOLON
             _textures = textures;
             _kernel = kernel;
 
+            IsManaged = true;
+
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
 
             Border = new Border(_textures["UI\\Borders\\window-border"], 11, 4, 4, 4);
@@ -98,7 +100,8 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0));
+            drawingContext.DrawArea(InnerBounds, Color.Black);
+
             drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: TransformMatrix);
 
             DrawContents(drawingContext);

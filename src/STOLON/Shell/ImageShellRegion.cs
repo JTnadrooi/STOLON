@@ -18,7 +18,10 @@ namespace STOLON
             _textures = textures;
             _kernel = kernel;
 
-            _window = new ImageWindow(_textures, _kernel, texture, title);
+            _window = new ImageWindow(_textures, _kernel, texture, title)
+            {
+                IsManaged = false
+            };
         }
 
         public override void Update(int elapsedMilliseconds)
@@ -29,6 +32,7 @@ namespace STOLON
 
         public override void Draw(DrawingContext drawingContext)
         {
+            _window.Draw(drawingContext);
             // window drawing is done by kernel.
         }
     }
