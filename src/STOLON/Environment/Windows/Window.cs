@@ -15,6 +15,11 @@ namespace STOLON
         public bool Draggable { get; protected set; }
         public bool Resizable { get; protected set; }
 
+        /// <summary>
+        /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
+        /// </summary>
+        public bool IsManaged { get; protected set; }
+
         public Rectangle InnerBounds
         {
             get => _innerBounds;

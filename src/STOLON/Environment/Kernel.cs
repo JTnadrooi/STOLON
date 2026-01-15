@@ -30,7 +30,7 @@ namespace STOLON
         {
             foreach (Window window in _windows)
             {
-                window.Update(elapsedMilliseconds);
+                if (window.IsManaged) window.Update(elapsedMilliseconds);
             }
         }
 
@@ -38,7 +38,7 @@ namespace STOLON
         {
             foreach (Window window in _windows)
             {
-                window.Draw(drawingContext);
+                if (window.IsManaged) window.Draw(drawingContext);
             }
         }
     }
