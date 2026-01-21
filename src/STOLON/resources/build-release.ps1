@@ -1,5 +1,5 @@
 Set-Location $PSScriptRoot
-$buildScript = ".\..\..\..\scripts\build.ps1"
+$buildScript = ".\..\..\..\scripts\build-resources.ps1"
 
 if (-not (Test-Path $buildScript)) {
     Write-Host "build script not found." -ForegroundColor Red
