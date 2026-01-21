@@ -3,6 +3,24 @@ using System.Reflection;
 
 namespace STOLON.CLI
 {
+    public sealed class BypassDevCheckGlobalOption : GlobalOption
+    {
+        public BypassDevCheckGlobalOption() : base("bypass-devcheck", "Bypasses the devcheck.")
+        {
+
+        }
+
+        public override void PreCommand(CommandContext context)
+        {
+            CLI.DevOverride = true;
+        }
+
+        public override void PostCommand(CommandContext context)
+        {
+            CLI.DevOverride = null;
+        }
+    }
+
     public sealed class DevActionHook : ActionHook
     {
         public DevActionHook() : base("dev-validate") { }
@@ -11,6 +29,8 @@ namespace STOLON.CLI
         {
             if (context.Command is FlaggedCommandInfo cmd)
             {
+                if (context.ArgumentsInfo.Arguments.Any(c => c.Target.IsLongForm && c.Target.SanitizedOptionToken == "bypass-devcheck")) return;
+
                 if (cmd.HasFlag(CommandFlags.DevOnly))
                 {
                     if (!CLI.IsDev)
@@ -64,6 +84,7 @@ namespace STOLON.CLI
                 {
                     return (CommandProvider)Services.Resolve(t);
                 });
+            _commandEngine.AddGlobalOption(new BypassDevCheckGlobalOption());
 
             Instance = this;
         }
@@ -83,15 +104,19 @@ namespace STOLON.CLI
 
         public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
         private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
+
+        public static bool? DevOverride { get; set; } = null;
+
         /// <summary>
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
-        //public static bool IsDev => false;
-        public static bool IsDev { get; } = !STOLON.Services.Resolve<IConfiguration>().Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY);
+        public static bool IsDev => DevOverride ?? (!STOLON.Services.Resolve<IConfiguration>().Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY));
+
         /// <summary>
         /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>
         public static string SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : throw new InvalidOperationException("User is not a dev.");
+
         /// <summary>
         /// Gets the absolute path of the <i>src\STOLON\resources\</i> folder.
         /// </summary>
