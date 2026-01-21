@@ -224,6 +224,5 @@ namespace STOLON
         public const int ASPECT_RATIO_Y = 9;
         public const int VIRTUAL_MODIFIER = 57;
         public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / (float)ASPECT_RATIO_Y;
-
     }
 }

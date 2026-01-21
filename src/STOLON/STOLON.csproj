@@ -42,10 +42,13 @@
 		<PackageReference Include="Tomlyn" Version="0.19.0" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+	</PropertyGroup>
 	<ItemGroup>
 		<SLBuildAssets Include="static-assets\**\*.*" />
 	</ItemGroup>
-	<Target Name="DepositAssets" AfterTargets="Build">
+	<Target Name="DepositAssets" AfterTargets="AfterBuild">
 		<Copy SourceFiles="@(SLBuildAssets)" DestinationFiles="@(SLBuildAssets->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="False" />
 	</Target>
 </Project>

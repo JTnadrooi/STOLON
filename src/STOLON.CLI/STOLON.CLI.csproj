@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<BaseOutputPath>..\..\build</BaseOutputPath>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -34,6 +35,6 @@
 		<DebugBuildCondition Condition="'$(Configuration)' != 'Debug'">$False</DebugBuildCondition>
 	</PropertyGroup>
 	<Target Name="CLI_AfterBuild" AfterTargets="AfterBuild">
-		<Exec Command="powershell.exe -ExecutionPolicy Bypass -Command $(ProjectDir)..\..\scripts\build.ps1 -BuildConfiguration $(Configuration) -ProjPath $(ProjectDir) -DebugBuild $(DebugBuildCondition)" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\scripts" />
+		<Exec Command="powershell.exe -ExecutionPolicy Bypass -Command $(ProjectDir)..\..\scripts\build.ps1 -BuildConfiguration $(Configuration) -DebugBuild $(DebugBuildCondition)"/>
 	</Target>
 </Project>
