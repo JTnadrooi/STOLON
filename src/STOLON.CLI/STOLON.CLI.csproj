@@ -23,6 +23,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="9.0.0" />
+		<PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\STOLON\STOLON.csproj" />
