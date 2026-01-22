@@ -195,9 +195,7 @@ namespace STOLON
             {
                 "The center rows are most valueable.", // fact, the tiles in them have the most posibilies.
                 "CENTER, ROWS, VALUABLE.",
-                "The border rows are most respectable.",
                 "They are stingers.", // Thetalore Fax(char) reference.
-                "Reality is overrated.",
                 "STOLON's deadline has always been 2025.", // Uh oh. 10/12/2025
                 "If you listen very closely you can hear the main theme.",
                 "If you listen very closely you can hear the sound effects.",
@@ -220,9 +218,9 @@ namespace STOLON
                 "Can you read this?",
                 "CAN YOU READ THIS?",
                 "POWER SURGING!", // Megumin reference.
-                "There,", // Thetalore word.
+                "There,", // Thetalore reference.
                 "No shaders?",
-                "All colors, Her.", // Thetalore Nue reference.
+                "All colors, Her.", // Thetalore Nue reference. (yeah i like these kind of sentences)
                 "Thanks for playing! :D",
                 "\"Call that a Natural Deadline.\"",
                 "Nue not included!",
@@ -233,7 +231,7 @@ namespace STOLON
                 "Luck good.",
                 "The chance of getting this message is quite low.",
                 "Fax as in the machine.", // fax (thetalore char) reference.
-                "Self proclaimed?.",
+                "Self proclaimed..?",
                 "The Musical",
                 "The Movie",
                 "Why is Lanulox here..",
@@ -247,7 +245,6 @@ namespace STOLON
                 "Galore!",
                 "NOT solved.",
                 "NOT CLUELESS!", // prof dave explains reference. (from debate against tour)
-                "Tiory?", // reference to a ancient story I wrote, it had a character named Tiory.
                 "27 Compile errors..?", // reference to cracktorio finding out STOLON only builds on my pc. (fixed now)
                 "Simply Rendering,",
                 "Behold, The \"Sky Train\"!", // reference to one of my Stormworks creations.
@@ -266,18 +263,17 @@ namespace STOLON
                 "elevenhundredthousand.",
                 "The comfort of finity.", // Antics (lanpi) reference
                 "Pressure discrepancy detected - reversing airflow.", // White knuckle reference.
-                ":LOVINGSTARE:", // Efvour reference.
-                ":STARE:", // Efvour reference.
+                ":LOVINGSTARE:", // Efvour reference. (STOLON character)
+                ":STARE:", // Efvour reference. (STOLON character)
                 "Collida past 3.", // Lanpi reference.
                 "That translates to \"flour\".", // Bloem reference.
                 "Index is jealous.",
                 "the chairs have eyes",
                 "\"Its funny. You.\"", // Efvour talks like this.
                 "The BOULDER.", // that one cavevideo meme maker.
-                "Merde.",
                 "Seven-eyed wonders.", // Cenci reference.
                 "Antartica is not the answer.", // random meme about people going to antartica as escape from life for some reason.
-                "Alloclassified.",
+                "Alloclassified.", // Alloclasse reference. (STOLON character)
                 "Envi states but doesn't inform.", // im trying to make envi helpfull...
                 "Powered by AsitLib!", // STOLON makes heavy use of one of my libaries named AsitLib.
                 "Powered by AsitLib's mild enthusiasm!",
@@ -298,8 +294,10 @@ namespace STOLON
                 "Powered by hopes and whimsy.",
                 "Dual warning!", // reference to one of my geometry dash levels.
                 "You world has been blessed with cobalt!", // terraria reference.
+                "You have been Noticed.",
                 "Drawing vegitation..",
                 "FLORA.",
+                "Stukadoor", // inside joke.
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
