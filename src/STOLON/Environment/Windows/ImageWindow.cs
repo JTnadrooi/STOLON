@@ -17,6 +17,9 @@ namespace STOLON
         {
             Title = title;
             Image = image;
+
+            AddButton(new CloseWindowButton(textures));
+            AddButton(new ToggleLockWindowButton(textures));
         }
 
         protected override void UpdateContents(int elapsedMilliseconds)
