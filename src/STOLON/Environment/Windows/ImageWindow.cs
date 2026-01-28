@@ -9,13 +9,10 @@ namespace STOLON
     public class ImageWindow : Window
     {
         public Texture2D Image { get; }
-        public string? Title { get; }
 
-        public Point Dimensions => Image.Bounds.Size + new Point(Border.AddedWidth, Border.AddedHeight);
-
-        public ImageWindow(ITexture2DCollection textures, Kernel kernel, Texture2D image, string? title = null) : base(kernel, textures, image.Width, image.Height)
+        public ImageWindow(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Texture2D image)
+            : base(kernel, textures, fonts, input, image.Width, image.Height, name: "Img: North")
         {
-            Title = title;
             Image = image;
 
             AddButton(new CloseWindowButton(textures));

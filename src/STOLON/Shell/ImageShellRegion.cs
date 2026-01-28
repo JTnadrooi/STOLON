@@ -7,18 +7,18 @@ namespace STOLON
         private readonly ITexture2DCollection _textures;
         private readonly Kernel _kernel;
 
-        public override int Height => _window.Dimensions.Y;
+        public override int Height => _window.OuterBounds.Height;
 
         private ImageWindow _window;
 
         private Vector2 _borderCompensatingOffset;
 
-        public ImageShellRegion(ITexture2DCollection textures, Kernel kernel, Shell shell, Texture2D texture, string? title = null) : base(shell)
+        public ImageShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Texture2D texture) : base(shell)
         {
             _textures = textures;
             _kernel = kernel;
 
-            _window = new ImageWindow(_textures, _kernel, texture, title)
+            _window = new ImageWindow(_kernel, _textures, fonts, input, texture)
             {
                 IsManaged = false
             };

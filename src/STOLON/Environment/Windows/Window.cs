@@ -9,23 +9,29 @@ using System.Threading.Tasks;
 namespace STOLON
 {
     public readonly record struct WindowButtonClickArgs(Window Window);
+    public readonly record struct WindowButtonDefaultArgs(Window Window);
     public readonly record struct WindowButtonHoverArgs(Window Window);
-
-    [Flags]
-    internal enum WindowButtonState
-    {
-        Enabled = 1,
-        Hovered = 2,
-    }
-
 
     public abstract class WindowButton
     {
-        public Texture2D Texture { get; }
+        private Texture2D _texture;
+
+        public Texture2D Texture
+        {
+            get => _texture;
+            protected set
+            {
+                ThrowIfInvalidTexture(value);
+
+                _texture = value;
+            }
+        }
+
+        protected Texture2D InitialTexture { get; }
 
         private Window? _window;
 
-        public const int Size = 9;
+        public const int Size = 11;
 
         public Window Window
         {
@@ -40,19 +46,13 @@ namespace STOLON
         /// </summary>
         public int Order { get; }
 
-        protected Texture2D DefaultTexture { get; }
-        protected Texture2D HoverTexture { get; }
-
-        private WindowButtonState _state;
-
-        protected WindowButton(Texture2D defaultTexture, Texture2D hoverTexture, int order)
+        protected WindowButton(Texture2D texture, int order)
         {
-            ThrowIfInvalidTexture(defaultTexture);
+            ThrowIfInvalidTexture(texture);
 
-            DefaultTexture = defaultTexture;
-            HoverTexture = hoverTexture;
+            _texture = texture;
 
-            Texture = defaultTexture;
+            InitialTexture = _texture;
 
             Order = order;
         }
@@ -62,8 +62,9 @@ namespace STOLON
             if (texture.Width != Size || texture.Height != Size) throw new ArgumentException("Invalid texture dimensions.");
         }
 
-        protected virtual void OnClick() { } // maybe make it so the Kernel doesnt create the ... args if this isnt overrriden? (reflection check)
-        protected virtual void OnHover() { } // same here.
+        protected virtual void OnClick(Window source) { }
+        protected virtual void OnHover(Window source) { }
+        protected virtual void OnDefault(Window source) { }
 
         internal void BindTo(Window window)
         {
@@ -79,64 +80,101 @@ namespace STOLON
             _window = null;
         }
 
-        internal void Click()
+        internal void Click(Window source)
         {
-            _state = _state | WindowButtonState.Enabled;
-
             Debug.Assert(HasWindow);
 
-            OnClick();
+            OnClick(source);
         }
 
-        internal void Hover()
+        internal void Hover(Window source)
         {
-            _state = _state | WindowButtonState.Hovered;
-
             Debug.Assert(HasWindow);
 
-            OnHover();
+            OnHover(source);
         }
 
-        internal void SetState(WindowButtonState state)
+        internal void Default(Window source)
         {
-            _state = state;
+            Debug.Assert(HasWindow);
+
+            OnDefault(source);
         }
     }
 
     public sealed class CloseWindowButton : WindowButton
     {
-        public CloseWindowButton(ITexture2DCollection textures) : base(textures["UI\\Window\\window_button_close"], textures["UI\\Window\\window_button_close"], 0)
-        {
+        private Texture2D _hoverTexture;
 
+        public CloseWindowButton(ITexture2DCollection textures) : base(textures["UI\\Window\\window_button_close"], 0)
+        {
+            _hoverTexture = textures["UI\\Window\\window_button_close-inverted"];
         }
 
-        protected override void OnClick()
+        protected override void OnDefault(Window source)
         {
-            base.OnClick();
+            Texture = InitialTexture;
+        }
+
+        protected override void OnHover(Window source)
+        {
+            Texture = _hoverTexture;
         }
     }
 
     public sealed class ToggleLockWindowButton : WindowButton
     {
-        public ToggleLockWindowButton(ITexture2DCollection textures) : base(textures["UI\\Window\\window_button_lock"], textures["UI\\Window\\window_button_lock"], 1)
-        {
+        private Texture2D _hoverTexture;
+        private Texture2D _hoverTextureToggled;
 
+        private Texture2D _initialTextureToggled;
+
+        private bool _locked;
+
+        public ToggleLockWindowButton(ITexture2DCollection textures) : base(textures["UI\\Window\\window_button_lock"], 1)
+        {
+            _hoverTexture = textures["UI\\Window\\window_button_lock-inverted"];
+            _hoverTextureToggled = textures["UI\\Window\\window_button_unlock-inverted"];
+
+            _initialTextureToggled = textures["UI\\Window\\window_button_unlock"];
         }
 
-        protected override void OnClick()
+        protected override void OnDefault(Window source)
         {
-            base.OnClick();
+            if (_locked)
+                Texture = _initialTextureToggled;
+            else
+                Texture = InitialTexture;
+        }
+
+        protected override void OnHover(Window source)
+        {
+            if (_locked)
+                Texture = _hoverTextureToggled;
+            else
+                Texture = _hoverTexture;
+        }
+
+        protected override void OnClick(Window source)
+        {
+            _locked = !_locked;
         }
     }
 
     public abstract class Window : IComponent
     {
+        private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
+
         private readonly ITexture2DCollection _textures;
         private readonly Kernel _kernel;
+        private readonly IFont2DCollection _fonts;
+        private readonly IInputManager _input;
 
         public bool IsDraggable { get; protected set; }
         public bool IsResizable { get; protected set; }
         public bool IsBorderless { get; protected set; }
+
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
@@ -146,7 +184,12 @@ namespace STOLON
         public Rectangle InnerBounds
         {
             get => _innerBounds;
-            set => _innerBounds = value;
+            set
+            {
+                _innerBounds = value;
+
+                UpdatePosition();
+            }
         }
 
         public Rectangle OuterBounds
@@ -154,13 +197,13 @@ namespace STOLON
             get
             {
                 return new Rectangle(
-                    _innerBounds.Location + new Point(-Border.PaddingLeft, -Border.PaddingBottom),
-                    _innerBounds.Size + new Point(Border.AddedWidth, Border.AddedHeight)
+                    InnerBounds.Location + new Point(-Border.PaddingLeft, -Border.PaddingBottom),
+                    InnerBounds.Size + new Point(Border.AddedWidth, Border.AddedHeight)
                 );
             }
             set
             {
-                _innerBounds =
+                InnerBounds =
                     new Rectangle(
                         value.Location + new Point(Border.PaddingLeft, Border.PaddingBottom),
                         value.Size + new Point(-Border.AddedWidth, -Border.AddedHeight)
@@ -192,26 +235,40 @@ namespace STOLON
 
         private Rectangle _innerBounds;
         private TypeDictionary<WindowButton> _buttons;
-        private WindowButton[] _orderedButtons;
+        private WindowButtonDrawInfo[] _orderedButtons;
+        private Font2D _nameFont;
 
-        protected Window(Kernel kernel, ITexture2DCollection textures, int innerSizeX, int innerSizeY)
+        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY, string? name = null)
         {
             _textures = textures;
             _kernel = kernel;
+            _fonts = fonts;
+            _input = input;
+            _nameFont = fonts.Medium;
+
+            _buttons = new TypeDictionary<WindowButton>();
+            _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
 
             IsManaged = true;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
-            Border = new Border(_textures["UI\\Window\\window-border"], 13, 4, 4, 4);
+            Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
+            Name = name ?? string.Empty;
 
             kernel.RegisterWindow(this);
+        }
 
-            _buttons = new TypeDictionary<WindowButton>();
-            _orderedButtons = Array.Empty<WindowButton>();
+        private void UpdatePosition()
+        {
+            UpdateButtons();
         }
 
         private void UpdateButtons()
         {
-            _orderedButtons = Buttons.Values.OrderBy(w => w.Order).ToArray();
+            _orderedButtons = Buttons.Values.OrderBy(b => b.Order).Select((b, i) =>
+                new WindowButtonDrawInfo(b,
+                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * i, OuterBounds.Height - WindowButton.Size - 2)).ToPoint(), new Point(WindowButton.Size))
+                )
+            ).ToArray();
         }
 
         protected void AddButton<TButton>(TButton button) where TButton : WindowButton
@@ -251,6 +308,26 @@ namespace STOLON
         {
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
+            bool foundButton = false; // it should not be possible to click two buttons at once anyways.
+
+            for (int i = 0; i < _orderedButtons.Length; i++)
+            {
+                WindowButtonDrawInfo buttonInfo = _orderedButtons[i];
+
+                if (!foundButton && buttonInfo.Bounds.Contains(_input.VirtualMousePos))
+                {
+                    foundButton = true;
+
+                    buttonInfo.Button.Hover(this);
+
+                    if (_input.IsClicked(MouseButton.Left)) buttonInfo.Button.Click(this);
+                }
+                else
+                {
+                    buttonInfo.Button.Default(this);
+                }
+            }
+
             UpdateContents(elapsedMilliseconds);
         }
 
@@ -270,9 +347,12 @@ namespace STOLON
 
             for (int i = 0; i < _orderedButtons.Length; i++)
             {
-                drawingContext.Draw(_orderedButtons[i].Texture,
-                    OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 4 - WindowButton.Size - (WindowButton.Size + 2) * i, OuterBounds.Height - WindowButton.Size - 2));
+                drawingContext.Draw(_orderedButtons[i].Button.Texture,
+                    OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * i, OuterBounds.Height - WindowButton.Size - 2));
             }
+
+            drawingContext.DrawString(_nameFont, Name,
+                OuterBounds.Location.ToVector2() + new Vector2(3, (int)(OuterBounds.Height - 15 + _nameFont.Dimensions.Y / 2 - 3)));
         }
 
         protected abstract void DrawContents(DrawingContext drawingContext);

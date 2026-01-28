@@ -293,7 +293,7 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new ImageShellRegion(_textures, _kernel, this, texture));
+            _regions.Add(new ImageShellRegion(this, _kernel, _textures, _fonts, _input, texture));
 
             if (reAddInputLine)
             {
