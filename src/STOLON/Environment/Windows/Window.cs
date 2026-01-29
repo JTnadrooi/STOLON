@@ -8,10 +8,6 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public readonly record struct WindowButtonClickArgs(Window Window);
-    public readonly record struct WindowButtonDefaultArgs(Window Window);
-    public readonly record struct WindowButtonHoverArgs(Window Window);
-
     public abstract class WindowButton
     {
         private Texture2D _texture;
@@ -220,7 +216,7 @@ namespace STOLON
         //    }
         //}
 
-        public Vector2 Position
+        public Vector2 Position // could be optimised by offsetting rectangles instead.
         {
             get => OuterBounds.Location.ToVector2();
             set
@@ -297,11 +293,6 @@ namespace STOLON
         protected Vector2 ScreenToLocal(Vector2 screenPosition)
         {
             return screenPosition - InnerBounds.Location.ToVector2();
-        }
-
-        public void Offset(Vector2 amount)
-        {
-
         }
 
         public virtual void Update(int elapsedMilliseconds)
