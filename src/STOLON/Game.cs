@@ -174,6 +174,8 @@ namespace STOLON
                 _tasks.Update(elapsedMilliseconds);
                 _environment.Update(elapsedMilliseconds);
 
+                _input.CollapseCursor();
+
                 if (_input.IsPressed(Keys.LeftControl))
                 {
                     if (_input.IsClicked(Keys.F)) GoFullscreen();

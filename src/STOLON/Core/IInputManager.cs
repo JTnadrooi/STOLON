@@ -17,5 +17,7 @@ namespace STOLON
         bool IsClicked(MouseButton button);
         bool IsPressed(Keys key);
         bool IsPressed(MouseButton button);
+        void SetCursor(MouseCursor cursor);
+        void CollapseCursor();
     }
 }

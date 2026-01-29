@@ -238,6 +238,8 @@ namespace STOLON
         private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
 
+        private const bool AllowCursorSelect = false;
+
         public TextShellRegion(Shell shell, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
         {
             _logger = logger;
@@ -430,9 +432,14 @@ namespace STOLON
                     Cursor = ShellCharacterInfo.GetOutOfBounds(this);
                 }
                 //Console.WriteLine(GetCharacterIndexAt(_input.VirtualMousePos, false));
-                _cursorSelecting = true;
-                if (character.IsOnText && _lastClickCursor.IsOnText)
-                    _cursorSelection = ShellCharacterInfo.GetRange(character, _lastClickCursor);
+
+                if (AllowCursorSelect)
+                {
+                    _cursorSelecting = true;
+
+                    if (character.IsOnText && _lastClickCursor.IsOnText)
+                        _cursorSelection = ShellCharacterInfo.GetRange(character, _lastClickCursor);
+                }
             }
             else
             {
