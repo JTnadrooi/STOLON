@@ -21,7 +21,7 @@ namespace STOLON
             _windows = new List<Window>();
         }
 
-        public void RegisterWindow(Window window)
+        internal void RegisterWindow(Window window)
         {
             _windows.Add(window);
         }

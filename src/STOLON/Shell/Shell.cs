@@ -29,6 +29,8 @@ namespace STOLON
 
         private ShellCharacterInfo? _cursor; // null when out of bounds of any region.
 
+        private int _lastLockHandle;
+
 
         //internal Vector2 Pos { get; }
 
@@ -293,7 +295,10 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new ImageShellRegion(this, _kernel, _textures, _fonts, _input, texture));
+            _regions.Add(new WindowShellRegion(this, _kernel, _textures, _fonts, _input, new ImageWindow(_kernel, _textures, _fonts, _input, texture)
+            {
+                IsManaged = false,
+            }));
 
             if (reAddInputLine)
             {

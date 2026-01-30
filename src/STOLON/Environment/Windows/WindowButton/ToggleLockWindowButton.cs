@@ -19,23 +19,27 @@
 
         protected override void OnDefault(Window source)
         {
-            if (_locked)
-                Texture = _initialTextureToggled;
-            else
-                Texture = InitialTexture;
+            if (_locked) Texture = _initialTextureToggled;
+            else Texture = InitialTexture;
         }
 
         protected override void OnHover(Window source)
         {
-            if (_locked)
-                Texture = _hoverTextureToggled;
-            else
-                Texture = _hoverTexture;
+            if (_locked) Texture = _hoverTextureToggled;
+            else Texture = _hoverTexture;
         }
 
         protected override void OnClick(Window source)
         {
             _locked = !_locked;
+
+            if (_locked)
+            {
+                Window.Unlock();
+                Window.Position += new Vector2(10);
+            }
+            else Window.Lock();
+
         }
     }
 }

@@ -16,11 +16,19 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly IInputManager _input;
 
-        public bool IsDraggable { get; protected set; }
-        public bool IsResizable { get; protected set; }
-        public bool IsBorderless { get; protected set; }
+        public bool IsDraggable { get; set; }
+        public bool IsResizable { get; set; }
+        public bool IsBorderless { get; set; }
 
-        public string Name { get; protected set; }
+        public string Name { get; set; }
+
+        public WindowShellRegion? BoundRegion
+        {
+            get;
+            internal set;
+        }
+
+        public bool IsLocked => BoundRegion is not null && BoundRegion.IsLockActive();
 
         /// <summary>
         /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
@@ -84,7 +92,7 @@ namespace STOLON
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
 
-        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY, string? name = null)
+        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
         {
             _textures = textures;
             _kernel = kernel;
@@ -96,9 +104,10 @@ namespace STOLON
             _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
 
             IsManaged = true;
-            InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
             Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
-            Name = name ?? string.Empty;
+            Name = string.Empty;
+            InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
+            Position = Vector2.Zero;
 
             kernel.RegisterWindow(this);
         }
@@ -143,6 +152,20 @@ namespace STOLON
         protected Vector2 ScreenToLocal(Vector2 screenPosition)
         {
             return screenPosition - InnerBounds.Location.ToVector2();
+        }
+
+        public void Lock()
+        {
+            if (BoundRegion is null) throw new InvalidOperationException("Can't lock unbound region.");
+
+            BoundRegion.LockWindow();
+        }
+
+        public void Unlock()
+        {
+            if (BoundRegion is null) throw new InvalidOperationException("Can't unlock unbound region.");
+
+            BoundRegion.UnlockWindow();
         }
 
         public virtual void Update(int elapsedMilliseconds)

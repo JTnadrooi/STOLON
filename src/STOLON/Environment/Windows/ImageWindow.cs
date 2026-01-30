@@ -11,9 +11,10 @@ namespace STOLON
         public Texture2D Image { get; }
 
         public ImageWindow(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Texture2D image)
-            : base(kernel, textures, fonts, input, image.Width, image.Height, name: "Img: North")
+            : base(kernel, textures, fonts, input, image.Width, image.Height)
         {
             Image = image;
+            Name = "Img: North";
 
             AddButton(new CloseWindowButton(textures));
             AddButton(new ToggleLockWindowButton(textures));
