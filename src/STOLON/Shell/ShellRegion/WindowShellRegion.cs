@@ -21,19 +21,19 @@ namespace STOLON
 
         public void LockWindow()
         {
-            if (_isWindowLocked) throw new InvalidOperationException("Cannot lock already locked window.");
+            if (_queuedLockAction.GetValueOrDefault() || _isWindowLocked) throw new InvalidOperationException("Cannot lock already locked window.");
 
-            _isWindowLocked = true;
-            _window.IsManaged = false;
+            _queuedLockAction = true;
         }
 
         public void UnlockWindow()
         {
-            if (!_isWindowLocked) throw new InvalidOperationException("Cannot unlock already unlocked window.");
+            if (_queuedLockAction.GetValueOrDefault() || !_isWindowLocked) throw new InvalidOperationException("Cannot unlock already unlocked window.");
 
-            _isWindowLocked = false;
-            _window.IsManaged = true;
+            _queuedLockAction = false;
         }
+
+        private bool? _queuedLockAction;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool IsLockActive() => _isWindowLocked;
@@ -49,11 +49,21 @@ namespace STOLON
             _windowSlotTex = textures["UI\\Window\\window_slot"];
 
             _window.BoundRegion = this;
-            LockWindow();
+
+            _isWindowLocked = true;
+            _window.IsManaged = false;
         }
 
         public override void Update(int elapsedMilliseconds)
         {
+            if (_queuedLockAction.HasValue)
+            {
+                _isWindowLocked = _queuedLockAction.Value;
+                _window.IsManaged = !_queuedLockAction.Value;
+
+                _queuedLockAction = null;
+            }
+
             if (_isWindowLocked)
             {
                 _window.Position = this.Position;

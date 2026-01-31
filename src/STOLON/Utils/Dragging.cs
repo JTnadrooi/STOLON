@@ -8,15 +8,11 @@ namespace STOLON
 {
     public static class Dragging
     {
-        public static void Update(bool canInitiateDrag, IInputManager input, ref Vector2? dragOffset, IPositionable positionable)
+        public static void Update(bool initiateDrag, IInputManager input, ref Vector2? dragOffset, IPositionable positionable)
         {
-            if (input.IsClicked(MouseButton.Left))
+            if (initiateDrag)
             {
-                if (canInitiateDrag)
-                {
-                    dragOffset = positionable.Position - input.VirtualMousePos;
-                }
-                else dragOffset = null;
+                dragOffset = positionable.Position - input.VirtualMousePos;
             }
 
             if (!input.IsPressed(MouseButton.Left))

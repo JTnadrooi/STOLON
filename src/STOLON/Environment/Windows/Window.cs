@@ -93,6 +93,8 @@ namespace STOLON
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
 
+        const int spacing = 2;
+
         protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
         {
             _textures = textures;
@@ -121,11 +123,18 @@ namespace STOLON
 
         private void UpdateButtons()
         {
+            if (Buttons.Count == 0)
+            {
+                _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
+                _maybeButtonsBounds = Rectangle.Empty;
+            }
             _orderedButtons = Buttons.Values.OrderBy(b => b.Order).Select((b, i) =>
                 new WindowButtonDrawInfo(b,
-                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * i, OuterBounds.Height - WindowButton.Size - 2)).ToPoint(), new Point(WindowButton.Size))
+                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - spacing - WindowButton.Size - (WindowButton.Size + spacing) * i, OuterBounds.Height - WindowButton.Size - spacing)).ToPoint(), new Point(WindowButton.Size))
                 )
             ).ToArray();
+
+            _maybeButtonsBounds = GetMaybeButtonBounds();
         }
 
         protected void AddButton<TButton>(TButton button) where TButton : WindowButton
@@ -170,15 +179,43 @@ namespace STOLON
             BoundRegion.UnlockWindow();
         }
 
+        public Vector2 GetButtonPos(int index)
+        {
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, Buttons.Count);
+            ArgumentOutOfRangeException.ThrowIfNegative(index);
+
+            return OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * index, OuterBounds.Height - WindowButton.Size - 2);
+        }
+
+        private Rectangle _maybeButtonsBounds;
+
+        private Rectangle GetMaybeButtonBounds()
+        {
+            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + spacing) + spacing;
+            int mbbHeight = (WindowButton.Size + spacing) + spacing;
+
+            return new Rectangle(OuterBounds.X + OuterBounds.Width - mbbWidth, OuterBounds.Y + OuterBounds.Height - mbbHeight, mbbWidth, mbbHeight);
+        }
+
+        private bool MaybeHoveringButton()
+        {
+            return _maybeButtonsBounds.Contains(_input.VirtualMousePos);
+        }
+
         private Vector2? _dragOffset;
 
         public virtual void Update(int elapsedMilliseconds)
         {
-            Dragging.Update(IsDraggable && !IsLocked && OuterBounds.Contains(_input.VirtualMousePos), _input, ref _dragOffset, this);
-
-            TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
-
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
+
+            Dragging.Update(
+                _input.IsClicked(MouseButton.Left) &&
+                IsDraggable &&
+                !IsLocked &&
+                OuterBounds.Contains(_input.VirtualMousePos) &&
+                !MaybeHoveringButton(),
+                _input, ref _dragOffset, this);
+
 
             for (int i = 0; i < _orderedButtons.Length; i++)
             {
@@ -190,7 +227,8 @@ namespace STOLON
 
                     buttonInfo.Button.Hover(this);
 
-                    if (_input.IsClicked(MouseButton.Left)) buttonInfo.Button.Click(this);
+                    if (_input.IsClicked(MouseButton.Left))
+                        buttonInfo.Button.Click(this);
                 }
                 else
                 {
@@ -198,6 +236,7 @@ namespace STOLON
                 }
             }
 
+            TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
             UpdateContents(elapsedMilliseconds);
         }
 
@@ -217,8 +256,7 @@ namespace STOLON
 
             for (int i = 0; i < _orderedButtons.Length; i++)
             {
-                drawingContext.Draw(_orderedButtons[i].Button.Texture,
-                    OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * i, OuterBounds.Height - WindowButton.Size - 2));
+                drawingContext.Draw(_orderedButtons[i].Button.Texture, GetButtonPos(i));
             }
 
             drawingContext.DrawString(_nameFont, Name,
