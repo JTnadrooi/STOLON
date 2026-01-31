@@ -196,18 +196,20 @@ namespace STOLON
                 region.Update(elapsedMilliseconds);
             }
 
-            if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.VirtualMousePos))
+            if (_autocompletions is not null)
             {
-                for (int i = 0; i < _autocompletionDividerLines.Length; i++)
+                if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.VirtualMousePos))
                 {
-                    Line line = _autocompletionDividerLines[i];
-
-                    if (_input.VirtualMousePos.Y >= line.Start.Y)
+                    for (int i = 0; i < _autocompletionDividerLines.Length; i++)
                     {
-                        Console.WriteLine(i);
-                        AutoComplete(i);
+                        Line line = _autocompletionDividerLines[i];
 
-                        break;
+                        if (_input.VirtualMousePos.Y >= line.Start.Y)
+                        {
+                            AutoComplete(i);
+
+                            break;
+                        }
                     }
                 }
             }
