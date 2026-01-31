@@ -66,10 +66,6 @@
             _previousVirtualMousePos = VirtualMousePos;
             VirtualMousePos = TransformMousePos(CurrentMouse.Position.ToVector2());
             MouseDelta = (VirtualMousePos - _previousVirtualMousePos);
-            //MouseDelta = (CurrentMouse.Position.ToVector2() - PreviousMouse.Position.ToVector2()) / STOLON.DrawingContext.Scale * new Vector2(1, -1);
-            //MouseDelta = TransformMousePos(MouseDelta);
-
-            Console.WriteLine(MouseDelta);
 
             if (!STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(CurrentMouse.Position)) Domain = MouseDomain.None;
             else Domain = MouseDomain.OnScreen;

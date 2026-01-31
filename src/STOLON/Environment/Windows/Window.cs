@@ -169,31 +169,32 @@ namespace STOLON
             BoundRegion.UnlockWindow();
         }
 
-        private bool _isDragging;
+        private Vector2? _dragOffset;
 
         public virtual void Update(int elapsedMilliseconds)
         {
+            #region DRAG_LOGIC
+
             if (_input.IsClicked(MouseButton.Left))
             {
                 if (IsDraggable && !IsLocked && OuterBounds.Contains(_input.VirtualMousePos))
                 {
-                    _isDragging = true;
+                    _dragOffset = Position - _input.VirtualMousePos;
                 }
-                else _isDragging = false;
+                else _dragOffset = null;
             }
 
             if (!_input.IsPressed(MouseButton.Left))
             {
-                _isDragging = false;
+                _dragOffset = null;
             }
 
-            if (_isDragging)
+            if (_dragOffset is not null)
             {
-                Position += _input.MouseDelta;
+                Position = _input.VirtualMousePos + _dragOffset.Value;
             }
 
-            if (_kernel.GetWindowIndex(this) == 0)
-                Console.WriteLine(_isDragging);
+            #endregion
 
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
