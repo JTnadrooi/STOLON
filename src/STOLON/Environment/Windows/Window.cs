@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using STOLON;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public abstract class Window : IComponent
+    public abstract class Window : IComponent, IPositionable
     {
         private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
 
@@ -173,28 +174,7 @@ namespace STOLON
 
         public virtual void Update(int elapsedMilliseconds)
         {
-            #region DRAG_LOGIC
-
-            if (_input.IsClicked(MouseButton.Left))
-            {
-                if (IsDraggable && !IsLocked && OuterBounds.Contains(_input.VirtualMousePos))
-                {
-                    _dragOffset = Position - _input.VirtualMousePos;
-                }
-                else _dragOffset = null;
-            }
-
-            if (!_input.IsPressed(MouseButton.Left))
-            {
-                _dragOffset = null;
-            }
-
-            if (_dragOffset is not null)
-            {
-                Position = _input.VirtualMousePos + _dragOffset.Value;
-            }
-
-            #endregion
+            Dragging.Update(IsDraggable && !IsLocked && OuterBounds.Contains(_input.VirtualMousePos), _input, ref _dragOffset, this);
 
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
