@@ -12,6 +12,7 @@ namespace STOLON
         KeyboardState PreviousKeyboard { get; }
         MouseState PreviousMouse { get; }
         Vector2 VirtualMousePos { get; }
+        Vector2 MouseDelta { get; }
 
         bool IsClicked(Keys key);
         bool IsClicked(MouseButton button);

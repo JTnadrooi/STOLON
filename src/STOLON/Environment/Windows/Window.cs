@@ -108,6 +108,7 @@ namespace STOLON
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
             Position = Vector2.Zero;
+            IsDraggable = true;
 
             kernel.RegisterWindow(this);
         }
@@ -168,8 +169,32 @@ namespace STOLON
             BoundRegion.UnlockWindow();
         }
 
+        private bool _isDragging;
+
         public virtual void Update(int elapsedMilliseconds)
         {
+            if (_input.IsClicked(MouseButton.Left))
+            {
+                if (IsDraggable && !IsLocked && OuterBounds.Contains(_input.VirtualMousePos))
+                {
+                    _isDragging = true;
+                }
+                else _isDragging = false;
+            }
+
+            if (!_input.IsPressed(MouseButton.Left))
+            {
+                _isDragging = false;
+            }
+
+            if (_isDragging)
+            {
+                Position += _input.MouseDelta;
+            }
+
+            if (_kernel.GetWindowIndex(this) == 0)
+                Console.WriteLine(_isDragging);
+
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
 
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.

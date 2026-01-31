@@ -35,8 +35,7 @@
 
         public KeyboardState PreviousKeyboard { get; private set; }
 
-        public Vector2 VirtualMousePos
-            => Vector2.Transform(CurrentMouse.Position.ToVector2() - STOLON.DrawingContext.GameWindowDrawOffsetWithCorrectedY, STOLON.DrawingContext.InvertYMatrix) / STOLON.DrawingContext.Scale;
+        public Vector2 VirtualMousePos { get; private set; }
 
         public int MouseScrollValue => CurrentMouse.ScrollWheelValue;
         /// <summary>
@@ -46,10 +45,14 @@
 
         private MouseCursor? _pendingCursor;
 
+        public Vector2 MouseDelta { get; private set; }
+
         public InputManager()
         {
             Cursor = MouseCursor.Arrow;
         }
+
+        private Vector2 _previousVirtualMousePos;
 
         public void Update(int elapsedMilliseconds)
         {
@@ -60,12 +63,24 @@
             PreviousMouse = CurrentMouse;
             CurrentMouse = Mouse.GetState();
 
+            _previousVirtualMousePos = VirtualMousePos;
+            VirtualMousePos = TransformMousePos(CurrentMouse.Position.ToVector2());
+            MouseDelta = (VirtualMousePos - _previousVirtualMousePos);
+            //MouseDelta = (CurrentMouse.Position.ToVector2() - PreviousMouse.Position.ToVector2()) / STOLON.DrawingContext.Scale * new Vector2(1, -1);
+            //MouseDelta = TransformMousePos(MouseDelta);
+
+            Console.WriteLine(MouseDelta);
+
             if (!STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(CurrentMouse.Position)) Domain = MouseDomain.None;
             else Domain = MouseDomain.OnScreen;
 
             PreviousKeyboard = CurrentKeyboard;
             CurrentKeyboard = Keyboard.GetState();
         }
+
+        private Vector2 TransformMousePos(Vector2 pos)
+            => Vector2.Transform(pos - STOLON.DrawingContext.GameWindowDrawOffsetWithCorrectedY, STOLON.DrawingContext.InvertYMatrix) / STOLON.DrawingContext.Scale;
+
 
         public void CollapseCursor()
         {
