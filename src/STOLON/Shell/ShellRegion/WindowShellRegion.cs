@@ -9,34 +9,14 @@ namespace STOLON
         private readonly Kernel _kernel;
 
         public override int Height => IsLockActive() ? _window.OuterBounds.Height : _windowSlotTex.Height;
+        public Window Window => _window;
 
         private Window _window;
         private Texture2D _windowSlotTex;
-
         private Vector2 _borderCompensatingOffset;
 
         private bool _isWindowLocked;
-
-        public Window Window => _window;
-
-        public void LockWindow()
-        {
-            if (_queuedLockAction.GetValueOrDefault() || _isWindowLocked) throw new InvalidOperationException("Cannot lock already locked window.");
-
-            _queuedLockAction = true;
-        }
-
-        public void UnlockWindow()
-        {
-            if (_queuedLockAction.GetValueOrDefault() || !_isWindowLocked) throw new InvalidOperationException("Cannot unlock already unlocked window.");
-
-            _queuedLockAction = false;
-        }
-
         private bool? _queuedLockAction;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool IsLockActive() => _isWindowLocked;
 
         public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Window window) : base(shell)
         {
@@ -50,16 +30,41 @@ namespace STOLON
 
             _window.BoundRegion = this;
 
-            _isWindowLocked = true;
             _window.IsManaged = false;
+            _isWindowLocked = true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool IsLockActive() => _isWindowLocked;
+
+        internal void LockWindow()
+        {
+            if (_queuedLockAction.GetValueOrDefault() || _isWindowLocked) throw new InvalidOperationException("Cannot lock already locked window.");
+
+            _queuedLockAction = true;
+        }
+
+        internal void UnlockWindow()
+        {
+            if (_queuedLockAction.GetValueOrDefault() || !_isWindowLocked) throw new InvalidOperationException("Cannot unlock already unlocked window.");
+
+            _queuedLockAction = false;
         }
 
         public override void Update(int elapsedMilliseconds)
         {
             if (_queuedLockAction.HasValue)
             {
-                _isWindowLocked = _queuedLockAction.Value;
-                _window.IsManaged = !_queuedLockAction.Value;
+                if (_queuedLockAction.Value) // to prevent IsManaged from throwing ex
+                {
+                    _window.IsManaged = !_queuedLockAction.Value;
+                    _isWindowLocked = _queuedLockAction.Value;
+                }
+                else
+                {
+                    _isWindowLocked = _queuedLockAction.Value;
+                    _window.IsManaged = !_queuedLockAction.Value;
+                }
 
                 _queuedLockAction = null;
             }

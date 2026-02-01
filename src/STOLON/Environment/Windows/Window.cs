@@ -23,18 +23,37 @@ namespace STOLON
 
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets the <see cref="WindowShellRegion"/> bound to this <see cref="Window"/> instance or <see langword="null"/> if this window is not bound to any region.
+        /// </summary>
         public WindowShellRegion? BoundRegion
         {
             get;
             internal set;
         }
 
+        /// <summary>
+        /// Gets if this <see cref="Window"/> is currently locked to the <see cref="BoundRegion"/>. 
+        /// Locked windows are always managed by the <see cref="BoundRegion"/> instead of the <see cref="Kernel"/>. 
+        /// (When this is <see langword="true"/>, <see cref="IsManaged"/> is always <see langword="false"/>.)
+        /// </summary>
         public bool IsLocked => BoundRegion is not null && BoundRegion.IsLockActive();
+
+        private bool _isManaged;
 
         /// <summary>
         /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
         /// </summary>
-        public bool IsManaged { get; set; }
+        public bool IsManaged
+        {
+            get => _isManaged;
+            set
+            {
+                if (IsLocked) throw new InvalidOperationException("Cannot change IsManaged for locked window.");
+
+                _isManaged = value;
+            }
+        }
 
         public Rectangle InnerBounds
         {
