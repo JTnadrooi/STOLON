@@ -33,12 +33,25 @@ namespace STOLON
             _windows.Add(window);
         }
 
-        public int GetWindowCount<TWindow>() where TWindow : Window
+        /// <summary>
+        /// Returns the amount of windows registered to the kernel of exact type <typeparamref name="TWindow"/>.
+        /// </summary>
+        /// <typeparam name="TWindow">The type of window to count.</typeparam>
+        /// <returns>The amount of windows registered to the kernel of exact type <typeparamref name="TWindow"/>.</returns>
+        public int GetCount<TWindow>() where TWindow : Window
         {
             return _windows.Count(w => w.GetType() == typeof(TWindow));
         }
 
-        public int GetWindowIndex<TWindow>(TWindow window) where TWindow : Window
+        /// <summary>
+        /// Gets the index of the specified window within the collection of windows of the same exact type <typeparamref name="TWindow"/>.
+        /// </summary>
+        /// <typeparam name="TWindow">The type of window to search for.</typeparam>
+        /// <param name="window">The window instance to find.</param>
+        /// <returns>
+        /// The index of the window within the filtered collection of windows of the same type as <paramref name="window"/>. Returns -1 if not found.
+        /// </returns>
+        public int GetIndex<TWindow>(TWindow window) where TWindow : Window
         {
             return _windows.Where(w => w.GetType() == window.GetType()).IndexOf(window);
         }
