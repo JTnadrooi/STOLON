@@ -13,6 +13,7 @@ namespace STOLON
         private readonly IInputManager _input;
 
         private readonly List<Window> _windows;
+        private readonly List<Window> _drawingOrder;
 
         public IReadOnlyList<Window> Windows { get; }
 
@@ -23,14 +24,40 @@ namespace STOLON
             _input = input;
 
             _windows = new List<Window>();
-            Windows = _windows.AsReadOnly();
+            _drawingOrder = new List<Window>();
+
+            Windows = _windows;
 
             //Windows = (_windows = new List<Window>()).AsReadOnly(); // yeah im not doing that, cool though
+        }
+
+        private void ThrowIfNotRegistered(Window window)
+        {
+            if (!_windows.Contains(window))
+                throw new ArgumentException("Window is not registered to the kernel.", nameof(window)); // currently not possible but just in case.
         }
 
         internal void RegisterWindow(Window window)
         {
             _windows.Add(window);
+            //if (!)
+            //throw new ArgumentException("Window is already registered.");
+            _drawingOrder.Add(window); // Initially same order
+        }
+
+        internal bool Focus(Window window)
+        {
+            ThrowIfNotRegistered(window);
+
+            if (_drawingOrder[_drawingOrder.Count - 1] == window)
+            {
+                return false;
+            }
+
+            _drawingOrder.Remove(window);
+            _drawingOrder.Add(window);
+
+            return true;
         }
 
         /// <summary>
@@ -53,6 +80,8 @@ namespace STOLON
         /// </returns>
         public int GetIndex<TWindow>(TWindow window) where TWindow : Window
         {
+            ThrowIfNotRegistered(window);
+
             return _windows.Where(w => w.GetType() == window.GetType()).IndexOf(window);
         }
 
@@ -66,7 +95,7 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            foreach (Window window in _windows)
+            foreach (Window window in _drawingOrder)
             {
                 if (window.IsManaged) window.Draw(drawingContext);
             }

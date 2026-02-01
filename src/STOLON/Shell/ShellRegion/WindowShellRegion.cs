@@ -82,12 +82,10 @@ namespace STOLON
             {
                 _window.Draw(drawingContext);
             }
-            else
+            else  // window drawing is done by kernel.
             {
                 drawingContext.Draw(_windowSlotTex, Position);
             }
-
-            // window drawing is done by kernel.
         }
     }
 }

@@ -184,6 +184,21 @@ namespace STOLON
             return screenPosition - InnerBounds.Location.ToVector2();
         }
 
+        private Rectangle _maybeButtonsBounds;
+
+        private Rectangle GetMaybeButtonBounds()
+        {
+            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + spacing) + spacing;
+            int mbbHeight = (WindowButton.Size + spacing) + spacing;
+
+            return new Rectangle(OuterBounds.X + OuterBounds.Width - mbbWidth, OuterBounds.Y + OuterBounds.Height - mbbHeight, mbbWidth, mbbHeight);
+        }
+
+        private bool MaybeHoveringButton()
+        {
+            return _maybeButtonsBounds.Contains(_input.VirtualMousePos);
+        }
+
         public void Lock()
         {
             if (BoundRegion is null) throw new InvalidOperationException("Can't lock unbound region.");
@@ -198,27 +213,26 @@ namespace STOLON
             BoundRegion.UnlockWindow();
         }
 
+        /// <summary>
+        /// Brings this window to the front of the <see cref="Kernel"/> drawing order.
+        /// Only calls <see cref="OnFocus()"/> if this window isn't focussed already.
+        /// </summary>
+        public void Focus()
+        {
+            if (_kernel.Focus(this)) // only run OnFocus if focussing changed anything
+            {
+                OnFocus();
+            }
+        }
+
+        protected virtual void OnFocus() { }
+
         public Vector2 GetButtonPos(int index)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, Buttons.Count);
             ArgumentOutOfRangeException.ThrowIfNegative(index);
 
             return OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * index, OuterBounds.Height - WindowButton.Size - 2);
-        }
-
-        private Rectangle _maybeButtonsBounds;
-
-        private Rectangle GetMaybeButtonBounds()
-        {
-            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + spacing) + spacing;
-            int mbbHeight = (WindowButton.Size + spacing) + spacing;
-
-            return new Rectangle(OuterBounds.X + OuterBounds.Width - mbbWidth, OuterBounds.Y + OuterBounds.Height - mbbHeight, mbbWidth, mbbHeight);
-        }
-
-        private bool MaybeHoveringButton()
-        {
-            return _maybeButtonsBounds.Contains(_input.VirtualMousePos);
         }
 
         private Vector2? _dragOffset;
@@ -235,6 +249,10 @@ namespace STOLON
                 !MaybeHoveringButton(),
                 _input, ref _dragOffset, this);
 
+            if (_input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.VirtualMousePos))
+            {
+                _kernel.Focus(this);
+            }
 
             for (int i = 0; i < _orderedButtons.Length; i++)
             {
