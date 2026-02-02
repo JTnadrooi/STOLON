@@ -136,11 +136,11 @@
         /// <summary>
         /// A value indicating if the source <see cref="UIElement"/> is pressed by the mouse.
         /// </summary>
-        public bool IsPressed(IInputManager input) => IsHovered && input.CurrentMouse.LeftButton == ButtonState.Pressed;
+        public bool IsPressed(IInputManager input) => IsHovered && input.IsPressed(MouseButton.Left);
         /// <summary>
         /// A value indicating if the source <see cref="UIElement"/> is clicked by the mouse.
         /// </summary>
-        public bool IsClicked(IInputManager input) => IsPressed(input) && input.PreviousMouse.LeftButton == ButtonState.Released;
+        public bool IsClicked(IInputManager input) => IsPressed(input) && input.IsClicked(MouseButton.Left);
         public bool IsEmpty => Source == null;
         public UIElement? Source { get; }
         /// <summary>

@@ -86,7 +86,7 @@ namespace STOLON
     //    {
     //        if (!_firstFrame) _firstFrame = true;
 
-    //        WorldMousePos = Camera.Unproject(_input.VirtualMousePos);
+    //        WorldMousePos = Camera.Unproject(_input.Mouse.Position);
 
     //        _mouseStateCoefficient = _input.CurrentMouse.GetMouseStateCoefficient();
 

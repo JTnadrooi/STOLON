@@ -175,7 +175,7 @@ namespace STOLON
                 _tasks.Update(elapsedMilliseconds);
                 _environment.Update(elapsedMilliseconds);
 
-                _input.CollapseCursor();
+                _input.PostUpdate(elapsedMilliseconds);
 
                 if (_input.IsPressed(Keys.LeftControl))
                 {

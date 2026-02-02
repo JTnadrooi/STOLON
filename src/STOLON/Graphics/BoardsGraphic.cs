@@ -56,7 +56,7 @@
 
         public void Update(int elapsedMilliseconds)
         {
-            int scrollDelta = Math.Sign(_input.MouseScrollDelta);
+            int scrollDelta = Math.Sign(_input.Mouse.ScrollDelta);
             if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
 
             float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
@@ -80,7 +80,7 @@
                     default
                 );
 
-                if (_input.IsClicked(MouseButton.Left) && _optionDraws[i].Bounds.Contains(_input.VirtualMousePos) && _viewport.Contains(_input.VirtualMousePos))
+                if (_input.IsClicked(MouseButton.Left) && _optionDraws[i].Bounds.Contains(_input.Mouse.Position) && _viewport.Contains(_input.Mouse.Position))
                 {
                     _selectedIndex = i;
                 }

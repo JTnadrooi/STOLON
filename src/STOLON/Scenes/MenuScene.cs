@@ -34,7 +34,7 @@ namespace STOLON
                 "specialThanks" => "!",
                 _ => ">",
             };
-            isHovered = elementBounds.Contains(_input.VirtualMousePos);
+            isHovered = elementBounds.Contains(_input.Mouse.Position);
             return new UIElementDrawData(element, isHovered
                 ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
                 : elementText, _font, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);

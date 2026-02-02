@@ -199,13 +199,13 @@ namespace STOLON
 
             if (_autocompletions is not null)
             {
-                if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.VirtualMousePos))
+                if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.Mouse.Position))
                 {
                     for (int i = 0; i < _autocompletionDividerLines.Length; i++)
                     {
                         Line line = _autocompletionDividerLines[i];
 
-                        if (_input.VirtualMousePos.Y >= line.Start.Y)
+                        if (_input.Mouse.Position.Y >= line.Start.Y)
                         {
                             AutoComplete(i);
 

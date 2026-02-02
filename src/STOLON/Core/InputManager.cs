@@ -1,17 +1,7 @@
-﻿namespace STOLON
+﻿using DiscordRPC;
+
+namespace STOLON
 {
-    public enum MouseDomain
-    {
-        None,
-        OnScreen,
-    }
-
-    public enum MouseFocus
-    {
-        None,
-        Textbox,
-    }
-
     public enum MouseButton
     {
         Left,
@@ -19,65 +9,46 @@
         Right,
     }
 
-    [Dependency(ServiceLifetime.Singleton)]
-    public class InputManager : IInputManager
+    public sealed class MouseInfo : IUpdatable
     {
-        public MouseCursor Cursor { get; private set; }
-
-        public MouseDomain Domain { get; private set; }
-
-        public MouseFocus Focus { get; private set; }
-
-        public MouseState PreviousMouse { get; private set; }
-
-        public MouseState CurrentMouse { get; private set; }
-
-        public KeyboardState CurrentKeyboard { get; private set; }
-
-        public KeyboardState PreviousKeyboard { get; private set; }
-
-        public Vector2 VirtualMousePos { get; private set; }
-
-        public int MouseScrollValue => CurrentMouse.ScrollWheelValue;
-        /// <summary>
-        /// Change in scroll value since the last frame (positive = scrolled up, negative = down).
-        /// </summary>
-        public int MouseScrollDelta => CurrentMouse.ScrollWheelValue - PreviousMouse.ScrollWheelValue;
-
+        private MouseState _currentState;
+        private MouseState _previousState;
+        private Vector2 _previousPos;
+        private bool _isOnScreen;
         private MouseCursor? _pendingCursor;
 
-        public Vector2 MouseDelta { get; private set; }
+        public MouseCursor Cursor { get; private set; }
+        public Vector2 Position { get; private set; }
+        public Vector2 Delta { get; private set; }
+        public int ScrollValue { get; private set; }
 
-        public InputManager()
+        /// <summary>
+        /// Gets the change in scroll value since the last frame (positive = scrolled up, negative = down).
+        /// </summary>
+        public int ScrollDelta { get; private set; }
+
+        public MouseInfo()
         {
             Cursor = MouseCursor.Arrow;
         }
 
-        private Vector2 _previousVirtualMousePos;
-
-        public void Update(int elapsedMilliseconds)
+        private static bool IsPressedImpl(in MouseState state, in MouseButton button) => button switch
         {
-            _pendingCursor = null;
-
-            SetCursor(MouseCursor.Arrow);
-
-            PreviousMouse = CurrentMouse;
-            CurrentMouse = Mouse.GetState();
-
-            _previousVirtualMousePos = VirtualMousePos;
-            VirtualMousePos = TransformMousePos(CurrentMouse.Position.ToVector2());
-            MouseDelta = (VirtualMousePos - _previousVirtualMousePos);
-
-            if (!STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(CurrentMouse.Position)) Domain = MouseDomain.None;
-            else Domain = MouseDomain.OnScreen;
-
-            PreviousKeyboard = CurrentKeyboard;
-            CurrentKeyboard = Keyboard.GetState();
-        }
+            MouseButton.Left => state.LeftButton,
+            MouseButton.Middle => state.MiddleButton,
+            MouseButton.Right => state.RightButton,
+            _ => throw new Exception(),
+        } == ButtonState.Pressed;
 
         private Vector2 TransformMousePos(Vector2 pos)
             => Vector2.Transform(pos - STOLON.DrawingContext.GameWindowDrawOffsetWithCorrectedY, STOLON.DrawingContext.InvertYMatrix) / STOLON.DrawingContext.Scale;
 
+        public void SetCursor(MouseCursor cursor)
+        {
+            ArgumentNullException.ThrowIfNull(cursor);
+
+            _pendingCursor = cursor;
+        }
 
         public void CollapseCursor()
         {
@@ -88,26 +59,76 @@
             Cursor = _pendingCursor;
         }
 
-        public bool IsPressed(MouseButton button) => IsPressed(CurrentMouse, button);
-        private bool IsPressed(MouseState state, MouseButton button) => button switch
+        public void Update(int elapsedMilliseconds)
         {
-            MouseButton.Left => state.LeftButton,
-            MouseButton.Middle => state.MiddleButton,
-            MouseButton.Right => state.RightButton,
-            _ => throw new Exception(),
-        } == ButtonState.Pressed;
+            _pendingCursor = null;
 
-        private bool IsPressed(KeyboardState state, Keys key) => state.IsKeyDown(key);
-        public bool IsPressed(Keys key) => IsPressed(CurrentKeyboard, key);
+            SetCursor(MouseCursor.Arrow);
 
-        public bool IsClicked(Keys key) => IsPressed(CurrentKeyboard, key) && !IsPressed(PreviousKeyboard, key);
-        public bool IsClicked(MouseButton button) => IsPressed(CurrentMouse, button) && !IsPressed(PreviousMouse, button);
+            _previousState = _currentState;
+            _currentState = Mouse.GetState();
 
-        public void SetCursor(MouseCursor cursor)
-        {
-            ArgumentNullException.ThrowIfNull(cursor);
+            _previousPos = Position;
+            Position = TransformMousePos(_currentState.Position.ToVector2());
+            Delta = (Position - _previousPos);
 
-            _pendingCursor = cursor;
+            ScrollDelta = _currentState.ScrollWheelValue - _previousState.ScrollWheelValue;
+
+            _isOnScreen = !STOLON.Instance.GraphicsDevice.Viewport.Bounds.Contains(_currentState.Position);
         }
+
+        public bool IsPressed(MouseButton button) => IsPressedImpl(_currentState, button);
+
+        public bool IsClicked(MouseButton button) => IsPressedImpl(_currentState, button) && !IsPressedImpl(_previousState, button);
+    }
+
+    public sealed class KeyboardInfo : IUpdatable
+    {
+        private KeyboardState _currentState;
+        private KeyboardState _previousState;
+
+        public KeyboardInfo() { }
+
+        private static bool IsPressedImpl(in KeyboardState state, in Keys key) => state.IsKeyDown(key);
+
+        public void Update(int elapsedMilliseconds)
+        {
+            _previousState = _currentState;
+            _currentState = Keyboard.GetState();
+        }
+
+        public bool IsPressed(Keys key) => IsPressedImpl(_currentState, key);
+
+        public bool IsClicked(Keys key) => IsPressedImpl(_currentState, key) && !IsPressedImpl(_previousState, key);
+    }
+
+    [Dependency(ServiceLifetime.Singleton)]
+    public class InputManager : IInputManager
+    {
+        public KeyboardInfo Keyboard { get; }
+        public MouseInfo Mouse { get; }
+
+        public InputManager()
+        {
+            Keyboard = new KeyboardInfo();
+            Mouse = new MouseInfo();
+        }
+
+        public void Update(int elapsedMilliseconds)
+        {
+            Keyboard.Update(elapsedMilliseconds);
+            Mouse.Update(elapsedMilliseconds);
+        }
+
+        public void PostUpdate(int elapsedMilliseconds)
+        {
+            Mouse.CollapseCursor();
+        }
+
+        public bool IsPressed(MouseButton button) => Mouse.IsPressed(button);
+        public bool IsPressed(Keys key) => Keyboard.IsPressed(key);
+
+        public bool IsClicked(MouseButton button) => Mouse.IsClicked(button);
+        public bool IsClicked(Keys key) => Keyboard.IsClicked(key);
     }
 }
