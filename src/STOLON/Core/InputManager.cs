@@ -7,6 +7,8 @@ namespace STOLON
         Left,
         Middle,
         Right,
+        XButton1,
+        XButton2,
     }
 
     public sealed class MouseInfo : IUpdatable
@@ -37,7 +39,9 @@ namespace STOLON
             MouseButton.Left => state.LeftButton,
             MouseButton.Middle => state.MiddleButton,
             MouseButton.Right => state.RightButton,
-            _ => throw new Exception(),
+            MouseButton.XButton1 => state.XButton1,
+            MouseButton.XButton2 => state.XButton2,
+            _ => throw new InvalidOperationException(),
         } == ButtonState.Pressed;
 
         private Vector2 TransformMousePos(Vector2 pos)
