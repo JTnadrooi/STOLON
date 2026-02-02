@@ -5,7 +5,8 @@ using System.Numerics;
 
 namespace STOLON
 {
-    public class OverlayManager : IComponent, IOverlayManager, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class OverlayManager : IComponent, IOverlayManager
     {
         private Dictionary<string, IOverlay> _overlayDict;
         private List<string> _initialized;

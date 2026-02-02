@@ -19,7 +19,8 @@
         Right,
     }
 
-    public class InputManager : IInputManager, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class InputManager : IInputManager
     {
         public MouseCursor Cursor { get; private set; }
 

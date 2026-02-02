@@ -9,7 +9,8 @@ namespace STOLON
         NearestNeighbour,
     }
 
-    public class DrawingContext : IDisposable, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class DrawingContext : IDisposable
     {
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 

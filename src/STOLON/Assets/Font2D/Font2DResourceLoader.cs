@@ -2,7 +2,8 @@
 
 namespace STOLON
 {
-    public class Font2DResourceLoader : SequentialResourceLoader<Font2D>, ITransientDependency
+    [Dependency(ServiceLifetime.Transient)]
+    public class Font2DResourceLoader : SequentialResourceLoader<Font2D>
     {
         public Font2DResourceLoader(IRichLogger logger) : base(logger)
         {

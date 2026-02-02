@@ -4,7 +4,8 @@ using Tomlyn.Model;
 
 namespace STOLON
 {
-    public sealed class Configuration : IConfiguration, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public sealed class Configuration : IConfiguration
     {
         public FrozenDictionary<string, object> Defaults { get; }
 

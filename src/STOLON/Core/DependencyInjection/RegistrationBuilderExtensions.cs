@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace STOLON
 {
-    public record class RegisteredTypeInfo(Type RegisteredType, Type MarkerInterface);
+    public record class RegisteredTypeInfo(Type RegisteredType, ServiceLifetime Lifetime);
 
     public static class RegistrationBuilderExtensions
     {
@@ -34,7 +34,7 @@ namespace STOLON
             return registration.AsImplementedInterfaces().AsImplementedBaseClasses();
         }
 
-        public static Type[] GetImplementedBaseClasses(Type type)
+        private static Type[] GetImplementedBaseClasses(Type type)
         {
             List<Type> baseTypes = new List<Type>();
 
@@ -55,29 +55,43 @@ namespace STOLON
 
             foreach (Assembly assembly in assemblies)
             {
-                Type[] interfaces = { typeof(ISingletonDependency), typeof(IScopedDependency), typeof(ITransientDependency) };
                 Type[] assemblyTypes = assembly.GetTypes();
 
-                foreach (Type lifetimeMarkerInterface in interfaces)
-                    foreach (Type type in assemblyTypes)
+                foreach (Type type in assemblyTypes)
+                {
+                    if (!type.IsClass || type.IsAbstract) continue;
+
+                    DependencyAttribute? attribute = type.GetCustomAttribute<DependencyAttribute>();
+
+                    Type? baseType = type.BaseType;
+
+                    while (attribute is null)
                     {
-                        if (!type.IsClass || type.IsAbstract) continue;
-
-                        Type[] implementedInterfaces = type.GetInterfaces().Where(i => interfaces.Contains(i)).ToArray();
-                        if (!implementedInterfaces.Contains(lifetimeMarkerInterface)) continue;
-                        if (implementedInterfaces.Length > 1) throw new InvalidOperationException();
-                        if (type.Namespace?.StartsWith("System") == true) continue;
-
-                        registeredTypes.Add(new RegisteredTypeInfo(type, lifetimeMarkerInterface));
-
-                        IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registration = builder.RegisterType(type)
-                            .AsImplemented()
-                            .AsSelf();
-
-                        if (lifetimeMarkerInterface == typeof(IScopedDependency)) registration.InstancePerLifetimeScope();
-                        else if (lifetimeMarkerInterface == typeof(ITransientDependency)) registration.InstancePerDependency();
-                        else registration.SingleInstance();
+                        if (baseType is not null)
+                        {
+                            attribute = baseType.GetCustomAttribute<DependencyAttribute>();
+                            baseType = baseType.BaseType;
+                        }
+                        else break;
                     }
+
+                    if (attribute is null) continue;
+                    if ((type.Namespace?.StartsWith("System")).GetValueOrDefault()) continue;
+
+                    registeredTypes.Add(new RegisteredTypeInfo(type, attribute.Lifetime));
+
+                    IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registration = builder.RegisterType(type)
+                        .AsImplemented()
+                        .AsSelf();
+
+                    switch (attribute.Lifetime)
+                    {
+                        case ServiceLifetime.Singleton: registration.SingleInstance(); break;
+                        case ServiceLifetime.Scoped: registration.InstancePerLifetimeScope(); break;
+                        case ServiceLifetime.Transient: registration.InstancePerDependency(); break;
+                        default: throw new InvalidProgramException($"{type}' has an invalid lifetime '{attribute.Lifetime}'.");
+                    }
+                }
             }
 
             return registeredTypes.ToArray();

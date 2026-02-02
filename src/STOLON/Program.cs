@@ -1,8 +1,9 @@
-﻿using DiscordRPC.Logging;
-using Autofac;
+﻿using Autofac;
+using Autofac.Builder;
+using Autofac.Core;
+using DiscordRPC.Logging;
 using System.Diagnostics;
 using System.Reflection;
-using Autofac.Builder;
 
 namespace STOLON
 {
@@ -21,31 +22,19 @@ namespace STOLON
                    .SingleInstance()
                    .OnActivating(e => e.Instance.Silent = false);
 
-            Type[] interfaces = { typeof(ISingletonDependency), typeof(IScopedDependency), typeof(ITransientDependency) };
             Type[] assemblyTypes = Assembly.GetExecutingAssembly().GetTypes();
-
-#if DEBUG
-            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
-            {
-                if (t.IsInterface)
-                {
-                    if (t.GetInterfaces().Any(i => interfaces.Contains(i))) throw new InvalidProgramException($"Interface '{t.FullName}' must not inherit from lifetime marker interfaces.");
-                }
-            }
-#endif
 
             RegisteredTypeInfo[] registeredTypes = builder.RegisterMarkedAssemblyTypes(Assembly.GetExecutingAssembly());
 
             for (int i = 0; i < registeredTypes.Length; i++)
             {
-                Console.WriteLine($"type '{registeredTypes[i].RegisteredType}' for lifetime marker interface '{registeredTypes[i].MarkerInterface}'.");
+                Console.WriteLine($"registered type '{registeredTypes[i].RegisteredType}' with lifetime '{registeredTypes[i].Lifetime}'.");
             }
 
             _services = STOLON.Services = builder.Build();
+            stopwatch.Stop();
 
             Console.WriteLine($"DI registration completed in {stopwatch.ElapsedMilliseconds} ms.");
-
-            stopwatch.Stop();
         }
 
         public static void Main()

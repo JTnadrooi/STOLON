@@ -3,7 +3,8 @@
     /// <summary>
     /// The enviroment of the <see cref="STOLON"/> game.
     /// </summary>
-    public class Environment : IComponent, IDialogueProvider, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class Environment : IComponent, IDialogueProvider
     {
         private readonly IRichLogger _logger;
         private readonly IAudioEngine _audioEngine;

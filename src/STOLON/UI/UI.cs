@@ -6,7 +6,8 @@ namespace STOLON
     /// <summary>
     /// The user interface for the <see cref="Environment"/>.
     /// </summary>
-    public class Interface : IComponent, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class Interface : IComponent
     {
         public const int LINE_WIDTH = 2;
 

@@ -1,6 +1,7 @@
 ﻿namespace STOLON
 {
-    public class Texture2DCollection : ResourceCollection<Texture2D>, ITexture2DCollection, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class Texture2DCollection : ResourceCollection<Texture2D>, ITexture2DCollection
     {
         private Texture2D? _pixel;
 

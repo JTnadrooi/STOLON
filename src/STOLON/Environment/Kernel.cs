@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public sealed class Kernel : IComponent, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public sealed class Kernel : IComponent
     {
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;

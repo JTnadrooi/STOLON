@@ -10,10 +10,12 @@ namespace STOLON
         SFX,
         OST,
     }
+
     /// <summary>
     /// The main <see cref="AudioEngine"/> for the <see cref="STOLON"/> environment. <i>Moderately thread-safe.</i>
     /// </summary>
-    public class AudioEngine : IDisposable, IAudioEngine, ISingletonDependency // NOT DEBUG SAFE
+    [Dependency(ServiceLifetime.Singleton)]
+    public class AudioEngine : IDisposable, IAudioEngine // NOT DEBUG SAFE
     {
         public Playlist? Current => _currentPlaylist;
 

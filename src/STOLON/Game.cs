@@ -5,7 +5,8 @@ using System.Reflection;
 
 namespace STOLON
 {
-    public sealed class STOLON : Game, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public sealed class STOLON : Game
     {
         private GraphicsDeviceManager _graphics;
         private DrawingContext _drawingContext;

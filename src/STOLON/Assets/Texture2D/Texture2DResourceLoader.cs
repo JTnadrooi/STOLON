@@ -1,7 +1,8 @@
 ﻿
 namespace STOLON
 {
-    public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>, ITransientDependency
+    [Dependency(ServiceLifetime.Transient)]
+    public class Texture2DResourceLoader : SequentialResourceLoader<Texture2D>
     {
         public Texture2DResourceLoader(IRichLogger logger) : base(logger)
         {

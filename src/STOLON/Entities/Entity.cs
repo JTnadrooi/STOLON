@@ -45,10 +45,12 @@
                 textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus);
     }
+
     /// <summary>
     /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
-    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
 
         public string FullName { get; }

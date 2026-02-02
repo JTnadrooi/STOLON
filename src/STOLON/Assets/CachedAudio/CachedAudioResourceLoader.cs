@@ -1,7 +1,8 @@
 ﻿
 namespace STOLON
 {
-    public class CachedAudioResourceLoader : SequentialResourceLoader<CachedAudio>, ITransientDependency
+    [Dependency(ServiceLifetime.Transient)]
+    public class CachedAudioResourceLoader : SequentialResourceLoader<CachedAudio>
     {
         public CachedAudioResourceLoader(IRichLogger logger) : base(logger)
         {

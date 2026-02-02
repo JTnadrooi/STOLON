@@ -24,7 +24,9 @@ namespace STOLON
             }).ToArray(), info.PostMilliseconds);
         }
     }
-    public class Textframe : ITextframe, ISingletonDependency
+
+    [Dependency(ServiceLifetime.Singleton)]
+    public class Textframe : ITextframe
     {
         private Queue<DialogueInfo> _dialogueQueue;
         private Rectangle _dialoguebounds;

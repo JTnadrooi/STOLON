@@ -6,7 +6,8 @@ using System.Text.RegularExpressions;
 
 namespace STOLON
 {
-    public sealed class Shell : IComponent, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public sealed class Shell : IComponent
     {
         private readonly IRichLogger _logger;
         private readonly IFont2DCollection _fonts;

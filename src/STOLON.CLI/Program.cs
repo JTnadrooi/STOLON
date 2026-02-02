@@ -17,17 +17,15 @@ namespace STOLON.CLI
             builder.RegisterType<RichLogger>().As<IRichLogger>().SingleInstance();
             builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 
-            RegisteredTypeInfo[] registeredTypes = builder.RegisterMarkedAssemblyTypes(Assembly.GetExecutingAssembly());
+            builder.RegisterMarkedAssemblyTypes(Assembly.GetExecutingAssembly());
 
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
-            {
                 if (typeof(CommandProvider).IsAssignableFrom(type)
                     && type != typeof(CommandProvider)
                     && !type.IsAbstract)
                 {
                     builder.RegisterType(type).AsImplemented().SingleInstance();
                 }
-            }
 
             builder.Register<CommandEngine>(i => new CommandEngine()
                 .AddHook(new DevActionHook())

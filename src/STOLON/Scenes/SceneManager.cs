@@ -2,7 +2,8 @@
 
 namespace STOLON
 {
-    public abstract class Scene : IComponent, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public abstract class Scene : IComponent
     {
         public string Id { get; }
 
@@ -45,7 +46,8 @@ namespace STOLON
         }
     }
 
-    public sealed class SceneManager : ISceneManager, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public sealed class SceneManager : ISceneManager
     {
         private Scene? _currentScene;
 

@@ -1,6 +1,7 @@
 ﻿namespace STOLON
 {
-    public abstract class Shader : ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public abstract class Shader
     {
         public bool IsEnabled { get; set; }
         public bool IsVirtual { get; }

@@ -1,7 +1,8 @@
 ﻿
 namespace STOLON
 {
-    public class EffectResourceLoader : SequentialResourceLoader<Effect>, ITransientDependency
+    [Dependency(ServiceLifetime.Transient)]
+    public class EffectResourceLoader : SequentialResourceLoader<Effect>
     {
         public EffectResourceLoader(IRichLogger logger) : base(logger)
         {

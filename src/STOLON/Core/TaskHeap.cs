@@ -3,7 +3,8 @@
     /// <summary>
     /// Provides a way to "fire and forget" simple game logic.
     /// </summary>
-    public class TaskHeap : ITaskHeap, ISingletonDependency
+    [Dependency(ServiceLifetime.Singleton)]
+    public class TaskHeap : ITaskHeap
     {
         public ReadOnlyDictionary<string, DynamicTask> Functions { get; }
         public ReadOnlyDictionary<string, object?> FrameCompletedTasks { get; }
