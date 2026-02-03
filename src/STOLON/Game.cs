@@ -136,11 +136,6 @@ namespace STOLON
             }
             if (loadCount != 4) throw new Exception(loadCount.ToString());  // 4 because of the differnt asset types, ignore this. This is just checking if nothing is loaded more than once.
 
-            Console.WriteLine(Services.Resolve<IEnumerable<IResourceCollection>>().All(c => c.IsLoaded)); // true, rest below is false. (even though the texture collection implements all these, and of course IResourceCollection) 
-            Console.WriteLine(Services.Resolve<ITexture2DCollection>().IsLoaded);
-            Console.WriteLine(Services.Resolve<Texture2DCollection>().IsLoaded);
-            Console.WriteLine(Services.Resolve<IResourceCollection<Texture2D>>().IsLoaded);
-
             STOLON.DrawingContext = _drawingContext = Services.Resolve<DrawingContext>();
 
             _environment = Services.Resolve<Environment>();
@@ -188,13 +183,16 @@ namespace STOLON
 
         protected override void Draw(GameTime gameTime)
         {
-            _drawingContext.BeginScene();
+            if (IsActive)
+            {
+                _drawingContext.BeginScene();
 
-            _environment.Draw(_drawingContext);
-            //_drawingContext.DrawString(_fonts.Small, Version, new Vector2(V_WIDTH / 2 - _fonts.Small.FastMeasure(Version).X / 2, 500));
-            _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
+                _environment.Draw(_drawingContext);
+                //_drawingContext.DrawString(_fonts.Small, Version, new Vector2(V_WIDTH / 2 - _fonts.Small.FastMeasure(Version).X / 2, 500));
+                _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
 
-            _drawingContext.EndScene();
+                _drawingContext.EndScene();
+            }
 
             base.Draw(gameTime);
         }
