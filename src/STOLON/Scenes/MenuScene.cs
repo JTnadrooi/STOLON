@@ -222,7 +222,7 @@ namespace STOLON
                 "No shaders?",
                 "All colors, Her.", // Thetalore Nue reference. (yeah i like these kind of sentences)
                 "Thanks for playing! :D",
-                "\"Call that a Natural Deadline.\"",
+                //"\"Call that a Natural Deadline.\"",
                 "Nue not included!",
                 "Fishing update when?",
                 "\"What even is a Stolon?\"", // stolons are some sort of tree "root". 
@@ -297,7 +297,8 @@ namespace STOLON
                 "You have been Noticed.",
                 "Drawing vegitation..",
                 "FLORA.",
-                "Stukadoor", // inside joke.
+                "Stukadoor", // internship joke.
+                "The rest of your life is probably a loooong time.."
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
