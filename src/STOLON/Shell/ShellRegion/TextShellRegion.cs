@@ -423,7 +423,7 @@ namespace STOLON
 
             #region HANDLE_MOUSE
 
-            if (_input.IsPressed(MouseButton.Left))
+            if (_input.IsMouseOn<Shell>() && _input.IsPressed(MouseButton.Left))
             {
                 ShellCharacterInfo character = GetCharacterInfoAt(_input.Mouse.Position, true);
 
@@ -446,13 +446,18 @@ namespace STOLON
                 _cursorSelecting = false;
             }
 
-            if (_input.IsClicked(MouseButton.Left))
+            if (_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
             {
                 _lastClickCursor = GetCharacterInfoAt(_input.Mouse.Position, true);
                 if (_lastClickCursor.IsValidCursorInfo())
                     _cursorLifetime = 0;
 
                 if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
+            }
+
+            if (!_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
+            {
+                Cursor = ShellCharacterInfo.GetOutOfBounds(this);
             }
 
             #endregion

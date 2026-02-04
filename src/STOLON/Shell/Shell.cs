@@ -30,11 +30,6 @@ namespace STOLON
 
         private ShellCharacterInfo? _cursor; // null when out of bounds of any region.
 
-        private int _lastLockHandle;
-
-
-        //internal Vector2 Pos { get; }
-
         public bool HasInputLine
         {
             get => EnsureLastRegionIsTextRegion().HasInputLine;
@@ -199,7 +194,7 @@ namespace STOLON
 
             if (_autocompletions is not null)
             {
-                if (_input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.Mouse.Position))
+                if (_input.IsMouseOn(this) && _input.IsClicked(MouseButton.Left) && _autocompletionRect.Contains(_input.Mouse.Position))
                 {
                     for (int i = 0; i < _autocompletionDividerLines.Length; i++)
                     {
