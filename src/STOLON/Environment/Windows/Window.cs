@@ -306,7 +306,7 @@ namespace STOLON
             //    drawingContext.DrawArea(OuterBounds, Color.Green);
             //}
 
-            _input.RegisterDraw(this, OuterBounds);
+            drawingContext.RegisterDraw(this, OuterBounds);
         }
 
         protected abstract void DrawContents(DrawingContext drawingContext);

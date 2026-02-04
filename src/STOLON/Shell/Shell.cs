@@ -256,7 +256,7 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            _input.RegisterDraw(this, STOLON.Bounds);
+            drawingContext.RegisterDraw(this, STOLON.Bounds);
 
             foreach (ShellRegion region in _regions)
             {

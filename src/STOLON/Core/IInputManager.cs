@@ -15,6 +15,8 @@ namespace STOLON
         void PostUpdate(int elapsedMilliseconds);
         bool IsMouseOn<TElement>(TElement element) where TElement : class, IDrawable;
         bool IsMouseOn<TElement>() where TElement : class, IDrawable;
+
+        [Obsolete] // Use the RegisterDraw() on DrawingContext instead.
         void RegisterDraw<TElement>(TElement element, in Rectangle hitbox) where TElement : class, IDrawable;
     }
 }

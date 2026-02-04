@@ -247,14 +247,22 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly ITexture2DCollection _textures;
         private readonly IEnumerable<Shader> _shaders;
+        private readonly IInputManager _input;
 
-        public DrawingContext(IRichLogger logger, IConfiguration config, IFont2DCollection fonts, ITexture2DCollection textures, IEnumerable<Shader> shaders)
+        public DrawingContext(
+            IRichLogger logger,
+            IConfiguration config,
+            IFont2DCollection fonts,
+            ITexture2DCollection textures,
+            IInputManager input,
+            IEnumerable<Shader> shaders)
         {
             _logger = logger;
             _config = config;
             _fonts = fonts;
             _textures = textures;
             _shaders = shaders;
+            _input = input;
 
             _logger.Log(">[s]initialising drawing context");
             SpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
@@ -332,6 +340,11 @@ namespace STOLON
 
             _logger.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
+
+        public void RegisterDraw<TElement>(TElement element, in Rectangle hitbox) where TElement : class, IDrawable
+#pragma warning disable CS0612 
+            => _input.RegisterDraw(element, hitbox);
+#pragma warning restore CS0612
 
         public void DisableShader(string name)
         {
