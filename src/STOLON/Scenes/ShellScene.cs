@@ -34,7 +34,7 @@ namespace STOLON
             _shell.WriteTexture(_textures["Entities\\north\\north-128"]);
         }
 
-        protected override void UpdateUI(int elapsedMilliseconds)
+        protected override void UpdateInterface(int elapsedMilliseconds)
         {
             if (_input.IsPressed(Keys.LeftControl))
             {

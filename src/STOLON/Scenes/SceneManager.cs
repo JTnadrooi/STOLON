@@ -19,13 +19,13 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            UpdateUI(elapsedMilliseconds);
-            UpdateEnvironment(elapsedMilliseconds);
+            UpdateInterface(elapsedMilliseconds);
+            UpdateContent(elapsedMilliseconds);
         }
 
-        protected virtual void UpdateUI(int elapsedMilliseconds) { }
+        protected virtual void UpdateInterface(int elapsedMilliseconds) { }
 
-        protected virtual void UpdateEnvironment(int elapsedMilliseconds) { }
+        protected virtual void UpdateContent(int elapsedMilliseconds) { }
 
         public static string GetId<T>() where T : Scene => GetId(typeof(T));
         public static string GetId(Type type) => type.FullName ?? throw new Exception();

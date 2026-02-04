@@ -40,12 +40,12 @@ namespace STOLON
             throw new Exception();
         }
 
-        protected override void UpdateEnvironment(int elapsedMilliseconds)
+        protected override void UpdateContent(int elapsedMilliseconds)
         {
-            UpdateUI(elapsedMilliseconds);
+            UpdateInterface(elapsedMilliseconds);
             //_board?.Update(elapsedMilliseconds);
         }
-        protected override void UpdateUI(int elapsedMilliseconds)
+        protected override void UpdateInterface(int elapsedMilliseconds)
         {
             //float zoomIntensity = ((BoardScene)_sceneManager.Current).Board.ZoomIntensity;
             float zoomIntensity = 1;

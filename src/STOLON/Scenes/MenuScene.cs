@@ -323,7 +323,7 @@ namespace STOLON
             _done = true;
             this._onLeave = onLeave;
         }
-        protected override void UpdateUI(int elapsedMilliseconds)
+        protected override void UpdateInterface(int elapsedMilliseconds)
         {
             int rowHeight = (int)(_logoLines.Height / (float)LOGO_ROW_COUNT);
             float menuRemoveTweenerOffset = -300f * _removeTweener.Value;
