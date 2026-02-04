@@ -5,6 +5,7 @@ namespace STOLON
     {
         KeyboardInfo Keyboard { get; }
         MouseInfo Mouse { get; }
+        IDrawable? MouseFocus { get; }
 
         bool IsClicked(Keys key);
         bool IsClicked(MouseButton button);
