@@ -416,7 +416,7 @@ namespace STOLON
         public void BeginScene()
         {
             _graphics.SetRenderTarget(_vrt1);
-            _graphics.Clear(STOLON.Instance.Color2);
+            _graphics.Clear(STOLON.Color2);
             BeginBatch();
         }
 

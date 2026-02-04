@@ -9,9 +9,7 @@ namespace STOLON
     public sealed class STOLON : Game
     {
         private GraphicsDeviceManager _graphics;
-        private DrawingContext _drawingContext;
         private int _desiredModifier;
-        private Color[] _palette;
         private Point _oldWindowSize;
 
         public DiscordRichPresence DRP { get; private set; }
@@ -20,8 +18,6 @@ namespace STOLON
         public float ScreenScale { get; private set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
-        public Color Color1 => _palette[0];
-        public Color Color2 => _palette[1];
 
         private readonly IRichLogger _logger;
         private readonly IInputManager _input;
@@ -41,8 +37,7 @@ namespace STOLON
             _tasks = tasks;
             _config = config;
 
-            Instance = this;
-            IsInitiated = true;
+            _instance = this;
 
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = string.Empty; // heh
@@ -121,10 +116,6 @@ namespace STOLON
         {
             _logger.Log(">[s]loading stolon content");
 
-            _palette = [
-                new Color(242, 251, 235), // #f2fbeb
-                new Color(23, 18, 25), // #171219
-            ];
 
             int loadCount = 0;
             foreach (IResourceCollection resourceCollection in Services.Resolve<IEnumerable<IResourceCollection>>())
@@ -136,7 +127,7 @@ namespace STOLON
             }
             if (loadCount != 4) throw new Exception(loadCount.ToString());  // 4 because of the differnt asset types, ignore this. This is just checking if nothing is loaded more than once.
 
-            STOLON.DrawingContext = _drawingContext = Services.Resolve<DrawingContext>();
+            _drawingContext = Services.Resolve<DrawingContext>();
 
             _environment = Services.Resolve<Environment>();
             _environment.Initialize();
@@ -152,7 +143,6 @@ namespace STOLON
         protected override void UnloadContent()
         {
             MediaPlayer.Stop();
-
 
             base.UnloadContent();
         }
@@ -197,27 +187,38 @@ namespace STOLON
             base.Draw(gameTime);
         }
 
-#nullable disable
-        public static bool IsInitiated { get; private set; }
+        public static readonly Rectangle Bounds;
+        public static Color Color1 => _palette[0];
+        public static Color Color2 => _palette[1];
+        public static string Version { get; } = File.ReadAllText(".version");
+        public static bool IsInitiated => _instance is not null;
+        public static STOLON Instance => _instance ?? throw new InvalidOperationException("STOLON is not initiated.");
+        public static DrawingContext DrawingContext => _drawingContext ?? throw new InvalidOperationException("STOLON is not initiated.");
 
-        public static STOLON Instance { get; private set; }
+        private static STOLON? _instance;
+        private static IContainer? _services;
+        private static DrawingContext? _drawingContext;
+        private readonly static Color[] _palette;
 
-        public static DrawingContext DrawingContext { get; private set; }
-
-        private static IContainer _container;
         public new static IContainer Services
         {
-            get => _container;
+            get => _services ?? throw new InvalidOperationException("Services is not set.");
             set
             {
-                if (_container is not null) throw new InvalidOperationException("Container can only be set once.");
-                _container = value;
+                if (_services is not null) throw new InvalidOperationException("Container can only be set once.");
+                _services = value;
             }
         }
 
-#nullable enable
+        static STOLON()
+        {
+            _palette = [
+                new Color(242, 251, 235), // #f2fbeb
+                new Color(23, 18, 25), // #171219
+            ];
 
-        public static string Version { get; } = File.ReadAllText(".version");
+            Bounds = new Rectangle(0, 0, V_WIDTH, V_HEIGHT);
+        }
 
         public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
         public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;

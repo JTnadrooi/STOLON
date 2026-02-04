@@ -21,9 +21,9 @@
         public StolonReplaceColorShader(IEffectResourceCollection effects) : base(effects["apply_palette"], true)
         {
             Effect.Parameters["dcolor1"].SetValue(Color.White.ToVector4());
-            Effect.Parameters["color1"].SetValue(STOLON.Instance.Color1.ToVector4());
+            Effect.Parameters["color1"].SetValue(STOLON.Color1.ToVector4());
             Effect.Parameters["dcolor2"].SetValue(Color.Black.ToVector4());
-            Effect.Parameters["color2"].SetValue(STOLON.Instance.Color2.ToVector4());
+            Effect.Parameters["color2"].SetValue(STOLON.Color2.ToVector4());
         }
     }
 
