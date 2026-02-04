@@ -256,6 +256,8 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
+            _input.RegisterDraw(this, STOLON.Bounds);
+
             foreach (ShellRegion region in _regions)
             {
                 region.Draw(drawingContext);
@@ -272,8 +274,6 @@ namespace STOLON
                     drawingContext.DrawString(Font, _displayedAutocompletions![i], _autocompletionDividerLines![i].Start.ToVector2() + new Vector2(5, 0));
                 }
             }
-
-            _input.RegisterDraw(this, STOLON.Bounds);
         }
 
         private bool IsLastSectionAcceptingInput()

@@ -240,7 +240,7 @@ namespace STOLON
         public virtual void Update(int elapsedMilliseconds)
         {
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
-            bool isMouseOnThis = _input.IsMouseOn(this) || (IsLocked && _input.IsMouseOn<Shell>());
+            bool isMouseOnThis = _input.IsMouseOn(this);
 
             Dragging.Update(
                 isMouseOnThis &&
