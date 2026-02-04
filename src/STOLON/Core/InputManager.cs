@@ -120,7 +120,7 @@ namespace STOLON
         public KeyboardInfo Keyboard { get; }
         public MouseInfo Mouse { get; }
 
-        public IDrawable? MouseFocus => _mouseFocus;
+        public IDrawable? MouseOn => _mouseFocus;
 
         private readonly List<DrawableHitboxInfo> _drawnDrawables;
         private DrawableHitboxInfo[] _lastFrameDrawables;
@@ -193,13 +193,13 @@ namespace STOLON
             _drawnDrawables.Add(new DrawableHitboxInfo(element, hitbox));
         }
 
-        public bool IsMouseFocus<TElement>() where TElement : class, IDrawable
+        public bool IsMouseOn<TElement>() where TElement : class, IDrawable
         {
             return _mouseFocus is TElement;
         }
 
 
-        public bool IsMouseFocus<TElement>(TElement element) where TElement : class, IDrawable
+        public bool IsMouseOn<TElement>(TElement element) where TElement : class, IDrawable
         {
             return ReferenceEquals(element, _mouseFocus);
         }
