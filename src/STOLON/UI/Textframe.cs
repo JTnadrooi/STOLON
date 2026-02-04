@@ -51,7 +51,7 @@ namespace STOLON
 
         public Rectangle DialogueBounds => _dialoguebounds;
         public const int CHAR_READ_MILLISECONDS = 75; // per char
-        public const int POST_READ_MILLISECONDS = CHAR_READ_MILLISECONDS * 10; // how long the dialogue stagnates after its finished.
+        public const int PostReadMilliseconds = CHAR_READ_MILLISECONDS * 10; // how long the dialogue stagnates after its finished.
 
         private int _msSinceLastChar;
         private int _charsRead;
@@ -182,7 +182,7 @@ namespace STOLON
             _dialogueShowCoefficient = Math.Clamp(_dialogueShowCoefficient, 0.1f, 1f);
 
             _dialoguebounds = new Rectangle(
-                (int)Centering.CenterX(BOX_W, 0, STOLON.V_WIDTH).X,
+                (int)Centering.CenterX(BOX_W, 0, STOLON.VWidth).X,
                 (int)((BOX_H * _dialogueShowCoefficient - BOX_H) + BOX_OFFSET_Y) - (_hide ? 100 : 0),
                 BOX_W, BOX_H
             );
@@ -199,7 +199,7 @@ namespace STOLON
                 drawingContext.DrawString(_font, _toDrawDialogueText, _dialogueTextPos.ToVector2());
                 drawingContext.DrawString(_font, _currentDialogue.Value.Provider.Name.ToUpper(), _providerTextPos.ToVector2(), _providerTextScaleCoefficient);
             }
-            drawingContext.DrawRectangle(_dialoguebounds, Color.White, Interface.LINE_WIDTH);
+            drawingContext.DrawRectangle(_dialoguebounds, Color.White, Interface.LineWidth);
         }
     }
 }

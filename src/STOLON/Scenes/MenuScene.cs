@@ -21,7 +21,7 @@ namespace STOLON
         {
             Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
                                 index * (-_font.Dimensions.Y * 2 - 2) + _origin.Y,
-                                STOLON.V_WIDTH, Vector2.One);
+                                STOLON.VWidth, Vector2.One);
             Centering.OnPixel(ref elementPos);
 
             Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
@@ -163,12 +163,12 @@ namespace STOLON
             _entityProfiles = [_environment.Entities.Values.First().Profile, _environment.Entities.Values.Last().Profile];
 
             _mainOrderContainer = new MenuOrderContainer([
-                new UIElement("story_start", UIElement.TOP_ID, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
-                new UIElement("com_start", UIElement.TOP_ID, "COM", UIElementType.Listen, clickSound: _audio["coin_4"]),
-                new UIElement("xp_start", UIElement.TOP_ID, "2P", UIElementType.Listen, clickSound: _audio["coin_4"]),
-                new UIElement("options", UIElement.TOP_ID, "Options", UIElementType.Listen),
-                new UIElement("special_thanks", UIElement.TOP_ID, "Special Thanks", UIElementType.Listen),
-                new UIElement("quit", UIElement.TOP_ID, "Quit", UIElementType.Listen),
+                new UIElement("story_start", UIElement.TopId, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
+                new UIElement("com_start", UIElement.TopId, "COM", UIElementType.Listen, clickSound: _audio["coin_4"]),
+                new UIElement("xp_start", UIElement.TopId, "2P", UIElementType.Listen, clickSound: _audio["coin_4"]),
+                new UIElement("options", UIElement.TopId, "Options", UIElementType.Listen),
+                new UIElement("special_thanks", UIElement.TopId, "Special Thanks", UIElementType.Listen),
+                new UIElement("quit", UIElement.TopId, "Quit", UIElementType.Listen),
                 new UIElement("sound", "options", "Sound", UIElementType.Listen),
                 new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: _audio["exit_3"]),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
@@ -331,7 +331,7 @@ namespace STOLON
             bool menuFlashEnded = _millisecondsSinceStartup > _flashEnd;
             int uiElementOffsetY = (int)(280f + menuRemoveTweenerOffset);
             int logoYoffset = (int)(512 - 30 - _logoLines.Height + 8f * _logoEaseTweener.Value * (1 - _removeTweener.Value));
-            int logoYScreenCenter = (int)Centering.CenterY(_logoLines, 0, STOLON.V_HEIGHT).Y;
+            int logoYScreenCenter = (int)Centering.CenterY(_logoLines, 0, STOLON.VHeight).Y;
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
@@ -353,7 +353,7 @@ namespace STOLON
 
             #region inFlash
             _millisecondsSinceStartup += elapsedMilliseconds;
-            _logoDrawPos = Vector2.Round(Centering.CenterX(_logoLines, logoYoffset, STOLON.V_WIDTH));
+            _logoDrawPos = Vector2.Round(Centering.CenterX(_logoLines, logoYoffset, STOLON.VWidth));
             _logoTileHider = new Rectangle(
                 _logoDrawPos.ToPoint() + new Point(0, (int)(rowHeight * (LOGO_ROW_COUNT - _logoRowsHidden))),
                 new Point((int)(_logoLines.Width), (int)(rowHeight * _logoRowsHidden))
@@ -362,10 +362,10 @@ namespace STOLON
             _flashStart = 1200;
             _flashEnd = _flashStart + 400;
 
-            _divLine1X = (int)(STOLON.V_WIDTH / 2f) - lineFromMid;
-            _divLine2X = (int)(STOLON.V_WIDTH / 2f) + lineFromMid;
+            _divLine1X = (int)(STOLON.VWidth / 2f) - lineFromMid;
+            _divLine2X = (int)(STOLON.VWidth / 2f) + lineFromMid;
 
-            _divLineLenght = _drawLogoFilledTiles ? STOLON.V_HEIGHT : 0;
+            _divLineLenght = _drawLogoFilledTiles ? STOLON.VHeight : 0;
             _divLineWidth = 2 + (menuFlashEnded ? 2 : 0);
 
             if (_millisecondsSinceStartup > 300) _logoRowsHidden = 4;
@@ -410,7 +410,7 @@ namespace STOLON
             _logoBoundingBox =
                 new Rectangle(_logoDrawPos.ToPoint() + new Point(-MENU_LOGO_BOUNDS_CLEARING), _logoLines.Bounds.Size + new Point(MENU_LOGO_BOUNDS_CLEARING * 2));
 
-            _ditherTexturePositions = new Point[(int)Math.Ceiling(STOLON.V_HEIGHT / (float)_dither32.Height) * 2];
+            _ditherTexturePositions = new Point[(int)Math.Ceiling(STOLON.VHeight / (float)_dither32.Height) * 2];
             for (int i = 0; i < _ditherTexturePositions.Length; i++) // dithering positions.
                 _ditherTexturePositions[i] = new Point(
                         (i >= _ditherTexturePositions.Length / 2f) ? _divLine2X : _divLine1X - _dither32.Width,
@@ -469,12 +469,12 @@ namespace STOLON
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
             _splashTextPos = Centering.CenterX((int)(_fonts.Small.FastMeasure(_splashText).X),
-                _logoDrawPos.Y - _fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.V_WIDTH, Vector2.One);
+                _logoDrawPos.Y - _fonts.Small.Dimensions.Y - (MENU_LOGO_BOUNDS_CLEARING * Math.Clamp(_removeTweener.Value * 2f, 0f, 1f)), STOLON.VWidth, Vector2.One);
 
-            _removeLineYAmount = STOLON.V_HEIGHT - (int)(_removeTweener.Value * STOLON.V_HEIGHT);
+            _removeLineYAmount = STOLON.VHeight - (int)(_removeTweener.Value * STOLON.VHeight);
             int lDelta = (int)(_logoDrawPos.X - 8);
             RemoveLine1x = lDelta;
-            RemoveLine2x = STOLON.V_WIDTH - lDelta;
+            RemoveLine2x = STOLON.VWidth - lDelta;
 
             Centering.OnPixel(ref _logoDrawPos);
         }
@@ -490,7 +490,7 @@ namespace STOLON
                     drawingContext.Draw(_dither32, _ditherTexturePositions[i].ToVector2(), effects: (i >= _ditherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
                 drawingContext.DrawArea(_logoBoundingBox, Color.Black);
-                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, Interface.LINE_WIDTH);
+                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, Interface.LineWidth);
 
             }
             if (_drawLogoDummyTiles) drawingContext.Draw(_logoMarks, _logoDrawPos);
@@ -500,13 +500,13 @@ namespace STOLON
             drawingContext.DrawArea(_logoTileHider, Color.Black);
             if (_drawLogoLines) drawingContext.Draw(_logoLines, _logoDrawPos);
 
-            drawingContext.DrawLine(RemoveLine1x, STOLON.V_HEIGHT, RemoveLine1x, _removeLineYAmount, Color.White, Interface.LINE_WIDTH);
-            drawingContext.DrawLine(RemoveLine2x, STOLON.V_HEIGHT, RemoveLine2x, _removeLineYAmount, Color.White, Interface.LINE_WIDTH);
+            drawingContext.DrawLine(RemoveLine1x, STOLON.VHeight, RemoveLine1x, _removeLineYAmount, Color.White, Interface.LineWidth);
+            drawingContext.DrawLine(RemoveLine2x, STOLON.VHeight, RemoveLine2x, _removeLineYAmount, Color.White, Interface.LineWidth);
 
             if (_showEntityProfiles)
             {
-                drawingContext.DrawEntity(_entityProfiles[0], 512, new Vector2(STOLON.V_WIDTH / 2 + 64, 0), drawMode: EntityDrawMode.Menu);
-                drawingContext.DrawEntity(_entityProfiles[1], 512, new Vector2(STOLON.V_WIDTH / 2 - 512, 0), drawMode: EntityDrawMode.Menu);
+                drawingContext.DrawEntity(_entityProfiles[0], 512, new Vector2(STOLON.VWidth / 2 + 64, 0), drawMode: EntityDrawMode.Menu);
+                drawingContext.DrawEntity(_entityProfiles[1], 512, new Vector2(STOLON.VWidth / 2 - 512, 0), drawMode: EntityDrawMode.Menu);
             }
 
             _mainOrderContainer.Draw(drawingContext);

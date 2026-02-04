@@ -59,16 +59,16 @@ namespace STOLON
             _uiRightOffset = lineZoomOffset;
 
             _lineX1 = (int)(_lineOffset + _uiLeftOffset);
-            _lineX2 = (int)(STOLON.V_WIDTH - _lineOffset + _uiRightOffset);
+            _lineX2 = (int)(STOLON.VWidth - _lineOffset + _uiRightOffset);
         }
         public override void Draw(DrawingContext drawingContext)
         {
             //_board?.Draw(drawingContext);
 
             drawingContext.DrawArea(new Rectangle(Point.Zero, new Point((int)_lineX1, UI_HEIGHT)), Color.Black);
-            drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, Interface.LINE_WIDTH);
-            drawingContext.DrawArea(new Rectangle((int)_lineX2, 0, STOLON.V_WIDTH - (int)_lineX2, UI_HEIGHT), Color.Black);
-            drawingContext.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, Interface.LINE_WIDTH);
+            drawingContext.DrawLine(_lineX1, -10f, _lineX1, UI_HEIGHT, Color.White, Interface.LineWidth);
+            drawingContext.DrawArea(new Rectangle((int)_lineX2, 0, STOLON.VWidth - (int)_lineX2, UI_HEIGHT), Color.Black);
+            drawingContext.DrawLine(_lineX2, -10f, _lineX2, UI_HEIGHT, Color.White, Interface.LineWidth);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace STOLON
         /// </summary>
         /// <param name="provider">The initial <see cref="IDialogueProvider"/>.</param>
         /// <param name="text">The text this <see cref="DialogueInfo"/> holds.</param>
-        public DialogueInfo(IDialogueProvider provider, string text, int postMs = Textframe.POST_READ_MILLISECONDS)
+        public DialogueInfo(IDialogueProvider provider, string text, int postMs = Textframe.PostReadMilliseconds)
         {
             Provider = provider;
             Text = text;

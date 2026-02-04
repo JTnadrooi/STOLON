@@ -133,7 +133,7 @@
         public static void DrawSymbolNotation(this DrawingContext context, Font2D font, string symbolNotationStr, Rectangle bounds)
         {
             context.DrawArea(bounds, Color.Black);
-            context.DrawRectangle(bounds, Color.White, Interface.LINE_WIDTH);
+            context.DrawRectangle(bounds, Color.White, Interface.LineWidth);
             Vector2 dimensions = font.FastMeasure(symbolNotationStr);
             Vector2 scale = Vector2.One;
             if (dimensions.X > bounds.Width - 10) scale = new Vector2(0.8f, 1);

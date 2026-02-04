@@ -7,7 +7,7 @@ namespace STOLON.CLI
     {
         public DevCommandProvider() : base("dev", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [FlaggedCommand($"Prints a value indicating if the {CLI.BUILD_INFO_DIRECTORY} directory is found and valid.", Flags = CommandFlags.ReadOnly)]
+        [FlaggedCommand($"Prints a value indicating if the {CLI.BuildInfoDirectory} directory is found and valid.", Flags = CommandFlags.ReadOnly)]
         public void Main()
         {
             Console.WriteLine(CLI.IsDev);

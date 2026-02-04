@@ -13,8 +13,8 @@ namespace STOLON
         private Point _oldWindowSize;
 
         public DiscordRichPresence DRP { get; private set; }
-        public Point DesiredDimensions => new Point(ASPECT_RATIO_X * _desiredModifier, ASPECT_RATIO_Y * _desiredModifier);
-        public Point ScreenCenter => new Point(V_WIDTH / 2, V_HEIGHT / 2);
+        public Point DesiredDimensions => new Point(AspectRatioX * _desiredModifier, AspectRatioY * _desiredModifier);
+        public Point ScreenCenter => new Point(VWidth / 2, VHeight / 2);
         public float ScreenScale { get; private set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
@@ -74,26 +74,26 @@ namespace STOLON
             if (newWidth != _oldWindowSize.X)
             {
                 _graphics.PreferredBackBufferWidth = newWidth;
-                _graphics.PreferredBackBufferHeight = (int)(newWidth / ASPECT_RATIO_FLOAT);
+                _graphics.PreferredBackBufferHeight = (int)(newWidth / AspectRatioFloat);
             }
             else if (newHeight != _oldWindowSize.Y)
             {
-                _graphics.PreferredBackBufferWidth = (int)(newHeight * ASPECT_RATIO_FLOAT);
+                _graphics.PreferredBackBufferWidth = (int)(newHeight * AspectRatioFloat);
                 _graphics.PreferredBackBufferHeight = newHeight;
             }
 
             _graphics.ApplyChanges();
 
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
-            ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT);
-            _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
+            ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)VHeight);
+            _desiredModifier = (int)(VirtualModifier * ScreenScale);
 
             _drawingContext.UpdateResolution();
             Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
         public void GoFullscreen()
         {
-            if (_graphics.IsFullScreen) SetBackBufferSize(new Point(V_WIDTH, V_HEIGHT));
+            if (_graphics.IsFullScreen) SetBackBufferSize(new Point(VWidth, VHeight));
             else
             {
                 SetBackBufferSize(new Point(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
@@ -104,7 +104,7 @@ namespace STOLON
         }
 
         public Rectangle GetVirtualBounds() => new Rectangle(Point.Zero, GetVirtualDimensions());
-        public Point GetVirtualDimensions() => new Point(V_WIDTH, V_HEIGHT);
+        public Point GetVirtualDimensions() => new Point(VWidth, VHeight);
 
         private void SetBackBufferSize(Point size)
         {
@@ -153,8 +153,8 @@ namespace STOLON
 
             if (IsActive)
             {
-                ScreenScale = GraphicsDevice.Viewport.Bounds.Size.Y / (float)V_HEIGHT;
-                _desiredModifier = (int)(VIRTUAL_MODIFIER * ScreenScale);
+                ScreenScale = GraphicsDevice.Viewport.Bounds.Size.Y / (float)VHeight;
+                _desiredModifier = (int)(VirtualModifier * ScreenScale);
 
                 _input.Update(elapsedMilliseconds);
                 _tasks.Update(elapsedMilliseconds);
@@ -217,14 +217,14 @@ namespace STOLON
                 new Color(23, 18, 25), // #171219
             ];
 
-            Bounds = new Rectangle(0, 0, V_WIDTH, V_HEIGHT);
+            Bounds = new Rectangle(0, 0, VWidth, VHeight);
         }
 
-        public const int V_WIDTH = ASPECT_RATIO_X * VIRTUAL_MODIFIER;
-        public const int V_HEIGHT = ASPECT_RATIO_Y * VIRTUAL_MODIFIER;
-        public const int ASPECT_RATIO_X = 16;
-        public const int ASPECT_RATIO_Y = 9;
-        public const int VIRTUAL_MODIFIER = 57;
-        public const float ASPECT_RATIO_FLOAT = ASPECT_RATIO_X / (float)ASPECT_RATIO_Y;
+        public const int VWidth = AspectRatioX * VirtualModifier;
+        public const int VHeight = AspectRatioY * VirtualModifier;
+        public const int AspectRatioX = 16;
+        public const int AspectRatioY = 9;
+        public const int VirtualModifier = 57;
+        public const float AspectRatioFloat = AspectRatioX / (float)AspectRatioY;
     }
 }

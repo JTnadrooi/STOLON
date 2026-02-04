@@ -109,7 +109,7 @@ namespace STOLON
         internal Vector2 GetRegionPos(ShellRegion region) // VERY SLOW, make regioninfo record and do in Update().
         {
             float x = _origin.X;
-            float y = STOLON.V_HEIGHT - RegionClearance;
+            float y = STOLON.VHeight - RegionClearance;
 
             foreach (ShellRegion r in _regions)
             {

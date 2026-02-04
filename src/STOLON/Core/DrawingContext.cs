@@ -280,26 +280,26 @@ namespace STOLON
             _logger.Success();
 
             _ditherAtlas = Texture2DAtlas.Create("dither_tile", _textures["UI\\dither_sheet-128"], DITHER_TEXTURE_SIZE, DITHER_TEXTURE_SIZE);
-            _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.V_WIDTH, STOLON.V_HEIGHT);
+            _screenshotCache = new Texture2D(STOLON.Instance.GraphicsDevice, STOLON.VWidth, STOLON.VHeight);
 
             if (!_config.GetBool("graphics.crt.enable")) DisableShader("Effects\\crt.mgfx");
             ScalingMethod = Enum.Parse<ScalingMethod>(_config.GetString("graphics.scaling_method").Replace("_", string.Empty), true);
-            Scale = STOLON.Instance.DesiredDimensions.X / STOLON.V_WIDTH;
+            Scale = STOLON.Instance.DesiredDimensions.X / STOLON.VWidth;
 
             SetDrawingParameters(); // just sets defaults, doesnt do anything with the spritebatch if its not started yet. (it isn't right now)
 
             _logger.Success();
         }
 
-        private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.V_WIDTH, STOLON.V_HEIGHT);
+        private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.VWidth, STOLON.VHeight);
 
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
 
         public void UpdateResolution()
         {
             Point newRes = STOLON.Instance.DesiredDimensions;
-            float scaleX = (float)newRes.X / STOLON.V_WIDTH;
-            float scaleY = (float)newRes.Y / STOLON.V_HEIGHT;
+            float scaleX = (float)newRes.X / STOLON.VWidth;
+            float scaleY = (float)newRes.Y / STOLON.VHeight;
 
             switch (ScalingMethod)
             {
@@ -307,10 +307,10 @@ namespace STOLON
                     newRes = STOLON.Instance.GetVirtualDimensions();
                     break;
                 case ScalingMethod.Integer:
-                    newRes = new Point((int)(scaleX) * STOLON.V_WIDTH, (int)(scaleY) * STOLON.V_HEIGHT);
+                    newRes = new Point((int)(scaleX) * STOLON.VWidth, (int)(scaleY) * STOLON.VHeight);
                     break;
                 case ScalingMethod.NearestNeighbour:
-                    newRes = new Point((int)(scaleX * STOLON.V_WIDTH), (int)(scaleY * STOLON.V_HEIGHT));
+                    newRes = new Point((int)(scaleX * STOLON.VWidth), (int)(scaleY * STOLON.VHeight));
                     break;
                 default:
                     throw new InvalidOperationException("Unknown scaling method.");
@@ -328,7 +328,7 @@ namespace STOLON
                 effect.UpdateResolution(newRes);
             }
 
-            Scale = newRes.X / (float)STOLON.V_WIDTH;
+            Scale = newRes.X / (float)STOLON.VWidth;
 
             _logger.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
@@ -402,7 +402,7 @@ namespace STOLON
             _logger.Success();
 
             _logger.Log(">saving screentexture to file.");
-            using (FileStream stream = File.Create(path)) _screenshotCache.SaveAsPng(stream, STOLON.V_WIDTH, STOLON.V_HEIGHT);
+            using (FileStream stream = File.Create(path)) _screenshotCache.SaveAsPng(stream, STOLON.VWidth, STOLON.VHeight);
             _logger.Success();
 
             _logger.Success();
@@ -549,27 +549,27 @@ namespace STOLON
         private Rectangle? TranslateSourceRectangle(Rectangle? sourceRectangle)
             => sourceRectangle == null ? null : new Rectangle(sourceRectangle.Value.Location + new Point(0, sourceRectangle.Value.Height), sourceRectangle.Value.Size);
 
-        public void DrawLine(Line line, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawLine(Line line, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
-        public void DrawLine(Vector2 point1, Vector2 point2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawLine(Vector2 point1, Vector2 point2, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawLine(point1.X, point1.Y, point2.X, point2.X, color, thickness, layerDepth);
-        public void DrawLine(float x1, float y1, float x2, float y2, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawLine(float x1, float y1, float x2, float y2, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => SpriteBatch.DrawLine(x1, y1, x2, y2, color ?? Color.White, thickness, layerDepth);
 
-        public void DrawVerticalLine(Vector2 point1, float amountUp = 1000f, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawVerticalLine(Vector2 point1, float amountUp = 1000f, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawVerticalLine(point1.X, point1.Y, amountUp, color, thickness, layerDepth);
-        public void DrawVerticalLine(float x1, float y1, float amountUp = 1000f, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawVerticalLine(float x1, float y1, float amountUp = 1000f, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawLine(x1, y1, x1, y1 + amountUp, color, thickness, layerDepth);
 
-        public void DrawHorizontalLine(Vector2 point1, float amountLeft = 1000f, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawHorizontalLine(Vector2 point1, float amountLeft = 1000f, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawHorizontalLine(point1.X, point1.Y, amountLeft, color, thickness, layerDepth);
-        public void DrawHorizontalLine(float x1, float y1, float amountLeft = 1000f, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawHorizontalLine(float x1, float y1, float amountLeft = 1000f, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => DrawLine(x1, y1, x1 + amountLeft, y1, color, thickness, layerDepth);
 
-        public void DrawLine(Line line, Color color, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawLine(Line line, Color color, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => SpriteBatch.DrawLine(line.Start.X, line.Start.Y, line.End.X, line.End.Y, color, thickness, layerDepth);
 
-        public void DrawRectangle(Rectangle rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
+        public void DrawRectangle(Rectangle rectangle, Color? color = null, float thickness = Interface.LineWidth, float layerDepth = 0f)
             => SpriteBatch.DrawRectangle(rectangle, color ?? Color.White, thickness, layerDepth);
         //public void DrawRectangle(RectangleF rectangle, Color? color = null, float thickness = Interface.LINE_WIDTH, float layerDepth = 0f)
         //    => _spriteBatch.DrawRectangle(rectangle, color, thickness, layerDepth);

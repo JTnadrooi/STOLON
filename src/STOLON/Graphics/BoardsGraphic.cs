@@ -16,11 +16,11 @@
         private OptionDrawData[] _optionDraws;
         private Vector2 _pos;
 
-        private const int OPTION_SPACING = 10;
-        private const int OPTION_TILE_SIZE = TILE_SIZE;
-        private const int DIV_LINE_LENGHT = 100;
-        public const int BOXED_TEXT_DIV_CLEARANCE = 32;
-        private const float LERP_FACTOR = 0.15f;
+        private const int OptionSpacing = 10;
+        private const int OptionTileSize = TILE_SIZE;
+        private const int DivLineLenght = 100;
+        public const int BoxedTextDivClearance = 32;
+        private const float LerpFactor = 0.15f;
 
         private float _scrollOffset;
         private float _targetScroll;
@@ -60,11 +60,11 @@
             if (scrollDelta != 0) _selectedIndex = Math.Clamp(_selectedIndex - scrollDelta, 0, _optionDraws.Length - 1);
 
             float viewportCenter = TILE_SIZE * 3 + (TILE_SIZE * 2) / 2f;
-            float optionCenter = _pos.X + _selectedIndex * (OPTION_TILE_SIZE + OPTION_SPACING) + OPTION_TILE_SIZE / 2f;
+            float optionCenter = _pos.X + _selectedIndex * (OptionTileSize + OptionSpacing) + OptionTileSize / 2f;
 
             _targetScroll = optionCenter - viewportCenter;
 
-            _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LERP_FACTOR);
+            _scrollOffset = MathHelper.Lerp(_scrollOffset, _targetScroll, LerpFactor);
             for (int i = 0; i < Boards.Length; i++)
             {
                 _optionDraws[i] = new OptionDrawData(
@@ -104,7 +104,7 @@
                             TILE_SIZE
                         )
                     );
-                    drawingContext.DrawHorizontalLine(_optionDraws[i].Bounds.Location.ToVector2() + new Vector2((TILE_SIZE - DIV_LINE_LENGHT) / 2f, -_fonts.Medium.CoreFont.LineHeight), DIV_LINE_LENGHT, thickness: 1);
+                    drawingContext.DrawHorizontalLine(_optionDraws[i].Bounds.Location.ToVector2() + new Vector2((TILE_SIZE - DivLineLenght) / 2f, -_fonts.Medium.CoreFont.LineHeight), DivLineLenght, thickness: 1);
                     drawingContext.DrawString(_fonts.Small,
                         _optionDraws[i].Description.ToUpper(),
                         _optionDraws[i].Bounds.Location.ToVector2() + Centering.CenterX(

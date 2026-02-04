@@ -9,7 +9,7 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public class Interface : IComponent
     {
-        public const int LINE_WIDTH = 2;
+        public const int LineWidth = 2;
 
         public DefaultDictionary<string, UIElementUpdateData> UpdateDump { get; }
 
@@ -70,6 +70,6 @@ namespace STOLON
         public override int GetHashCode() => _segments.ToJoinedString(string.Empty).GetHashCode();
         public override bool Equals([NotNullWhen(true)] object? obj) => obj.GetHashCode() == GetHashCode();
 
-        public static UIPath TopPath { get; } = new UIPath([UIElement.TOP_ID]);
+        public static UIPath TopPath { get; } = new UIPath([UIElement.TopId]);
     }
 }

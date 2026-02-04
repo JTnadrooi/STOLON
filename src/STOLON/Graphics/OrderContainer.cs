@@ -3,7 +3,7 @@
 
     public abstract class OrderContainer : IComponent, IGraphic
     {
-        private const string BACK_PREFIX = "_back_";
+        private const string BackPrefix = "_back_";
 
         public Vector2 Position { get; set; }
         public UIPath Path { get; protected set; }
@@ -41,10 +41,10 @@
             _parents = new HashSet<string>();
 
             for (int i = 0; i < baseElements.Count; i++)
-                if (baseElements[i].ParentId != UIElement.TOP_ID && idSet.Contains(baseElements[i].ParentId))
+                if (baseElements[i].ParentId != UIElement.TopId && idSet.Contains(baseElements[i].ParentId))
                     _parents.Add(baseElements[i].ParentId);
 
-            foreach (string parentId in _parents) baseElements.Add(new UIElement(BACK_PREFIX + parentId, parentId, "Back", UIElementType.Listen));
+            foreach (string parentId in _parents) baseElements.Add(new UIElement(BackPrefix + parentId, parentId, "Back", UIElementType.Listen));
 
             _elements = baseElements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
@@ -69,7 +69,7 @@
         public UIPath GetSelfPath(string id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            if (id == UIElement.TOP_ID) return UIPath.TopPath;
+            if (id == UIElement.TopId) return UIPath.TopPath;
 
             HashSet<string> visited = new HashSet<string>(StringComparer.Ordinal);
             Stack<string> stack = new Stack<string>();
@@ -81,9 +81,9 @@
                 stack.Push(currentId);
                 if (!_elementMap.TryGetValue(currentId, out UIElement? element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
 
-                if (element.ParentId == UIElement.TOP_ID)
+                if (element.ParentId == UIElement.TopId)
                 {
-                    stack.Push(UIElement.TOP_ID);
+                    stack.Push(UIElement.TopId);
                     break;
                 }
 
@@ -94,7 +94,7 @@
         }
         public UIPath GetParentPath(string id)
         {
-            if (id == UIElement.TOP_ID) throw new InvalidOperationException("Id equal to UIElement.TOP_ID has no parent.");
+            if (id == UIElement.TopId) throw new InvalidOperationException("Id equal to UIElement.TOP_ID has no parent.");
 
             ReadOnlySpan<string> segments = GetSelfPath(id).Segments;
 
@@ -149,7 +149,7 @@
             {
                 UIPath oldPath = Path;
 
-                if (clickedId.Length > BACK_PREFIX.Length && clickedId.StartsWith(BACK_PREFIX)) Path = GetParentPath(clickedId.Substring(BACK_PREFIX.Length));
+                if (clickedId.Length > BackPrefix.Length && clickedId.StartsWith(BackPrefix)) Path = GetParentPath(clickedId.Substring(BackPrefix.Length));
                 else if (_parents.Contains(clickedId)) Path = GetSelfPath(clickedId);
 
                 if (!Equals(oldPath, Path))

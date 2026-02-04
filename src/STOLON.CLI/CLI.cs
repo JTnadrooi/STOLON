@@ -102,20 +102,20 @@ namespace STOLON.CLI
         public static ICommandInfoFactory InfoFactory { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-        public const string BUILD_INFO_DIRECTORY = @".buildinfo\";
-        private const string RELATIVE_SOURCE_PATH = @".\..\..\src\";
+        public const string BuildInfoDirectory = @".buildinfo\";
+        private const string RelativeSourceDirectory = @".\..\..\src\";
 
         public static bool? DevOverride { get; set; } = null;
 
         /// <summary>
         /// Gets if the currently in use dll's are built from a local repo. See the <i>scripts\build.ps1</i> script.
         /// </summary>
-        public static bool IsDev => DevOverride ?? (!STOLON.Services.Resolve<IConfiguration>().Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BUILD_INFO_DIRECTORY));
+        public static bool IsDev => DevOverride ?? (!STOLON.Services.Resolve<IConfiguration>().Get<bool>("cli.ignore_buildinfo") && Directory.Exists(BuildInfoDirectory));
 
         /// <summary>
         /// Gets the absolute path of the <i>src\</i> folder.
         /// </summary>
-        public static string SourcePath => IsDev ? (System.IO.Path.GetFullPath(RELATIVE_SOURCE_PATH)) : throw new InvalidOperationException("User is not a dev.");
+        public static string SourcePath => IsDev ? (System.IO.Path.GetFullPath(RelativeSourceDirectory)) : throw new InvalidOperationException("User is not a dev.");
 
         /// <summary>
         /// Gets the absolute path of the <i>src\STOLON\resources\</i> folder.

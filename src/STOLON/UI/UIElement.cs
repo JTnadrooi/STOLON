@@ -19,8 +19,8 @@
     /// </summary>
     public class UIElement
     {
-        public bool IsTop => ParentId == TOP_ID;
-        public const string TOP_ID = "_";
+        public bool IsTop => ParentId == TopId;
+        public const string TopId = "_";
         /// <summary>
         /// The type of the <see cref="UIElement"/>.
         /// </summary>
@@ -47,7 +47,7 @@
 
         public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
 
-        public UIElement(string id, string parentId = UIElement.TOP_ID, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
+        public UIElement(string id, string parentId = UIElement.TopId, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
         {
             Text = text ?? id;
             Type = type;
@@ -164,7 +164,7 @@
             if (drawData.Hide) return;
             if (drawData.DrawBackground) context.DrawArea(drawData.Rectangle, Color.Black);
             context.DrawString(drawData.Font, drawData.Text, drawData.Position);
-            if (drawData.DrawRectangle) context.DrawRectangle(drawData.Rectangle, Color.White, Interface.LINE_WIDTH);
+            if (drawData.DrawRectangle) context.DrawRectangle(drawData.Rectangle, Color.White, Interface.LineWidth);
         }
     }
 }

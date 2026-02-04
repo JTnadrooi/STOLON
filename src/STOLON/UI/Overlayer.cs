@@ -130,7 +130,7 @@ namespace STOLON
             _scale = 0.20f;
             _rotationSpeed = 40f;
 
-            _pos = new Vector2(STOLON.V_WIDTH, STOLON.V_HEIGHT) + new Vector2(-lineTexture.Width, -lineTexture.Height) * _scale;
+            _pos = new Vector2(STOLON.VWidth, STOLON.VHeight) + new Vector2(-lineTexture.Width, -lineTexture.Height) * _scale;
 
         }
 
@@ -163,8 +163,8 @@ namespace STOLON
         public bool Ended => _ended;
 
         private Texture2D _ditherTexture;
-        private const int FRAME_PIXELS_TO_REMOVE = 11150 / RESOLUTION; // Number of pixels to turn transparent each frame
-        private const int RESOLUTION = 2;
+        private const int FramePixelsToRemove = 11150 / Resolution; // Number of pixels to turn transparent each frame
+        private const int Resolution = 2;
         private Color[] _pixelData; // Holds the pixel data for the dither texture
         private Random _random;
         private GraphicsDevice _graphicsDevice;
@@ -183,13 +183,13 @@ namespace STOLON
             _audioEngine = audioEngine;
 
             this._graphicsDevice = STOLON.Instance.GraphicsDevice;
-            this._resolution = RESOLUTION;
+            this._resolution = Resolution;
             _random = new Random();
 
 
-            _tweener = new Tweener<float>(1, FRAME_PIXELS_TO_REMOVE, 5f, Ease.Expo.In);
-            _height = STOLON.V_HEIGHT / RESOLUTION;
-            _width = STOLON.V_WIDTH / RESOLUTION;
+            _tweener = new Tweener<float>(1, FramePixelsToRemove, 5f, Ease.Expo.In);
+            _height = STOLON.VHeight / Resolution;
+            _width = STOLON.VWidth / Resolution;
 
             _ditherTexture = null!;
             _pixelData = null!;

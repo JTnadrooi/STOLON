@@ -13,9 +13,9 @@
 
         private readonly record struct CachedNoteData(string WrappedText, int LineCount, bool IsActive, Texture2D NoteSign);
 
-        private const int NOTE_CLEARANCE = 12;
-        private const int NOTE_BORDER_X_CLEARANCE = 10;
-        public const int TILE_SIZE = 128;
+        private const int NoteClearance = 12;
+        private const int NoteBorderXClearance = 10;
+        public const int TileSize = 128;
 
         public EntitySelection? Selection { get; set; }
 
@@ -63,7 +63,7 @@
                 if (isPosOrNeutral) Count(ref activePosCount, ref totalPosCount);
                 else Count(ref activeNegCount, ref totalNegCount);
 
-                _cachedNotes[i] = new CachedNoteData(_fonts.Small.Wrap(Notes[i].Text, TextWidth - NOTE_BORDER_X_CLEARANCE * 2 - NOTE_CLEARANCE, int.MaxValue, out var lc).ToUpper(),
+                _cachedNotes[i] = new CachedNoteData(_fonts.Small.Wrap(Notes[i].Text, TextWidth - NoteBorderXClearance * 2 - NoteClearance, int.MaxValue, out var lc).ToUpper(),
                     lc,
                     isActive,
                     noteSign
@@ -71,7 +71,7 @@
             }
 
             _counterStr = $"[{activePosCount}/{totalPosCount}] / [{activeNegCount}/{totalNegCount}]";
-            _counterPos = Centering.CenterX((int)_fonts.Small.FastMeasure(_counterStr).X, 10, TILE_SIZE) + new Vector2(Pos.X, 0);
+            _counterPos = Centering.CenterX((int)_fonts.Small.FastMeasure(_counterStr).X, 10, TileSize) + new Vector2(Pos.X, 0);
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -82,9 +82,9 @@
             for (int i = 0; i < _cachedNotes.Length; i++)
             {
                 CachedNoteData note = _cachedNotes[i];
-                drawingContext.DrawString(_fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE + NOTE_CLEARANCE, (int)Pos.Y - notesClearingUp - note.LineCount * _fonts.Small.CoreFont.LineHeight));
+                drawingContext.DrawString(_fonts.Small, note.WrappedText, new Vector2((int)Pos.X + NoteBorderXClearance + NoteClearance, (int)Pos.Y - notesClearingUp - note.LineCount * _fonts.Small.CoreFont.LineHeight));
                 //drawingContext.DrawString(_fonts.Small, "-", new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - _fonts.Small.CoreFont.LineHeight));
-                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NOTE_BORDER_X_CLEARANCE, (int)Pos.Y - notesClearingUp - _fonts.Small.CoreFont.LineHeight));
+                drawingContext.Draw(note.NoteSign, new Vector2((int)Pos.X + NoteBorderXClearance, (int)Pos.Y - notesClearingUp - _fonts.Small.CoreFont.LineHeight));
 
                 if (note.IsActive)
                     drawingContext.DrawRectangle(new Rectangle((int)Pos.X + 4, (int)Pos.Y - notesClearingUp - note.LineCount * _fonts.Small.CoreFont.LineHeight - 3, TextWidth - 8, note.LineCount * _fonts.Small.CoreFont.LineHeight + 6), thickness: 1);
