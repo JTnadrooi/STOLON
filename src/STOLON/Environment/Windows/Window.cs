@@ -240,9 +240,10 @@ namespace STOLON
         public virtual void Update(int elapsedMilliseconds)
         {
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
+            bool isMouseOnThis = _input.IsMouseFocus(this) || (IsLocked && _input.IsMouseFocus<Shell>());
 
             Dragging.Update(
-                _input.IsMouseFocus(this) &&
+                isMouseOnThis &&
                 _input.IsClicked(MouseButton.Left) &&
                 IsDraggable &&
                 !IsLocked &&
@@ -250,7 +251,7 @@ namespace STOLON
                 !MaybeHoveringButton(),
                 _input, ref _dragOffset, this);
 
-            if (_input.IsMouseFocus(this) && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
+            if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
             {
                 _kernel.Focus(this);
             }
@@ -259,7 +260,7 @@ namespace STOLON
             {
                 WindowButtonDrawInfo buttonInfo = _orderedButtons[i];
 
-                if (!foundButton && _input.IsMouseFocus(this) && buttonInfo.Bounds.Contains(_input.Mouse.Position))
+                if (!foundButton && isMouseOnThis && buttonInfo.Bounds.Contains(_input.Mouse.Position))
                 {
                     foundButton = true;
 
