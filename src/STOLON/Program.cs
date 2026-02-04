@@ -31,6 +31,8 @@ namespace STOLON
                 Console.WriteLine($"registered type '{registeredTypes[i].RegisteredType}' with lifetime '{registeredTypes[i].Lifetime}'.");
             }
 
+            builder.Register<Random>(i => new Random()).SingleInstance();
+
             _services = STOLON.Services = builder.Build();
             stopwatch.Stop();
 
