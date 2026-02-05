@@ -23,6 +23,8 @@ namespace STOLON
 
         public string Name { get; set; }
 
+        public ControllerCollection Controllers { get; }
+
         /// <summary>
         /// Gets the <see cref="WindowShellRegion"/> bound to this <see cref="Window"/> instance or <see langword="null"/> if this window is not bound to any region.
         /// </summary>
@@ -130,6 +132,18 @@ namespace STOLON
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
             Position = Vector2.Zero;
+            Controllers = new ControllerCollection();
+            Controllers.Add("dragger-position", new DragController(_input,
+                () =>
+                    IsDraggable &&
+                    _input.IsMouseOn(this) &&
+                    _input.IsClicked(MouseButton.Left) &&
+                    !IsLocked &&
+                    OuterBounds.Contains(_input.Mouse.Position) &&
+                    !MaybeHoveringButton(),
+                () => Position,
+                v => Position = v));
+
             IsDraggable = true;
 
             kernel.RegisterWindow(this);
@@ -242,14 +256,7 @@ namespace STOLON
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
             bool isMouseOnThis = _input.IsMouseOn(this);
 
-            Dragging.Update(
-                isMouseOnThis &&
-                _input.IsClicked(MouseButton.Left) &&
-                IsDraggable &&
-                !IsLocked &&
-                OuterBounds.Contains(_input.Mouse.Position) &&
-                !MaybeHoveringButton(),
-                _input, ref _dragOffset, this);
+            Controllers.Update(elapsedMilliseconds);
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
             {
