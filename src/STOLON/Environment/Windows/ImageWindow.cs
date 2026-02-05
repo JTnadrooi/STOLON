@@ -27,7 +27,7 @@ namespace STOLON
 
         protected override void DrawContents(DrawingContext drawingContext)
         {
-            drawingContext.Draw(Image, Vector2.Zero + new Vector2(20));
+            drawingContext.Draw(Image, Vector2.Zero);
         }
     }
 }
