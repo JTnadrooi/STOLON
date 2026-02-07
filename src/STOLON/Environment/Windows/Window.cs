@@ -206,19 +206,14 @@ namespace STOLON
 
         private bool CanDragPosition()
         {
-            return IsDraggable && CanMouseInitDrag() && _input.IsMouseOn(this) && !IsMouseOnBorder();
+            return IsDraggable && CanMouseInitDrag() && _input.IsMouseOn(this) && (GetMouseSides() is null);
         }
 
-        private bool CanResize(Sides side = Sides.Any)
-        {
-            return IsResizable && CanMouseInitDrag() && IsMouseOnBorder(side);
-        }
-
-        private bool IsMouseOnBorder(Sides side = Sides.Any)
+        private Sides? GetMouseSides()
         {
             const int dragAreaSize = 6;
 
-            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>())) return false;
+            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>())) return null;
 
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
@@ -235,9 +230,8 @@ namespace STOLON
             if (onTop) hitSide |= Sides.Top;
             if (onBottom) hitSide |= Sides.Bottom;
 
-            return (hitSide & side) != 0;
+            return hitSide == 0 ? null : hitSide;
         }
-
 
         private bool CanMouseInitDrag()
         {
@@ -349,7 +343,7 @@ namespace STOLON
         }
 
         private Vector2? _dragOrigin;
-        private Sides? _dragSide;
+        private Sides? _dragSides;
         private Rectangle? _draginitialBounds;
 
         public virtual void Update(int elapsedMilliseconds)
@@ -359,48 +353,45 @@ namespace STOLON
 
             Controllers.Update(elapsedMilliseconds);
 
-            Sides[] sides = [Sides.Left, Sides.Top, Sides.Right, Sides.Bottom];
+            Sides? mouseSides = GetMouseSides();
 
-            for (int i = 0; i < sides.Length; i++)
+            if (mouseSides is not null && _dragSides is null)
             {
-                ref Sides side = ref sides[i];
-
-                if (CanMouseInitDrag() && IsMouseOnBorder(side))
-                {
-                    _dragOrigin = _input.Mouse.Position;
-                    _dragSide = side;
-                    _draginitialBounds = OuterBounds;
-
-                    break;
-                }
+                _dragOrigin = _input.Mouse.Position;
+                _dragSides = mouseSides;
+                _draginitialBounds = OuterBounds;
             }
 
             if (!_input.IsPressed(MouseButton.Left))
             {
                 _dragOrigin = null;
-                _dragSide = null;
+                _dragSides = null;
                 _draginitialBounds = null;
             }
 
-            if (_dragSide is not null)
+            if (_dragSides is not null)
             {
                 Point delta = (_input.Mouse.Position - _dragOrigin!.Value).ToPoint();
+                Rectangle newBounds = _draginitialBounds!.Value;
 
-                switch (_dragSide)
+                if ((_dragSides.Value & Sides.Right) != 0)
                 {
-                    case Sides.Right:
-                        Resize(_dragSide.Value, delta.X + _draginitialBounds!.Value.Width);
-                        break;
-                    case Sides.Top:
-                        Resize(_dragSide.Value, delta.Y + _draginitialBounds!.Value.Height);
-                        break;
-                    case Sides.Left:
-                        OuterBounds = new Rectangle(_draginitialBounds!.Value.X + delta.X, _draginitialBounds.Value.Y, _draginitialBounds.Value.Width - delta.X, _draginitialBounds.Value.Height);
-                        break;
-                    case Sides.Bottom:
-                        OuterBounds = new Rectangle(_draginitialBounds!.Value.X, _draginitialBounds.Value.Y + delta.Y, _draginitialBounds.Value.Width, _draginitialBounds.Value.Height - delta.Y);
-                        break;
+                    newBounds = new Rectangle(newBounds.X, newBounds.Y, delta.X + newBounds.Width, newBounds.Height);
                 }
+                if ((_dragSides.Value & Sides.Top) != 0)
+                {
+                    newBounds = new Rectangle(newBounds.X, newBounds.Y, newBounds.Width, delta.Y + newBounds.Height);
+                }
+                if ((_dragSides.Value & Sides.Left) != 0)
+                {
+                    newBounds = new Rectangle(newBounds.X + delta.X, newBounds.Y, newBounds.Width - delta.X, newBounds.Height);
+                }
+                if ((_dragSides.Value & Sides.Bottom) != 0)
+                {
+                    newBounds = new Rectangle(newBounds.X, newBounds.Y + delta.Y, newBounds.Width, newBounds.Height - delta.Y);
+                }
+
+                OuterBounds = newBounds;
             }
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
