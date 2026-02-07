@@ -198,7 +198,6 @@ namespace STOLON
             return _mouseFocus is TElement;
         }
 
-
         public bool IsMouseOn<TElement>(TElement element) where TElement : class, IDrawable
         {
             return ReferenceEquals(element, _mouseFocus);

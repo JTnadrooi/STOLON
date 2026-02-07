@@ -15,7 +15,7 @@ namespace STOLON
         private readonly Func<Vector2> _getValue;
         private readonly Action<Vector2> _setValue;
 
-        private Vector2? _dragOffset;
+        private Vector2? _initialDragOffset;
 
         public DragController(
             IInputManager input,
@@ -33,17 +33,17 @@ namespace STOLON
         {
             if (_canInitiateDrag.Invoke())
             {
-                _dragOffset = _getValue.Invoke() - _input.Mouse.Position;
+                _initialDragOffset = _getValue.Invoke() - _input.Mouse.Position;
             }
 
             if (!_input.IsPressed(MouseButton.Left))
             {
-                _dragOffset = null;
+                _initialDragOffset = null;
             }
 
-            if (_dragOffset is not null)
+            if (_initialDragOffset is not null)
             {
-                _setValue.Invoke(_input.Mouse.Position + _dragOffset.Value);
+                _setValue.Invoke(_input.Mouse.Position + _initialDragOffset.Value);
             }
         }
     }

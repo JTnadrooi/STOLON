@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using STOLON;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,20 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
+    [Flags]
+    public enum Sides
+    {
+        Left = 1,
+        Top = 2,
+        Right = 4,
+        Bottom = 8,
+        Any = Left | Top | Right | Bottom,
+    }
+
     public abstract class Window : IComponent, IPositionable
     {
         private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
+
 
         private readonly ITexture2DCollection _textures;
         private readonly Kernel _kernel;
@@ -114,7 +126,7 @@ namespace STOLON
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
 
-        const int spacing = 2;
+        private const int Spacing = 2;
 
         protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
         {
@@ -132,22 +144,109 @@ namespace STOLON
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
             Position = Vector2.Zero;
+
             Controllers = new ControllerCollection();
-            Controllers.Add("dragger-position", new DragController(_input,
-                () =>
-                    IsDraggable &&
-                    _input.IsMouseOn(this) &&
-                    _input.IsClicked(MouseButton.Left) &&
-                    !IsLocked &&
-                    OuterBounds.Contains(_input.Mouse.Position) &&
-                    !MaybeHoveringButton(),
+            Controllers.Add("drag", new DragController(_input,
+                () => CanDragPosition(),
                 () => Position,
                 v => Position = v));
+            //Controllers.Add("resize-border-right", new DragController(_input,
+            //    () => CanResize(Sides.Right),
+            //    () => new Vector2(OuterBounds.Width, 0),
+            //    v => Resize(Sides.Right, ((int)v.X))));
+            //Controllers.Add("resize-border-top", new DragController(_input,
+            //    () => CanResize(Sides.Top),
+            //    () => new Vector2(0, OuterBounds.Height),
+            //    v => Resize(Sides.Top, ((int)v.Y))));
+            //Controllers.Add("resize-border-left", new DragController(_input,
+            //    () => CanResize(Sides.Left),
+            //    () => new Vector2(OuterBounds.Width, 0),
+            //    v => Resize(Sides.Left, -((int)v.X)))
+            //{
+            //    Invert = true
+            //});
 
             IsDraggable = true;
+            IsResizable = true; // temp.
 
             kernel.RegisterWindow(this);
         }
+
+        public void Resize(Sides sides, int newSize, bool throwIfNotResizable = true)
+        {
+            //throw new NotImplementedException();
+
+            if (throwIfNotResizable && !IsResizable) throw new InvalidObjectException("Cannot resize unresizable window.");
+
+            if ((sides & Sides.Right) != 0)
+            {
+                OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y, newSize, OuterBounds.Height);
+            }
+
+            if ((sides & Sides.Top) != 0)
+            {
+                OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y, OuterBounds.Width, newSize);
+            }
+
+            //if ((sides & Sides.Left) != 0)
+            //{
+
+            //}
+
+            //if ((sides & Sides.Top) != 0)
+            //{
+            //    int heightChange = OuterBounds.Height - newSize;
+            //    OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y + heightChange, OuterBounds.Width, newSize);
+            //}
+
+            //Console.WriteLine(newSize);
+        }
+
+        #region DRAG_CHECKS
+
+        private bool CanDragPosition()
+        {
+            return IsDraggable && CanMouseInitDrag() && _input.IsMouseOn(this) && !IsMouseOnBorder();
+        }
+
+        private bool CanResize(Sides side = Sides.Any)
+        {
+            return IsResizable && CanMouseInitDrag() && IsMouseOnBorder(side);
+        }
+
+        private bool IsMouseOnBorder(Sides side = Sides.Any)
+        {
+            const int dragAreaSize = 6;
+
+            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>())) return false;
+
+            Vector2 mousePos = _input.Mouse.Position;
+            Rectangle bounds = OuterBounds;
+
+            bool onLeft = Math.Abs(mousePos.X - bounds.Left) <= dragAreaSize && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onRight = Math.Abs(mousePos.X - bounds.Right) <= dragAreaSize && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) <= dragAreaSize && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+            bool onBottom = Math.Abs(mousePos.Y - bounds.Top) <= dragAreaSize && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+
+            Sides hitSide = 0;
+
+            if (onLeft) hitSide |= Sides.Left;
+            if (onRight) hitSide |= Sides.Right;
+            if (onTop) hitSide |= Sides.Top;
+            if (onBottom) hitSide |= Sides.Bottom;
+
+            return (hitSide & side) != 0;
+        }
+
+
+        private bool CanMouseInitDrag()
+        {
+            return _input.IsClicked(MouseButton.Left) &&
+                !IsLocked &&
+                !MaybeHoveringButton();
+        }
+
+        #endregion
 
         private void UpdatePosition()
         {
@@ -163,7 +262,7 @@ namespace STOLON
             }
             _orderedButtons = Buttons.Values.OrderBy(b => b.Order).Select((b, i) =>
                 new WindowButtonDrawInfo(b,
-                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - spacing - WindowButton.Size - (WindowButton.Size + spacing) * i, OuterBounds.Height - WindowButton.Size - spacing)).ToPoint(), new Point(WindowButton.Size))
+                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - Spacing - WindowButton.Size - (WindowButton.Size + Spacing) * i, OuterBounds.Height - WindowButton.Size - Spacing)).ToPoint(), new Point(WindowButton.Size))
                 )
             ).ToArray();
 
@@ -202,8 +301,8 @@ namespace STOLON
 
         private Rectangle GetMaybeButtonBounds()
         {
-            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + spacing) + spacing;
-            int mbbHeight = (WindowButton.Size + spacing) + spacing;
+            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + Spacing) + Spacing;
+            int mbbHeight = (WindowButton.Size + Spacing) + Spacing;
 
             return new Rectangle(OuterBounds.X + OuterBounds.Width - mbbWidth, OuterBounds.Y + OuterBounds.Height - mbbHeight, mbbWidth, mbbHeight);
         }
@@ -249,7 +348,9 @@ namespace STOLON
             return OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * index, OuterBounds.Height - WindowButton.Size - 2);
         }
 
-        private Vector2? _dragOffset;
+        private Vector2? _dragOrigin;
+        private Sides? _dragSide;
+        private Rectangle? _draginitialBounds;
 
         public virtual void Update(int elapsedMilliseconds)
         {
@@ -257,6 +358,50 @@ namespace STOLON
             bool isMouseOnThis = _input.IsMouseOn(this);
 
             Controllers.Update(elapsedMilliseconds);
+
+            Sides[] sides = [Sides.Left, Sides.Top, Sides.Right, Sides.Bottom];
+
+            for (int i = 0; i < sides.Length; i++)
+            {
+                ref Sides side = ref sides[i];
+
+                if (CanMouseInitDrag() && IsMouseOnBorder(side))
+                {
+                    _dragOrigin = _input.Mouse.Position;
+                    _dragSide = side;
+                    _draginitialBounds = OuterBounds;
+
+                    break;
+                }
+            }
+
+            if (!_input.IsPressed(MouseButton.Left))
+            {
+                _dragOrigin = null;
+                _dragSide = null;
+                _draginitialBounds = null;
+            }
+
+            if (_dragSide is not null)
+            {
+                Point delta = (_input.Mouse.Position - _dragOrigin!.Value).ToPoint();
+
+                switch (_dragSide)
+                {
+                    case Sides.Right:
+                        Resize(_dragSide.Value, delta.X + _draginitialBounds!.Value.Width);
+                        break;
+                    case Sides.Top:
+                        Resize(_dragSide.Value, delta.Y + _draginitialBounds!.Value.Height);
+                        break;
+                    case Sides.Left:
+                        OuterBounds = new Rectangle(_draginitialBounds!.Value.X + delta.X, _draginitialBounds.Value.Y, _draginitialBounds.Value.Width - delta.X, _draginitialBounds.Value.Height);
+                        break;
+                    case Sides.Bottom:
+                        OuterBounds = new Rectangle(_draginitialBounds!.Value.X, _draginitialBounds.Value.Y + delta.Y, _draginitialBounds.Value.Width, _draginitialBounds.Value.Height - delta.Y);
+                        break;
+                }
+            }
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
             {
