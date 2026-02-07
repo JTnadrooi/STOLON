@@ -23,7 +23,6 @@ namespace STOLON
     {
         private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
 
-
         private readonly ITexture2DCollection _textures;
         private readonly Kernel _kernel;
         private readonly IFont2DCollection _fonts;
@@ -32,6 +31,9 @@ namespace STOLON
         public bool IsDraggable { get; set; }
         public bool IsResizable { get; set; }
         public bool IsBorderless { get; set; }
+
+        public Point? MaxSize { get; set; }
+        public Point? MinSize { get; set; }
 
         public string Name { get; set; }
 
@@ -168,6 +170,9 @@ namespace STOLON
 
             IsDraggable = true;
             IsResizable = true; // temp.
+
+            //MinSize = new Point(80, 20);
+            //MaxSize = new Point(200);
 
             kernel.RegisterWindow(this);
         }
@@ -391,7 +396,8 @@ namespace STOLON
                     newBounds = new Rectangle(newBounds.X, newBounds.Y + delta.Y, newBounds.Width, newBounds.Height - delta.Y);
                 }
 
-                OuterBounds = newBounds;
+                OuterBounds = newBounds.ClampRectangle(_dragSides.Value, MinSize ?? Point.Zero, MaxSize ?? new Point(int.MaxValue));
+                //OuterBounds = newBounds;
             }
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
