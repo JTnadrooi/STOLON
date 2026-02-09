@@ -360,7 +360,7 @@ namespace STOLON
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
             {
-                _kernel.Focus(this);
+                Focus();
             }
 
             for (int i = 0; i < _orderedButtons.Length; i++)
