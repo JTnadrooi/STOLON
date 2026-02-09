@@ -12,6 +12,7 @@ namespace STOLON
     [Flags]
     public enum Sides
     {
+        None = 0,
         Left = 1,
         Top = 2,
         Right = 4,
@@ -220,14 +221,14 @@ namespace STOLON
                 !IsLocked &&
                 _input.IsMouseOn(this) &&
                 !MaybeHoveringButton() &&
-                GetMouseSides() is null;
+                GetMouseSides() == Sides.None;
         }
 
-        private Sides? GetMouseSides()
+        private Sides GetMouseSides()
         {
             const int dragAreaSize = 6;
 
-            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return null;
+            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return Sides.None;
 
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
@@ -244,7 +245,7 @@ namespace STOLON
             if (onTop) hitSide |= Sides.Top;
             if (onBottom) hitSide |= Sides.Bottom;
 
-            return hitSide == 0 ? null : hitSide;
+            return hitSide;
         }
 
         private bool CanMouseInitDrag()
