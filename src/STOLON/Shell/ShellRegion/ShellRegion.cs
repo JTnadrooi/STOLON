@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public abstract class ShellRegion
+    public abstract class ShellRegion : IComponent
     {
         public abstract int Height { get; } // no buildin clearance svp
 
@@ -8,11 +8,9 @@
 
         protected Vector2 Position => Shell.GetRegionPos(this);
 
-        //protected bool HasMouse =>
-
         public virtual int VerticalOverlap => 0;
 
-        public ShellRegion(Shell shell)
+        internal ShellRegion(Shell shell)
         {
             Shell = shell;
         }
