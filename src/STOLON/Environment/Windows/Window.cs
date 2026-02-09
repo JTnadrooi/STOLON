@@ -167,7 +167,8 @@ namespace STOLON
                     return IsLocked ? GetMouseSides() & (Sides.Right | Sides.Bottom) : GetMouseSides(); // only right and bottom sides are resizable when locked.
                 },
                 () => OuterBounds,
-                v => OuterBounds = v));
+                v => OuterBounds = v,
+                () => Focus()));
 
             IsDraggable = true;
             IsResizable = true; // temp.

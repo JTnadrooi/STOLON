@@ -9,14 +9,15 @@ namespace STOLON
 {
     public class ResizeController : IController
     {
+        private readonly IInputManager _input;
+
         public Point? MaxSize { get; set; }
         public Point? MinSize { get; set; }
 
-        private readonly IInputManager _input;
         private readonly Func<Sides?> _getResizeSides;
-
         private readonly Func<Rectangle> _getValue;
         private readonly Action<Rectangle> _setValue;
+        private readonly Action? _onResizeStart;
 
         private Vector2? _dragOrigin;
         private Sides? _dragSides;
@@ -26,12 +27,15 @@ namespace STOLON
             IInputManager input,
             Func<Sides?> getResizeSides,
             Func<Rectangle> getValue,
-            Action<Rectangle> setValue)
+            Action<Rectangle> setValue,
+            Action? onResizeStart = null)
         {
             _input = input;
+
             _getResizeSides = getResizeSides;
             _getValue = getValue;
             _setValue = setValue;
+            _onResizeStart = onResizeStart;
         }
 
         public void Update(int elapsedMilliseconds)
@@ -43,6 +47,7 @@ namespace STOLON
                 _dragOrigin = _input.Mouse.Position;
                 _dragSides = mouseSides;
                 _draginitialBounds = _getValue.Invoke();
+                _onResizeStart?.Invoke();
             }
 
             if (!_input.IsPressed(MouseButton.Left))
