@@ -158,7 +158,7 @@ namespace STOLON
 
             Controllers = new ControllerCollection();
             Controllers.Add("drag", new DragController(_input,
-                () => CanDragPosition(),
+                () => ShouldInitiateDrag(),
                 () => Position,
                 v => Position = v));
             Controllers.Add("resize", new ResizeController(_input,
@@ -213,9 +213,14 @@ namespace STOLON
 
         #region DRAG_CHECKS
 
-        private bool CanDragPosition()
+        private bool ShouldInitiateDrag()
         {
-            return IsDraggable && CanMouseInitDrag() && _input.IsMouseOn(this) && (GetMouseSides() is null);
+            return IsDraggable &&
+                _input.IsClicked(MouseButton.Left) &&
+                !IsLocked &&
+                _input.IsMouseOn(this) &&
+                !MaybeHoveringButton() &&
+                GetMouseSides() is null;
         }
 
         private Sides? GetMouseSides()
