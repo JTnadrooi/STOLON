@@ -10,23 +10,25 @@ namespace STOLON
     public class DragController : IController
     {
         private readonly IInputManager _input;
-        private readonly Func<bool> _shouldInitiateDrag;
 
+        public bool IsDragging => _initialOffset.HasValue;
+
+        private readonly Func<bool> _shouldInitiate;
         private readonly Func<Vector2> _getValue;
         private readonly Action<Vector2> _setValue;
         private readonly Action? _onDragStart;
 
-        private Vector2? _initialDragOffset;
+        private Vector2? _initialOffset;
 
         public DragController(
             IInputManager input,
-            Func<bool> shouldInitiateDrag,
+            Func<bool> shouldInitiate,
             Func<Vector2> getValue,
             Action<Vector2> setValue,
             Action? onDragStart = null)
         {
             _input = input;
-            _shouldInitiateDrag = shouldInitiateDrag;
+            _shouldInitiate = shouldInitiate;
             _getValue = getValue;
             _setValue = setValue;
             _onDragStart = onDragStart;
@@ -34,20 +36,20 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            if (_shouldInitiateDrag.Invoke())
+            if (_shouldInitiate.Invoke())
             {
-                _initialDragOffset = _getValue.Invoke() - _input.Mouse.Position;
+                _initialOffset = _getValue.Invoke() - _input.Mouse.Position;
                 _onDragStart?.Invoke();
             }
 
             if (!_input.IsPressed(MouseButton.Left))
             {
-                _initialDragOffset = null;
+                _initialOffset = null;
             }
 
-            if (_initialDragOffset is not null)
+            if (_initialOffset is not null)
             {
-                _setValue.Invoke(_input.Mouse.Position + _initialDragOffset.Value);
+                _setValue.Invoke(_input.Mouse.Position + _initialOffset.Value);
             }
         }
     }

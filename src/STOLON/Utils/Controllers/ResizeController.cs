@@ -14,14 +14,16 @@ namespace STOLON
         public Point? MaxSize { get; set; }
         public Point? MinSize { get; set; }
 
+        public bool IsResizing => _resizeOrigin.HasValue;
+
         private readonly Func<Sides> _getResizeSides;
         private readonly Func<Rectangle> _getValue;
         private readonly Action<Rectangle> _setValue;
         private readonly Action? _onResizeStart;
 
-        private Vector2? _dragOrigin;
-        private Sides _dragSides;
-        private Rectangle? _draginitialBounds;
+        private Vector2? _resizeOrigin;
+        private Sides _resizingSides;
+        private Rectangle? _initialBounds;
 
         public ResizeController(
             IInputManager input,
@@ -42,44 +44,44 @@ namespace STOLON
         {
             Sides mouseSides;
 
-            if (_input.IsClicked(MouseButton.Left) && _dragSides == Sides.None && (mouseSides = _getResizeSides.Invoke()) != Sides.None)
+            if (_input.IsClicked(MouseButton.Left) && _resizingSides == Sides.None && (mouseSides = _getResizeSides.Invoke()) != Sides.None)
             {
-                _dragOrigin = _input.Mouse.Position;
-                _dragSides = mouseSides;
-                _draginitialBounds = _getValue.Invoke();
+                _resizeOrigin = _input.Mouse.Position;
+                _resizingSides = mouseSides;
+                _initialBounds = _getValue.Invoke();
                 _onResizeStart?.Invoke();
             }
 
             if (!_input.IsPressed(MouseButton.Left))
             {
-                _dragOrigin = null;
-                _dragSides = Sides.None;
-                _draginitialBounds = null;
+                _resizeOrigin = null;
+                _resizingSides = Sides.None;
+                _initialBounds = null;
             }
 
-            if (_dragSides != Sides.None)
+            if (_resizingSides != Sides.None)
             {
-                Point delta = (_input.Mouse.Position - _dragOrigin!.Value).ToPoint();
-                Rectangle newBounds = _draginitialBounds!.Value;
+                Point delta = (_input.Mouse.Position - _resizeOrigin!.Value).ToPoint();
+                Rectangle newBounds = _initialBounds!.Value;
 
-                if ((_dragSides & Sides.Right) != 0)
+                if ((_resizingSides & Sides.Right) != 0)
                 {
                     newBounds = new Rectangle(newBounds.X, newBounds.Y, delta.X + newBounds.Width, newBounds.Height);
                 }
-                if ((_dragSides & Sides.Top) != 0)
+                if ((_resizingSides & Sides.Top) != 0)
                 {
                     newBounds = new Rectangle(newBounds.X, newBounds.Y, newBounds.Width, delta.Y + newBounds.Height);
                 }
-                if ((_dragSides & Sides.Left) != 0)
+                if ((_resizingSides & Sides.Left) != 0)
                 {
                     newBounds = new Rectangle(newBounds.X + delta.X, newBounds.Y, newBounds.Width - delta.X, newBounds.Height);
                 }
-                if ((_dragSides & Sides.Bottom) != 0)
+                if ((_resizingSides & Sides.Bottom) != 0)
                 {
                     newBounds = new Rectangle(newBounds.X, newBounds.Y + delta.Y, newBounds.Width, newBounds.Height - delta.Y);
                 }
 
-                _setValue.Invoke(newBounds.ClampRectangle(_dragSides, MinSize ?? Point.Zero, MaxSize ?? new Point(int.MaxValue)));
+                _setValue.Invoke(newBounds.ClampRectangle(_resizingSides, MinSize ?? Point.Zero, MaxSize ?? new Point(int.MaxValue)));
             }
         }
     }
