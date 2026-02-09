@@ -192,9 +192,12 @@ namespace STOLON
 
         public void Resize(Sides sides, int newSize, bool throwIfNotResizable = true)
         {
-            //throw new NotImplementedException();
-
             if (throwIfNotResizable && !IsResizable) throw new InvalidObjectException("Cannot resize unresizable window.");
+
+            //if ((sides & (Sides.Right | Sides.Left)) != 0 && OuterBounds.Width + newSize < (MinSize.Value.X ?? ) || )
+            //{
+
+            //}
 
             if ((sides & Sides.Right) != 0)
             {
@@ -206,18 +209,17 @@ namespace STOLON
                 OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y, OuterBounds.Width, newSize);
             }
 
-            //if ((sides & Sides.Left) != 0)
-            //{
+            if ((sides & Sides.Left) != 0)
+            {
+                int delta = newSize - OuterBounds.Width;
+                OuterBounds = new Rectangle(OuterBounds.X - delta, OuterBounds.Y, newSize, OuterBounds.Height);
+            }
 
-            //}
-
-            //if ((sides & Sides.Top) != 0)
-            //{
-            //    int heightChange = OuterBounds.Height - newSize;
-            //    OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y + heightChange, OuterBounds.Width, newSize);
-            //}
-
-            //Console.WriteLine(newSize);
+            if ((sides & Sides.Bottom) != 0)
+            {
+                int delta = newSize - OuterBounds.Height;
+                OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y - delta, OuterBounds.Width, newSize);
+            }
         }
 
         #region DRAG_CHECKS
@@ -374,7 +376,7 @@ namespace STOLON
 
             for (int i = 0; i < _orderedButtons.Length; i++)
             {
-                WindowButtonDrawInfo buttonInfo = _orderedButtons[i];
+                ref WindowButtonDrawInfo buttonInfo = ref _orderedButtons[i];
 
                 if (!foundButton && isMouseOnThis && buttonInfo.Bounds.Contains(_input.Mouse.Position))
                 {
