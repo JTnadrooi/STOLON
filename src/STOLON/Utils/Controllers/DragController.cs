@@ -10,30 +10,34 @@ namespace STOLON
     public class DragController : IController
     {
         private readonly IInputManager _input;
-        private readonly Func<bool> _canInitiateDrag;
+        private readonly Func<bool> _shouldInitiateDrag;
 
         private readonly Func<Vector2> _getValue;
         private readonly Action<Vector2> _setValue;
+        private readonly Action? _onDragStart;
 
         private Vector2? _initialDragOffset;
 
         public DragController(
             IInputManager input,
-            Func<bool> canInitiateDrag,
+            Func<bool> shouldInitiateDrag,
             Func<Vector2> getValue,
-            Action<Vector2> setValue)
+            Action<Vector2> setValue,
+            Action? onDragStart = null)
         {
             _input = input;
-            _canInitiateDrag = canInitiateDrag;
+            _shouldInitiateDrag = shouldInitiateDrag;
             _getValue = getValue;
             _setValue = setValue;
+            _onDragStart = onDragStart;
         }
 
         public void Update(int elapsedMilliseconds)
         {
-            if (_canInitiateDrag.Invoke())
+            if (_shouldInitiateDrag.Invoke())
             {
                 _initialDragOffset = _getValue.Invoke() - _input.Mouse.Position;
+                _onDragStart?.Invoke();
             }
 
             if (!_input.IsPressed(MouseButton.Left))
