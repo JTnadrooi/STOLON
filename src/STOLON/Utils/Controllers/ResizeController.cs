@@ -38,7 +38,7 @@ namespace STOLON
         {
             Sides? mouseSides = _getDragSides.Invoke();
 
-            if (mouseSides is not null && _dragSides is null)
+            if (mouseSides is not null && _dragSides is null && _input.IsClicked(MouseButton.Left))
             {
                 _dragOrigin = _input.Mouse.Position;
                 _dragSides = mouseSides;
