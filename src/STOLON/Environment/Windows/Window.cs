@@ -60,7 +60,7 @@ namespace STOLON
         /// <summary>
         /// Gets if this <see cref="Window"/> is currently locked to the <see cref="BoundRegion"/>. 
         /// Locked windows are always managed by the <see cref="BoundRegion"/> instead of the <see cref="Kernel"/>. 
-        /// (When this is <see langword="true"/>, <see cref="IsManaged"/> is always <see langword="false"/>.)
+        /// When this is <see langword="true"/>, <see cref="IsManaged"/> is always <see langword="false"/>.
         /// </summary>
         public bool IsLocked => BoundRegion is not null && BoundRegion.IsLockActive();
 
@@ -162,29 +162,17 @@ namespace STOLON
                 () => Position,
                 v => Position = v));
             Controllers.Add("resize", new ResizeController(_input,
-                () => GetMouseSides(),
+                () =>
+                {
+                    return IsLocked ? GetMouseSides() & (Sides.Right | Sides.Bottom) : GetMouseSides(); // only right and bottom sides are resizable when locked.
+                },
                 () => OuterBounds,
                 v => OuterBounds = v));
-            //Controllers.Add("resize-border-right", new DragController(_input,
-            //    () => CanResize(Sides.Right),
-            //    () => new Vector2(OuterBounds.Width, 0),
-            //    v => Resize(Sides.Right, ((int)v.X))));
-            //Controllers.Add("resize-border-top", new DragController(_input,
-            //    () => CanResize(Sides.Top),
-            //    () => new Vector2(0, OuterBounds.Height),
-            //    v => Resize(Sides.Top, ((int)v.Y))));
-            //Controllers.Add("resize-border-left", new DragController(_input,
-            //    () => CanResize(Sides.Left),
-            //    () => new Vector2(OuterBounds.Width, 0),
-            //    v => Resize(Sides.Left, -((int)v.X)))
-            //{
-            //    Invert = true
-            //});
 
             IsDraggable = true;
             IsResizable = true; // temp.
 
-            //MinSize = new Point(80, 20);
+            MinSize = new Point(80, 20);
             //MaxSize = new Point(200);
 
             kernel.RegisterWindow(this);
