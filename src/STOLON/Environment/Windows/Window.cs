@@ -32,8 +32,17 @@ namespace STOLON
         public bool IsResizable { get; set; }
         public bool IsBorderless { get; set; }
 
-        public Point? MaxSize { get; set; }
-        public Point? MinSize { get; set; }
+        public Point? MaxSize
+        {
+            get => ((ResizeController)Controllers["resize"]).MaxSize;
+            set => ((ResizeController)Controllers["resize"]).MaxSize = value;
+        }
+
+        public Point? MinSize
+        {
+            get => ((ResizeController)Controllers["resize"]).MinSize;
+            set => ((ResizeController)Controllers["resize"]).MinSize = value;
+        }
 
         public string Name { get; set; }
 
@@ -152,6 +161,10 @@ namespace STOLON
                 () => CanDragPosition(),
                 () => Position,
                 v => Position = v));
+            Controllers.Add("resize", new ResizeController(_input,
+                () => GetMouseSides(),
+                () => OuterBounds,
+                v => OuterBounds = v));
             //Controllers.Add("resize-border-right", new DragController(_input,
             //    () => CanResize(Sides.Right),
             //    () => new Vector2(OuterBounds.Width, 0),
@@ -347,58 +360,12 @@ namespace STOLON
             return OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * index, OuterBounds.Height - WindowButton.Size - 2);
         }
 
-        private Vector2? _dragOrigin;
-        private Sides? _dragSides;
-        private Rectangle? _draginitialBounds;
-
         public virtual void Update(int elapsedMilliseconds)
         {
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
             bool isMouseOnThis = _input.IsMouseOn(this);
 
             Controllers.Update(elapsedMilliseconds);
-
-            Sides? mouseSides = GetMouseSides();
-
-            if (mouseSides is not null && _dragSides is null)
-            {
-                _dragOrigin = _input.Mouse.Position;
-                _dragSides = mouseSides;
-                _draginitialBounds = OuterBounds;
-            }
-
-            if (!_input.IsPressed(MouseButton.Left))
-            {
-                _dragOrigin = null;
-                _dragSides = null;
-                _draginitialBounds = null;
-            }
-
-            if (_dragSides is not null)
-            {
-                Point delta = (_input.Mouse.Position - _dragOrigin!.Value).ToPoint();
-                Rectangle newBounds = _draginitialBounds!.Value;
-
-                if ((_dragSides.Value & Sides.Right) != 0)
-                {
-                    newBounds = new Rectangle(newBounds.X, newBounds.Y, delta.X + newBounds.Width, newBounds.Height);
-                }
-                if ((_dragSides.Value & Sides.Top) != 0)
-                {
-                    newBounds = new Rectangle(newBounds.X, newBounds.Y, newBounds.Width, delta.Y + newBounds.Height);
-                }
-                if ((_dragSides.Value & Sides.Left) != 0)
-                {
-                    newBounds = new Rectangle(newBounds.X + delta.X, newBounds.Y, newBounds.Width - delta.X, newBounds.Height);
-                }
-                if ((_dragSides.Value & Sides.Bottom) != 0)
-                {
-                    newBounds = new Rectangle(newBounds.X, newBounds.Y + delta.Y, newBounds.Width, newBounds.Height - delta.Y);
-                }
-
-                OuterBounds = newBounds.ClampRectangle(_dragSides.Value, MinSize ?? Point.Zero, MaxSize ?? new Point(int.MaxValue));
-                //OuterBounds = newBounds;
-            }
 
             if (isMouseOnThis && _input.IsClicked(MouseButton.Left) && OuterBounds.Contains(_input.Mouse.Position))
             {
