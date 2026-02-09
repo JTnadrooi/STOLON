@@ -221,7 +221,7 @@ namespace STOLON
         {
             const int dragAreaSize = 6;
 
-            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>())) return null;
+            if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return null;
 
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
