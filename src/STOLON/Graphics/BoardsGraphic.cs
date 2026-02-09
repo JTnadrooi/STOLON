@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public class BoardsGraphic : IUpdatable, IGraphic
+    public class BoardsGraphic : IComponent
     {
         public const int TILE_SIZE = 128;
 

@@ -1,7 +1,6 @@
 ﻿namespace STOLON
 {
-
-    public abstract class OrderContainer : IComponent, IGraphic
+    public abstract class OrderContainer : IComponent
     {
         private const string BackPrefix = "_back_";
 

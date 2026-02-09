@@ -601,11 +601,6 @@ namespace STOLON
                 }
         }
 
-        public void Draw(IGraphic graphic)
-        {
-            graphic.Draw(this);
-        }
-
         #endregion
 
 

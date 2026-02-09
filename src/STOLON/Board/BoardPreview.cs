@@ -2,7 +2,7 @@
 
 namespace STOLON
 {
-    public class BoardPreview : IGraphic
+    public class BoardPreview : IDrawable
     {
         public BoardState SourceState { get; }
         public Rectangle Bounds { get; private set; }

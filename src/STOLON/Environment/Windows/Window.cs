@@ -388,6 +388,11 @@ namespace STOLON
                 }
             }
 
+            //if (((DragController)Controllers["drag"]).IsDragging && BoundRegion is not null && BoundRegion _input.Mouse.Position)
+            //{
+
+            //}
+
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
             UpdateContents(elapsedMilliseconds);
         }

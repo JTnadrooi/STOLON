@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public class ConditionalNoteEnumerationGraphic : IUpdatable, IGraphic
+    public class ConditionalNoteEnumerationGraphic : IComponent
     {
         public ConditionalNote[] Notes { get; set; }
         public Vector2 Pos { get; }
