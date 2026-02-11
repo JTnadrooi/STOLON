@@ -424,7 +424,7 @@ namespace STOLON
 
             #region HANDLE_MOUSE
 
-            if (_input.IsMouseOn<Shell>() && _input.IsPressed(MouseButton.Left))
+            if (_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
             {
                 ShellCharacterInfo character = GetCharacterInfoAt(_input.Mouse.Position, true);
 
