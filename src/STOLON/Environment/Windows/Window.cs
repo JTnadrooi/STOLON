@@ -60,24 +60,24 @@ namespace STOLON
 
         /// <summary>
         /// Gets if this <see cref="Window"/> is currently locked to the <see cref="BoundRegion"/>. 
-        /// Locked windows are always managed by the <see cref="BoundRegion"/> instead of the <see cref="Kernel"/>. 
-        /// When this is <see langword="true"/>, <see cref="IsManaged"/> is always <see langword="false"/>.
+        /// Locked windows are always drawn by the <see cref="BoundRegion"/> instead of the <see cref="Kernel"/>. 
+        /// When this is <see langword="true"/>, <see cref="IsDrawnByKernel"/> is always <see langword="false"/>.
         /// </summary>
         public bool IsLocked => BoundRegion is not null && BoundRegion.IsLockActive();
 
-        private bool _isManaged;
+        private bool _isDrawnByKernel;
 
         /// <summary>
         /// Gets or sets whenever  <see cref="Update(int)"/> and <see cref="Draw(DrawingContext)"/> get called by the <see cref="Kernel"/>.
         /// </summary>
-        public bool IsManaged
+        public bool IsDrawnByKernel
         {
-            get => _isManaged;
+            get => _isDrawnByKernel;
             set
             {
-                if (IsLocked) throw new InvalidOperationException("Cannot change IsManaged for locked window.");
+                if (IsLocked) throw new InvalidOperationException("Cannot change IsDrawnByKernel for locked window.");
 
-                _isManaged = value;
+                _isDrawnByKernel = value;
             }
         }
 
@@ -151,7 +151,7 @@ namespace STOLON
             _buttons = new TypeDictionary<WindowButton>();
             _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
 
-            IsManaged = true;
+            IsDrawnByKernel = true;
             Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);

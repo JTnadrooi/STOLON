@@ -297,7 +297,7 @@ namespace STOLON
 
             _regions.Add(new WindowShellRegion(this, _kernel, _textures, _fonts, _input, new ImageWindow(_kernel, _textures, _fonts, _input, texture)
             {
-                IsManaged = false,
+                IsDrawnByKernel = false,
             }));
 
             if (reAddInputLine)

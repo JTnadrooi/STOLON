@@ -90,7 +90,7 @@ namespace STOLON
         {
             foreach (Window window in _windows)
             {
-                if (window.IsManaged) window.Update(elapsedMilliseconds);
+                window.Update(elapsedMilliseconds);
             }
         }
 
@@ -98,7 +98,7 @@ namespace STOLON
         {
             foreach (Window window in _drawingOrder)
             {
-                if (window.IsManaged) window.Draw(drawingContext);
+                if (window.IsDrawnByKernel) window.Draw(drawingContext);
             }
         }
     }

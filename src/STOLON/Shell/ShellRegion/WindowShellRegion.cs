@@ -30,7 +30,7 @@ namespace STOLON
 
             _window.BoundRegion = this;
 
-            _window.IsManaged = false;
+            _window.IsDrawnByKernel = false;
             _isWindowLocked = true;
         }
 
@@ -76,13 +76,13 @@ namespace STOLON
             {
                 if (_queuedLockAction.Value) // to prevent IsManaged from throwing ex
                 {
-                    _window.IsManaged = !_queuedLockAction.Value;
+                    _window.IsDrawnByKernel = false;
                     _isWindowLocked = _queuedLockAction.Value;
                 }
                 else
                 {
                     _isWindowLocked = _queuedLockAction.Value;
-                    _window.IsManaged = !_queuedLockAction.Value;
+                    _window.IsDrawnByKernel = true;
                 }
 
                 _queuedLockAction = null;
@@ -91,7 +91,6 @@ namespace STOLON
             if (_isWindowLocked)
             {
                 _window.Position = this.Position;
-                _window.Update(elapsedMilliseconds);
             }
         }
 
