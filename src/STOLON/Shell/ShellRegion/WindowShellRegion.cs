@@ -17,7 +17,6 @@ namespace STOLON
         private Vector2 _borderCompensatingOffset;
 
         private bool _isWindowLocked;
-        private bool? _queuedLockAction;
 
         public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Window window) : base(shell)
         {
@@ -40,17 +39,21 @@ namespace STOLON
 
         internal bool TryLockWindow()
         {
-            if ((_queuedLockAction.HasValue && _queuedLockAction.Value) || _isWindowLocked) return false;
+            if (_isWindowLocked) return false;
 
-            _queuedLockAction = true;
+            _window.IsDrawnByKernel = false;
+            _isWindowLocked = true;
+
             return true;
         }
 
         internal bool TryUnlockWindow()
         {
-            if ((_queuedLockAction.HasValue && !_queuedLockAction.Value) || !_isWindowLocked) return false;
+            if (!_isWindowLocked) return false;
 
-            _queuedLockAction = false;
+            _isWindowLocked = false;
+            _window.IsDrawnByKernel = true;
+
             return true;
         }
 
@@ -66,22 +69,6 @@ namespace STOLON
 
         public override void Update(int elapsedMilliseconds)
         {
-            if (_queuedLockAction.HasValue)
-            {
-                if (_queuedLockAction.Value) // to prevent IsManaged from throwing ex
-                {
-                    _window.IsDrawnByKernel = false;
-                    _isWindowLocked = _queuedLockAction.Value;
-                }
-                else
-                {
-                    _isWindowLocked = _queuedLockAction.Value;
-                    _window.IsDrawnByKernel = true;
-                }
-
-                _queuedLockAction = null;
-            }
-
             if (_isWindowLocked)
             {
                 _window.Position = this.Position;
