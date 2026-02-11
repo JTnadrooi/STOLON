@@ -139,8 +139,8 @@ namespace STOLON
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
 
-        private const int Spacing = 2;
-        private const int ResizeAllowance = 6;
+        private const int ButtonSpacing = 2;
+        private const int ResizeBorderAllowance = 6;
 
         protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
         {
@@ -238,10 +238,10 @@ namespace STOLON
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
 
-            bool onLeft = Math.Abs(mousePos.X - bounds.Left) < ResizeAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
-            bool onRight = Math.Abs(mousePos.X - bounds.Right) < ResizeAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
-            bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) < ResizeAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
-            bool onBottom = Math.Abs(mousePos.Y - bounds.Top) < ResizeAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+            bool onLeft = Math.Abs(mousePos.X - bounds.Left) < ResizeBorderAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onRight = Math.Abs(mousePos.X - bounds.Right) < ResizeBorderAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) < ResizeBorderAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+            bool onBottom = Math.Abs(mousePos.Y - bounds.Top) < ResizeBorderAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
 
             Sides hitSide = 0;
 
@@ -266,7 +266,7 @@ namespace STOLON
         {
             _resizeBounds = OuterBounds;
 
-            _resizeBounds.Inflate(ResizeAllowance, ResizeAllowance);
+            _resizeBounds.Inflate(ResizeBorderAllowance, ResizeBorderAllowance);
 
             UpdateButtons();
         }
@@ -280,7 +280,7 @@ namespace STOLON
             }
             _orderedButtons = Buttons.Values.OrderBy(b => b.Order).Select((b, i) =>
                 new WindowButtonDrawInfo(b,
-                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - Spacing - WindowButton.Size - (WindowButton.Size + Spacing) * i, OuterBounds.Height - WindowButton.Size - Spacing)).ToPoint(), new Point(WindowButton.Size))
+                    new Rectangle((OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - ButtonSpacing - WindowButton.Size - (WindowButton.Size + ButtonSpacing) * i, OuterBounds.Height - WindowButton.Size - ButtonSpacing)).ToPoint(), new Point(WindowButton.Size))
                 )
             ).ToArray();
 
@@ -319,8 +319,8 @@ namespace STOLON
 
         private Rectangle GetMaybeButtonBounds()
         {
-            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + Spacing) + Spacing;
-            int mbbHeight = (WindowButton.Size + Spacing) + Spacing;
+            int mbbWidth = _orderedButtons.Length * (WindowButton.Size + ButtonSpacing) + ButtonSpacing;
+            int mbbHeight = (WindowButton.Size + ButtonSpacing) + ButtonSpacing;
 
             return new Rectangle(OuterBounds.X + OuterBounds.Width - mbbWidth, OuterBounds.Y + OuterBounds.Height - mbbHeight, mbbWidth, mbbHeight);
         }
