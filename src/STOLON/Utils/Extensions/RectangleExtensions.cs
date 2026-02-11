@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,9 +62,15 @@ namespace STOLON
             return new Rectangle(x, y, width, height);
         }
 
-        public static Rectangle ClampRectangle(this Rectangle rect, Sides draggedSides, int minWidth, int minHeight, int maxWidth, int maxHeight)
+        public static Rectangle ClampRectangle(this in Rectangle rect, Sides draggedSides, int minWidth, int minHeight, int maxWidth, int maxHeight)
         {
             return rect.ClampRectangle(draggedSides, new Point(minWidth, minHeight), new Point(maxWidth, maxHeight));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle At(this in Rectangle rect, in Point pos)
+        {
+            return new Rectangle(pos.X, pos.Y, rect.Width, rect.Height);
         }
     }
 }
