@@ -7,8 +7,6 @@
 
         private Texture2D _initialTextureToggled;
 
-        private bool _locked;
-
         public ToggleLockWindowButton(ITexture2DCollection textures) : base(textures["UI\\Window\\window_button_lock"], 1)
         {
             _hoverTexture = textures["UI\\Window\\window_button_lock-inverted"];
@@ -19,27 +17,24 @@
 
         protected override void OnDefault(Window source)
         {
-            if (_locked) Texture = _initialTextureToggled;
+            if (Window.IsLocked) Texture = _initialTextureToggled;
             else Texture = InitialTexture;
         }
 
         protected override void OnHover(Window source)
         {
-            if (_locked) Texture = _hoverTextureToggled;
+            if (Window.IsLocked) Texture = _hoverTextureToggled;
             else Texture = _hoverTexture;
         }
 
         protected override void OnClick(Window source)
         {
-            _locked = !_locked;
-
-            if (_locked)
+            if (Window.IsLocked)
             {
                 Window.Unlock();
                 Window.Position += new Vector2(10);
             }
             else Window.Lock();
-
         }
     }
 }
