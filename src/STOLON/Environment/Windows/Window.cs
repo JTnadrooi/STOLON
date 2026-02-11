@@ -4,6 +4,7 @@ using STOLON;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -80,7 +81,6 @@ namespace STOLON
                 _isDrawnByKernel = value;
             }
         }
-
         public Rectangle InnerBounds
         {
             get => _innerBounds;
@@ -161,7 +161,11 @@ namespace STOLON
             Controllers.Add("drag", new DragController(_input,
                 () => ShouldInitiateDrag(),
                 () => Position,
-                v => Position = v));
+                v =>
+                {
+                    if (!IsLocked)
+                        Position = v;
+                }));
             Controllers.Add("resize", new ResizeController(_input,
                 () =>
                 {
@@ -402,10 +406,13 @@ namespace STOLON
                 }
             }
 
-            //if (((DragController)Controllers["drag"]).IsDragging && BoundRegion is not null && BoundRegion _input.Mouse.Position)
-            //{
-
-            //}
+            if (((DragController)Controllers["drag"]).IsDragging && BoundRegion is not null)
+            {
+                if (BoundRegion.GetBounds().Contains(_input.Mouse.Position))
+                    TryLock();
+                else
+                    TryUnlock();
+            }
 
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
             UpdateContents(elapsedMilliseconds);
