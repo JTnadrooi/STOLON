@@ -205,7 +205,6 @@ namespace STOLON
         {
             return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
         }
-        public static Rectangle OffsetPos(this Rectangle inRectanle, Point offset) => ChangePos(inRectanle, inRectanle.Location + offset);
         public static Rectangle ChangePos(this Rectangle inRectanle, Point newPos)
         {
             return new Rectangle(newPos, inRectanle.Size);
