@@ -35,20 +35,39 @@ namespace STOLON
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool IsLockActive() => _isWindowLocked;
+        internal bool IsLockActive() => _isWindowLocked; //|| (_queuedLockAction.HasValue && _queuedLockAction.Value)
+
+        internal bool TryLockWindow()
+        {
+            if ((_queuedLockAction.HasValue && _queuedLockAction.Value) || _isWindowLocked) return false;
+
+            _queuedLockAction = true;
+            return true;
+        }
+
+        internal bool TryUnlockWindow()
+        {
+            if ((_queuedLockAction.HasValue && !_queuedLockAction.Value) || !_isWindowLocked) return false;
+
+            _queuedLockAction = false;
+            return true;
+        }
 
         internal void LockWindow()
         {
-            if (_queuedLockAction.GetValueOrDefault() || _isWindowLocked) throw new InvalidOperationException("Cannot lock already locked window.");
-
-            _queuedLockAction = true;
+            if (!TryLockWindow()) throw new InvalidOperationException("Cannot lock already locked window.");
         }
 
         internal void UnlockWindow()
         {
-            if (_queuedLockAction.GetValueOrDefault() || !_isWindowLocked) throw new InvalidOperationException("Cannot unlock already unlocked window.");
+            if (!TryUnlockWindow()) throw new InvalidOperationException("Cannot unlock already unlocked window.");
+        }
 
-            _queuedLockAction = false;
+        public Rectangle GetBounds()
+        {
+            if (_isWindowLocked) return _window.OuterBounds;
+
+            return _windowSlotTex.Bounds.At(Position.ToPoint());
         }
 
         public override void Update(int elapsedMilliseconds)

@@ -321,11 +321,25 @@ namespace STOLON
             return _maybeButtonsBounds.Contains(_input.Mouse.Position);
         }
 
+        public bool TryLock()
+        {
+            if (BoundRegion is null) throw new InvalidOperationException("Can't lock unbound region.");
+
+            return BoundRegion.TryLockWindow();
+        }
+
         public void Lock()
         {
             if (BoundRegion is null) throw new InvalidOperationException("Can't lock unbound region.");
 
             BoundRegion.LockWindow();
+        }
+
+        public bool TryUnlock()
+        {
+            if (BoundRegion is null) throw new InvalidOperationException("Can't unlock unbound region.");
+
+            return BoundRegion.TryUnlockWindow();
         }
 
         public void Unlock()
