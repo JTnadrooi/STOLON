@@ -134,11 +134,13 @@ namespace STOLON
         protected IReadOnlyDictionary<Type, WindowButton> Buttons => _buttons;
 
         private Rectangle _innerBounds;
+        private Rectangle _resizeBounds; // slightly inflated outerbounds.
         private TypeDictionary<WindowButton> _buttons;
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
 
         private const int Spacing = 2;
+        private const int ResizeAllowance = 6;
 
         protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
         {
@@ -230,17 +232,16 @@ namespace STOLON
 
         private Sides GetMouseSides()
         {
-            const int dragAreaSize = 6;
 
             if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return Sides.None;
 
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
 
-            bool onLeft = Math.Abs(mousePos.X - bounds.Left) <= dragAreaSize && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
-            bool onRight = Math.Abs(mousePos.X - bounds.Right) <= dragAreaSize && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
-            bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) <= dragAreaSize && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
-            bool onBottom = Math.Abs(mousePos.Y - bounds.Top) <= dragAreaSize && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+            bool onLeft = Math.Abs(mousePos.X - bounds.Left) < ResizeAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onRight = Math.Abs(mousePos.X - bounds.Right) < ResizeAllowance && mousePos.Y >= bounds.Top && mousePos.Y <= bounds.Bottom;
+            bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) < ResizeAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
+            bool onBottom = Math.Abs(mousePos.Y - bounds.Top) < ResizeAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
 
             Sides hitSide = 0;
 
@@ -263,6 +264,10 @@ namespace STOLON
 
         private void UpdatePosition()
         {
+            _resizeBounds = OuterBounds;
+
+            _resizeBounds.Inflate(ResizeAllowance, ResizeAllowance);
+
             UpdateButtons();
         }
 
@@ -445,7 +450,7 @@ namespace STOLON
             //    drawingContext.DrawArea(OuterBounds, Color.Green);
             //}
 
-            drawingContext.RegisterDraw(this, OuterBounds);
+            drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
         }
 
         protected abstract void DrawContents(DrawingContext drawingContext);
