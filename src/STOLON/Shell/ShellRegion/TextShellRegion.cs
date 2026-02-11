@@ -152,6 +152,7 @@ namespace STOLON
         public bool IsFocus { get; set; }
 
         public override int Height => _height;
+        public override int Width => STOLON.VWidth;
 
         public override int VerticalOverlap => (int)(_lines.Last().Length == 0 ? 13 : 0);
 

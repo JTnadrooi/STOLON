@@ -408,7 +408,7 @@ namespace STOLON
 
             if (((DragController)Controllers["drag"]).IsDragging && BoundRegion is not null)
             {
-                if (BoundRegion.GetBounds().Contains(_input.Mouse.Position))
+                if (BoundRegion.Bounds.Contains(_input.Mouse.Position))
                     TryLock();
                 else
                     TryUnlock();

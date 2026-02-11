@@ -9,6 +9,7 @@ namespace STOLON
         private readonly Kernel _kernel;
 
         public override int Height => IsLockActive() ? _window.OuterBounds.Height : _windowSlotTex.Height;
+        public override int Width => IsLockActive() ? _window.OuterBounds.Width : _windowSlotTex.Width;
         public Window Window => _window;
 
         private Window _window;
@@ -61,13 +62,6 @@ namespace STOLON
         internal void UnlockWindow()
         {
             if (!TryUnlockWindow()) throw new InvalidOperationException("Cannot unlock already unlocked window.");
-        }
-
-        public Rectangle GetBounds()
-        {
-            if (_isWindowLocked) return _window.OuterBounds;
-
-            return _windowSlotTex.Bounds.At(Position.ToPoint());
         }
 
         public override void Update(int elapsedMilliseconds)
