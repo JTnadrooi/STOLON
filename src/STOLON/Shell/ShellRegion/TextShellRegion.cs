@@ -436,7 +436,7 @@ namespace STOLON
 
             #region HANDLE_MOUSE
 
-            TextPosition? mouseTextPos = GetTextPosition(_input.Mouse.Position, true);
+            TryGetTextPosition(_input.Mouse.Position, out TextPosition? mouseTextPos, true);
 
             if (_input.IsMouseOn<Shell>() && _input.IsPressed(MouseButton.Left))
             {
@@ -476,13 +476,7 @@ namespace STOLON
             #endregion
         }
 
-        /// <summary>
-        /// Creates a <see cref="TextPosition"/> from a screen position.
-        /// </summary>
-        /// <param name="clamp">
-        /// If <see langword="true"/>, clamps out of bounds clicks to always be on text. (<see cref="TextPosition.IsPostText"/> can still be <see langword="true"/> though.)
-        /// </param>
-        private TextPosition? GetTextPosition(Vector2 screenPos, bool clamp = false)
+        private bool TryGetTextPosition(Vector2 screenPos, [NotNullWhen(true)] out TextPosition? position, bool clamp = false)
         {
             int charWidth = (int)Font.Dimensions.X;
             int charHeight = (int)Font.Dimensions.Y;
@@ -496,11 +490,16 @@ namespace STOLON
             {
                 if (charLineIndex < 0) // pretext check.
                 {
-                    return new TextPosition(this, 0);
+                    position = new TextPosition(this, 0);
+                    return true;
                 }
                 charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
             }
-            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return null;
+            else if (charLineIndex >= _lines.Count || charLineIndex < 0)
+            {
+                position = null;
+                return false;
+            }
 
             string charLine = _lines[charLineIndex];
 
@@ -508,24 +507,34 @@ namespace STOLON
             {
                 if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // posttext check.
                 {
-                    return TextPosition.GetPostText(this);
+                    position = TextPosition.GetPostText(this);
+                    return true;
                 }
                 charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
             }
-            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return null;
+            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0)
+            {
+                position = null;
+                return false;
+            }
 
             int result = charIndexOnLine;
 
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            if (result == _text.Length) return TextPosition.GetPostText(this);
+            if (result == _text.Length)
+            {
+                position = TextPosition.GetPostText(this);
+                return true;
+            }
 
             //Console.WriteLine($"{charLineIndex}:{charIndexOnLine} = {result}");
             //Console.WriteLine($"out of {_text.Length}");
             //Console.WriteLine($"char {_text[result]}");
 
-            return new TextPosition(this, result);
+            position = new TextPosition(this, result);
+            return true;
         }
 
         private Vector2 GetCharacterScreenPosAt(int charIndex)
@@ -685,7 +694,7 @@ namespace STOLON
             string[] lines = input.Split(newLine, StringSplitOptions.RemoveEmptyEntries);
 
             if (lineNumber < 1 || lineNumber > lines.Length + 1)
-                throw new ArgumentOutOfRangeException(nameof(lineNumber), "Line number is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(lineNumber), "'lineNumber' is out of range.");
 
             string result = string.Join(newLine,
                 new string[] { string.Join(newLine, lines.Take(lineNumber - 1)) }
