@@ -71,8 +71,6 @@ namespace STOLON
         /// <param name="position">When this method returns, contains the offset <see cref="TextPosition"/>.</param>
         public bool TryOffset(int amount, [NotNullWhen(true)] out TextPosition? position)
         {
-            position = null;
-
             if (amount == 0)
             {
                 position = this;
@@ -568,7 +566,7 @@ namespace STOLON
 
         public Vector2 GetCursorScreenPos()
         {
-            if (Cursor is null) throw new InvalidOperationException($"Cursor is not on text.");
+            if (Cursor is null) throw new InvalidOperationException($"Cannot get cursor screen position; cursor is not on text.");
 
             if (Cursor.Value.IsPostText)
             {
