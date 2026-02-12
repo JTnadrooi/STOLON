@@ -28,7 +28,7 @@ namespace STOLON
         private Line[]? _autocompletionDividerLines;
         private string[]? _displayedAutocompletions;
 
-        private ShellCharacterInfo? _cursor; // null when out of bounds of any region.
+        private TextPosition? _cursor; // null when out of bounds of any region.
 
         public bool HasInputLine
         {
@@ -119,11 +119,9 @@ namespace STOLON
             throw new InvalidOperationException();
         }
 
-        private bool TryGetCursor([NotNullWhen(true)] out ShellCharacterInfo? cursor)
+        private bool TryGetCursor([NotNullWhen(true)] out TextPosition? cursor)
         {
-            ShellCharacterInfo? result = null;
-
-#if DEBUG
+            TextPosition? result = null;
 
             foreach (ShellRegion region in _regions)
             {
@@ -137,22 +135,6 @@ namespace STOLON
                     }
                 }
             }
-
-#else
-
-            foreach (ShellRegion region in _regions)
-            {
-                if (region is TextShellRegion textRegion)
-                {
-                    if (textRegion.Cursor.IsOnText)
-                    {
-                        result = textRegion.Cursor;
-                        break;
-                    }
-                }
-            }
-
-#endif
 
             if (result.HasValue)
             {

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace STOLON
 {
-    public readonly struct ShellCharacterInfo : IEquatable<ShellCharacterInfo>
+    public readonly struct TextPosition : IEquatable<TextPosition>
     {
         private readonly TextShellRegion _region;
 
@@ -17,25 +12,56 @@ namespace STOLON
 
         public readonly int Index
         {
-            get => _index < 0 ? throw new InvalidOperationException() : _index;
+            get
+            {
+                if (_index < 0)
+                {
+                    if (IsOnText) throw new InvalidOperationException("Cannot get Index when cursor is post text. (Not on a character.)");
+                    if (!IsOnCharacter) throw new InvalidOperationException("Cannot get Index when cursor is not on a character.");
+
+                    Debug.Assert(false, "Invalid internal '_index'."); // idk what to do here.
+                    throw new InvalidOperationException("Invalid internal '_index'.");
+                }
+                else return _index;
+            }
         }
 
+        /// <summary>
+        /// Gets the <see cref="TextShellRegion"/> this position is on.
+        /// </summary>
         public readonly TextShellRegion Region => _region;
 
+        /// <summary>
+        /// Gets if this position is post text, but still on the text. <br/>
+        /// <i>(Like when you put the cursor on the end of a word, its still on the word but "after" it.)</i>
+        /// </summary>
         public readonly bool IsPostText { get; }
 
-        public readonly bool IsOnText => IsPostText || _index != -1;
-        public readonly bool IsOnCharacter => _index != -1;
-        public readonly int ClampedIndex => IsPostText ? _region.Text.Length - 1 : Index;
-        public readonly int BorderingIndex => IsPostText ? _region.Text.Length : Index;
+        /// <summary>
+        /// Gets if this position is on the text. 
+        /// 
+        /// <code>IsPostText || IsOnCharacter</code>
+        /// </summary>
+        public readonly bool IsOnText => IsPostText || IsOnCharacter;
 
-        public ShellCharacterInfo(TextShellRegion region, int index) : this(region, index, false)
+        /// <summary>
+        /// Gets if this position is on a character. 
+        /// <see langword="false"/> if <see cref="IsPostText"/> is <see langword="true"/> as even though the position is on the text, its not on a character.
+        /// </summary>
+        public readonly bool IsOnCharacter => _index != -1;
+
+        /// <summary>
+        /// Gets the <see cref="Index"/>, or the last valid character position if <see cref="IsPostText"/> is <see langword="true"/>.
+        /// </summary>
+        public readonly int ClampedIndex => IsPostText ? _region.Text.Length - 1 : Index;
+
+        internal TextPosition(TextShellRegion region, int index) : this(region, index, false)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _region.Text.Length);
         }
 
-        private ShellCharacterInfo(TextShellRegion region, int index, bool isPostText)
+        private TextPosition(TextShellRegion region, int index, bool isPostText)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(index, -1);
 
@@ -44,92 +70,102 @@ namespace STOLON
             IsPostText = isPostText;
         }
 
-        public bool TryOffset(int amount, [NotNullWhen(true)] out ShellCharacterInfo? characterInfo, bool allowPostText = false)
+        /// <summary>
+        /// Attempts to offset this <see cref="TextPosition"/> by a specified <paramref name="amount"/>.
+        /// </summary>
+        /// <param name="amount">The amount of characters to offset this <see cref="TextPosition"/>.</param>
+        /// <param name="position">When this method returns, contains the offset <see cref="TextPosition"/>.</param>
+        public bool TryOffset(int amount, [NotNullWhen(true)] out TextPosition? position)
         {
-            characterInfo = null;
-
-            if (!allowPostText && IsPostText) return false;
+            position = null;
 
             if (amount == 0)
             {
-                characterInfo = this;
+                position = this;
                 return true;
             }
 
-            if (allowPostText)
+            if (IsPostText)
             {
-                if (IsPostText)
+                if (amount > 0)
                 {
-                    if (amount > 0)
-                    {
-                        characterInfo = ShellCharacterInfo.GetPostText(_region);
-                        return true;
-                    }
-                    else
-                    {
-                        characterInfo = new ShellCharacterInfo(_region, _region.Text.Length + amount); // amount is negative here.
-                        return true;
-                    }
+                    position = TextPosition.GetPostText(_region);
+                    return true;
                 }
                 else
                 {
-                    int newPos = Index + amount;
-
-                    if (newPos >= _region.Text.Length)
-                    {
-                        characterInfo = ShellCharacterInfo.GetPostText(_region);
-                        return true;
-                    }
-                    characterInfo = new ShellCharacterInfo(_region, newPos);
+                    position = new TextPosition(_region, _region.Text.Length + amount); // amount is negative here.
                     return true;
                 }
             }
             else
             {
-                characterInfo = new ShellCharacterInfo(_region, Index + amount);
+                int newPos = Index + amount;
+
+                if (newPos >= _region.Text.Length)
+                {
+                    position = TextPosition.GetPostText(_region);
+                    return true;
+                }
+                position = new TextPosition(_region, newPos);
                 return true;
             }
         }
 
-        public ShellCharacterInfo Offset(int amount, bool allowPostText = false)
+        /// <summary>
+        /// Offset this <see cref="TextPosition"/> by a specified <paramref name="amount"/>.
+        /// </summary>
+        /// <param name="amount">The amount of characters to offset this <see cref="TextPosition"/>.</param>
+        /// <returns>This <see cref="TextPosition"/> offset by a specified <paramref name="amount"/>.</returns>
+        public TextPosition Offset(int amount)
         {
-            //if (!allowPostText && IsPostText) throw new InvalidOperationException($"Cannot offset post text pos if '{nameof(allowPostText)}' is false.");
-
-            if (TryOffset(amount, out ShellCharacterInfo? characterInfo, allowPostText)) return characterInfo.Value;
+            if (TryOffset(amount, out TextPosition? characterInfo)) return characterInfo.Value;
             else throw new InvalidOperationException($"Offset '{this}' by {amount} on text lenght of '{_region.Text.Length}' failed.");
         }
 
+        /// <summary>
+        /// Gets if this <see cref="TextPosition"/> is valid as cursor position. 
+        /// Returns <see langword="false"/> if <see cref="IsOnCharacter"/> is <see langword="false"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> if this <see cref="TextPosition"/> is valid as cursor position, otherwise <see langword="false"/>.</returns>
         public bool IsValidCursorInfo()
         {
             if (IsPostText) return _region.HasInputLine;
-            if (!IsOnCharacter) throw new InvalidOperationException("Can't check if valid if pos isn't on a character.");
+            if (!IsOnCharacter) return true;
 
             return !_region.ReadonlyRange.Contains(Index);
         }
 
-        public static ShellCharacterInfo GetPostText(TextShellRegion region) => new ShellCharacterInfo(region, -1, true);
-        public static ShellCharacterInfo GetOutOfBounds(TextShellRegion region) => new ShellCharacterInfo(region, -1, false);
+        /// <summary>
+        /// Create a new post text <see cref="TextPosition"/>.
+        /// </summary>
+        public static TextPosition GetPostText(TextShellRegion region) => new TextPosition(region, -1, true);
 
-        public static NormalizedRange GetRange(ShellCharacterInfo info1, ShellCharacterInfo info2)
+        /// <summary>
+        /// Create a new out of bounds <see cref="TextPosition"/>.
+        /// </summary>
+        public static TextPosition GetOutOfBounds(TextShellRegion region) => new TextPosition(region, -1, false);
+
+        public static NormalizedRange GetRange(TextPosition pos1, TextPosition pos2)
         {
-            NormalizedRange temp = NormalizedRange.FromValues(info1.ClampedIndex, info2.ClampedIndex);
+            NormalizedRange temp = NormalizedRange.FromValues(pos1.ClampedIndex, pos2.ClampedIndex);
 
-            if (info1.IsPostText ^ info2.IsPostText) return new NormalizedRange(temp.Start, info1._region.Text.Length);
+            if (pos1.IsPostText ^ pos2.IsPostText) return new NormalizedRange(temp.Start, pos1._region.Text.Length);
 
             return temp;
         }
 
-        public static explicit operator int(ShellCharacterInfo src)
+        public static explicit operator int(TextPosition src)
         {
             return src.Index;
         }
 
-        public static bool operator ==(ShellCharacterInfo item1, ShellCharacterInfo item2) => item1.Equals(item2);
-        public static bool operator !=(ShellCharacterInfo item1, ShellCharacterInfo item2) => !item1.Equals(item2);
+        public static bool operator ==(TextPosition item1, TextPosition item2) => item1.Equals(item2);
+        public static bool operator !=(TextPosition item1, TextPosition item2) => !item1.Equals(item2);
 
         public override bool Equals(object? obj)
         {
-            return obj is ShellCharacterInfo other && Equals(other);
+            return obj is TextPosition other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -137,7 +173,7 @@ namespace STOLON
             return HashCode.Combine(HashCode.Combine(_index, IsPostText), _region);
         }
 
-        public bool Equals(ShellCharacterInfo other)
+        public bool Equals(TextPosition other)
         {
             return _index == other._index && IsPostText == other.IsPostText && _region == other._region;
         }
@@ -149,23 +185,18 @@ namespace STOLON
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
 
-        public bool IsFocus { get; set; }
-
+        private int _height;
         public override int Height => _height;
+
         public override int Width => STOLON.VWidth;
 
-        public override int VerticalOverlap => (int)(_lines.Last().Length == 0 ? 13 : 0);
+        private int _verticalOverlap;
+        public override int VerticalOverlap => _verticalOverlap;
 
         public Font2D Font { get; }
 
         private string _text;
         public string Text => _text;
-        private List<string> _lines;
-        private Vector2 _textScale;
-        private int _height;
-
-        private const char NewLine = '\n';
-        private const string InputLinePrefix = "> ";
 
         private NormalizedRange _readonlyRange;
         public NormalizedRange ReadonlyRange
@@ -182,26 +213,18 @@ namespace STOLON
             }
         }
 
-        private ShellCharacterInfo _cursor;
-        public ShellCharacterInfo Cursor
+        private TextPosition _cursor;
+        public TextPosition Cursor
         {
             get => _cursor;
             set
             {
-                if (!value.IsOnText)
-                {
-                    Debug.Assert(value == ShellCharacterInfo.GetOutOfBounds(this));
-                    _cursor = value;
-                }
-                else if (value.IsValidCursorInfo()) _cursor = value;
+                if (value.IsValidCursorInfo()) _cursor = value;
                 else if (_hasInputLine && value.IsPostText) throw new InvalidOperationException($"Cursor cannot be placed post text if '{nameof(_hasInputLine)}' is true.");
                 else if (!value.IsOnText) throw new InvalidOperationException($"Cursor '{value}' is not on text.");
                 else throw new InvalidOperationException($"Cursor cannot be placed at '{value}'.");
             }
         }
-
-        private ShellCharacterInfo _lastClickCursor;
-        private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
 
         private bool _hasInputLine;
         public bool HasInputLine
@@ -218,11 +241,10 @@ namespace STOLON
 
                     _hasInputLine = false;
 
-                    Cursor = ShellCharacterInfo.GetOutOfBounds(this);
+                    Cursor = TextPosition.GetOutOfBounds(this);
                     _readonlyRange = new NormalizedRange(0, _text.Length);
 
                     UpdateText();
-                    //_hasInputLine = false;
                 }
                 else
                 {
@@ -236,9 +258,14 @@ namespace STOLON
             }
         }
 
-        private bool _cursorSelecting;
         private NormalizedRange _cursorSelection;
+        private TextPosition _lastClickCursor;
+        private int _cursorLifetime; // resets when a new cursor is placed with the mouse.
+        private List<string> _lines;
+        private Vector2 _textScale;
 
+        private const char NewLine = '\n';
+        private const string InputLinePrefix = "> ";
         private const bool AllowCursorSelect = false;
 
         public TextShellRegion(Shell shell, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
@@ -256,14 +283,12 @@ namespace STOLON
             STOLON.Instance.Window.TextInput += OnTextInput;
             STOLON.Instance.Window.KeyDown += OnKeyDown;
 
-            _lastClickCursor = ShellCharacterInfo.GetOutOfBounds(this);
-            Cursor = ShellCharacterInfo.GetOutOfBounds(this);
+            _lastClickCursor = TextPosition.GetOutOfBounds(this);
+            Cursor = TextPosition.GetOutOfBounds(this);
             ReadonlyRange = NormalizedRange.Empty;
-
-            IsFocus = true;
         }
 
-        private bool TrySetCursor(ShellCharacterInfo newPos)
+        private bool TrySetCursor(TextPosition newPos)
         {
             if (newPos.IsValidCursorInfo())
             {
@@ -311,7 +336,7 @@ namespace STOLON
             UpdateText();
 
             if (Cursor.IsOnText)
-                Cursor = Cursor.Offset(str.Length, true);
+                Cursor = Cursor.Offset(str.Length);
             ExtendReadonlyRange(str.Length);
         }
 
@@ -334,7 +359,7 @@ namespace STOLON
             UpdateText();
 
             if (Cursor.IsOnText)
-                Cursor = Cursor.Offset(line.Length, true);
+                Cursor = Cursor.Offset(line.Length);
             ExtendReadonlyRange(line.Length);
         }
 
@@ -365,8 +390,8 @@ namespace STOLON
 
         #endregion
 
-        private void Put<T>(T item, ShellCharacterInfo pos) => Put(item.ToString()!, pos);
-        private void Put(string str, ShellCharacterInfo pos)
+        private void Put<T>(T item, TextPosition pos) => Put(item.ToString()!, pos);
+        private void Put(string str, TextPosition pos)
         {
             if (!pos.IsOnText) throw new InvalidOperationException();
 
@@ -413,6 +438,8 @@ namespace STOLON
         {
             _lines = SplitWithNewline(_text).ToList();
             if (_lines.Last().EndsWith(NewLine)) _lines.Add(string.Empty);
+
+            _verticalOverlap = (int)(_lines.Last().Length == 0 ? 13 : 0);
         }
 
         public override void Update(int elapsedMilliseconds)
@@ -426,30 +453,24 @@ namespace STOLON
 
             if (_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
             {
-                ShellCharacterInfo character = GetCharacterInfoAt(_input.Mouse.Position, true);
+                TextPosition character = GetTextPosition(_input.Mouse.Position, true);
 
                 if (!TrySetCursor(character))
                 {
-                    Cursor = ShellCharacterInfo.GetOutOfBounds(this);
+                    Cursor = TextPosition.GetOutOfBounds(this);
                 }
                 //Console.WriteLine(GetCharacterIndexAt(_input.Mouse.Position, false));
 
                 if (AllowCursorSelect)
                 {
-                    _cursorSelecting = true;
-
                     if (character.IsOnText && _lastClickCursor.IsOnText)
-                        _cursorSelection = ShellCharacterInfo.GetRange(character, _lastClickCursor);
+                        _cursorSelection = TextPosition.GetRange(character, _lastClickCursor);
                 }
-            }
-            else
-            {
-                _cursorSelecting = false;
             }
 
             if (_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
             {
-                _lastClickCursor = GetCharacterInfoAt(_input.Mouse.Position, true);
+                _lastClickCursor = GetTextPosition(_input.Mouse.Position, true);
                 if (_lastClickCursor.IsValidCursorInfo())
                     _cursorLifetime = 0;
 
@@ -458,7 +479,7 @@ namespace STOLON
 
             if (!_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))
             {
-                Cursor = ShellCharacterInfo.GetOutOfBounds(this);
+                Cursor = TextPosition.GetOutOfBounds(this);
             }
 
             #endregion
@@ -470,25 +491,31 @@ namespace STOLON
             #endregion
         }
 
-        private ShellCharacterInfo GetCharacterInfoAt(Vector2 pos, bool clamp = false)
+        /// <summary>
+        /// Creates a <see cref="TextPosition"/> from a screen position.
+        /// </summary>
+        /// <param name="clamp">
+        /// If <see langword="true"/>, clamps out of bounds clicks to always be on text. (<see cref="TextPosition.IsPostText"/> can still be <see langword="true"/> though.)
+        /// </param>
+        private TextPosition GetTextPosition(Vector2 screenPos, bool clamp = false)
         {
             int charWidth = (int)Font.Dimensions.X;
             int charHeight = (int)Font.Dimensions.Y;
 
-            int charIndexOnLine = (int)((pos.X - Position.X) / charWidth);
+            int charIndexOnLine = (int)((screenPos.X - Position.X) / charWidth);
 
-            int charLineIndex = (int)((pos.Y - Position.Y) / charHeight);
+            int charLineIndex = (int)((screenPos.Y - Position.Y) / charHeight);
             charLineIndex = (_lines.Count - 1) - charLineIndex; // invert it. (text is top down)
 
             if (clamp)
             {
                 if (charLineIndex < 0) // pretext check.
                 {
-                    return new ShellCharacterInfo(this, 0);
+                    return new TextPosition(this, 0);
                 }
                 charLineIndex = Math.Clamp(charLineIndex, 0, _lines.Count - 1); // clamp y
             }
-            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return ShellCharacterInfo.GetOutOfBounds(this);
+            else if (charLineIndex >= _lines.Count || charLineIndex < 0) return TextPosition.GetOutOfBounds(this);
 
             string charLine = _lines[charLineIndex];
 
@@ -496,24 +523,24 @@ namespace STOLON
             {
                 if (charLineIndex == _lines.Count - 1 && charIndexOnLine > charLine.Length) // posttext check.
                 {
-                    return ShellCharacterInfo.GetPostText(this);
+                    return TextPosition.GetPostText(this);
                 }
                 charIndexOnLine = Math.Clamp(charIndexOnLine, 0, charLine.Length == 0 ? 0 : (charLine.Length - 1)); // clamp x, ?: because of empty lines, remove the -1 and when selecting lines, the cursor will be placed after the newline.
             }
-            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return ShellCharacterInfo.GetOutOfBounds(this);
+            else if (charIndexOnLine > charLine.Length || charIndexOnLine < 0) return TextPosition.GetOutOfBounds(this);
 
             int result = charIndexOnLine;
 
             for (int lineIndex = 0; lineIndex < charLineIndex; lineIndex++)
                 result += _lines[lineIndex].Length; // newline is already in line.
 
-            if (result == _text.Length) return ShellCharacterInfo.GetPostText(this);
+            if (result == _text.Length) return TextPosition.GetPostText(this);
 
             //Console.WriteLine($"{charLineIndex}:{charIndexOnLine} = {result}");
             //Console.WriteLine($"out of {_text.Length}");
             //Console.WriteLine($"char {_text[result]}");
 
-            return new ShellCharacterInfo(this, result);
+            return new TextPosition(this, result);
         }
 
         private Vector2 GetCharacterScreenPosAt(int charIndex)
@@ -568,10 +595,10 @@ namespace STOLON
             switch (e.Key)
             {
                 case Keys.Left:
-                    TrySetCursor(Cursor.Offset(-1, true));
+                    TrySetCursor(Cursor.Offset(-1));
                     break;
                 case Keys.Right:
-                    TrySetCursor(Cursor.Offset(1, true));
+                    TrySetCursor(Cursor.Offset(1));
                     break;
                 default: return;
             }
@@ -584,7 +611,7 @@ namespace STOLON
             void PutAndOffset(char c)
             {
                 Put(c, Cursor);
-                if (!Cursor.IsPostText) Cursor = Cursor.Offset(1, true);
+                if (!Cursor.IsPostText) Cursor = Cursor.Offset(1);
             }
 
             switch (e.Character)
@@ -603,7 +630,7 @@ namespace STOLON
                         if (!ReadonlyRange.Contains(newPos))
                         {
                             RemoveAt(newPos);
-                            Cursor = new ShellCharacterInfo(this, newPos);
+                            Cursor = new TextPosition(this, newPos);
                         }
                     }
 
@@ -663,12 +690,12 @@ namespace STOLON
             return new string(span);
         }
 
-        static string[] SplitWithNewline(string input)
+        private static string[] SplitWithNewline(string input)
         {
             return Regex.Split(input, @"(?<=\n)(?=\S)|(?<=\n)(?=\n)");
         }
 
-        public static string InsertLine(string input, int lineNumber, string lineToInsert, char newLine)
+        private static string InsertLine(string input, int lineNumber, string lineToInsert, char newLine)
         {
             string[] lines = input.Split(newLine, StringSplitOptions.RemoveEmptyEntries);
 

@@ -232,7 +232,6 @@ namespace STOLON
 
         private Sides GetMouseSides()
         {
-
             if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return Sides.None;
 
             Vector2 mousePos = _input.Mouse.Position;
@@ -243,14 +242,14 @@ namespace STOLON
             bool onTop = Math.Abs(mousePos.Y - bounds.Bottom) < ResizeBorderAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
             bool onBottom = Math.Abs(mousePos.Y - bounds.Top) < ResizeBorderAllowance && mousePos.X >= bounds.Left && mousePos.X <= bounds.Right; // inverted Y
 
-            Sides hitSide = 0;
+            Sides hitSides = 0;
 
-            if (onLeft) hitSide |= Sides.Left;
-            if (onRight) hitSide |= Sides.Right;
-            if (onTop) hitSide |= Sides.Top;
-            if (onBottom) hitSide |= Sides.Bottom;
+            if (onLeft) hitSides |= Sides.Left;
+            if (onRight) hitSides |= Sides.Right;
+            if (onTop) hitSides |= Sides.Top;
+            if (onBottom) hitSides |= Sides.Bottom;
 
-            return hitSide;
+            return hitSides;
         }
 
         private bool CanMouseInitDrag()
