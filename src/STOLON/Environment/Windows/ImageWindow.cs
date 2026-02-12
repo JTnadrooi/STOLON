@@ -27,11 +27,13 @@ namespace STOLON
             AddButton(new ToggleLockWindowButton(textures));
         }
 
-        protected override void UpdateContents(int elapsedMilliseconds)
+        protected override void OnBoundsChanged()
         {
             _imgPos = Centering.Center(new Point(Image.Width, Image.Height), new Rectangle(0, 0, InnerBounds.Width, InnerBounds.Height));
             _imgPos = _imgPos.PixelLock();
         }
+
+        protected override void UpdateContents(int elapsedMilliseconds) { }
 
         protected override void DrawContents(DrawingContext drawingContext)
         {

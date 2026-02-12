@@ -111,7 +111,7 @@ namespace STOLON
             {
                 _innerBounds = value;
 
-                UpdatePosition();
+                UpdateBounds();
             }
         }
 
@@ -161,6 +161,7 @@ namespace STOLON
         private TypeDictionary<WindowButton> _buttons;
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
+        private bool _isInitialized;
 
         private const int ButtonSpacing = 2;
         private const int ResizeBorderAllowance = 6;
@@ -207,6 +208,8 @@ namespace STOLON
             //MaxSize = new Point(200);
 
             kernel.RegisterWindow(this);
+
+            _isInitialized = true;
         }
 
         public void Resize(Sides sides, int newSize, bool throwIfNotResizable = true)
@@ -284,14 +287,19 @@ namespace STOLON
 
         #endregion
 
-        private void UpdatePosition()
+        private void UpdateBounds()
         {
             _resizeBounds = OuterBounds;
 
             _resizeBounds.Inflate(ResizeBorderAllowance, ResizeBorderAllowance);
 
             UpdateButtons();
+
+            if (_isInitialized)
+                OnBoundsChanged();
         }
+
+        protected virtual void OnBoundsChanged() { }
 
         private void UpdateButtons()
         {
@@ -382,17 +390,17 @@ namespace STOLON
 
         /// <summary>
         /// Brings this window to the front of the <see cref="Kernel"/> drawing order.
-        /// Only calls <see cref="OnFocus()"/> if this window isn't focussed already.
+        /// Only calls <see cref="OnFocused()"/> if this window isn't focussed already.
         /// </summary>
         public void Focus()
         {
             if (_kernel.Focus(this)) // only run OnFocus if focussing changed anything
             {
-                OnFocus();
+                OnFocused();
             }
         }
 
-        protected virtual void OnFocus() { }
+        protected virtual void OnFocused() { }
 
         public Vector2 GetButtonPos(int index)
         {
