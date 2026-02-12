@@ -34,16 +34,39 @@ namespace STOLON
         public bool IsResizable { get; set; }
         public bool IsBorderless { get; set; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] // hmm
+        private Point AdjustSizeForBorder(Point size)
+        {
+            if (IsBorderless) return size;
+
+            return new Point(size.X + Border.AddedWidth, size.Y + Border.AddedHeight);
+        }
+
         public Point? MaxSize
         {
-            get => ((ResizeController)Controllers["resize"]).MaxSize;
-            set => ((ResizeController)Controllers["resize"]).MaxSize = value;
+            get
+            {
+                Point? s = ((ResizeController)Controllers["resize"]).MaxSize;
+                return s is null ? null : AdjustSizeForBorder(s.Value);
+            }
+            set
+            {
+                ((ResizeController)Controllers["resize"]).MaxSize = value is null ? null : AdjustSizeForBorder(value.Value);
+            }
         }
 
         public Point? MinSize
         {
-            get => ((ResizeController)Controllers["resize"]).MinSize;
-            set => ((ResizeController)Controllers["resize"]).MinSize = value;
+            get
+            {
+                Point? s = ((ResizeController)Controllers["resize"]).MinSize;
+                return s is null ? null : AdjustSizeForBorder(s.Value);
+            }
+            set
+            {
+                Point? s = value;
+                ((ResizeController)Controllers["resize"]).MinSize = value is null ? null : AdjustSizeForBorder(value.Value);
+            }
         }
 
         public string Name { get; set; }
