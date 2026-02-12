@@ -127,7 +127,7 @@ namespace STOLON
             {
                 if (region is TextShellRegion textRegion)
                 {
-                    if (textRegion.Cursor.IsOnText)
+                    if (textRegion.Cursor is not null)
                     {
                         Debug.Assert(!result.HasValue, "Cursor cannot be on multiple textregion's at once.");
 
