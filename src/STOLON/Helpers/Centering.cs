@@ -1,13 +1,5 @@
 ﻿namespace STOLON
 {
-    public enum Orgin
-    {
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-    }
-
     public static class Centering
     {
         public static Vector2 TopLeft(Texture2D texture, Vector2 pos, Vector2 scaling) => pos + new Vector2(0, texture.Height * scaling.Y);
