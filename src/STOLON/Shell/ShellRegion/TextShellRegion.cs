@@ -16,10 +16,8 @@ namespace STOLON
             {
                 if (_index < 0)
                 {
-                    if (!IsOnCharacter) throw new InvalidOperationException("Cannot get Index when cursor is not on a character.");
-
-                    Debug.Assert(false, "Invalid internal '_index'."); // idk what to do here.
-                    throw new InvalidOperationException("Invalid internal '_index'.");
+                    Debug.Assert(!IsOnCharacter);
+                    throw new InvalidOperationException("Cannot get Index when cursor is not on a character.");
                 }
                 else return _index;
             }
@@ -69,7 +67,7 @@ namespace STOLON
         /// </summary>
         /// <param name="amount">The amount of characters to offset this <see cref="TextPosition"/>.</param>
         /// <param name="position">When this method returns, contains the offset <see cref="TextPosition"/>.</param>
-        public bool TryOffset(int amount, [NotNullWhen(true)] out TextPosition? position)
+        public readonly bool TryOffset(int amount, [NotNullWhen(true)] out TextPosition? position)
         {
             if (amount == 0)
             {
