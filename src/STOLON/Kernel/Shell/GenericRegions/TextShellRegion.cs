@@ -168,6 +168,7 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
+        private readonly Kernel _kernel;
 
         private int _height;
         public override int Height => _height;
@@ -251,11 +252,12 @@ namespace STOLON
         private const string InputLinePrefix = "> ";
         private const bool AllowCursorSelect = false;
 
-        public TextShellRegion(Shell shell, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
+        public TextShellRegion(Shell shell, Kernel kernel, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
         {
             _logger = logger;
             _input = input;
             _textures = textures;
+            _kernel = kernel;
 
             _text = string.Empty;
             _lines = new List<string>();
@@ -406,6 +408,17 @@ namespace STOLON
             _text = _lines.ToJoinedString();
 
             UpdateText();
+        }
+
+        public string GetInputAsProcessing()
+        {
+            string input = GetInput();
+
+            ClearInput();
+
+            WriteLine(InputLinePrefix + input);
+
+            return input;
         }
 
         public void RemoveAt(int pos)
@@ -626,6 +639,7 @@ namespace STOLON
 
                     break;
                 case '\r':
+                    _kernel.Execute(GetInputAsProcessing());
                     //PutAndOffset(NewLine);
 
                     //WriteLine(GetInput());

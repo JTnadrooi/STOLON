@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using AsitLib.CommandLine;
+using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using DiscordRPC.Logging;
@@ -31,7 +32,22 @@ namespace STOLON
                 Console.WriteLine($"registered type '{registeredTypes[i].RegisteredType}' with lifetime '{registeredTypes[i].Lifetime}'.");
             }
 
+            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+                if (typeof(CommandProvider).IsAssignableFrom(type)
+                    && type != typeof(CommandProvider)
+                    && !type.IsAbstract)
+                {
+                    builder.RegisterType(type).As(type).AsImplemented().SingleInstance();
+                }
+
             builder.Register<Random>(i => new Random()).SingleInstance();
+            builder.Register<CommandEngine>(i => new CommandEngine()).SingleInstance().OnActivated(e => // can be better i think? test later
+            {
+                e.Instance.Populate(activator: t =>
+                {
+                    return (CommandProvider)STOLON.Services.Resolve(t);
+                });
+            });
 
             _services = STOLON.Services = builder.Build();
             stopwatch.Stop();

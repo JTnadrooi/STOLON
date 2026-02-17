@@ -86,7 +86,7 @@ namespace STOLON
                 _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
         }
 
-        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _logger, Font, _input, _textures));
+        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _kernel, _logger, Font, _input, _textures));
 
         private TRegion EnsureLastRegionIs<TRegion>(Func<TRegion> regionFactory) where TRegion : TextShellRegion
         {
@@ -192,7 +192,7 @@ namespace STOLON
                 }
             }
 
-            if (TryGetCursor(out _cursor))
+            if (TryGetCursor(out _cursor) && _cursor.Value.Region.GetInput().Length > 0)
             {
                 _autocompletions = Autocomplete.Complete(GetAutoCompleteTarget(), Words).Options.Take(3).ToArray();
 

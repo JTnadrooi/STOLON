@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AsitLib.CommandLine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,24 +13,26 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
+        private readonly CommandEngine _commandEngine;
+
+        public IReadOnlyList<Window> Windows { get; }
 
         private readonly List<Window> _windows;
         private readonly List<Window> _drawingOrder;
 
-        public IReadOnlyList<Window> Windows { get; }
-
-        public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input)
+        public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input, CommandEngine commandEngine)
         {
             _logger = logger;
             _textures = textures;
             _input = input;
+            _commandEngine = commandEngine;
 
             _windows = new List<Window>();
             _drawingOrder = new List<Window>();
 
             Windows = _windows;
 
-            //Windows = (_windows = new List<Window>()).AsReadOnly(); // yeah im not doing that, cool though
+            //Windows = (_windows = new List<Window>()).AsReadOnly(); // not doing that, cool though
         }
 
         private void ThrowIfNotRegistered(Window window)
@@ -84,6 +87,11 @@ namespace STOLON
             ThrowIfNotRegistered(window);
 
             return _windows.Where(w => w.GetType() == window.GetType()).IndexOf(window);
+        }
+
+        public void Execute(string command)
+        {
+            _commandEngine.Execute(command);
         }
 
         public void Update(int elapsedMilliseconds)
