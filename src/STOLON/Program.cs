@@ -37,7 +37,7 @@ namespace STOLON
                     && type != typeof(CommandProvider)
                     && !type.IsAbstract)
                 {
-                    builder.RegisterType(type).As(type).AsImplemented().SingleInstance();
+                    builder.RegisterType(type).AsSelf().AsImplemented().SingleInstance();
                 }
 
             builder.Register<Random>(i => new Random()).SingleInstance();
