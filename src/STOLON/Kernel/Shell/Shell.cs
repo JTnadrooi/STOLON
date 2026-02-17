@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AsitLib.CommandLine;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -14,6 +15,7 @@ namespace STOLON
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
         private readonly Kernel _kernel;
+        private readonly CommandEngine _commandEngine;
 
         private readonly List<ShellRegion> _regions;
         private readonly Vector2 _origin;
@@ -41,13 +43,14 @@ namespace STOLON
         public const int RegionClearance = 5;
         public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
-        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel, CommandEngine commandEngine)
         {
             _logger = logger;
             _fonts = fonts;
             _input = input;
             _textures = textures;
             _kernel = kernel;
+            _commandEngine = commandEngine;
 
             _regions = new List<ShellRegion>();
 
@@ -86,7 +89,8 @@ namespace STOLON
                 _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
         }
 
-        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(() => new TextShellRegion(this, _kernel, _logger, Font, _input, _textures));
+        private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(()
+            => new TextShellRegion(this, _commandEngine, _logger, Font, _input, _textures));
 
         private TRegion EnsureLastRegionIs<TRegion>(Func<TRegion> regionFactory) where TRegion : TextShellRegion
         {

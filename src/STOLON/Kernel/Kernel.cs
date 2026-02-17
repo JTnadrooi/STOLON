@@ -89,11 +89,6 @@ namespace STOLON
             return _windows.Where(w => w.GetType() == window.GetType()).IndexOf(window);
         }
 
-        public void Execute(string command)
-        {
-            _commandEngine.Execute(command);
-        }
-
         public void Update(int elapsedMilliseconds)
         {
             foreach (Window window in _windows)

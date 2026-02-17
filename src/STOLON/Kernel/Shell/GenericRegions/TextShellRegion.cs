@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AsitLib.CommandLine;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -168,7 +169,7 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
-        private readonly Kernel _kernel;
+        private readonly CommandEngine _commandEngine;
 
         private int _height;
         public override int Height => _height;
@@ -252,12 +253,12 @@ namespace STOLON
         private const string InputLinePrefix = "> ";
         private const bool AllowCursorSelect = false;
 
-        public TextShellRegion(Shell shell, Kernel kernel, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
+        public TextShellRegion(Shell shell, CommandEngine commandEngine, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
         {
             _logger = logger;
             _input = input;
             _textures = textures;
-            _kernel = kernel;
+            _commandEngine = commandEngine;
 
             _text = string.Empty;
             _lines = new List<string>();
@@ -639,12 +640,17 @@ namespace STOLON
 
                     break;
                 case '\r':
-                    _kernel.Execute(GetInputAsProcessing());
-                    //PutAndOffset(NewLine);
+                    string command = GetInputAsProcessing();
 
-                    //WriteLine(GetInput());
-                    //ClearInput();
-                    return;
+                    if (_commandEngine.Commands.ContainsKey(command))
+                    {
+                        _commandEngine.Execute(command);
+                    }
+                    else
+                    {
+                        WriteLine($"'{command}' is not recognized as an internal or external command, operable program or batch file.");
+                    }
+                    break;
                 case '\t':
                     string input = GetInput().Split(" ").Last();
 
