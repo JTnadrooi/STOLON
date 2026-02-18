@@ -24,6 +24,7 @@ namespace STOLON
 
         public static string[] Words { get; } = ["write", "read", "region", "shell", "stolon"]; // temp for autocomplete tests.
 
+        private const bool EnableAutofill = false;
         private string[]? _autocompletions;
         private int _selectedAutocompletion;
         private Rectangle _autocompletionRect;
@@ -68,23 +69,22 @@ namespace STOLON
             switch (e.Key)
             {
                 case Keys.Up:
-                    if (_selectedAutocompletion != 0)
+                    if (_autocompletions is not null && _selectedAutocompletion != 0)
                         _selectedAutocompletion--;
                     break;
                 case Keys.Down:
-                    if (_selectedAutocompletion != _autocompletions.Length - 1)
+                    if (_autocompletions is not null && _selectedAutocompletion != _autocompletions.Length - 1)
                         _selectedAutocompletion++;
                     break;
                 case Keys.Tab:
                     if (_autocompletions is not null)
-                    {
                         AutoComplete(_selectedAutocompletion);
-                    }
                     break;
                 default: return;
             }
 
-            if (_autocompletions is null || _autocompletions.Length == 0) _selectedAutocompletion = -1;
+            if (_autocompletions is null || _autocompletions.Length == 0)
+                _selectedAutocompletion = -1;
             else
                 _selectedAutocompletion = Math.Clamp(_selectedAutocompletion, 0, _autocompletions.Length - 1);
         }
@@ -196,7 +196,7 @@ namespace STOLON
                 }
             }
 
-            if (TryGetCursor(out _cursor) && _cursor.Value.Region.GetInput().Length > 0)
+            if (EnableAutofill && TryGetCursor(out _cursor) && _cursor.Value.Region.GetInput().Length > 0)
             {
                 _autocompletions = Autocomplete.Complete(GetAutoCompleteTarget(), Words).Options.Take(3).ToArray();
 
