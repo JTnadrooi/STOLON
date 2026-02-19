@@ -13,19 +13,17 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
-        private readonly CommandEngine _commandEngine;
 
         public IReadOnlyList<Window> Windows { get; }
 
         private readonly List<Window> _windows;
         private readonly List<Window> _drawingOrder;
 
-        public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input, CommandEngine commandEngine)
+        public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input, CommandManager commandManager)
         {
             _logger = logger;
             _textures = textures;
             _input = input;
-            _commandEngine = commandEngine;
 
             _windows = new List<Window>();
             _drawingOrder = new List<Window>();

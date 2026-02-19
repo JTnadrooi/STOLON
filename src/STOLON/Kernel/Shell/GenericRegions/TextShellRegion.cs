@@ -169,7 +169,7 @@ namespace STOLON
         private readonly IRichLogger _logger;
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
-        private readonly CommandEngine _commandEngine;
+        private readonly CommandManager _commandManager;
 
         private int _height;
         public override int Height => _height;
@@ -253,12 +253,12 @@ namespace STOLON
         private const string InputLinePrefix = "> ";
         private const bool AllowCursorSelect = false;
 
-        public TextShellRegion(Shell shell, CommandEngine commandEngine, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
+        public TextShellRegion(Shell shell, CommandManager commandManager, IRichLogger logger, Font2D font, IInputManager input, ITexture2DCollection textures) : base(shell)
         {
             _logger = logger;
             _input = input;
             _textures = textures;
-            _commandEngine = commandEngine;
+            _commandManager = commandManager;
 
             _text = string.Empty;
             _lines = new List<string>();
@@ -642,14 +642,7 @@ namespace STOLON
                 case '\r':
                     string command = GetInputAsProcessing();
 
-                    if (_commandEngine.Commands.ContainsKey(command))
-                    {
-                        _commandEngine.Execute(command);
-                    }
-                    else
-                    {
-                        WriteLine($"'{command}' is not recognized as an internal or external command, operable program or batch file.");
-                    }
+                    _commandManager.Execute(command);
                     break;
                 case '\t':
                     string input = GetInput().Split(" ").Last();

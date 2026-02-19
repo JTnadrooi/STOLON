@@ -15,7 +15,7 @@ namespace STOLON
         private readonly ITexture2DCollection _textures;
         private readonly IInputManager _input;
         private readonly Kernel _kernel;
-        private readonly CommandEngine _commandEngine;
+        private readonly CommandManager _commandManager;
 
         private readonly List<ShellRegion> _regions;
         private readonly Vector2 _origin;
@@ -44,14 +44,14 @@ namespace STOLON
         public const int RegionClearance = 5;
         public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
-        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel, CommandEngine commandEngine)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel, CommandManager commandManager)
         {
             _logger = logger;
             _fonts = fonts;
             _input = input;
             _textures = textures;
             _kernel = kernel;
-            _commandEngine = commandEngine;
+            _commandManager = commandManager;
 
             _regions = new List<ShellRegion>();
 
@@ -90,7 +90,7 @@ namespace STOLON
         }
 
         private TextShellRegion EnsureLastRegionIsTextRegion() => EnsureLastRegionIs<TextShellRegion>(()
-            => new TextShellRegion(this, _commandEngine, _logger, Font, _input, _textures));
+            => new TextShellRegion(this, _commandManager, _logger, Font, _input, _textures));
 
         private TRegion EnsureLastRegionIs<TRegion>(Func<TRegion> regionFactory) where TRegion : TextShellRegion
         {
