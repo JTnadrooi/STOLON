@@ -41,7 +41,10 @@ namespace STOLON
                 }
 
             builder.Register<Random>(i => new Random()).SingleInstance();
-            builder.Register<CommandEngine>(i => new CommandEngine()).SingleInstance().OnActivated(e => // can be better i think? test later
+            builder.Register<CommandEngine>(i => new CommandEngine()
+            {
+                DefaultInfoFactory = new KernelCommandInfoFactory(),
+            }).SingleInstance().OnActivated(e => // can be better i think? test later
             {
                 e.Instance.Populate(activator: t =>
                 {
