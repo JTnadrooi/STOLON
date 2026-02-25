@@ -18,8 +18,8 @@ namespace STOLON
             _shell = shell;
         }
 
-        [KernelCommand("Prints the STOLON version.", Aliases = ["v"], Id = "version", IsGenericFlag = true)]
-        public void GetVersion() => _shell.WriteLine(STOLON.Version);
+        [KernelCommand("Prints the reality number.", Aliases = ["v"], Id = "version", IsGenericFlag = true)] // not the game version, lore version.
+        public void GetVersion() => _shell.WriteLine($"revise--1236979249_sto&a");
 
         [KernelCommand(".", Id = "addr")]
         public void InitAddress() => _commandManager.SetFlag<InitAddressCommandFlag>();
