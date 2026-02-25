@@ -1,5 +1,4 @@
 ﻿using AsitLib.CommandLine;
-using System.Reflection;
 
 namespace STOLON.CLI
 {
@@ -39,24 +38,6 @@ namespace STOLON.CLI
                     }
                 }
             }
-        }
-    }
-
-    public sealed class FlaggedCommandInfoFactory : ICommandInfoFactory
-    {
-        public CommandInfo? Convert(CommandProvider provider, MethodInfo methodInfo, CommandAttribute attribute)
-        {
-            FlaggedCommandAttribute flaggedCommandAttribute = (FlaggedCommandAttribute)attribute;
-
-            CommandInfo defaultResult = MethodCommandInfo.FromMethod(methodInfo, provider);
-
-            return new FlaggedCommandInfo(defaultResult.Ids.ToArray(), defaultResult.Description, methodInfo)
-            {
-                Flags = flaggedCommandAttribute.Flags,
-                PassingPolicies = flaggedCommandAttribute.PassingPolicies,
-                Target = provider,
-                Provider = provider,
-            };
         }
     }
 
@@ -120,6 +101,6 @@ namespace STOLON.CLI
         /// <summary>
         /// Gets the absolute path of the <i>src\STOLON\resources\</i> folder.
         /// </summary>
-        public static string? SourceResourcesPath => SourcePath == null ? null : (SourcePath + @"STOLON\resources\");
+        public static string? SourceResourcesPath => SourcePath is null ? null : (SourcePath + @"STOLON\resources\");
     }
 }

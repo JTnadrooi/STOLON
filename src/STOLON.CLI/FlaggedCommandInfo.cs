@@ -10,8 +10,7 @@ namespace STOLON.CLI
     {
         public CommandFlags Flags { get; init; }
 
-        public FlaggedCommandInfo(string[] ids, string description, MethodInfo methodInfo)
-            : base(ids, description, methodInfo)
+        public FlaggedCommandInfo(string[] ids, string description, MethodInfo methodInfo) : base(ids, description, methodInfo)
         {
 
         }
