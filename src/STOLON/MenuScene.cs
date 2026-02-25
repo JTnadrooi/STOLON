@@ -293,12 +293,13 @@ namespace STOLON
                 "I put that there.",
                 "Powered by hopes and whimsy.",
                 "Dual warning!", // reference to one of my geometry dash levels.
-                "You world has been blessed with cobalt!", // terraria reference.
+                "Your world has been blessed with cobalt!", // terraria reference.
                 "You have been Noticed.",
                 "Drawing vegitation..",
                 "FLORA.",
                 "Stukadoor", // internship joke.
-                "The rest of your life is probably a loooong time.."
+                "The rest of your life is probably a loooong time..",
+                "Woo! Nyaa!", // Haiyore! Nyaruko-san reference
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
