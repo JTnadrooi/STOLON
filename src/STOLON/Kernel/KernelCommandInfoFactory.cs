@@ -11,9 +11,10 @@ namespace STOLON
 
             CommandInfo defaultResult = MethodCommandInfo.FromMethod(methodInfo, provider);
 
-            return new KernelCommandInfo(defaultResult.RawIds.ToArray(), defaultResult.Description, methodInfo, defaultResult.IsGenericFlag)
+            string[] ids = defaultResult.RawIds.ToArray();
+
+            return new KernelCommandInfo(ids, defaultResult.Description, methodInfo, defaultResult.IsGenericFlag)
             {
-                IsExternal = commandAttribute.IsExternal,
                 RequiredFlag = commandAttribute.RequiredFlag,
                 PassingPolicies = commandAttribute.PassingPolicies,
                 Target = provider,

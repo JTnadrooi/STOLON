@@ -5,8 +5,6 @@ namespace STOLON
 {
     public sealed class KernelCommandInfo : MethodCommandInfo
     {
-        public bool IsExternal { get; init; }
-
         private Type? _requiredFlag;
         public Type? RequiredFlag
         {
