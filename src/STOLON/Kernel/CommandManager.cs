@@ -13,11 +13,6 @@ namespace STOLON
 
     }
 
-    public sealed class DefaultCommandFlag : CommandFlag
-    {
-
-    }
-
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class CommandManager
     {
@@ -25,14 +20,14 @@ namespace STOLON
 
         public CommandEngine Engine { get; }
 
-        public CommandFlag ActiveFlag { get; private set; }
+        public CommandFlag? ActiveFlag { get; private set; }
 
         public CommandManager(CommandEngine engine, Lazy<Shell> shell)
         {
             Engine = engine;
             _shell = shell;
 
-            ActiveFlag = new DefaultCommandFlag();
+            ActiveFlag = null;
         }
 
         public void Execute(string command)
@@ -64,7 +59,7 @@ namespace STOLON
 
         public void ResetFlag()
         {
-            ActiveFlag = new DefaultCommandFlag();
+            ActiveFlag = null;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace STOLON
         {
             if (context.Command is KernelCommandInfo cmd) // not all commands will be the KernelCommandInfo type. (e.g; automatically added ones)
             {
-                if (cmd.RequiredFlag != _commandManager.Value.ActiveFlag.GetType())
+                if (cmd.RequiredFlag is not null && cmd.RequiredFlag != _commandManager.Value.ActiveFlag?.GetType())
                 {
                     context.Flags |= ExecutingContextFlags.PreventCommand;
                     throw new CommandException("Required flag for this command is not active.");
