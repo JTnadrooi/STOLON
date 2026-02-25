@@ -37,13 +37,20 @@ namespace STOLON
 
         public void Execute(string command)
         {
-            if (Engine.Commands.ContainsKey(command.Split(" ")[0]))
+            try
             {
-                Engine.Execute(command);
+                if (Engine.Commands.ContainsKey(command.Split(" ")[0]))
+                {
+                    Engine.Execute(command);
+                }
+                else
+                {
+                    _shell.Value.WriteLine($"'{command.Split(" ")[0]}' is not recognized as an internal or external command, operable program or batch file.");
+                }
             }
-            else
+            catch (CommandException e)
             {
-                _shell.Value.WriteLine($"'{command.Split(" ")[0]}' is not recognized as an internal or external command, operable program or batch file.");
+                _shell.Value.WriteLine("Error: " + e.Message);
             }
         }
 

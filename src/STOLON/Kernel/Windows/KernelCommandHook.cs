@@ -18,11 +18,12 @@ namespace STOLON
 
         public override void PreCommand(CommandContext context)
         {
-            if (context.Command is KernelCommandInfo cmd)
+            if (context.Command is KernelCommandInfo cmd) // not all commands will be the KernelCommandInfo type. (e.g; automatically added ones)
             {
                 if (cmd.RequiredFlag != _commandManager.Value.ActiveFlag.GetType())
                 {
-                    throw new Exception("no.");
+                    context.Flags |= ExecutingContextFlags.PreventCommand;
+                    throw new CommandException("Required flag for this command is not active.");
                 }
             }
         }
