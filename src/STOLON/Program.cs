@@ -53,7 +53,10 @@ namespace STOLON
                     return (CommandProvider)STOLON.Services.Resolve(t);
                 });
 
-                e.Instance.AddHook(STOLON.Services.Resolve<KernelCommandHook>());
+                foreach (ActionHook hook in STOLON.Services.Resolve<ActionHook[]>())
+                {
+                    e.Instance.AddHook(hook);
+                }
             });
 
             _services = STOLON.Services = builder.Build();
