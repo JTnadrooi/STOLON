@@ -2,6 +2,11 @@
 
 namespace STOLON
 {
+    public sealed class InitAddressCommandFlag : CommandFlag
+    {
+
+    }
+
     public class GenericCommandProvider : CommandProvider
     {
         private readonly CommandManager _commandManager;
@@ -16,5 +21,10 @@ namespace STOLON
         [KernelCommand("Prints the STOLON version.", Aliases = ["v"], Id = "version", IsGenericFlag = true)]
         public void GetVersion() => _shell.WriteLine(STOLON.Version);
 
+        [KernelCommand(".", Id = "addr")]
+        public void InitAddress() => _commandManager.SetFlag<InitAddressCommandFlag>();
+
+        [KernelCommand(".", Id = "flag", RequiredFlag = typeof(InitAddressCommandFlag))]
+        public void GetActiveFlag() => _shell.WriteLine(_commandManager.ActiveFlag);
     }
 }

@@ -33,12 +33,14 @@ namespace STOLON
             }
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
-                if (typeof(CommandProvider).IsAssignableFrom(type)
-                    && type != typeof(CommandProvider)
-                    && !type.IsAbstract)
+            {
+                if (type.IsAbstract) continue;
+
+                if (typeof(CommandProvider).IsAssignableFrom(type) || typeof(ActionHook).IsAssignableFrom(type))
                 {
                     builder.RegisterType(type).AsSelf().AsImplemented().SingleInstance();
                 }
+            }
 
             builder.Register<Random>(i => new Random()).SingleInstance();
             builder.Register<CommandEngine>(i => new CommandEngine()
@@ -50,6 +52,8 @@ namespace STOLON
                 {
                     return (CommandProvider)STOLON.Services.Resolve(t);
                 });
+
+                e.Instance.AddHook(STOLON.Services.Resolve<KernelCommandHook>());
             });
 
             _services = STOLON.Services = builder.Build();
