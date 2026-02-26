@@ -20,6 +20,9 @@ namespace STOLON
 
         public CommandEngine Engine { get; }
 
+        /// <summary>
+        /// Gets the currently active <see cref="CommandFlag"/> or <see langword="null"/> if no flag is active.
+        /// </summary>
         public CommandFlag? ActiveFlag { get; private set; }
 
         public CommandManager(CommandEngine engine, Lazy<Shell> shell)
@@ -49,7 +52,7 @@ namespace STOLON
             }
         }
 
-        public void SetFlag<TFlag>() where TFlag : CommandFlag => SetFlag(typeof(TFlag));
+        public void SetFlag<TFlag>() where TFlag : CommandFlag, new() => SetFlag(typeof(TFlag));
         public void SetFlag(Type flagType)
         {
             if (!flagType.IsAssignableTo<CommandFlag>()) throw new ArgumentException("Invalid flagtype.", nameof(flagType));
@@ -57,9 +60,22 @@ namespace STOLON
             ActiveFlag = (CommandFlag)Activator.CreateInstance(flagType)!;
         }
 
-        public void ResetFlag()
+        /// <summary>
+        /// Clears the currently active <see cref="CommandFlag"/>. (Sets <see cref="ActiveFlag"/> to <see langword="null"/>.)
+        /// </summary>
+        public void ClearFlag()
         {
             ActiveFlag = null;
+        }
+
+        /// <summary>
+        /// Resets the currently active <see cref="CommandFlag"/>.
+        /// 
+        /// <code>SetFlag(ActiveFlag.GetType());</code>
+        /// </summary>
+        public void ResetFlag()
+        {
+            SetFlag(ActiveFlag.GetType());
         }
     }
 }
