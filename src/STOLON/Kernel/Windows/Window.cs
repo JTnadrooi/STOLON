@@ -214,6 +214,7 @@ namespace STOLON
             //MaxSize = new Point(200);
 
             _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
+            _topFoliage.MaxReach = 20;
 
             kernel.RegisterWindow(this);
 

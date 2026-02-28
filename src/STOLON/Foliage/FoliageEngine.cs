@@ -34,6 +34,11 @@ namespace STOLON
             }
         }
 
+        /// <summary>
+        /// Gets or sets the maximum amount of distance this foliage can reach from the line consisting of <see cref="Point1"/> and <see cref="Point2"/>. 
+        /// </summary>
+        public int MaxReach { get; set; }
+
         private int _count;
         private bool _isDisposed;
         private List<FoliageAssetDrawInfo> _cache;
@@ -52,6 +57,8 @@ namespace STOLON
 
             _cache = new List<FoliageAssetDrawInfo>(_count);
             _seed = engine.Register(this);
+
+            MaxReach = int.MaxValue;
 
             UpdatePoints();
         }
@@ -99,7 +106,7 @@ namespace STOLON
 
                 int maxSpace = (int)Math.Min(distToA, distToB);
 
-                Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, 20, out Vector2 offset);
+                Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, MaxReach, out Vector2 offset);
 
                 bool drawMirrored = _seed % 2 == 0;
 
@@ -211,6 +218,8 @@ namespace STOLON
             FoliageAsset result = availibleFoliageAssets[foliageAssetIndex];
 
             offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availibleFoliageAssets[foliageAssetIndex].Offset);
+
+            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")");
 
             return result.Texture;
         }
