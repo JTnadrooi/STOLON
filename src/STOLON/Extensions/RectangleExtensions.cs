@@ -82,10 +82,10 @@ namespace STOLON
         {
             Line[] lines = new Line[4];
 
-            Point topLeft = new Point(rectangle.Left, rectangle.Top);
-            Point topRight = new Point(rectangle.Right, rectangle.Top);
-            Point bottomLeft = new Point(rectangle.Left, rectangle.Bottom);
-            Point bottomRight = new Point(rectangle.Right, rectangle.Bottom);
+            Vector2 topLeft = new Vector2(rectangle.Left, rectangle.Top);
+            Vector2 topRight = new Vector2(rectangle.Right, rectangle.Top);
+            Vector2 bottomLeft = new Vector2(rectangle.Left, rectangle.Bottom);
+            Vector2 bottomRight = new Vector2(rectangle.Right, rectangle.Bottom);
 
             lines[0] = new Line(topLeft, bottomLeft);       //left
             lines[1] = new Line(topLeft, topRight);         //top

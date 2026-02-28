@@ -2,40 +2,40 @@
 {
     public readonly struct Line // does not implement IDrawable, see DrawLine().
     {
-        public readonly Point Start;
-        public readonly Point End;
+        public readonly Vector2 Start;
+        public readonly Vector2 End;
 
-        public Line(Point start, Point end)
+        public Line(Vector2 start, Vector2 end)
         {
             Start = start;
             End = end;
         }
 
-        public Line(int startX, int startY, int endX, int endY)
-            : this(new Point(startX, startY), new Point(endX, endY)) { }
+        public Line(float startX, float startY, float endX, float endY)
+            : this(new Vector2(startX, startY), new Vector2(endX, endY)) { }
 
-        public Line Offset(Point amount)
+        public Line Offset(Vector2 amount)
         {
             return new Line(Start + amount, End + amount);
         }
 
         public bool IsNear(Vector2 vector, int threshold = 10)
         {
-            Vector2 lineDirection = (End - Start).ToVector2();
-            float projectionLength = Vector2.Dot(vector - Start.ToVector2(), lineDirection) / lineDirection.Length();
+            Vector2 lineDirection = End - Start;
+            float projectionLength = Vector2.Dot(vector - Start, lineDirection) / lineDirection.Length();
 
             if (projectionLength < 0) projectionLength = 0;
             else if (projectionLength > lineDirection.Length()) projectionLength = lineDirection.Length();
 
-            return Vector2.Distance(vector, Start.ToVector2() + projectionLength * Vector2.Normalize(lineDirection)) <= threshold;
+            return Vector2.Distance(vector, Start + projectionLength * Vector2.Normalize(lineDirection)) <= threshold;
         }
 
-        public static Line CreateHorizontal(int startX, int endX, int y)
+        public static Line CreateHorizontal(float startX, float endX, float y)
         {
             return new Line(startX, y, endX, y);
         }
 
-        public static Line CreateVertical(int x, int startY, int endY)
+        public static Line CreateVertical(float x, float startY, float endY)
         {
             return new Line(x, startY, x, endY);
         }

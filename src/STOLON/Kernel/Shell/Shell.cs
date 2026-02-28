@@ -252,7 +252,7 @@ namespace STOLON
                 for (int i = 0; i < _autocompletionDividerLines!.Length; i++)
                 {
                     drawingContext.DrawLine(_autocompletionDividerLines![i], thickness: 1);
-                    drawingContext.DrawString(Font, _displayedAutocompletions![i], _autocompletionDividerLines![i].Start.ToVector2() + new Vector2(5, 0));
+                    drawingContext.DrawString(Font, _displayedAutocompletions![i], _autocompletionDividerLines![i].Start + new Vector2(5, 0));
                 }
             }
         }
