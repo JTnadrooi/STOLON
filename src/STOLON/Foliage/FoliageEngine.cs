@@ -62,33 +62,21 @@ namespace STOLON
         {
             _engine = engine;
 
-            _count = 4;
-
             _point1 = p1;
             _point2 = p2;
+
+            _count = 5;
 
             _cache = new List<FoliageAssetDrawInfo>(_count);
             _seed = engine.Register(this);
 
             MaxReach = int.MaxValue;
 
-            UpdatePoints();
+            UpdatePoints(); // _count gets set here
         }
 
-        public void SetPoints(Vector2 p1, Vector2 p2)
+        private void UpdatePoints()
         {
-            _point1 = p1;
-            _point2 = p2;
-
-            UpdatePoints();
-        }
-
-        public void UpdatePoints()
-        {
-            Console.WriteLine("update points for " + _seed);
-
-            _cache.Clear();
-
             static float Hash01(int x)
             {
                 unchecked
@@ -100,7 +88,15 @@ namespace STOLON
                 }
             }
 
-            const float minSpacing = 0.1f;
+            Console.WriteLine("update points for " + _seed);
+
+            _cache.Clear();
+
+            float lenght = Vector2.Distance(_point1, _point2);
+
+            float minSpacing = (1f / _count) * 0.5f;
+
+            Console.WriteLine(minSpacing);
 
             float segment = 1f / _count;
 
@@ -116,7 +112,7 @@ namespace STOLON
                 float distToA = Vector2.Distance(p, _point1);
                 float distToB = Vector2.Distance(p, _point2);
 
-                int maxSpace = (int)Math.Min(distToA, distToB);
+                int maxSpace = (int)Math.Min(distToA, distToB) * 2; // times 2 because of centered drawing
 
                 Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, MaxReach, out Vector2 offset);
 
@@ -131,6 +127,14 @@ namespace STOLON
                     addedTextures.Add(texture);
                 }
             }
+        }
+
+        public void SetPoints(Vector2 p1, Vector2 p2)
+        {
+            _point1 = p1;
+            _point2 = p2;
+
+            UpdatePoints();
         }
 
         public void Draw(DrawingContext drawingContext)
