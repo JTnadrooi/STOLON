@@ -8,10 +8,7 @@ namespace STOLON
 {
     public sealed class Foliage : IDrawable, IDisposable
     {
-        private readonly record struct FoliageAssetDrawInfo(Texture2D Texture, Vector2 Pos)
-        {
-
-        }
+        private readonly record struct FoliageAssetDrawInfo(Texture2D Texture, Vector2 Pos, bool DrawMirrored);
 
         private readonly FoliageEngine _engine;
 
@@ -29,7 +26,7 @@ namespace STOLON
 
         private int _count;
         private bool _isDisposed;
-        private FoliageAssetDrawInfo[] _cache;
+        private List<FoliageAssetDrawInfo> _cache;
         private Vector2[] _points;
 
         public Foliage(FoliageEngine engine, Vector2[] points)
@@ -39,7 +36,7 @@ namespace STOLON
             _count = 4;
 
             _points = points;
-            _cache = new FoliageAssetDrawInfo[_count];
+            _cache = new List<FoliageAssetDrawInfo>(_count);
             _seed = engine.Register(this);
         }
 
@@ -50,9 +47,11 @@ namespace STOLON
         {
             Console.WriteLine("update points for " + _seed);
 
-            if (resize && _cache.Length != _count)
+            _cache.Clear();
+
+            if (resize && _cache.Capacity != _count)
             {
-                _cache = new FoliageAssetDrawInfo[_points.Length];
+                _cache.Capacity = _count;
             }
 
             static float Hash01(int x)
@@ -73,6 +72,8 @@ namespace STOLON
 
             float segment = 1f / _count;
 
+            HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
+
             for (int i = 0; i < _count; i++)
             {
                 float jitter = Hash01(_seed * 73856093 * (i + 1)) * (segment - minSpacing);
@@ -80,12 +81,23 @@ namespace STOLON
 
                 Vector2 p = Vector2.Lerp(a, b, t);
 
-                Texture2D texture = _engine.GetFoliageAsset(_seed, i, -1, -1, out Vector2 offset);
+                float distToA = Vector2.Distance(p, a);
+                float distToB = Vector2.Distance(p, b);
+
+                int maxSpace = (int)Math.Min(distToA, distToB);
+
+                Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, 20, out Vector2 offset);
+
+                bool drawMirrored = unchecked(_seed * i * i) < 0;
 
                 p = p + offset;
                 NumberHelper.OnPixel(ref p);
 
-                _cache[i] = new FoliageAssetDrawInfo(texture, p);
+                if (texture is not null && !addedTextures.Contains(texture))
+                {
+                    _cache.Add(new FoliageAssetDrawInfo(texture, p, drawMirrored));
+                    addedTextures.Add(texture);
+                }
             }
         }
 
@@ -96,10 +108,10 @@ namespace STOLON
             //    drawingContext.DrawPoint(Points[i], Color.Aqua, 5);
             //}
 
-            for (int i = 0; i < _cache.Length; i++)
+            for (int i = 0; i < _cache.Count; i++)
             {
                 //drawingContext.DrawPoint(_cache[i].Pos, Color.Red, 5);
-                drawingContext.Draw(_cache[i].Texture, _cache[i].Pos);
+                drawingContext.Draw(_cache[i].Texture, _cache[i].Pos, effects: _cache[i].DrawMirrored ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             }
         }
 
@@ -149,7 +161,16 @@ namespace STOLON
         {
             _foliages.Add(new WeakReference<Foliage>(foliage));
 
-            return unchecked(foliage.GetHashCode() * _random.Next());
+            int seed = _random.Next();
+
+            unchecked
+            {
+                seed *= foliage.GetHashCode();
+                seed = seed < 0 ? seed / 2 : seed;
+                seed = Math.Abs(seed); // just to be sure.
+            }
+
+            return seed;
         }
 
         internal void Deregister(Foliage foliage)
@@ -157,23 +178,31 @@ namespace STOLON
             _foliages.RemoveAll(wr => wr.TryGetTarget(out Foliage? f) && f == foliage);
         }
 
-        internal Texture2D GetFoliageAsset(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
+        internal Texture2D? GetFoliageAsset(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
         {
             int foliageAssetIndex;
+            //FoliageAsset[] availibleFoliageAssets = _foliageAssets.Where(f => (f.Group & group) != 0).ToArray(); // sloww.
+            FoliageAsset[] availibleFoliageAssets = _foliageAssets.Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY).ToArray(); // sloww.
+
+            if (availibleFoliageAssets.Length == 0)
+            {
+                offset = default;
+                return null;
+            }
 
             unchecked
             {
-                foliageAssetIndex = (int)(((float)Math.Abs(seed * index) / (float)int.MaxValue) * _foliageAssets.Length);
+                foliageAssetIndex = (int)(((float)Math.Abs(seed * index) / (float)int.MaxValue) * availibleFoliageAssets.Length);
             }
 
-            FoliageAsset result = _foliageAssets[foliageAssetIndex];
+            FoliageAsset result = availibleFoliageAssets[foliageAssetIndex];
 
-            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + _foliageAssets[foliageAssetIndex].Offset);
+            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availibleFoliageAssets[foliageAssetIndex].Offset);
 
             return result.Texture;
         }
 
-        public void Update(int elapsedMilliseconds) // doesnt do anything yet, as i dont have a wind shader..... (also doesnt get called!!)
+        public void Update(int elapsedMilliseconds) // doesnt do anything yet as i dont have a wind shader..... (also doesnt get called!!)
         {
 
         }
