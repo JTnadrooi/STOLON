@@ -35,9 +35,21 @@ namespace STOLON
         }
 
         /// <summary>
-        /// Gets or sets the maximum amount of distance this foliage can reach from the line consisting of <see cref="Point1"/> and <see cref="Point2"/>. 
+        /// Gets or sets the maximum amount of distance this foliage can reach from the <see cref="Line"/>. 
         /// </summary>
         public int MaxReach { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="global::STOLON.Line"/> from <see cref="Point1"/> to <see cref="Point2"/>.
+        /// </summary>
+        public Line Line
+        {
+            get => new Line(_point1, _point2);
+            set
+            {
+                SetPoints(value.Start, value.End);
+            }
+        }
 
         private int _count;
         private bool _isDisposed;
