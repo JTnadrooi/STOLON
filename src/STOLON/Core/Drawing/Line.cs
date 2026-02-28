@@ -5,6 +5,8 @@
         public readonly Vector2 Start;
         public readonly Vector2 End;
 
+        public float Lenght => Vector2.Distance(Start, End);
+
         public Line(Vector2 start, Vector2 end)
         {
             Start = start;
