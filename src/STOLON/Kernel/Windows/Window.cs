@@ -305,9 +305,7 @@ namespace STOLON
 
             if (_isInitialized)
             {
-                _topFoliage.Points[0] = new Vector2(OuterBounds.Left, OuterBounds.Bottom);
-                _topFoliage.Points[1] = new Vector2(OuterBounds.Right, OuterBounds.Bottom);
-                _topFoliage.UpdatePoints();
+                _topFoliage.SetPoints(new Vector2(OuterBounds.Left, OuterBounds.Bottom), new Vector2(OuterBounds.Right, OuterBounds.Bottom));
 
                 OnBoundsChanged();
             }

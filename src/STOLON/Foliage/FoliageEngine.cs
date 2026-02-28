@@ -12,47 +12,63 @@ namespace STOLON
 
         private readonly FoliageEngine _engine;
 
-        public Vector2[] Points
+        private readonly int _seed;
+
+        public Vector2 Point1
         {
-            get => _points;
+            get => _point1;
             set
             {
-                _points = value;
-                UpdatePointImpl(true);
+                _point1 = value;
+                UpdatePoints();
             }
         }
 
-        private readonly int _seed;
+        public Vector2 Point2
+        {
+            get => _point2;
+            set
+            {
+                _point2 = value;
+                UpdatePoints();
+            }
+        }
 
         private int _count;
         private bool _isDisposed;
         private List<FoliageAssetDrawInfo> _cache;
-        private Vector2[] _points;
 
-        public Foliage(FoliageEngine engine, Vector2[] points)
+        private Vector2 _point1;
+        private Vector2 _point2;
+
+        public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
         {
             _engine = engine;
 
             _count = 4;
 
-            _points = points;
+            _point1 = p1;
+            _point2 = p2;
+
             _cache = new List<FoliageAssetDrawInfo>(_count);
             _seed = engine.Register(this);
+
+            UpdatePoints();
+        }
+
+        public void SetPoints(Vector2 p1, Vector2 p2)
+        {
+            _point1 = p1;
+            _point2 = p2;
+
+            UpdatePoints();
         }
 
         public void UpdatePoints()
-            => UpdatePointImpl(false);
-
-        private void UpdatePointImpl(bool resize)
         {
             Console.WriteLine("update points for " + _seed);
 
             _cache.Clear();
-
-            if (resize && _cache.Capacity != _count)
-            {
-                _cache.Capacity = _count;
-            }
 
             static float Hash01(int x)
             {
@@ -65,9 +81,6 @@ namespace STOLON
                 }
             }
 
-            Vector2 a = Points[0];
-            Vector2 b = Points[^1];
-
             const float minSpacing = 0.1f;
 
             float segment = 1f / _count;
@@ -76,13 +89,13 @@ namespace STOLON
 
             for (int i = 0; i < _count; i++)
             {
-                float jitter = Hash01(_seed * 73856093 * (i + 1)) * (segment - minSpacing);
+                float jitter = Hash01(_seed * (i + 1)) * (segment - minSpacing);
                 float t = i * segment + jitter;
 
-                Vector2 p = Vector2.Lerp(a, b, t);
+                Vector2 p = Vector2.Lerp(_point1, _point2, t);
 
-                float distToA = Vector2.Distance(p, a);
-                float distToB = Vector2.Distance(p, b);
+                float distToA = Vector2.Distance(p, _point1);
+                float distToB = Vector2.Distance(p, _point2);
 
                 int maxSpace = (int)Math.Min(distToA, distToB);
 
@@ -117,7 +130,7 @@ namespace STOLON
 
         public static Foliage FromRectangle(FoliageEngine engine, Rectangle r)
         {
-            return new Foliage(engine, [new Vector2(r.Left, r.Bottom), new Vector2(r.Right, r.Bottom)]); // inverted y.
+            return new Foliage(engine, new Vector2(r.Left, r.Bottom), new Vector2(r.Right, r.Bottom)); // inverted y.
         }
 
         public void Dispose()
