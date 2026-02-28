@@ -15,7 +15,12 @@ namespace STOLON
         public override Texture2D LoadItem(string item)
         {
             using FileStream fileStream = new FileStream(item, FileMode.Open);
-            return Texture2D.FromStream(STOLON.Instance.GraphicsDevice, fileStream);
+
+            Texture2D result = Texture2D.FromStream(STOLON.Instance.GraphicsDevice, fileStream);
+
+            result.Name = GetId(item);
+
+            return result;
         }
     }
 }
