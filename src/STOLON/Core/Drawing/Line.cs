@@ -1,6 +1,6 @@
 ﻿namespace STOLON
 {
-    public readonly struct Line // does not implement IDrawable, see DrawLine().
+    public readonly struct Line : IEquatable<Line> // does not implement IDrawable, see DrawLine().
     {
         public readonly Vector2 Start;
         public readonly Vector2 End;
@@ -39,5 +39,17 @@
         {
             return new Line(x, startY, x, endY);
         }
+
+        public bool Equals(Line other) => Start == other.Start && End == other.End;
+
+        public override bool Equals(object? obj) => obj is Line other && Equals(other);
+
+        public override int GetHashCode() => HashCode.Combine(Start, End);
+
+        public static bool operator ==(Line left, Line right) => left.Equals(right);
+
+        public static bool operator !=(Line left, Line right) => !(left == right);
+
+        public override string ToString() => $"{{{Start} to {End}}}";
     }
 }
