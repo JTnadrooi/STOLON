@@ -101,7 +101,7 @@ namespace STOLON
 
                 Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, 20, out Vector2 offset);
 
-                bool drawMirrored = unchecked(_seed * i * i) < 0;
+                bool drawMirrored = _seed % 2 == 0;
 
                 p = p + offset;
                 NumberHelper.OnPixel(ref p);
