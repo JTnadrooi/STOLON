@@ -16,7 +16,7 @@ namespace STOLON
         private readonly IInputManager _input;
         private readonly Kernel _kernel;
         private readonly CommandManager _commandManager;
-
+        private readonly FoliageEngine _foliageEngine;
         private readonly List<ShellRegion> _regions;
         private readonly Vector2 _origin;
 
@@ -44,7 +44,7 @@ namespace STOLON
         public const int RegionClearance = 5;
         public const int CursorHeight = 8; // size of cursor texture, cursor in texture is one pixel shorter.
 
-        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel, CommandManager commandManager)
+        public Shell(IRichLogger logger, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Kernel kernel, CommandManager commandManager, FoliageEngine foliageEngine)
         {
             _logger = logger;
             _fonts = fonts;
@@ -52,7 +52,7 @@ namespace STOLON
             _textures = textures;
             _kernel = kernel;
             _commandManager = commandManager;
-
+            _foliageEngine = foliageEngine;
             _regions = new List<ShellRegion>();
 
             _origin = new Vector2(10, 0);
@@ -281,7 +281,7 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new WindowShellRegion(this, _kernel, _textures, _fonts, _input, new ImageWindow(_kernel, _textures, _fonts, _input, texture)
+            _regions.Add(new WindowShellRegion(this, _kernel, _textures, _fonts, _input, new ImageWindow(_kernel, _textures, _fonts, _input, _foliageEngine, texture)
             {
                 IsDrawnByKernel = false,
             }));

@@ -12,8 +12,8 @@ namespace STOLON
 
         private Vector2 _imgPos;
 
-        public ImageWindow(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Texture2D image)
-            : base(kernel, textures, fonts, input, image.Width, image.Height)
+        public ImageWindow(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, FoliageEngine foliageEngine, Texture2D image)
+            : base(kernel, textures, fonts, input, foliageEngine, image.Width, image.Height)
         {
             Image = image;
             Name = "Img: North";

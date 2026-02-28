@@ -29,6 +29,7 @@ namespace STOLON
         private readonly Kernel _kernel;
         private readonly IFont2DCollection _fonts;
         private readonly IInputManager _input;
+        private readonly FoliageEngine _foliageEngine;
 
         public bool IsDraggable { get; set; }
         public bool IsResizable { get; set; }
@@ -109,8 +110,9 @@ namespace STOLON
             get => _innerBounds;
             set
             {
-                _innerBounds = value;
+                if (_innerBounds == value) return;
 
+                _innerBounds = value;
                 UpdateBounds();
             }
         }
@@ -148,6 +150,8 @@ namespace STOLON
             get => OuterBounds.Location.ToVector2();
             set
             {
+                if (OuterBounds.Location == value.ToPoint()) return;
+
                 OuterBounds = new Rectangle(value.ToPoint(), OuterBounds.Size);
             }
         }
@@ -162,16 +166,18 @@ namespace STOLON
         private WindowButtonDrawInfo[] _orderedButtons;
         private Font2D _nameFont;
         private bool _isInitialized;
+        private Foliage _topFoliage;
 
         private const int ButtonSpacing = 2;
         private const int ResizeBorderAllowance = 6;
 
-        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, int innerSizeX, int innerSizeY)
+        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, FoliageEngine foliageEngine, int innerSizeX, int innerSizeY)
         {
             _textures = textures;
             _kernel = kernel;
             _fonts = fonts;
             _input = input;
+            _foliageEngine = foliageEngine;
             _nameFont = fonts.Medium;
 
             _buttons = new TypeDictionary<WindowButton>();
@@ -206,6 +212,8 @@ namespace STOLON
 
             MinSize = new Point(80, 20);
             //MaxSize = new Point(200);
+
+            _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
 
             kernel.RegisterWindow(this);
 
@@ -296,7 +304,13 @@ namespace STOLON
             UpdateButtons();
 
             if (_isInitialized)
+            {
+                _topFoliage.Points[0] = new Vector2(OuterBounds.Left, OuterBounds.Bottom);
+                _topFoliage.Points[1] = new Vector2(OuterBounds.Right, OuterBounds.Bottom);
+                _topFoliage.UpdatePoints();
+
                 OnBoundsChanged();
+            }
         }
 
         protected virtual void OnBoundsChanged() { }
@@ -479,6 +493,8 @@ namespace STOLON
             //{
             //    drawingContext.DrawArea(OuterBounds, Color.Green);
             //}
+
+            _topFoliage.Draw(drawingContext);
 
             drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
         }
