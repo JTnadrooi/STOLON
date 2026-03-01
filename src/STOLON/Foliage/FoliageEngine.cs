@@ -94,37 +94,47 @@ namespace STOLON
 
             float lenght = Vector2.Distance(_point1, _point2);
 
-            float minSpacing = (1f / _count) * 0.5f;
+            float minSpacingMod = (1f / _count) * 0.5f;
 
-            Console.WriteLine(minSpacing);
+            Console.WriteLine(minSpacingMod);
 
-            float segment = 1f / _count;
+            float segmentLenghtMod = 1f / _count;
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
+            float lastPlacedRight = float.NegativeInfinity;
+            float overlapMod = 1f; // more = less overlap allowed. (max 1)
 
             for (int i = 0; i < _count; i++)
             {
-                float jitter = Hash01(_seed * (i + 1)) * (segment - minSpacing);
-                float t = i * segment + jitter;
+                float jitter = Hash01(_seed * (i + 1)) * (segmentLenghtMod - minSpacingMod);
+                float lerpAmount = i * segmentLenghtMod + jitter;
 
-                Vector2 p = Vector2.Lerp(_point1, _point2, t);
+                Vector2 basePos = Vector2.Lerp(_point1, _point2, lerpAmount);
 
-                float distToA = Vector2.Distance(p, _point1);
-                float distToB = Vector2.Distance(p, _point2);
+                float distToLeft = Math.Abs(basePos.X - _point1.X);
+                float distToRight = Math.Abs(basePos.X - _point2.X);
+                int spaceToEnds = (int)Math.Min(distToLeft, distToRight) * 2;
 
-                int maxSpace = (int)Math.Min(distToA, distToB) * 2; // times 2 because of centered drawing
+                int spaceToPrevious = float.IsNegativeInfinity(lastPlacedRight) ?
+                    int.MaxValue :
+                    (int)((basePos.X - lastPlacedRight) * 2 / overlapMod);
+
+                int maxSpace = Math.Min(spaceToEnds, spaceToPrevious);
 
                 Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, MaxReach, out Vector2 offset);
 
+                if (texture is null) continue;
+
                 bool drawMirrored = _seed % 2 == 0;
+                Vector2 pos = basePos + offset;
 
-                p = p + offset;
-                NumberHelper.OnPixel(ref p);
+                NumberHelper.OnPixel(ref pos);
 
-                if (texture is not null && !addedTextures.Contains(texture))
+                if (!addedTextures.Contains(texture))
                 {
-                    _cache.Add(new FoliageAssetDrawInfo(texture, p, drawMirrored));
+                    _cache.Add(new FoliageAssetDrawInfo(texture, pos, drawMirrored));
                     addedTextures.Add(texture);
+                    lastPlacedRight = pos.X + texture.Width * 0.5f;
                 }
             }
         }
