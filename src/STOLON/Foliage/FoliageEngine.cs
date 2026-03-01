@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoGame.Extended;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -238,7 +239,11 @@ namespace STOLON
 
             unchecked
             {
-                foliageAssetIndex = (int)(((float)Math.Abs(seed * index) / (float)int.MaxValue) * availibleFoliageAssets.Length);
+                int hash = seed;
+                hash = hash * 397 ^ index;
+                hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF);
+                hash = Math.Abs(hash);
+                foliageAssetIndex = hash % availibleFoliageAssets.Length;
             }
 
             FoliageAsset result = availibleFoliageAssets[foliageAssetIndex];
