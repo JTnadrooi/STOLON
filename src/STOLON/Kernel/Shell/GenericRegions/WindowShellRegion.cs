@@ -18,7 +18,7 @@ namespace STOLON
 
         private bool _isWindowLocked;
 
-        public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, Window window) : base(shell)
+        public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, Window window) : base(shell)
         {
             if (window.BoundRegion is not null) throw new InvalidOperationException("Cannot bind 'window'; 'window' already belongs to region.");
 

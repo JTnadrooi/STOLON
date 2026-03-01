@@ -21,6 +21,15 @@ namespace STOLON
         Any = Left | Top | Right | Bottom,
     }
 
+    public sealed class WindowDependencies
+    {
+        public required Kernel Kernel { get; init; }
+        public required ITexture2DCollection Textures { get; init; }
+        public required IFont2DCollection Fonts { get; init; }
+        public required IInputManager Input { get; init; }
+        public required FoliageEngine FoliageEngine { get; init; }
+    }
+
     public abstract class Window : IComponent
     {
         private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
@@ -171,14 +180,14 @@ namespace STOLON
         private const int ButtonSpacing = 2;
         private const int ResizeBorderAllowance = 6;
 
-        protected Window(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, FoliageEngine foliageEngine, int innerSizeX, int innerSizeY)
+        protected Window(WindowDependencies deps, int innerSizeX, int innerSizeY)
         {
-            _textures = textures;
-            _kernel = kernel;
-            _fonts = fonts;
-            _input = input;
-            _foliageEngine = foliageEngine;
-            _nameFont = fonts.Medium;
+            _textures = deps.Textures;
+            _kernel = deps.Kernel;
+            _fonts = deps.Fonts;
+            _input = deps.Input;
+            _foliageEngine = deps.FoliageEngine;
+            _nameFont = _fonts.Medium;
 
             _buttons = new TypeDictionary<WindowButton>();
             _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
@@ -216,7 +225,7 @@ namespace STOLON
             _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
             _topFoliage.MaxReach = 20;
 
-            kernel.RegisterWindow(this);
+            _kernel.RegisterWindow(this);
 
             _isInitialized = true;
         }

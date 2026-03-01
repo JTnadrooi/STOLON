@@ -17,6 +17,9 @@ namespace STOLON
         private readonly Kernel _kernel;
         private readonly CommandManager _commandManager;
         private readonly FoliageEngine _foliageEngine;
+
+        private readonly WindowDependencies _windowDeps;
+
         private readonly List<ShellRegion> _regions;
         private readonly Vector2 _origin;
 
@@ -53,8 +56,17 @@ namespace STOLON
             _kernel = kernel;
             _commandManager = commandManager;
             _foliageEngine = foliageEngine;
-            _regions = new List<ShellRegion>();
 
+            _windowDeps = new WindowDependencies()
+            {
+                FoliageEngine = foliageEngine,
+                Fonts = fonts,
+                Input = input,
+                Kernel = kernel,
+                Textures = textures
+            };
+
+            _regions = new List<ShellRegion>();
             _origin = new Vector2(10, 0);
 
             _autocompletions = null;
@@ -281,7 +293,7 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new WindowShellRegion(this, _kernel, _textures, _fonts, _input, new ImageWindow(_kernel, _textures, _fonts, _input, _foliageEngine, texture)
+            _regions.Add(new WindowShellRegion(this, _kernel, _textures, new ImageWindow(_windowDeps, texture)
             {
                 IsDrawnByKernel = false,
             }));

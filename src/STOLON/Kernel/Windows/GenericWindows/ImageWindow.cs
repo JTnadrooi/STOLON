@@ -12,8 +12,8 @@ namespace STOLON
 
         private Vector2 _imgPos;
 
-        public ImageWindow(Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, FoliageEngine foliageEngine, Texture2D image)
-            : base(kernel, textures, fonts, input, foliageEngine, image.Width, image.Height)
+        public ImageWindow(WindowDependencies deps, Texture2D image)
+            : base(deps, image.Width, image.Height)
         {
             Image = image;
             Name = "Img: North";
@@ -23,8 +23,8 @@ namespace STOLON
 
             _imgPos = Vector2.Zero;
 
-            AddButton(new CloseWindowButton(textures));
-            AddButton(new ToggleLockWindowButton(textures));
+            AddButton(new CloseWindowButton(deps.Textures));
+            AddButton(new ToggleLockWindowButton(deps.Textures));
         }
 
         protected override void OnBoundsChanged()
