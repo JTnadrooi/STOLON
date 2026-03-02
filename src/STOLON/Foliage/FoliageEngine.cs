@@ -1,6 +1,7 @@
 ﻿using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -116,9 +117,7 @@ namespace STOLON
                 float distToRight = Math.Abs(basePos.X - _point2.X);
                 int spaceToEnds = (int)Math.Min(distToLeft, distToRight) * 2;
 
-                int spaceToPrevious = float.IsNegativeInfinity(lastPlacedRight) ?
-                    int.MaxValue :
-                    (int)((basePos.X - lastPlacedRight) * 2 / overlapMod);
+                int spaceToPrevious = float.IsNegativeInfinity(lastPlacedRight) ? int.MaxValue : (int)((basePos.X - lastPlacedRight) * 2 / overlapMod);
 
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious);
 
@@ -126,7 +125,7 @@ namespace STOLON
 
                 if (texture is null) continue;
 
-                bool drawMirrored = _seed % 2 == 0;
+                bool drawMirrored = unchecked((_seed * i) % 2) == 0;
                 Vector2 pos = basePos + offset;
 
                 NumberHelper.OnPixel(ref pos);
@@ -180,7 +179,41 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class FoliageEngine : IUpdatable
     {
-        private readonly record struct FoliageAsset(Texture2D Texture, Point Size, int Offset);
+        private readonly record struct FoliageAsset(Texture2D Texture, Sides SupportedSides, int BaseOffset, int BaseStart, int BaseLenght)
+        {
+            public FoliageAsset(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1
+            {
+                Texture = texture;
+
+                const string foliagePrefix = "foliage";
+
+                string textureName = Path.GetFileNameWithoutExtension(texture.Name);
+
+                Debug.Assert(textureName.StartsWith(foliagePrefix));
+
+                string metadataStr = textureName[foliagePrefix.Length..].Split("-").Last();
+                string[] parts = metadataStr.Split(';');
+
+                SupportedSides = parts[0] switch
+                {
+                    "l" => Sides.Left,
+                    "t" => Sides.Top,
+                    "r" => Sides.Right,
+                    "b" => Sides.Bottom,
+                    _ => throw new Exception()
+                };
+
+                BaseOffset = int.Parse(parts[1]);
+
+                int baseStart = int.Parse(parts[2]);
+
+                int baseLenght = int.Parse(parts[3]);
+                baseLenght = baseLenght <= 0 ? texture.Width : baseLenght;
+
+                BaseStart = baseStart;
+                BaseLenght = baseLenght;
+            }
+        }
 
         private readonly ITexture2DCollection _textures;
         private readonly Random _random;
@@ -201,7 +234,7 @@ namespace STOLON
 
             foliageTextures.AddRange(textures.Resources.Where(kvp => kvp.Key.Contains("foliage")).Select(kvp => kvp.Value));
 
-            _foliageAssets = foliageTextures.Select(t => new FoliageAsset(t, t.Bounds.Size, 1)).ToArray();
+            _foliageAssets = foliageTextures.Select(t => new FoliageAsset(t)).ToArray();
         }
 
         internal int Register(Foliage foliage)
@@ -217,7 +250,7 @@ namespace STOLON
                 seed = Math.Abs(seed); // just to be sure.
             }
 
-            return seed;
+            return Math.Abs(seed);
         }
 
         internal void Deregister(Foliage foliage)
@@ -248,7 +281,7 @@ namespace STOLON
 
             FoliageAsset result = availibleFoliageAssets[foliageAssetIndex];
 
-            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availibleFoliageAssets[foliageAssetIndex].Offset);
+            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availibleFoliageAssets[foliageAssetIndex].BaseOffset);
 
             Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")");
 
