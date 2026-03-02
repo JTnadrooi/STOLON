@@ -67,7 +67,7 @@ namespace STOLON
             _point1 = p1;
             _point2 = p2;
 
-            _count = 5;
+            _count = (int)Vector2.Distance(p1, p2) / 25;
 
             _cache = new List<FoliageAssetDrawInfo>(_count);
             _seed = engine.Register(this);
@@ -246,8 +246,6 @@ namespace STOLON
             unchecked
             {
                 seed *= foliage.GetHashCode();
-                seed = seed < 0 ? seed / 2 : seed;
-                seed = Math.Abs(seed); // just to be sure.
             }
 
             return Math.Abs(seed);
