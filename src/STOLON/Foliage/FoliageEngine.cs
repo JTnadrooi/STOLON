@@ -93,6 +93,8 @@ namespace STOLON
                 }
             }
 
+            if (_point1.Y != _point2.Y) throw new InvalidOperationException("Points must have same Y value.");
+
             Console.WriteLine("update points for " + _seed);
 
             _cache.Clear();
