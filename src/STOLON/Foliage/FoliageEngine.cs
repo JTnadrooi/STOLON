@@ -56,6 +56,7 @@ namespace STOLON
         private int _count;
         private bool _isDisposed;
         private List<FoliageAssetDrawInfo> _cache;
+        private List<Vector2> _pointCache;
 
         private Vector2 _point1;
         private Vector2 _point2;
@@ -68,8 +69,10 @@ namespace STOLON
             _point2 = p2;
 
             _count = (int)Vector2.Distance(p1, p2) / 25;
+            _count = 2;
 
             _cache = new List<FoliageAssetDrawInfo>(_count);
+            _pointCache = new List<Vector2>(_count);
             _seed = engine.Register(this);
 
             MaxReach = int.MaxValue;
@@ -93,18 +96,17 @@ namespace STOLON
             Console.WriteLine("update points for " + _seed);
 
             _cache.Clear();
+            _pointCache.Clear();
 
             float lenght = Vector2.Distance(_point1, _point2);
 
             float minSpacingMod = (1f / _count) * 0.5f;
 
-            Console.WriteLine(minSpacingMod);
-
             float segmentLenghtMod = 1f / _count;
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
-            float lastPlacedRight = float.NegativeInfinity;
-            float overlapMod = 1f; // more = less overlap allowed. (max 1)
+            float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
+            float overlapMod = .7f; // more = less overlap allowed. (max 1)
 
             for (int i = 0; i < _count; i++)
             {
@@ -112,29 +114,31 @@ namespace STOLON
                 float lerpAmount = i * segmentLenghtMod + jitter;
 
                 Vector2 basePos = Vector2.Lerp(_point1, _point2, lerpAmount);
+                _pointCache.Add(basePos);
 
                 float distToLeft = Math.Abs(basePos.X - _point1.X);
                 float distToRight = Math.Abs(basePos.X - _point2.X);
                 int spaceToEnds = (int)Math.Min(distToLeft, distToRight) * 2;
 
-                int spaceToPrevious = float.IsNegativeInfinity(lastPlacedRight) ? int.MaxValue : (int)((basePos.X - lastPlacedRight) * 2 / overlapMod);
+                int spaceToPrevious = lastPlacedFarBoundEndAlongLine == -1 ? STOLON.VWidth : (int)((((basePos - _point1).X - lastPlacedFarBoundEndAlongLine)) / overlapMod);
 
-                int maxSpace = Math.Min(spaceToEnds, spaceToPrevious);
+                int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
 
                 Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, MaxReach, out Vector2 offset);
 
-                if (texture is null) continue;
+                if (texture is null)
+                    continue;
 
                 bool drawMirrored = unchecked((_seed * i) % 2) == 0;
-                Vector2 pos = basePos + offset;
+                Vector2 drawPos = basePos + offset;
 
-                NumberHelper.OnPixel(ref pos);
+                NumberHelper.OnPixel(ref drawPos);
 
-                if (!addedTextures.Contains(texture))
+                //if (!addedTextures.Contains(texture))
                 {
-                    _cache.Add(new FoliageAssetDrawInfo(texture, pos, drawMirrored));
+                    _cache.Add(new FoliageAssetDrawInfo(texture, drawPos, drawMirrored));
                     addedTextures.Add(texture);
-                    lastPlacedRight = pos.X + texture.Width * 0.5f;
+                    lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + texture.Width * 0.5f;
                 }
             }
         }
@@ -149,14 +153,16 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            //for (int i = 0; i < Points.Length; i++)
-            //{
-            //    drawingContext.DrawPoint(Points[i], Color.Aqua, 5);
-            //}
+            drawingContext.DrawPoint(_point1, Color.Blue, 6);
+            drawingContext.DrawPoint(_point2, Color.Blue, 6);
+
+            for (int i = 0; i < _pointCache.Count; i++)
+            {
+                drawingContext.DrawPoint(_pointCache[i], Color.Red, 6);
+            }
 
             for (int i = 0; i < _cache.Count; i++)
             {
-                //drawingContext.DrawPoint(_cache[i].Pos, Color.Red, 5);
                 drawingContext.Draw(_cache[i].Texture, _cache[i].Pos, effects: _cache[i].DrawMirrored ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             }
         }
@@ -259,11 +265,22 @@ namespace STOLON
         internal Texture2D? GetFoliageAsset(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
         {
             int foliageAssetIndex;
-            //FoliageAsset[] availibleFoliageAssets = _foliageAssets.Where(f => (f.Group & group) != 0).ToArray(); // sloww.
             FoliageAsset[] availibleFoliageAssets = _foliageAssets.Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY).ToArray(); // sloww.
+
+            //availibleFoliageAssets = _foliageAssets
+            //    .Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY)
+            //    .ToArray();
+            //if (availibleFoliageAssets.Length == 0)
+            //    availibleFoliageAssets = Array.Empty<FoliageAsset>();
+            //else
+            //    availibleFoliageAssets = availibleFoliageAssets
+            //        .OrderByDescending(f => f.Texture.Bounds.Width)
+            //        .Take(1)
+            //        .ToArray();
 
             if (availibleFoliageAssets.Length == 0)
             {
+                Console.WriteLine("failed for (" + sizeX + ", " + sizeY + ")");
                 offset = default;
                 return null;
             }
