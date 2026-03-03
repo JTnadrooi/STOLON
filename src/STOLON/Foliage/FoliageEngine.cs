@@ -10,7 +10,7 @@ namespace STOLON
 {
     public sealed class Foliage : IDrawable, IDisposable
     {
-        private readonly record struct FoliageAssetDrawInfo(Texture2D Texture, Vector2 Pos, bool DrawMirrored);
+        private readonly record struct FoliageTextureDrawInfo(Texture2D Texture, Vector2 Pos, bool DrawMirrored);
 
         private readonly FoliageEngine _engine;
 
@@ -55,7 +55,7 @@ namespace STOLON
 
         private int _count;
         private bool _isDisposed;
-        private List<FoliageAssetDrawInfo> _cache;
+        private List<FoliageTextureDrawInfo> _cache;
         private List<Vector2> _pointCache;
 
         private Vector2 _point1;
@@ -71,7 +71,7 @@ namespace STOLON
             _count = (int)Vector2.Distance(p1, p2) / 25;
             _count = 2;
 
-            _cache = new List<FoliageAssetDrawInfo>(_count);
+            _cache = new List<FoliageTextureDrawInfo>(_count);
             _pointCache = new List<Vector2>(_count);
             _seed = engine.Register(this);
 
@@ -124,7 +124,7 @@ namespace STOLON
 
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
 
-                Texture2D? texture = _engine.GetFoliageAsset(_seed, i, maxSpace, MaxReach, out Vector2 offset);
+                Texture2D? texture = _engine.GetTexture(_seed, i, maxSpace, MaxReach, out Vector2 offset);
 
                 if (texture is null)
                     continue;
@@ -136,7 +136,7 @@ namespace STOLON
 
                 //if (!addedTextures.Contains(texture))
                 {
-                    _cache.Add(new FoliageAssetDrawInfo(texture, drawPos, drawMirrored));
+                    _cache.Add(new FoliageTextureDrawInfo(texture, drawPos, drawMirrored));
                     addedTextures.Add(texture);
                     lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + texture.Width * 0.5f;
                 }
@@ -185,9 +185,9 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class FoliageEngine : IUpdatable
     {
-        private readonly record struct FoliageAsset(Texture2D Texture, Sides SupportedSides, int BaseOffset, int BaseStart, int BaseLenght)
+        private readonly record struct FoliageTexture(Texture2D Texture, Sides SupportedSides, int BaseOffset, int BaseStart, int BaseLenght)
         {
-            public FoliageAsset(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1
+            public FoliageTexture(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1
             {
                 Texture = texture;
 
@@ -225,7 +225,7 @@ namespace STOLON
         private readonly Random _random;
 
         private readonly List<WeakReference<Foliage>> _foliages; // its a word.
-        private readonly FoliageAsset[] _foliageAssets;
+        private readonly FoliageTexture[] _foliageTextures;
 
         private const int MaxFoliages = 100;
 
@@ -240,7 +240,7 @@ namespace STOLON
 
             foliageTextures.AddRange(textures.Resources.Where(kvp => kvp.Key.Contains("foliage")).Select(kvp => kvp.Value));
 
-            _foliageAssets = foliageTextures.Select(t => new FoliageAsset(t)).ToArray();
+            _foliageTextures = foliageTextures.Select(t => new FoliageTexture(t)).ToArray();
         }
 
         internal int Register(Foliage foliage)
@@ -262,23 +262,23 @@ namespace STOLON
             _foliages.RemoveAll(wr => wr.TryGetTarget(out Foliage? f) && f == foliage);
         }
 
-        internal Texture2D? GetFoliageAsset(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
+        internal Texture2D? GetTexture(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
         {
-            int foliageAssetIndex;
-            FoliageAsset[] availibleFoliageAssets = _foliageAssets.Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY).ToArray(); // sloww.
+            int foliageTextureIndex;
+            FoliageTexture[] availableFoliageTextures = _foliageTextures.Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY).ToArray(); // sloww.
 
-            //availibleFoliageAssets = _foliageAssets
+            //availableFoliageTextures = _foliageTextures
             //    .Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY)
             //    .ToArray();
-            //if (availibleFoliageAssets.Length == 0)
-            //    availibleFoliageAssets = Array.Empty<FoliageAsset>();
+            //if (availableFoliageTextures.Length == 0)
+            //    availableFoliageTextures = Array.Empty<FoliageTexture>();
             //else
-            //    availibleFoliageAssets = availibleFoliageAssets
+            //    availableFoliageTextures = availableFoliageTextures
             //        .OrderByDescending(f => f.Texture.Bounds.Width)
             //        .Take(1)
             //        .ToArray();
 
-            if (availibleFoliageAssets.Length == 0)
+            if (availableFoliageTextures.Length == 0)
             {
                 Console.WriteLine("failed for (" + sizeX + ", " + sizeY + ")");
                 offset = default;
@@ -291,12 +291,12 @@ namespace STOLON
                 hash = hash * 397 ^ index;
                 hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF);
                 hash = Math.Abs(hash);
-                foliageAssetIndex = hash % availibleFoliageAssets.Length;
+                foliageTextureIndex = hash % availableFoliageTextures.Length;
             }
 
-            FoliageAsset result = availibleFoliageAssets[foliageAssetIndex];
+            FoliageTexture result = availableFoliageTextures[foliageTextureIndex];
 
-            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availibleFoliageAssets[foliageAssetIndex].BaseOffset);
+            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availableFoliageTextures[foliageTextureIndex].BaseOffset);
 
             Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")");
 
