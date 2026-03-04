@@ -236,7 +236,7 @@ namespace STOLON
 
             public FoliageTexture(Texture2D texture)
             {
-                Texture = texture ?? throw new ArgumentNullException(nameof(texture));
+                Texture = texture;
 
                 string textureName = Path.GetFileNameWithoutExtension(texture.Name);
                 IsCorner = textureName.StartsWith(FoliageCornerPrefix);
@@ -283,6 +283,12 @@ namespace STOLON
                 else
                     BaseLenght = defaultBaseLength;
             }
+
+            public override readonly string ToString()
+            {
+                string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : "";
+                return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLenght}, IsCorner: {IsCorner}{cornerInfo}}}";
+            }
         }
 
         private readonly ITexture2DCollection _textures;
@@ -316,9 +322,10 @@ namespace STOLON
             unchecked
             {
                 seed *= foliage.GetHashCode();
+                seed = Math.Abs(seed);
             }
 
-            return Math.Abs(seed);
+            return seed;
         }
 
         internal void Deregister(Foliage foliage)
