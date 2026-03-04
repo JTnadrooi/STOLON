@@ -74,8 +74,8 @@ namespace STOLON
 
         public override readonly string ToString()
         {
-            string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : "";
-            return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLength}, IsCorner: {IsCorner}{cornerInfo}}}";
+            string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : string.Empty;
+            return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), BaseLength: {BaseLength}, IsCorner: {IsCorner}{cornerInfo}}}";
         }
     }
 
