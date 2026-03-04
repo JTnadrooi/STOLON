@@ -198,7 +198,7 @@ namespace STOLON
                 if (foliageTexture is not null)
                 {
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point1 + offset, false));
-                    lastPlacedFarBoundEndAlongLine += foliageTexture.Value.Texture.Width;
+                    lastPlacedFarBoundEndAlongLine += foliageTexture.Value.BaseLength;
                 }
             }
 
@@ -232,7 +232,7 @@ namespace STOLON
                 {
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, drawPos, drawMirrored));
                     addedTextures.Add(foliageTexture.Value.Texture);
-                    lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + foliageTexture.Value.Texture.Width * 0.5f;
+                    lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + foliageTexture.Value.BaseLength * 0.5f;
                 }
             }
 
@@ -373,13 +373,13 @@ namespace STOLON
             else
             {
                 float baseXOffset = mirrored
-                    ? (-result.Texture.Width / 2) - result.BaseX
-                    : (-result.Texture.Width / 2) + result.BaseX;
+                    ? -(result.Texture.Width - (result.BaseLength + result.BaseX)) - (result.BaseLength / 2)
+                    : -result.BaseX - (result.BaseLength / 2);
 
                 offset = new Vector2(baseXOffset, baseYOffset);
             }
 
-            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : ""));
+            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : string.Empty));
 
             return result;
         }
