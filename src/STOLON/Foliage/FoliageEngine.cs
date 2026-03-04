@@ -175,6 +175,8 @@ namespace STOLON
             }
 
             if (_point1.Y != _point2.Y) throw new InvalidOperationException("Points must have same Y value.");
+            if (_point1.X > _point2.X) throw new InvalidOperationException("Point1 must be more left than Point2.");
+            if (_point1 == _point2) throw new InvalidOperationException("Points cannot be the same.");
 
             Console.WriteLine("update points for " + _seed);
 
@@ -189,7 +191,7 @@ namespace STOLON
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
             float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
-            float overlapMod = .5f; // more = less overlap allowed. (max 1)
+            float overlapMod = .7f; // more = less overlap allowed. (max 1)
 
             if (Hash01(unchecked(_seed * 15 * (int)lenght)) > 0.66f)
             {
