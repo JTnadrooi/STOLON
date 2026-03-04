@@ -9,6 +9,76 @@ using System.Threading.Tasks;
 
 namespace STOLON
 {
+    internal readonly struct FoliageTexture
+    {
+        public readonly Texture2D Texture;
+        public readonly Sides SupportedSides;
+        public readonly int BaseX;
+        public readonly int BaseY;
+        public readonly int BaseLength;
+        public readonly bool IsCorner;
+        public readonly CornerType? CornerType;
+
+        private const string FoliageCornerPrefix = "foliage_c";
+        private const string FoliagePrefix = "foliage";
+
+        public FoliageTexture(Texture2D texture)
+        {
+            Texture = texture;
+
+            string textureName = Path.GetFileNameWithoutExtension(texture.Name);
+            IsCorner = textureName.StartsWith(FoliageCornerPrefix);
+
+            if (!textureName.StartsWith(FoliagePrefix))
+                throw new InvalidOperationException($"Foliage texture '{texture.Name}' does not start with '{FoliagePrefix}'.");
+
+            string metadataStr = textureName[(IsCorner ? FoliageCornerPrefix : FoliagePrefix).Length..].Split("-").Last();
+            string[] parts = metadataStr.Split(';');
+
+            if (parts.Length != 3 && parts.Length != 4)
+                throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
+
+            SupportedSides = IsCorner ? Sides.Top : parts[0] switch
+            {
+                "t" => Sides.Top,
+                _ => throw new InvalidOperationException($"Invalid side specification '{parts[0]}' for texture '{texture.Name}'.")
+            };
+
+            if (IsCorner)
+                CornerType = parts[0] switch
+                {
+                    "t" => global::STOLON.CornerType.Top,
+                    _ => throw new InvalidOperationException($"Invalid corner type '{parts[0]}' for texture '{texture.Name}'.")
+                };
+            else
+                CornerType = null;
+
+            if (!int.TryParse(parts[1], out BaseX))
+                throw new InvalidOperationException($"Invalid BaseX value '{parts[1]}' for texture '{texture.Name}'.");
+
+            if (!int.TryParse(parts[2], out BaseY))
+                throw new InvalidOperationException($"Invalid BaseY value '{parts[2]}' for texture '{texture.Name}'.");
+
+            int defaultBaseLength = texture.Width - BaseX;
+
+            if (parts.Length == 4)
+            {
+                if (int.TryParse(parts[3], out int parsedLength))
+                    BaseLength = parsedLength <= 0 ? defaultBaseLength : parsedLength;
+                else
+                    throw new InvalidOperationException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
+            }
+            else
+                BaseLength = defaultBaseLength;
+        }
+
+        public override readonly string ToString()
+        {
+            string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : "";
+            return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLength}, IsCorner: {IsCorner}{cornerInfo}}}";
+        }
+    }
+
     public sealed class Foliage : IDrawable, IDisposable
     {
         private readonly record struct FoliageTextureDrawInfo(Texture2D Texture, Vector2 Pos, bool DrawMirrored);
@@ -123,11 +193,13 @@ namespace STOLON
 
             if (Hash01(_seed * 15) > 0.66f)
             {
-                Texture2D? texture = _engine.GetTexture(_seed, 1, (int)lenght, MaxReach, CornerType.Top, false, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)lenght, MaxReach, CornerType.Top, false, out Vector2 offset);
 
-                if (texture is not null)
-                    _cache.Add(new FoliageTextureDrawInfo(texture, _point1 + offset, false));
-                lastPlacedFarBoundEndAlongLine += texture.Width;
+                if (foliageTexture is not null)
+                {
+                    _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point1 + offset, false));
+                    lastPlacedFarBoundEndAlongLine += foliageTexture.Value.Texture.Width;
+                }
             }
 
             for (int i = 0; i < _count; i++)
@@ -147,29 +219,29 @@ namespace STOLON
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
                 bool drawMirrored = unchecked((_seed * i) % 2) == 0;
 
-                Texture2D? texture = _engine.GetTexture(_seed, i, maxSpace, MaxReach, null, drawMirrored, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, MaxReach, null, drawMirrored, out Vector2 offset);
 
-                if (texture is null)
+                if (foliageTexture is null)
                     continue;
 
                 Vector2 drawPos = basePos + offset;
 
                 NumberHelper.OnPixel(ref drawPos);
 
-                if (!addedTextures.Contains(texture))
+                if (!addedTextures.Contains(foliageTexture.Value.Texture))
                 {
-                    _cache.Add(new FoliageTextureDrawInfo(texture, drawPos, drawMirrored));
-                    addedTextures.Add(texture);
-                    lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + texture.Width * 0.5f;
+                    _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, drawPos, drawMirrored));
+                    addedTextures.Add(foliageTexture.Value.Texture);
+                    lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + foliageTexture.Value.Texture.Width * 0.5f;
                 }
             }
 
             if (Hash01(_seed * 15) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
             {
-                Texture2D? texture = _engine.GetTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), MaxReach, CornerType.Top, true, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), MaxReach, CornerType.Top, true, out Vector2 offset);
 
-                if (texture is not null)
-                    _cache.Add(new FoliageTextureDrawInfo(texture, _point2 + offset, true));
+                if (foliageTexture is not null)
+                    _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point2 + offset, true));
             }
         }
 
@@ -221,76 +293,6 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class FoliageEngine : IUpdatable
     {
-        private readonly struct FoliageTexture
-        {
-            public readonly Texture2D Texture;
-            public readonly Sides SupportedSides;
-            public readonly int BaseX;
-            public readonly int BaseY;
-            public readonly int BaseLength;
-            public readonly bool IsCorner;
-            public readonly CornerType? CornerType;
-
-            private const string FoliageCornerPrefix = "foliage_c";
-            private const string FoliagePrefix = "foliage";
-
-            public FoliageTexture(Texture2D texture)
-            {
-                Texture = texture;
-
-                string textureName = Path.GetFileNameWithoutExtension(texture.Name);
-                IsCorner = textureName.StartsWith(FoliageCornerPrefix);
-
-                if (!textureName.StartsWith(FoliagePrefix))
-                    throw new InvalidOperationException($"Foliage texture '{texture.Name}' does not start with '{FoliagePrefix}'.");
-
-                string metadataStr = textureName[(IsCorner ? FoliageCornerPrefix : FoliagePrefix).Length..].Split("-").Last();
-                string[] parts = metadataStr.Split(';');
-
-                if (parts.Length != 3 && parts.Length != 4)
-                    throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
-
-                SupportedSides = IsCorner ? Sides.Top : parts[0] switch
-                {
-                    "t" => Sides.Top,
-                    _ => throw new InvalidOperationException($"Invalid side specification '{parts[0]}' for texture '{texture.Name}'.")
-                };
-
-                if (IsCorner)
-                    CornerType = parts[0] switch
-                    {
-                        "t" => global::STOLON.CornerType.Top,
-                        _ => throw new InvalidOperationException($"Invalid corner type '{parts[0]}' for texture '{texture.Name}'.")
-                    };
-                else
-                    CornerType = null;
-
-                if (!int.TryParse(parts[1], out BaseX))
-                    throw new InvalidOperationException($"Invalid BaseX value '{parts[1]}' for texture '{texture.Name}'.");
-
-                if (!int.TryParse(parts[2], out BaseY))
-                    throw new InvalidOperationException($"Invalid BaseY value '{parts[2]}' for texture '{texture.Name}'.");
-
-                int defaultBaseLength = texture.Width - BaseX;
-
-                if (parts.Length == 4)
-                {
-                    if (int.TryParse(parts[3], out int parsedLength))
-                        BaseLength = parsedLength <= 0 ? defaultBaseLength : parsedLength;
-                    else
-                        throw new InvalidOperationException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
-                }
-                else
-                    BaseLength = defaultBaseLength;
-            }
-
-            public override readonly string ToString()
-            {
-                string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : "";
-                return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLength}, IsCorner: {IsCorner}{cornerInfo}}}";
-            }
-        }
-
         private readonly ITexture2DCollection _textures;
         private readonly Random _random;
 
@@ -333,7 +335,7 @@ namespace STOLON
             _foliages.RemoveAll(wr => wr.TryGetTarget(out Foliage? f) && f == foliage);
         }
 
-        internal Texture2D? GetTexture(int seed, int index, int sizeX, int sizeY, CornerType? cornerType, bool mirrored, out Vector2 offset)
+        internal FoliageTexture? GetFoliageTexture(int seed, int index, int sizeX, int sizeY, CornerType? cornerType, bool mirrored, out Vector2 offset)
         {
             int foliageTextureIndex;
             FoliageTexture[] availableFoliageTextures = _foliageTextures
@@ -379,7 +381,7 @@ namespace STOLON
 
             Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : ""));
 
-            return result.Texture;
+            return result;
         }
 
         public void Update(int elapsedMilliseconds) // doesnt do anything yet as i dont have a wind shader..... (also doesnt get called!!)
