@@ -30,34 +30,34 @@ namespace STOLON
             IsCorner = textureName.StartsWith(FoliageCornerPrefix);
 
             if (!textureName.StartsWith(FoliagePrefix))
-                throw new InvalidOperationException($"Foliage texture '{texture.Name}' does not start with '{FoliagePrefix}'.");
+                throw new InvalidResourceException($"Foliage texture '{texture.Name}' does not start with '{FoliagePrefix}'.");
 
             string metadataStr = textureName[(IsCorner ? FoliageCornerPrefix : FoliagePrefix).Length..].Split("-").Last();
             string[] parts = metadataStr.Split(';');
 
             if (parts.Length != 3 && parts.Length != 4)
-                throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
+                throw new InvalidResourceException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
 
             SupportedSides = IsCorner ? Sides.Top : parts[0] switch
             {
                 "t" => Sides.Top,
-                _ => throw new InvalidOperationException($"Invalid side specification '{parts[0]}' for texture '{texture.Name}'.")
+                _ => throw new InvalidResourceException($"Invalid side specification '{parts[0]}' for texture '{texture.Name}'.")
             };
 
             if (IsCorner)
                 CornerType = parts[0] switch
                 {
                     "t" => global::STOLON.CornerType.Top,
-                    _ => throw new InvalidOperationException($"Invalid corner type '{parts[0]}' for texture '{texture.Name}'.")
+                    _ => throw new InvalidResourceException($"Invalid corner type '{parts[0]}' for texture '{texture.Name}'.")
                 };
             else
                 CornerType = null;
 
             if (!int.TryParse(parts[1], out BaseX))
-                throw new InvalidOperationException($"Invalid BaseX value '{parts[1]}' for texture '{texture.Name}'.");
+                throw new InvalidResourceException($"Invalid BaseX value '{parts[1]}' for texture '{texture.Name}'.");
 
             if (!int.TryParse(parts[2], out BaseY))
-                throw new InvalidOperationException($"Invalid BaseY value '{parts[2]}' for texture '{texture.Name}'.");
+                throw new InvalidResourceException($"Invalid BaseY value '{parts[2]}' for texture '{texture.Name}'.");
 
             int defaultBaseLength = texture.Width - BaseX;
 
@@ -66,7 +66,7 @@ namespace STOLON
                 if (int.TryParse(parts[3], out int parsedLength))
                     BaseLength = parsedLength <= 0 ? defaultBaseLength : parsedLength;
                 else
-                    throw new InvalidOperationException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
+                    throw new InvalidResourceException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
             }
             else
                 BaseLength = defaultBaseLength;
