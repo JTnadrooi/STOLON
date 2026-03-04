@@ -1,6 +1,7 @@
 ﻿using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -220,67 +221,67 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class FoliageEngine : IUpdatable
     {
-        private readonly record struct FoliageTexture(Texture2D Texture, Sides SupportedSides, int BaseX, int BaseY, int BaseLenght)
+        private readonly struct FoliageTexture
         {
-            public bool IsCorner { get; }
-            public CornerType? CornerType { get; }
+            public readonly Texture2D Texture;
+            public readonly Sides SupportedSides;
+            public readonly int BaseX;
+            public readonly int BaseY;
+            public readonly int BaseLenght;
+            public readonly bool IsCorner;
+            public readonly CornerType? CornerType;
 
             private const string FoliageCornerPrefix = "foliage_c";
             private const string FoliagePrefix = "foliage";
 
-            public FoliageTexture(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1 OR foliage1-t;1;1
+            public FoliageTexture(Texture2D texture)
             {
-                Texture = texture;
+                Texture = texture ?? throw new ArgumentNullException(nameof(texture));
 
                 string textureName = Path.GetFileNameWithoutExtension(texture.Name);
-
                 IsCorner = textureName.StartsWith(FoliageCornerPrefix);
 
-                Debug.Assert(textureName.StartsWith(FoliagePrefix));
+                if (!textureName.StartsWith(FoliagePrefix))
+                    throw new InvalidOperationException($"Foliage texture '{texture.Name}' does not start with '{FoliagePrefix}'.");
 
                 string metadataStr = textureName[(IsCorner ? FoliageCornerPrefix : FoliagePrefix).Length..].Split("-").Last();
                 string[] parts = metadataStr.Split(';');
 
-                if (parts.Length != 3 && parts.Length != 4) throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
+                if (parts.Length != 3 && parts.Length != 4)
+                    throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
 
-                //SupportedSides = parts[0] switch
-                //{
-                //    "l" => Sides.Left,
-                //    "t" => Sides.Top,
-                //    "r" => Sides.Right,
-                //    "b" => Sides.Bottom,
-                //    _ => throw new Exception()
-                //};
                 SupportedSides = IsCorner ? Sides.Top : parts[0] switch
                 {
                     "t" => Sides.Top,
-                    _ => throw new Exception()
+                    _ => throw new InvalidOperationException($"Invalid side specification '{parts[0]}' for texture '{texture.Name}'.")
                 };
 
                 if (IsCorner)
-                {
                     CornerType = parts[0] switch
                     {
                         "t" => global::STOLON.CornerType.Top,
-                        _ => throw new Exception()
+                        _ => throw new InvalidOperationException($"Invalid corner type '{parts[0]}' for texture '{texture.Name}'.")
                     };
-                }
+                else
+                    CornerType = null;
 
-                BaseX = int.Parse(parts[1]);
+                if (!int.TryParse(parts[1], out BaseX))
+                    throw new InvalidOperationException($"Invalid BaseX value '{parts[1]}' for texture '{texture.Name}'.");
 
-                BaseY = int.Parse(parts[2]);
+                if (!int.TryParse(parts[2], out BaseY))
+                    throw new InvalidOperationException($"Invalid BaseY value '{parts[2]}' for texture '{texture.Name}'.");
 
-                int defaultBaseLenght = texture.Width - BaseX;
-                int baseLenght;
+                int defaultBaseLength = texture.Width - BaseX;
+
                 if (parts.Length == 4)
                 {
-                    baseLenght = int.Parse(parts[3]);
-                    baseLenght = baseLenght <= 0 ? defaultBaseLenght : baseLenght;
+                    if (int.TryParse(parts[3], out int parsedLength))
+                        BaseLenght = parsedLength <= 0 ? defaultBaseLength : parsedLength;
+                    else
+                        throw new InvalidOperationException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
                 }
                 else
-                    baseLenght = defaultBaseLenght;
-
-                BaseLenght = baseLenght;
+                    BaseLenght = defaultBaseLength;
             }
         }
 
