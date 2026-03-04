@@ -114,6 +114,8 @@ namespace STOLON
         /// </summary>
         public int MaxReach { get; set; }
 
+        public Func<float, int> ReachFormula { get; set; }
+
         /// <summary>
         /// Gets or sets the <see cref="global::STOLON.Line"/> from <see cref="Point1"/> to <see cref="Point2"/>.
         /// </summary>
@@ -157,6 +159,7 @@ namespace STOLON
             _seed = engine.Register(this);
 
             MaxReach = int.MaxValue;
+            ReachFormula = m => int.MaxValue;
 
             UpdatePoints(); // _count gets set here
         }
@@ -195,7 +198,7 @@ namespace STOLON
 
             if (Hash01(unchecked(_seed * 15 * (int)lenght)) > 0.66f)
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)lenght, MaxReach, CornerType.Top, false, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)lenght, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
 
                 if (foliageTexture is not null)
                 {
@@ -221,7 +224,7 @@ namespace STOLON
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
                 bool drawMirrored = unchecked((_seed * i) % 2) == 0;
 
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, MaxReach, null, drawMirrored, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach), null, drawMirrored, out Vector2 offset);
 
                 if (foliageTexture is null)
                     continue;
@@ -240,7 +243,7 @@ namespace STOLON
 
             if (Hash01(unchecked(_seed * 33 * (int)lenght)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), MaxReach, CornerType.Top, true, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), MaxReach), CornerType.Top, true, out Vector2 offset);
 
                 if (foliageTexture is not null)
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point2 + offset, true));
