@@ -227,7 +227,7 @@ namespace STOLON
             public readonly Sides SupportedSides;
             public readonly int BaseX;
             public readonly int BaseY;
-            public readonly int BaseLenght;
+            public readonly int BaseLength;
             public readonly bool IsCorner;
             public readonly CornerType? CornerType;
 
@@ -276,18 +276,18 @@ namespace STOLON
                 if (parts.Length == 4)
                 {
                     if (int.TryParse(parts[3], out int parsedLength))
-                        BaseLenght = parsedLength <= 0 ? defaultBaseLength : parsedLength;
+                        BaseLength = parsedLength <= 0 ? defaultBaseLength : parsedLength;
                     else
                         throw new InvalidOperationException($"Invalid BaseLength value '{parts[3]}' for texture '{texture.Name}'.");
                 }
                 else
-                    BaseLenght = defaultBaseLength;
+                    BaseLength = defaultBaseLength;
             }
 
             public override readonly string ToString()
             {
                 string cornerInfo = IsCorner ? $", CornerType: {CornerType}" : "";
-                return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLenght}, IsCorner: {IsCorner}{cornerInfo}}}";
+                return $"{{Texture: {Texture.Name}, SupportedSides: {SupportedSides}, Base: ({BaseX}, {BaseY}), Length: {BaseLength}, IsCorner: {IsCorner}{cornerInfo}}}";
             }
         }
 
@@ -310,7 +310,7 @@ namespace STOLON
 
             foliageTextures.AddRange(textures.Resources.Where(kvp => kvp.Key.Contains("foliage")).Select(kvp => kvp.Value));
 
-            _foliageTextures = foliageTextures.Select(t => new FoliageTexture(t)).ToArray();
+            _foliageTextures = foliageTextures.Select(t => new FoliageTexture(t)).OrderBy(t => t.Texture.Name).ToArray();
         }
 
         internal int Register(Foliage foliage)
@@ -338,7 +338,7 @@ namespace STOLON
             int foliageTextureIndex;
             FoliageTexture[] availableFoliageTextures = _foliageTextures
                 .Where(f => f.CornerType == cornerType &&
-                            f.BaseLenght < sizeX &&
+                            f.BaseLength < sizeX &&
                             f.Texture.Bounds.Height - f.BaseY < sizeY)
                 .ToArray();
 
