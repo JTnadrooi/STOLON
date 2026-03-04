@@ -224,6 +224,7 @@ namespace STOLON
 
             _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
             _topFoliage.MaxReach = 20;
+            _topFoliage.DrawCorners = true;
 
             _kernel.RegisterWindow(this);
 

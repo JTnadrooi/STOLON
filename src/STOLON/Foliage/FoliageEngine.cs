@@ -16,6 +16,7 @@ namespace STOLON
 
         private readonly int _seed;
 
+        private Vector2 _point1;
         public Vector2 Point1
         {
             get => _point1;
@@ -26,6 +27,7 @@ namespace STOLON
             }
         }
 
+        private Vector2 _point2;
         public Vector2 Point2
         {
             get => _point2;
@@ -53,13 +55,21 @@ namespace STOLON
             }
         }
 
+        public bool _drawCorners;
+        public bool DrawCorners
+        {
+            get => _drawCorners;
+            set
+            {
+                _drawCorners = value;
+                UpdatePoints();
+            }
+        }
+
         private int _count;
         private bool _isDisposed;
         private List<FoliageTextureDrawInfo> _cache;
         private List<Vector2> _pointCache;
-
-        private Vector2 _point1;
-        private Vector2 _point2;
 
         public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
         {
@@ -69,7 +79,7 @@ namespace STOLON
             _point2 = p2;
 
             _count = (int)Vector2.Distance(p1, p2) / 25;
-            _count = 2;
+            _count = 4;
 
             _cache = new List<FoliageTextureDrawInfo>(_count);
             _pointCache = new List<Vector2>(_count);
@@ -108,7 +118,16 @@ namespace STOLON
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
             float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
-            float overlapMod = .7f; // more = less overlap allowed. (max 1)
+            float overlapMod = .5f; // more = less overlap allowed. (max 1)
+
+            if (Hash01(_seed * 15) > 0.66f)
+            {
+                Texture2D? texture = _engine.GetTexture(_seed, 1, (int)lenght, MaxReach, CornerType.Top, false, out Vector2 offset);
+
+                if (texture is not null)
+                    _cache.Add(new FoliageTextureDrawInfo(texture, _point1 + offset, false));
+                lastPlacedFarBoundEndAlongLine += texture.Width;
+            }
 
             for (int i = 0; i < _count; i++)
             {
@@ -125,23 +144,31 @@ namespace STOLON
                 int spaceToPrevious = lastPlacedFarBoundEndAlongLine == -1 ? STOLON.VWidth : (int)((((basePos - _point1).X - lastPlacedFarBoundEndAlongLine)) / overlapMod);
 
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
+                bool drawMirrored = unchecked((_seed * i) % 2) == 0;
 
-                Texture2D? texture = _engine.GetTexture(_seed, i, maxSpace, MaxReach, out Vector2 offset);
+                Texture2D? texture = _engine.GetTexture(_seed, i, maxSpace, MaxReach, null, drawMirrored, out Vector2 offset);
 
                 if (texture is null)
                     continue;
 
-                bool drawMirrored = unchecked((_seed * i) % 2) == 0;
                 Vector2 drawPos = basePos + offset;
 
                 NumberHelper.OnPixel(ref drawPos);
 
-                //if (!addedTextures.Contains(texture))
+                if (!addedTextures.Contains(texture))
                 {
                     _cache.Add(new FoliageTextureDrawInfo(texture, drawPos, drawMirrored));
                     addedTextures.Add(texture);
                     lastPlacedFarBoundEndAlongLine = (basePos - _point1).X + texture.Width * 0.5f;
                 }
+            }
+
+            if (Hash01(_seed * 15) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
+            {
+                Texture2D? texture = _engine.GetTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), MaxReach, CornerType.Top, true, out Vector2 offset);
+
+                if (texture is not null)
+                    _cache.Add(new FoliageTextureDrawInfo(texture, _point2 + offset, true));
             }
         }
 
@@ -155,13 +182,13 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawPoint(_point1, Color.Blue, 6);
-            drawingContext.DrawPoint(_point2, Color.Blue, 6);
+            //drawingContext.DrawPoint(_point1, Color.Blue, 6);
+            //drawingContext.DrawPoint(_point2, Color.Blue, 6);
 
-            for (int i = 0; i < _pointCache.Count; i++)
-            {
-                drawingContext.DrawPoint(_pointCache[i], Color.Red, 6);
-            }
+            //for (int i = 0; i < _pointCache.Count; i++)
+            //{
+            //    drawingContext.DrawPoint(_pointCache[i], Color.Red, 6);
+            //}
 
             for (int i = 0; i < _cache.Count; i++)
             {
@@ -184,41 +211,75 @@ namespace STOLON
         }
     }
 
+    public enum CornerType
+    {
+        Top,
+        Bottom,
+    }
+
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class FoliageEngine : IUpdatable
     {
-        private readonly record struct FoliageTexture(Texture2D Texture, Sides SupportedSides, int BaseOffset, int BaseStart, int BaseLenght)
+        private readonly record struct FoliageTexture(Texture2D Texture, Sides SupportedSides, int BaseX, int BaseY, int BaseLenght)
         {
-            public FoliageTexture(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1
+            public bool IsCorner { get; }
+            public CornerType? CornerType { get; }
+
+            private const string FoliageCornerPrefix = "foliage_c";
+            private const string FoliagePrefix = "foliage";
+
+            public FoliageTexture(Texture2D texture) : this(default!, default, default, default, default) // foliage1-t;1;1;1 OR foliage1-t;1;1
             {
                 Texture = texture;
 
-                const string foliagePrefix = "foliage";
-
                 string textureName = Path.GetFileNameWithoutExtension(texture.Name);
 
-                Debug.Assert(textureName.StartsWith(foliagePrefix));
+                IsCorner = textureName.StartsWith(FoliageCornerPrefix);
 
-                string metadataStr = textureName[foliagePrefix.Length..].Split("-").Last();
+                Debug.Assert(textureName.StartsWith(FoliagePrefix));
+
+                string metadataStr = textureName[(IsCorner ? FoliageCornerPrefix : FoliagePrefix).Length..].Split("-").Last();
                 string[] parts = metadataStr.Split(';');
 
-                SupportedSides = parts[0] switch
+                if (parts.Length != 3 && parts.Length != 4) throw new InvalidOperationException($"Invalid foliage '{texture.Name}' with {parts.Length} metadata parts.");
+
+                //SupportedSides = parts[0] switch
+                //{
+                //    "l" => Sides.Left,
+                //    "t" => Sides.Top,
+                //    "r" => Sides.Right,
+                //    "b" => Sides.Bottom,
+                //    _ => throw new Exception()
+                //};
+                SupportedSides = IsCorner ? Sides.Top : parts[0] switch
                 {
-                    "l" => Sides.Left,
                     "t" => Sides.Top,
-                    "r" => Sides.Right,
-                    "b" => Sides.Bottom,
                     _ => throw new Exception()
                 };
 
-                BaseOffset = int.Parse(parts[1]);
+                if (IsCorner)
+                {
+                    CornerType = parts[0] switch
+                    {
+                        "t" => global::STOLON.CornerType.Top,
+                        _ => throw new Exception()
+                    };
+                }
 
-                int baseStart = int.Parse(parts[2]);
+                BaseX = int.Parse(parts[1]);
 
-                int baseLenght = int.Parse(parts[3]);
-                baseLenght = baseLenght <= 0 ? texture.Width : baseLenght;
+                BaseY = int.Parse(parts[2]);
 
-                BaseStart = baseStart;
+                int defaultBaseLenght = texture.Width - BaseX;
+                int baseLenght;
+                if (parts.Length == 4)
+                {
+                    baseLenght = int.Parse(parts[3]);
+                    baseLenght = baseLenght <= 0 ? defaultBaseLenght : baseLenght;
+                }
+                else
+                    baseLenght = defaultBaseLenght;
+
                 BaseLenght = baseLenght;
             }
         }
@@ -264,21 +325,14 @@ namespace STOLON
             _foliages.RemoveAll(wr => wr.TryGetTarget(out Foliage? f) && f == foliage);
         }
 
-        internal Texture2D? GetTexture(int seed, int index, int sizeX, int sizeY, out Vector2 offset)
+        internal Texture2D? GetTexture(int seed, int index, int sizeX, int sizeY, CornerType? cornerType, bool mirrored, out Vector2 offset)
         {
             int foliageTextureIndex;
-            FoliageTexture[] availableFoliageTextures = _foliageTextures.Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY).ToArray(); // sloww.
-
-            //availableFoliageTextures = _foliageTextures
-            //    .Where(f => f.Texture.Bounds.Width < sizeX && f.Texture.Bounds.Height < sizeY)
-            //    .ToArray();
-            //if (availableFoliageTextures.Length == 0)
-            //    availableFoliageTextures = Array.Empty<FoliageTexture>();
-            //else
-            //    availableFoliageTextures = availableFoliageTextures
-            //        .OrderByDescending(f => f.Texture.Bounds.Width)
-            //        .Take(1)
-            //        .ToArray();
+            FoliageTexture[] availableFoliageTextures = _foliageTextures
+                .Where(f => f.CornerType == cornerType &&
+                            f.BaseLenght < sizeX &&
+                            f.Texture.Bounds.Height - f.BaseY < sizeY)
+                .ToArray();
 
             if (availableFoliageTextures.Length == 0)
             {
@@ -292,15 +346,30 @@ namespace STOLON
                 int hash = seed;
                 hash = hash * 397 ^ index;
                 hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF);
+                hash = hash * 397 ^ (mirrored ? 1 : 0);
                 hash = Math.Abs(hash);
                 foliageTextureIndex = hash % availableFoliageTextures.Length;
             }
 
             FoliageTexture result = availableFoliageTextures[foliageTextureIndex];
+            float baseYOffset = -result.Texture.Height + result.BaseY;
 
-            offset = new Vector2(-result.Texture.Width / 2, -result.Texture.Height + availableFoliageTextures[foliageTextureIndex].BaseOffset);
+            if (result.IsCorner)
+            {
+                offset = mirrored
+                    ? new Vector2(result.BaseX - result.Texture.Width, baseYOffset)
+                    : new Vector2(-result.BaseX, baseYOffset);
+            }
+            else
+            {
+                float baseXOffset = mirrored
+                    ? (-result.Texture.Width / 2) - result.BaseX
+                    : (-result.Texture.Width / 2) + result.BaseX;
 
-            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")");
+                offset = new Vector2(baseXOffset, baseYOffset);
+            }
+
+            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : ""));
 
             return result.Texture;
         }
