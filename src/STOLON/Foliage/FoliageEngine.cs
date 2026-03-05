@@ -224,7 +224,7 @@ namespace STOLON
             float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
             float overlapMod = .7f; // more = less overlap allowed. (max 1)
 
-            if (Hash01(unchecked(_seed * 15 * (int)lenght)) > 0.66f)
+            if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)lenght)) > 0.66f)
             {
                 FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)lenght, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
 
@@ -269,7 +269,7 @@ namespace STOLON
                 }
             }
 
-            if (Hash01(unchecked(_seed * 33 * (int)lenght)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
+            if (DrawCorners && Hash01(unchecked(_seed * 33 * (int)lenght)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
             {
                 FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), MaxReach), CornerType.Top, true, out Vector2 offset);
 
