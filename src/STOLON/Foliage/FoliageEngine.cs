@@ -167,6 +167,9 @@ namespace STOLON
         private List<FoliageTextureDrawInfo> _cache;
         private List<Vector2> _pointCache;
 
+        /// <param name="line">The line used for the foliage to follow. This line must be exactly horizontal, with <see cref="Line.Start"/>.X less than <see cref="Line.End"/>.X.</param>
+        public Foliage(FoliageEngine engine, Line line) : this(engine, line.Start, line.End) { }
+
         /// <param name="p1">The first point. Must have the same Y value as <paramref name="p2"/> and a lower X value.</param>
         /// <param name="p2">The second point. Must have the same Y value as <paramref name="p1"/> and a higher X value.</param>
         public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
