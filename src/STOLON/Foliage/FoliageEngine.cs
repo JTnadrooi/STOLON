@@ -123,18 +123,36 @@ namespace STOLON
             }
         }
 
+        private int _maxReach;
         /// <summary>
         /// Gets or sets the maximum amount of distance this foliage can reach from the <see cref="Line"/>. 
         /// </summary>
-        public int MaxReach { get; set; }
+        public int MaxReach
+        {
+            get => _maxReach;
+            set
+            {
+                _maxReach = value;
+                UpdatePoints();
+            }
+        }
 
+        private Func<float, int> _reachFormula;
         /// <summary>
         /// Gets or sets the formula that determines foliage reach dynamically based on position along the <see cref="Line"/>.
         /// The input parameter (0 to 1) represents how far the current point is across the line.
         /// The output value will be clamped to <see cref="MaxReach"/>.
         /// <code>Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach)</code>
         /// </summary>
-        public Func<float, int> ReachFormula { get; set; }
+        public Func<float, int> ReachFormula
+        {
+            get => _reachFormula;
+            set
+            {
+                _reachFormula = value;
+                UpdatePoints();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="global::STOLON.Line"/> from <see cref="Point1"/> to <see cref="Point2"/>.
@@ -186,8 +204,8 @@ namespace STOLON
             _pointCache = new List<Vector2>(_count);
             _seed = engine.Register(this);
 
-            MaxReach = int.MaxValue;
-            ReachFormula = m => int.MaxValue;
+            _maxReach = int.MaxValue;
+            _reachFormula = m => int.MaxValue;
 
             UpdatePoints(); // _count gets set here
         }
@@ -226,7 +244,7 @@ namespace STOLON
 
             if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)length)) > 0.66f) // corner 1
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)length, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)length, Math.Min(ReachFormula.Invoke(0f), _maxReach), CornerType.Top, false, out Vector2 offset);
 
                 if (foliageTexture is not null)
                 {
@@ -253,7 +271,7 @@ namespace STOLON
                 int maxSpace = Math.Min(spaceToEnds * 2, spaceToPrevious * 2); // * 2 because textures are centered on the basePos. (x only)
                 bool drawMirrored = unchecked((_seed + i) & 1) == 0;
 
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach), null, drawMirrored, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, Math.Min(ReachFormula.Invoke(lerpAmount), _maxReach), null, drawMirrored, out Vector2 offset);
 
                 if (foliageTexture is null)
                     continue;
@@ -272,7 +290,7 @@ namespace STOLON
 
             if (DrawCorners && Hash01(unchecked(_seed * 33 * (int)length)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(length - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), MaxReach), CornerType.Top, true, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(length - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), _maxReach), CornerType.Top, true, out Vector2 offset);
 
                 if (foliageTexture is not null)
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point2 + offset, true));
