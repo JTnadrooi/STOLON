@@ -38,11 +38,20 @@ namespace STOLON
 
         static Scene()
         {
-            Configuration config = STOLON.Services.Resolve<Configuration>();
+            if (STOLON.IsInitiated)
+            {
+                Configuration config = STOLON.Services.Resolve<Configuration>();
 
-            SkipTarget = config.GetString("debug.skip.target");
-            SkipSceneAnimation = config.GetBool("debug.skip.skip_gamestage_animation");
-            SkipParameters = config.Get<string[]>("debug.skip.parameters").AsReadOnly();
+                SkipTarget = config.GetString("debug.skip.target");
+                SkipSceneAnimation = config.GetBool("debug.skip.skip_gamestage_animation");
+                SkipParameters = config.Get<string[]>("debug.skip.parameters").AsReadOnly();
+            }
+            else
+            {
+                SkipTarget = string.Empty;
+                SkipSceneAnimation = false;
+                SkipParameters = Array.Empty<string>().AsReadOnly();
+            }
         }
     }
 
