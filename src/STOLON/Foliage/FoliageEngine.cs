@@ -79,6 +79,10 @@ namespace STOLON
         }
     }
 
+    /// <summary>
+    /// Represents a line of foliage drawn between two points.
+    /// The points must have the same Y value, and the first point must be more left than the second.
+    /// </summary>
     public sealed class Foliage : IDrawable, IDisposable
     {
         private readonly record struct FoliageTextureDrawInfo(Texture2D Texture, Vector2 Pos, bool DrawMirrored);
@@ -88,6 +92,11 @@ namespace STOLON
         private readonly int _seed;
 
         private Vector2 _point1;
+        /// <summary>
+        /// Gets or sets the first point. Must have the same Y value as <see cref="Point2"/> and a lower X value.
+        /// Recalculates foliage positions when set.
+        /// Use <see cref="SetPoints(Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2)"/> for setting both points to prevent recalculating foliage texture positions twice.
+        /// </summary>
         public Vector2 Point1
         {
             get => _point1;
@@ -99,6 +108,11 @@ namespace STOLON
         }
 
         private Vector2 _point2;
+        /// <summary>
+        /// Gets or sets the second point. Must have the same Y value as <see cref="Point1"/> and a higher X value.
+        /// Recalculates foliage positions when set.
+        /// Use <see cref="SetPoints(Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2)"/> for setting both points to prevent recalculating foliage texture positions twice.
+        /// </summary>
         public Vector2 Point2
         {
             get => _point2;
@@ -114,6 +128,12 @@ namespace STOLON
         /// </summary>
         public int MaxReach { get; set; }
 
+        /// <summary>
+        /// Gets or sets the formula that determines foliage reach dynamically based on position along the <see cref="Line"/>.
+        /// The input parameter (0 to 1) represents how far the current point is across the line.
+        /// The output value will be clamped to <see cref="MaxReach"/>.
+        /// <code>Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach)</code>
+        /// </summary>
         public Func<float, int> ReachFormula { get; set; }
 
         /// <summary>
@@ -129,6 +149,9 @@ namespace STOLON
         }
 
         public bool _drawCorners;
+        /// <summary>
+        /// Gets or sets if this <see cref="Foliage"/> instance will draw corner specific foliage textures.
+        /// </summary>
         public bool DrawCorners
         {
             get => _drawCorners;
@@ -144,6 +167,11 @@ namespace STOLON
         private List<FoliageTextureDrawInfo> _cache;
         private List<Vector2> _pointCache;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p1">The first point. Must have the same Y value as <paramref name="p2"/> and a lower X value.</param>
+        /// <param name="p2">The second point. Must have the same Y value as <paramref name="p1"/> and a higher X value.</param>
         public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
         {
             _engine = engine;
@@ -250,6 +278,9 @@ namespace STOLON
             }
         }
 
+        /// <summary>
+        /// Sets both <see cref="Point1"/> and <see cref="Point2"/> at once. Use this to prevent recalculating foliage twice when setting both points.
+        /// </summary>
         public void SetPoints(Vector2 p1, Vector2 p2)
         {
             _point1 = p1;
@@ -274,6 +305,10 @@ namespace STOLON
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="Foliage"/> instance spanning the top of the rectangle.
+        /// </summary>
+        /// <returns>A <see cref="Foliage"/> instance spanning the top of the rectangle.</returns>
         public static Foliage FromRectangle(FoliageEngine engine, Rectangle r)
         {
             return new Foliage(engine, new Vector2(r.Left, r.Bottom), new Vector2(r.Right, r.Bottom)); // inverted y.
@@ -289,7 +324,7 @@ namespace STOLON
         }
     }
 
-    public enum CornerType
+    internal enum CornerType
     {
         Top,
         Bottom,
