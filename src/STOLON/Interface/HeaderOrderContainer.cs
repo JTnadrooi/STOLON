@@ -10,7 +10,7 @@
         private const int PaddingX = 8;
         private const int PaddingY = 4;
 
-        public HeaderOrderContainer(IEnumerable<UIElement> elements, Font2D font, IInputManager input, Vector2? position = null) : base(elements, input, position)
+        public HeaderOrderContainer(IInputManager input, IEnumerable<UIElement> elements, Font2D font, Vector2? position = null) : base(input, elements, position)
         {
             _font = font;
             _leftSpace = 0;

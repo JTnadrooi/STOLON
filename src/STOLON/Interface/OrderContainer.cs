@@ -22,7 +22,7 @@
         private readonly List<int> _visibleIndices;
         private readonly IInputManager _input;
 
-        protected OrderContainer(IEnumerable<UIElement> elements, IInputManager input, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        protected OrderContainer(IInputManager input, IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
 

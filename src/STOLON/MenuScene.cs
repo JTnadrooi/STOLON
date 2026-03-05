@@ -9,14 +9,16 @@ namespace STOLON
         private Vector2 _origin;
 
         private readonly Font2D _font;
-        private readonly InputManager _input;
+        private readonly IInputManager _input;
 
-        public MenuOrderContainer(IEnumerable<UIElement> elements, Font2D font, IInputManager input, Vector2? position = null) : base(elements, input, position)
+        public MenuOrderContainer(IInputManager input, IEnumerable<UIElement> elements, Font2D font, Vector2? position = null) : base(input, elements, position)
         {
             _font = font;
-            _input = STOLON.Services.Resolve<InputManager>();
+            _input = input;
         }
+
         public override void PrepareOrdering(Vector2 origin, int elementCount) => _origin = origin;
+
         public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
@@ -162,7 +164,7 @@ namespace STOLON
 
             _entityProfiles = [_environment.Entities.Values.First().Profile, _environment.Entities.Values.Last().Profile];
 
-            _mainOrderContainer = new MenuOrderContainer([
+            _mainOrderContainer = new MenuOrderContainer(_input, [
                 new UIElement("story_start", UIElement.TopId, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
                 new UIElement("com_start", UIElement.TopId, "COM", UIElementType.Listen, clickSound: _audio["coin_4"]),
                 new UIElement("xp_start", UIElement.TopId, "2P", UIElementType.Listen, clickSound: _audio["coin_4"]),
@@ -173,7 +175,7 @@ namespace STOLON
                 new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: _audio["exit_3"]),
                 new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
                 new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
-            ], _fonts.Medium, _input);
+            ], _fonts.Medium);
 
             //switch (_skipTo)
             //{
