@@ -2,6 +2,8 @@
 {
     public sealed class MouseInfo : IUpdatable
     {
+        private readonly Lazy<DrawingContext> _drawingContext;
+
         private MouseState _currentState;
         private MouseState _previousState;
         private Vector2 _previousPos;
@@ -18,8 +20,10 @@
         /// </summary>
         public int ScrollDelta { get; private set; }
 
-        public MouseInfo()
+        public MouseInfo(Lazy<DrawingContext> drawingContext)
         {
+            _drawingContext = drawingContext;
+
             Cursor = MouseCursor.Arrow;
         }
 
@@ -34,7 +38,7 @@
         } == ButtonState.Pressed;
 
         private Vector2 TransformMousePos(Vector2 pos)
-            => Vector2.Transform(pos - STOLON.DrawingContext.GameWindowDrawOffsetWithCorrectedY, STOLON.DrawingContext.InvertYMatrix) / STOLON.DrawingContext.Scale;
+            => Vector2.Transform(pos - _drawingContext.Value.GameWindowDrawOffsetWithCorrectedY, _drawingContext.Value.InvertYMatrix) / _drawingContext.Value.Scale;
 
         public void SetCursor(MouseCursor cursor)
         {

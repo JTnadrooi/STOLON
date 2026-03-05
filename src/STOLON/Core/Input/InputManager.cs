@@ -28,10 +28,10 @@ namespace STOLON
 
         private const int MaxDrawables = 128;
 
-        public InputManager()
+        public InputManager(Lazy<DrawingContext> drawingContext)
         {
             Keyboard = new KeyboardInfo();
-            Mouse = new MouseInfo();
+            Mouse = new MouseInfo(drawingContext);
 
             _drawnDrawables = new List<DrawableHitboxInfo>(64);
             _lastFrameDrawables = Array.Empty<DrawableHitboxInfo>();

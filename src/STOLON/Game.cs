@@ -197,7 +197,6 @@ namespace STOLON
         public static string Version { get; } = File.ReadAllText(".version");
         public static bool IsInitiated => _instance is not null;
         public static STOLON Instance => _instance ?? throw new InvalidOperationException("STOLON is not initiated.");
-        public static DrawingContext DrawingContext => _drawingContext ?? throw new InvalidOperationException("STOLON is not initiated.");
 
         private static STOLON? _instance;
         private static IContainer? _services;
