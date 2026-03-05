@@ -8,9 +8,11 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class STOLON : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private int _desiredModifier;
-        private Point _oldWindowSize;
+        private readonly IRichLogger _logger;
+        private readonly IInputManager _input;
+        private readonly ITaskHeap _tasks;
+        private readonly IConfiguration _config;
+        private Environment _environment;
 
         public DiscordRichPresence DRP { get; private set; }
         public Point DesiredDimensions => new Point(AspectRatioX * _desiredModifier, AspectRatioY * _desiredModifier);
@@ -19,11 +21,10 @@ namespace STOLON
 
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
 
-        private readonly IRichLogger _logger;
-        private readonly IInputManager _input;
-        private readonly ITaskHeap _tasks;
-        private readonly IConfiguration _config;
-        private Environment _environment;
+        private Foliage _topFoliage;
+        private GraphicsDeviceManager _graphics;
+        private int _desiredModifier;
+        private Point _oldWindowSize;
 
 #pragma warning disable CS8618
         public STOLON(IRichLogger logger,
@@ -36,7 +37,6 @@ namespace STOLON
             _input = input;
             _tasks = tasks;
             _config = config;
-
             _instance = this;
 
             _graphics = new GraphicsDeviceManager(this);
@@ -132,6 +132,9 @@ namespace STOLON
             _environment = Services.Resolve<Environment>();
             _environment.Initialize();
 
+            _topFoliage = new Foliage(Services.Resolve<FoliageEngine>(), Line.CreateHorizontal(0, STOLON.VWidth, STOLON.VHeight), maxReachFunction: f => (int)(f * STOLON.VHeight + 20), drawCorners: true);
+            //_topFoliage.ReachFormula = f => 20;
+
             bool silenceConsole = !_config.GetBool("debug.log.enable");
             if (silenceConsole) _logger.Log("console will be silenced.");
             _logger.Silent = silenceConsole;
@@ -180,6 +183,7 @@ namespace STOLON
                 _environment.Draw(_drawingContext);
                 //_drawingContext.DrawString(_fonts.Small, Version, new Vector2(V_WIDTH / 2 - _fonts.Small.FastMeasure(Version).X / 2, 500));
                 _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
+                _topFoliage.Draw(_drawingContext);
 
                 _drawingContext.EndScene();
             }
