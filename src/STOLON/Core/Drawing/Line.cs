@@ -1,11 +1,11 @@
-﻿namespace STOLON
+﻿using System.Runtime.CompilerServices;
+
+namespace STOLON
 {
     public readonly struct Line : IEquatable<Line> // does not implement IDrawable, see DrawLine().
     {
         public readonly Vector2 Start;
         public readonly Vector2 End;
-
-        public float Length => Vector2.Distance(Start, End);
 
         public Line(Vector2 start, Vector2 end)
         {
@@ -16,10 +16,14 @@
         public Line(float startX, float startY, float endX, float endY)
             : this(new Vector2(startX, startY), new Vector2(endX, endY)) { }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Line Offset(Vector2 amount)
         {
             return new Line(Start + amount, End + amount);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float GetLength() => Vector2.Distance(Start, End); // not calling it Length() like with Vector2.Length()
 
         public bool IsNear(Vector2 vector, int threshold = 10)
         {
