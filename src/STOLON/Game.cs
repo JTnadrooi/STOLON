@@ -12,31 +12,43 @@ namespace STOLON
         private readonly IInputManager _input;
         private readonly ITaskHeap _tasks;
         private readonly IConfiguration _config;
-        private Environment _environment;
+        private readonly Lazy<Environment> _environment;
+        private readonly Lazy<DiscordRichPresence> _drp;
+        private readonly Lazy<IEnumerable<IResourceCollection>> _resourceCollections;
+        private readonly Lazy<FoliageEngine> _foliageEngine;
+        private readonly Lazy<DrawingContext> _drawingContext;
 
-        public DiscordRichPresence DRP { get; private set; }
         public Point DesiredDimensions => new Point(AspectRatioX * _desiredModifier, AspectRatioY * _desiredModifier);
         public Point ScreenCenter => new Point(VWidth / 2, VHeight / 2);
         public float ScreenScale { get; private set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager => _graphics;
 
-        private Foliage _topFoliage;
+        private Foliage? _topFoliage;
         private GraphicsDeviceManager _graphics;
         private int _desiredModifier;
         private Point _oldWindowSize;
 
-#pragma warning disable CS8618
         public STOLON(IRichLogger logger,
             IInputManager input,
             ITaskHeap tasks,
-            IConfiguration config)
-#pragma warning restore CS8618
+            IConfiguration config,
+            Lazy<Environment> environment,
+            Lazy<DiscordRichPresence> drp,
+            Lazy<IEnumerable<IResourceCollection>> resourceCollections,
+            Lazy<FoliageEngine> foliageEngine,
+            Lazy<DrawingContext> drawingContext)
         {
             _logger = logger;
             _input = input;
             _tasks = tasks;
             _config = config;
+            _environment = environment;
+            _drp = drp;
+            _resourceCollections = resourceCollections;
+            _foliageEngine = foliageEngine;
+            _drawingContext = drawingContext;
+
             _instance = this;
 
             _graphics = new GraphicsDeviceManager(this);
@@ -46,7 +58,7 @@ namespace STOLON
 
         protected override void Initialize()
         {
-            DRP = new DiscordRichPresence();
+            _drp.Value.Initialize();
 
             _oldWindowSize = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
@@ -88,7 +100,7 @@ namespace STOLON
             ScreenScale = (GraphicsDevice.Viewport.Bounds.Size.Y / (float)VHeight);
             _desiredModifier = (int)(VirtualModifier * ScreenScale);
 
-            _drawingContext.UpdateResolution();
+            _drawingContext.Value.UpdateResolution();
             Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
         public void GoFullscreen()
@@ -116,24 +128,17 @@ namespace STOLON
         {
             _logger.Log(">[s]loading stolon content");
 
-
             int loadCount = 0;
-            foreach (IResourceCollection resourceCollection in Services.Resolve<IEnumerable<IResourceCollection>>())
+            foreach (IResourceCollection resourceCollection in _resourceCollections.Value)
             {
                 if (resourceCollection.IsLoaded) continue;
 
                 resourceCollection.LoadResources();
                 loadCount++;
             }
-            if (loadCount != 4) throw new Exception(loadCount.ToString());  // 4 because of the differnt asset types, ignore this. This is just checking if nothing is loaded more than once.
 
-            _drawingContext = Services.Resolve<DrawingContext>();
-
-            _environment = Services.Resolve<Environment>();
-            _environment.Initialize();
-
-            _topFoliage = new Foliage(Services.Resolve<FoliageEngine>(), Line.CreateHorizontal(0, STOLON.VWidth, STOLON.VHeight), maxReachFunction: f => (int)(f * STOLON.VHeight + 20), drawCorners: true);
-            //_topFoliage.ReachFormula = f => 20;
+            _environment.Value.Initialize();
+            _topFoliage = new Foliage(_foliageEngine.Value, Line.CreateHorizontal(0, STOLON.VWidth, STOLON.VHeight), maxReachFunction: f => (int)(f * STOLON.VHeight + 20), drawCorners: true);
 
             bool silenceConsole = !_config.GetBool("debug.log.enable");
             if (silenceConsole) _logger.Log("console will be silenced.");
@@ -161,14 +166,14 @@ namespace STOLON
 
                 _input.Update(elapsedMilliseconds);
                 _tasks.Update(elapsedMilliseconds);
-                _environment.Update(elapsedMilliseconds);
+                _environment.Value.Update(elapsedMilliseconds);
 
                 _input.PostUpdate(elapsedMilliseconds);
 
                 if (_input.IsPressed(Keys.LeftControl))
                 {
                     if (_input.IsClicked(Keys.F)) GoFullscreen();
-                    if (_input.IsClicked(Keys.S)) _drawingContext.Screenshot();
+                    if (_input.IsClicked(Keys.S)) _drawingContext.Value.Screenshot();
                 }
             }
             base.Update(gameTime);
@@ -178,14 +183,14 @@ namespace STOLON
         {
             if (IsActive)
             {
-                _drawingContext.BeginScene();
+                _drawingContext.Value.BeginScene();
 
-                _environment.Draw(_drawingContext);
+                _environment.Value.Draw(_drawingContext.Value);
                 //_drawingContext.DrawString(_fonts.Small, Version, new Vector2(V_WIDTH / 2 - _fonts.Small.FastMeasure(Version).X / 2, 500));
-                _drawingContext.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
-                _topFoliage.Draw(_drawingContext);
+                _drawingContext.Value.DrawRectangle(STOLON.Instance.GetVirtualBounds(), Color.White, 1);
+                _topFoliage!.Draw(_drawingContext.Value);
 
-                _drawingContext.EndScene();
+                _drawingContext.Value.EndScene();
             }
 
             base.Draw(gameTime);
@@ -200,7 +205,6 @@ namespace STOLON
 
         private static STOLON? _instance;
         private static IContainer? _services;
-        private static DrawingContext? _drawingContext;
         private readonly static Color[] _palette;
 
         public new static IContainer Services

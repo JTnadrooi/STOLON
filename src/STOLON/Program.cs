@@ -43,6 +43,7 @@ namespace STOLON
             }
 
             builder.Register<Random>(i => new Random()).SingleInstance();
+            builder.RegisterType<DiscordRichPresence>().AsSelf().SingleInstance();
             builder.Register<CommandEngine>(i => new CommandEngine()
             {
                 DefaultInfoFactory = new KernelCommandInfoFactory(),
