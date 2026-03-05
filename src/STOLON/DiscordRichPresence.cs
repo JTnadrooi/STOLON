@@ -16,7 +16,6 @@ namespace STOLON
             //{
             //	Level = LogLevel.Warning,
             //};
-            _client.Initialize();
             _presence = new RichPresence()
             {
                 Details = "STOLON",
@@ -28,6 +27,11 @@ namespace STOLON
                     SmallImageKey = string.Empty,
                 }
             };
+        }
+
+        public void Initialize()
+        {
+            _client.Initialize();
             _client.SetPresence(_presence);
         }
 
