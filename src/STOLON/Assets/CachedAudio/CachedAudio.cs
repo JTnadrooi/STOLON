@@ -13,9 +13,9 @@ namespace STOLON
         public long Position => _position;
         public CachedAudio CachedAudio => _cachedAudio;
         public WaveFormat WaveFormat => CachedAudio.WaveFormat;
-        public long Lenght => CachedAudio.Data.Length;
+        public long Length => CachedAudio.Data.Length;
         public bool Finished => AvailableSamples < 1;
-        public long AvailableSamples => Lenght - Position;
+        public long AvailableSamples => Length - Position;
 
         public CachedAudioSampleProvider(CachedAudio audio) => _cachedAudio = audio;
 

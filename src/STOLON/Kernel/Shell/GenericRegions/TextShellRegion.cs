@@ -111,7 +111,7 @@ namespace STOLON
         public TextPosition Offset(int amount)
         {
             if (TryOffset(amount, out TextPosition? characterInfo)) return characterInfo.Value;
-            else throw new InvalidOperationException($"Offset '{this}' by {amount} on text lenght of '{_region.Text.Length}' failed.");
+            else throw new InvalidOperationException($"Offset '{this}' by {amount} on text length of '{_region.Text.Length}' failed.");
         }
 
         /// <summary>

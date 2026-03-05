@@ -71,7 +71,7 @@ namespace STOLON
 
         private int _divLine1X;
         private int _divLine2X;
-        private int _divLineLenght;
+        private int _divLineLength;
         private int _divLineWidth;
 
         private int _removeLineYAmount;
@@ -366,7 +366,7 @@ namespace STOLON
             _divLine1X = (int)(STOLON.VWidth / 2f) - lineFromMid;
             _divLine2X = (int)(STOLON.VWidth / 2f) + lineFromMid;
 
-            _divLineLenght = _drawLogoFilledTiles ? STOLON.VHeight : 0;
+            _divLineLength = _drawLogoFilledTiles ? STOLON.VHeight : 0;
             _divLineWidth = 2 + (menuFlashEnded ? 2 : 0);
 
             if (_millisecondsSinceStartup > 300) _logoRowsHidden = 4;
@@ -481,8 +481,8 @@ namespace STOLON
         }
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawLine(_divLine1X, -10f, _divLine1X, _divLineLenght, Color.White, _divLineWidth);
-            drawingContext.DrawLine(_divLine2X, -10f, _divLine2X, _divLineLenght, Color.White, _divLineWidth);
+            drawingContext.DrawLine(_divLine1X, -10f, _divLine1X, _divLineLength, Color.White, _divLineWidth);
+            drawingContext.DrawLine(_divLine2X, -10f, _divLine2X, _divLineLength, Color.White, _divLineWidth);
             if (_done && _showSplashtexts) drawingContext.DrawString(_fonts.Small, _splashText, _splashTextPos);
 
             if (_drawLogoLowResFonted)

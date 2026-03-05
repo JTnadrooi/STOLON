@@ -59,7 +59,7 @@ namespace STOLON
         public string TopId => _segments[0];
         public string ParentId => _segments[^1];
         public string DestinationId => _segments.Last();
-        public int Lenght => _segments.Length;
+        public int Length => _segments.Length;
         public ReadOnlySpan<string> Segments => _segments;
         private readonly string[] _segments;
         public UIPath(IEnumerable<string> segments) => _segments = segments.ToArray();

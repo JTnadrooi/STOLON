@@ -214,19 +214,19 @@ namespace STOLON
             _cache.Clear();
             _pointCache.Clear();
 
-            float lenght = Vector2.Distance(_point1, _point2);
+            float length = Vector2.Distance(_point1, _point2);
 
             float minSpacingMod = (1f / _count) * 0.5f;
 
-            float segmentLenghtMod = 1f / _count;
+            float segmentLengthMod = 1f / _count;
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
             float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
             float overlapMod = .7f; // more = less overlap allowed. (max 1)
 
-            if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)lenght)) > 0.66f)
+            if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)length)) > 0.66f)
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)lenght, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)length, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
 
                 if (foliageTexture is not null)
                 {
@@ -237,8 +237,8 @@ namespace STOLON
 
             for (int i = 0; i < _count; i++)
             {
-                float jitter = Hash01(_seed * (i + 1)) * (segmentLenghtMod - minSpacingMod);
-                float lerpAmount = i * segmentLenghtMod + jitter;
+                float jitter = Hash01(_seed * (i + 1)) * (segmentLengthMod - minSpacingMod);
+                float lerpAmount = i * segmentLengthMod + jitter;
 
                 Vector2 basePos = Vector2.Lerp(_point1, _point2, lerpAmount);
                 _pointCache.Add(basePos);
@@ -269,9 +269,9 @@ namespace STOLON
                 }
             }
 
-            if (DrawCorners && Hash01(unchecked(_seed * 33 * (int)lenght)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
+            if (DrawCorners && Hash01(unchecked(_seed * 33 * (int)length)) > 0.33f) // higher chance than first corner because of the higher change GetTexture fails
             {
-                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(lenght - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), MaxReach), CornerType.Top, true, out Vector2 offset);
+                FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)(length - lastPlacedFarBoundEndAlongLine), Math.Min(ReachFormula.Invoke(1f), MaxReach), CornerType.Top, true, out Vector2 offset);
 
                 if (foliageTexture is not null)
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, _point2 + offset, true));
