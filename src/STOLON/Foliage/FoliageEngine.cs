@@ -167,9 +167,6 @@ namespace STOLON
         private List<FoliageTextureDrawInfo> _cache;
         private List<Vector2> _pointCache;
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="p1">The first point. Must have the same Y value as <paramref name="p2"/> and a lower X value.</param>
         /// <param name="p2">The second point. Must have the same Y value as <paramref name="p1"/> and a higher X value.</param>
         public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
@@ -179,8 +176,8 @@ namespace STOLON
             _point1 = p1;
             _point2 = p2;
 
-            _count = (int)Vector2.Distance(p1, p2) / 25;
-            _count = 4;
+            _count = (int)Vector2.Distance(p1, p2) / 40;
+            //_count = 4;
 
             _cache = new List<FoliageTextureDrawInfo>(_count);
             _pointCache = new List<Vector2>(_count);
