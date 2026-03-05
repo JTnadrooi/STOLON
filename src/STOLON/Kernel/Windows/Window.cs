@@ -223,7 +223,7 @@ namespace STOLON
             //MaxSize = new Point(200);
 
             _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
-            _topFoliage.ReachFormula = f =>
+            _topFoliage.MaxReachFunction = f =>
             {
                 float result = 500;
 
