@@ -186,26 +186,27 @@ namespace STOLON
         private List<Vector2> _pointCache;
 
         /// <param name="line">The line used for the foliage to follow. This line must be exactly horizontal, with <see cref="Line.Start"/>.X less than <see cref="Line.End"/>.X.</param>
-        public Foliage(FoliageEngine engine, Line line) : this(engine, line.Start, line.End) { }
+        public Foliage(FoliageEngine engine, Line line, int maxReach = int.MaxValue, Func<float, int>? maxReachFunction = null, bool drawCorners = false)
+            : this(engine, line.Start, line.End, maxReach, maxReachFunction, drawCorners) { }
 
-        /// <param name="p1">The first point. Must have the same Y value as <paramref name="p2"/> and a lower X value.</param>
-        /// <param name="p2">The second point. Must have the same Y value as <paramref name="p1"/> and a higher X value.</param>
-        public Foliage(FoliageEngine engine, Vector2 p1, Vector2 p2)
+        /// <param name="point1">The first point. Must have the same Y value as <paramref name="point2"/> and a lower X value.</param>
+        /// <param name="point2">The second point. Must have the same Y value as <paramref name="point1"/> and a higher X value.</param>
+        public Foliage(FoliageEngine engine, Vector2 point1, Vector2 point2, int maxReach = int.MaxValue, Func<float, int>? maxReachFunction = null, bool drawCorners = false)
         {
             _engine = engine;
 
-            _point1 = p1;
-            _point2 = p2;
+            _point1 = point1;
+            _point2 = point2;
 
-            _count = (int)Vector2.Distance(p1, p2) / 40;
+            _count = (int)Vector2.Distance(point1, point2) / 40;
             //_count = 4;
 
             _cache = new List<FoliageTextureDrawInfo>(_count);
             _pointCache = new List<Vector2>(_count);
             _seed = engine.Register(this);
 
-            _maxReach = int.MaxValue;
-            _reachFormula = m => int.MaxValue;
+            _maxReach = maxReach;
+            _reachFormula = maxReachFunction ?? (m => int.MaxValue);
 
             UpdatePoints(); // _count gets set here
         }
@@ -328,9 +329,9 @@ namespace STOLON
         /// Gets a <see cref="Foliage"/> instance spanning the top of the rectangle.
         /// </summary>
         /// <returns>A <see cref="Foliage"/> instance spanning the top of the rectangle.</returns>
-        public static Foliage FromRectangle(FoliageEngine engine, Rectangle r)
+        public static Foliage FromRectangle(FoliageEngine engine, Rectangle rect, int maxReach = int.MaxValue, Func<float, int>? maxReachFunction = null, bool drawCorners = true)
         {
-            return new Foliage(engine, new Vector2(r.Left, r.Bottom), new Vector2(r.Right, r.Bottom)); // inverted y.
+            return new Foliage(engine, new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Right, rect.Bottom), maxReach, maxReachFunction, drawCorners); // inverted y.
         }
 
         public void Dispose()

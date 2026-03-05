@@ -222,8 +222,7 @@ namespace STOLON
             MinSize = new Point(80, 20);
             //MaxSize = new Point(200);
 
-            _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds);
-            _topFoliage.MaxReachFunction = f =>
+            _topFoliage = Foliage.FromRectangle(_foliageEngine, OuterBounds, maxReachFunction: f =>
             {
                 float result = 500;
 
@@ -231,8 +230,7 @@ namespace STOLON
                 result += 20;
 
                 return (int)result;
-            };
-            _topFoliage.DrawCorners = true;
+            }, drawCorners: true);
 
             _kernel.RegisterWindow(this);
 
