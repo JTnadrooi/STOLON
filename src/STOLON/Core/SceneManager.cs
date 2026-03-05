@@ -58,18 +58,20 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class SceneManager : ISceneManager
     {
+        private readonly IContainer _container;
+
         private Scene? _currentScene;
 
         public Scene Current => _currentScene ?? throw new Exception();
 
-        public SceneManager()
+        public SceneManager(IContainer container)
         {
-
+            _container = container;
         }
 
         public void ChangeScene<T>() where T : Scene
         {
-            _currentScene = STOLON.Services.Resolve<T>();
+            _currentScene = _container.Resolve<T>();
         }
 
         public void Update(int elapsedMilliseconds)

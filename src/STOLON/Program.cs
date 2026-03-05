@@ -59,6 +59,7 @@ namespace STOLON
                     e.Instance.AddHook(hook);
                 }
             });
+            builder.Register<IContainer>(i => STOLON.Services).SingleInstance();
 
             _services = STOLON.Services = builder.Build();
             stopwatch.Stop();
