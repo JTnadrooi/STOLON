@@ -209,7 +209,7 @@ namespace STOLON
             if (_point1.X > _point2.X) throw new InvalidOperationException("Point1 must be more left than Point2.");
             if (_point1 == _point2) throw new InvalidOperationException("Points cannot be the same.");
 
-            Console.WriteLine("update points for " + _seed);
+            //Console.WriteLine("update points for " + _seed);
 
             _cache.Clear();
             _pointCache.Clear();
@@ -387,7 +387,7 @@ namespace STOLON
 
             if (availableFoliageTextures.Length == 0)
             {
-                Console.WriteLine("failed for (" + sizeX + ", " + sizeY + ")");
+                //Console.WriteLine("failed for (" + sizeX + ", " + sizeY + ")");
                 offset = default;
                 return null;
             }
@@ -420,7 +420,7 @@ namespace STOLON
                 offset = new Vector2(baseXOffset, baseYOffset);
             }
 
-            Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : string.Empty));
+            //Console.WriteLine(result.Texture.Name + " for (" + sizeX + ", " + sizeY + ")" + (mirrored ? " [mirrored]" : string.Empty));
 
             return result;
         }
