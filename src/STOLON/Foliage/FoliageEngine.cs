@@ -194,7 +194,7 @@ namespace STOLON
 
         private void UpdatePoints()
         {
-            static float Hash01(int x)
+            static float Hash01(int x) // [0, 1]
             {
                 unchecked
                 {
@@ -218,13 +218,13 @@ namespace STOLON
 
             float minSpacingMod = (1f / _count) * 0.5f;
 
-            float segmentLengthMod = 1f / _count;
+            float segmentLengthMod = 1f / _count; // basically length of each segment each point can occupy if it would be nicelly balanced. (1/2)
 
             HashSet<Texture2D> addedTextures = new HashSet<Texture2D>();
             float lastPlacedFarBoundEndAlongLine = -1; // 1d position of last placed along the line + half texture width. (NOT A MODIFIER)
             float overlapMod = .7f; // more = less overlap allowed. (max 1)
 
-            if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)length)) > 0.66f)
+            if (DrawCorners && Hash01(unchecked(_seed * 15 * (int)length)) > 0.66f) // corner 1
             {
                 FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, 1, (int)length, Math.Min(ReachFormula.Invoke(0f), MaxReach), CornerType.Top, false, out Vector2 offset);
 
@@ -237,7 +237,7 @@ namespace STOLON
 
             for (int i = 0; i < _count; i++)
             {
-                float jitter = Hash01(_seed * (i + 1)) * (segmentLengthMod - minSpacingMod);
+                float jitter = Hash01(_seed * (i + 1)) * (segmentLengthMod - minSpacingMod); // its not. (2/2)
                 float lerpAmount = i * segmentLengthMod + jitter;
 
                 Vector2 basePos = Vector2.Lerp(_point1, _point2, lerpAmount);
@@ -245,11 +245,12 @@ namespace STOLON
 
                 float distToLeft = Math.Abs(basePos.X - _point1.X);
                 float distToRight = Math.Abs(basePos.X - _point2.X);
-                int spaceToEnds = (int)Math.Min(distToLeft, distToRight) * 2;
+                int spaceToEnds = (int)Math.Min(distToLeft, distToRight);
 
+                // position has already been desided, but this makes sure larger textures dont overlap with the ones that came before.
                 int spaceToPrevious = lastPlacedFarBoundEndAlongLine == -1 ? STOLON.VWidth : (int)((((basePos - _point1).X - lastPlacedFarBoundEndAlongLine)) / overlapMod);
 
-                int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
+                int maxSpace = Math.Min(spaceToEnds * 2, spaceToPrevious * 2); // * 2 because textures are centered on the basePos. (x only)
                 bool drawMirrored = unchecked((_seed + i) & 1) == 0;
 
                 FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach), null, drawMirrored, out Vector2 offset);
@@ -257,11 +258,11 @@ namespace STOLON
                 if (foliageTexture is null)
                     continue;
 
-                Vector2 drawPos = basePos + offset;
+                Vector2 drawPos = basePos + offset; // because basePos is centered (x only), offset to implement all that texture metadata and proper offset to draw texture centered.
 
                 NumberHelper.OnPixel(ref drawPos);
 
-                if (!addedTextures.Contains(foliageTexture.Value.Texture))
+                if (!addedTextures.Contains(foliageTexture.Value.Texture)) // no duplicate textures.
                 {
                     _cache.Add(new FoliageTextureDrawInfo(foliageTexture.Value.Texture, drawPos, drawMirrored));
                     addedTextures.Add(foliageTexture.Value.Texture);
@@ -395,7 +396,7 @@ namespace STOLON
             {
                 int hash = seed;
                 hash = hash * 397 ^ index;
-                hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF);
+                hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF); // might wanna remove this later. (causes alot of texture switches when changing point to point distances)
                 hash = hash * 397 ^ (mirrored ? 1 : 0);
                 hash = Math.Abs(hash);
                 foliageTextureIndex = hash % availableFoliageTextures.Length;
@@ -413,7 +414,7 @@ namespace STOLON
             else
             {
                 float baseXOffset = mirrored
-                    ? -(result.Texture.Width - (result.BaseLength + result.BaseX)) - (result.BaseLength / 2)
+                    ? -(result.Texture.Width - (result.BaseLength + result.BaseX)) - (result.BaseLength / 2) // its never easy...
                     : -result.BaseX - (result.BaseLength / 2);
 
                 offset = new Vector2(baseXOffset, baseYOffset);
