@@ -222,7 +222,7 @@ namespace STOLON
                 int spaceToPrevious = lastPlacedFarBoundEndAlongLine == -1 ? STOLON.VWidth : (int)((((basePos - _point1).X - lastPlacedFarBoundEndAlongLine)) / overlapMod);
 
                 int maxSpace = Math.Min(spaceToEnds, spaceToPrevious * 2);
-                bool drawMirrored = unchecked((_seed * i) % 2) == 0;
+                bool drawMirrored = unchecked((_seed + i) & 1) == 0;
 
                 FoliageTexture? foliageTexture = _engine.GetFoliageTexture(_seed, i, maxSpace, Math.Min(ReachFormula.Invoke(lerpAmount), MaxReach), null, drawMirrored, out Vector2 offset);
 
