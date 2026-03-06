@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using System.Diagnostics.CodeAnalysis;
 
 namespace STOLON
 {
@@ -68,6 +69,11 @@ namespace STOLON
         public TScene GetCurrent<TScene>() where TScene : Scene => (TScene)Current;
 
         public bool IsCurrent<TScene>() where TScene : Scene => Current is TScene;
+
+        public bool TryGetCurrent([NotNullWhen(true)] out Scene? scene)
+        {
+            return (scene = _currentScene) is not null;
+        }
 
         public bool ShouldSkipAnimation(Scene scene)
         {
