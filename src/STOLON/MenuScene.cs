@@ -338,7 +338,7 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (Scene.SkipTarget)
+            switch (_sceneManager.SkipTarget)
             {
                 case "shell":
                     if (_millisecondsSinceStartup < 10000)
@@ -352,7 +352,7 @@ namespace STOLON
                     }
                     break;
             }
-            if (ShouldSkipAnimation() && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
+            if (_sceneManager.ShouldSkipAnimation(this) && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
 
             #region inFlash
             _millisecondsSinceStartup += elapsedMilliseconds;

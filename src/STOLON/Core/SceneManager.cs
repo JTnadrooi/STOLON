@@ -12,11 +12,6 @@ namespace STOLON
             Id = id;
         }
 
-        public string GetId() => GetId(this.GetType());
-        public bool ShouldSkipAnimation() => IsSkipTarget() && SkipSceneAnimation;
-        public bool IsSkipTarget() => SkipTarget == Id;
-        public ReadOnlyCollection<string>? GetSkipParameters() => IsSkipTarget() ? SkipParameters : null;
-
         public void Update(int elapsedMilliseconds)
         {
             UpdateInterface(elapsedMilliseconds);
@@ -27,46 +22,32 @@ namespace STOLON
 
         protected virtual void UpdateContent(int elapsedMilliseconds) { }
 
-        public static string GetId<T>() where T : Scene => GetId(typeof(T));
-        public static string GetId(Type type) => type.FullName ?? throw new Exception();
-
         public abstract void Draw(DrawingContext drawingContext);
-
-        public static string SkipTarget { get; }
-        public static bool SkipSceneAnimation { get; }
-        public static ReadOnlyCollection<string> SkipParameters { get; }
-
-        static Scene()
-        {
-            if (STOLON.IsInitiated)
-            {
-                Configuration config = STOLON.Services.Resolve<Configuration>();
-
-                SkipTarget = config.GetString("debug.skip.target");
-                SkipSceneAnimation = config.GetBool("debug.skip.skip_gamestage_animation");
-                SkipParameters = config.Get<string[]>("debug.skip.parameters").AsReadOnly();
-            }
-            else
-            {
-                SkipTarget = string.Empty;
-                SkipSceneAnimation = false;
-                SkipParameters = Array.Empty<string>().AsReadOnly();
-            }
-        }
     }
 
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class SceneManager : ISceneManager
     {
         private readonly IContainer _container;
+        private readonly Configuration _configuration;
+
+        private readonly bool _skipSceneAnimation;
+        private readonly IReadOnlyList<string>? _skipParameters;
 
         private Scene? _currentScene;
-
         public Scene Current => _currentScene ?? throw new Exception();
 
-        public SceneManager(IContainer container)
+        private readonly string? _skipTarget;
+        public string? SkipTarget => _skipTarget;
+
+        public SceneManager(IContainer container, Configuration configuration)
         {
             _container = container;
+            _configuration = configuration;
+
+            _skipTarget = _configuration.GetString("debug.skip.target");
+            _skipSceneAnimation = _configuration.GetBool("debug.skip.skip_gamestage_animation");
+            _skipParameters = _configuration.Get<string[]>("debug.skip.parameters");
         }
 
         public void ChangeScene<T>() where T : Scene
@@ -76,15 +57,38 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            _currentScene.Update(elapsedMilliseconds);
+            _currentScene?.Update(elapsedMilliseconds);
         }
 
         public void Draw(DrawingContext drawingContext)
         {
-            _currentScene.Draw(drawingContext);
+            _currentScene?.Draw(drawingContext);
         }
 
         public TScene GetCurrent<TScene>() where TScene : Scene => (TScene)Current;
+
         public bool IsCurrent<TScene>() where TScene : Scene => Current is TScene;
+
+        public bool ShouldSkipAnimation(Scene scene)
+        {
+            return IsSkipTarget(scene) && _skipSceneAnimation;
+        }
+
+        public bool IsSkipTarget(Scene scene)
+        {
+            return _skipTarget == scene.Id;
+        }
+
+        public IReadOnlyList<string>? GetSkipParameters(Scene scene)
+        {
+            return IsSkipTarget(scene) ? _skipParameters : null;
+        }
+
+        public bool IsCurrentSceneSkipTarget() => _currentScene is not null && IsSkipTarget(_currentScene);
+
+        public bool ShouldSkipCurrentAnimation() => _currentScene is not null && ShouldSkipAnimation(_currentScene);
+
+        public IReadOnlyList<string>? GetCurrentSkipParameters() =>
+            _currentScene is not null ? GetSkipParameters(_currentScene) : null;
     }
 }
