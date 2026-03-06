@@ -37,27 +37,34 @@ namespace STOLON
         {
             try
             {
-                if (Engine.Commands.ContainsKey(command.Split(" ")[0]))
+                if (Engine.Commands.ContainsKey(command.Split(" ")[0])) // to be improved when asitlib adapts better exceptions.
                 {
-                    Engine.Execute(command);
+                    CommandResult result = Engine.Execute(command);
+
+                    if (!result.IsVoid)
+                    {
+                        _shell.Value.WriteLine(result.ToOutputString());
+                    }
                 }
                 else
                 {
-                    _shell.Value.WriteLine($"'{command.Split(" ")[0]}' is not recognized as an internal or external command, operable program or batch file.");
+                    throw new CommandException($"'{command.Split(" ")[0]}' is not recognized as an internal or external command, operable program or batch file.");
                 }
             }
             catch (CommandException e)
             {
-                _shell.Value.WriteLine("Error: " + e.Message);
+                _shell.Value.WriteLine(e.Message);
             }
         }
 
-        public void SetFlag<TFlag>() where TFlag : CommandFlag, new() => SetFlag(typeof(TFlag));
-        public void SetFlag(Type flagType)
+        public TFlag SetFlag<TFlag>() where TFlag : CommandFlag, new() => (TFlag)SetFlag(typeof(TFlag));
+        public object SetFlag(Type flagType)
         {
             if (!flagType.IsAssignableTo<CommandFlag>()) throw new ArgumentException("Invalid flagtype.", nameof(flagType));
 
             ActiveFlag = (CommandFlag)Activator.CreateInstance(flagType)!;
+
+            return ActiveFlag;
         }
 
         /// <summary>
