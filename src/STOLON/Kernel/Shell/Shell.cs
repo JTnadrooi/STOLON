@@ -187,7 +187,8 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            _maxScrollAmount = 0;
+            int lastMaxScrollAmount = _maxScrollAmount;
+            _maxScrollAmount = 16;
             foreach (ShellRegion r in _regions)
             {
                 _maxScrollAmount += r.Height + RegionClearance;
@@ -198,6 +199,17 @@ namespace STOLON
 
             _scrollAmount -= _input.Mouse.ScrollDelta / 4;
             _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);
+
+            if (_scrollAmount == lastMaxScrollAmount && lastMaxScrollAmount < _maxScrollAmount)
+            {
+                _scrollAmount = _maxScrollAmount;
+            }
+
+            //Console.WriteLine("0----\n" +
+            //      "scr a" + _scrollAmount + "\n" +
+            //      "max a" + _maxScrollAmount + "\n" +
+            //      "last a" + lastMaxScrollAmount + "\n" +
+            //      "1----");
 
             foreach (ShellRegion region in _regions)
             {
