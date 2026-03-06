@@ -312,9 +312,11 @@ namespace STOLON
         public void WriteTexture(Texture2D texture)
         {
             bool reAddInputLine = false;
+            bool isCursorPostText = false;
 
             if (IsLastSectionAcceptingInput())
             {
+                isCursorPostText = (_regions[^1] as TextShellRegion).Cursor?.IsPostText ?? false;
                 (_regions[^1] as TextShellRegion).HasInputLine = false;
                 reAddInputLine = true;
             }
@@ -327,6 +329,9 @@ namespace STOLON
             if (reAddInputLine)
             {
                 HasInputLine = true;
+
+                if (isCursorPostText)
+                    (_regions[^1] as TextShellRegion).Cursor = TextPosition.GetPostText((TextShellRegion)_regions[^1]);
             }
         }
 
