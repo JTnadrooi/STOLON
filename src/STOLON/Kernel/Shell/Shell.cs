@@ -33,6 +33,8 @@ namespace STOLON
         private Rectangle _autocompletionRect;
         private Line[]? _autocompletionDividerLines;
         private string[]? _displayedAutocompletions;
+        private int _scrollAmount;
+        private int _maxScrollAmount;
 
         private TextPosition? _cursor; // null when out of bounds of any region.
 
@@ -120,7 +122,7 @@ namespace STOLON
         internal Vector2 GetRegionPos(ShellRegion region) // VERY SLOW, make regioninfo record and do in Update().
         {
             float x = _origin.X;
-            float y = STOLON.VHeight - RegionClearance;
+            float y = STOLON.VHeight - RegionClearance + _scrollAmount;
 
             foreach (ShellRegion r in _regions)
             {
@@ -185,6 +187,18 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
+            _maxScrollAmount = 0;
+            foreach (ShellRegion r in _regions)
+            {
+                _maxScrollAmount += r.Height + RegionClearance;
+                _maxScrollAmount -= r.VerticalOverlap;
+            }
+            _maxScrollAmount -= STOLON.VHeight;
+            _maxScrollAmount = Math.Max(_maxScrollAmount, 0);
+
+            _scrollAmount -= _input.Mouse.ScrollDelta / 4;
+            _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);
+
             foreach (ShellRegion region in _regions)
             {
                 region.Update(elapsedMilliseconds);
