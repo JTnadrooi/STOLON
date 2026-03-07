@@ -165,6 +165,8 @@ namespace STOLON
             }
         }
 
+        public bool IsResizing => ((ResizeController)Controllers["resize"]).IsResizing;
+
         public Matrix TransformMatrix { get; private set; }
         public Border Border { get; }
         protected IReadOnlyDictionary<Type, WindowButton> Buttons => _buttons;
