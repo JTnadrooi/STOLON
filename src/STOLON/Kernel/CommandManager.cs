@@ -57,6 +57,13 @@ namespace STOLON
             }
         }
 
+        public TFlag SetFlag<TFlag>(TFlag flag) where TFlag : CommandFlag
+        {
+            ActiveFlag = flag;
+
+            return (TFlag)ActiveFlag;
+        }
+
         public TFlag SetFlag<TFlag>() where TFlag : CommandFlag, new() => (TFlag)SetFlag(typeof(TFlag));
         public object SetFlag(Type flagType)
         {
