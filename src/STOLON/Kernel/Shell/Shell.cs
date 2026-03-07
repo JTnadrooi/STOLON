@@ -113,7 +113,7 @@ namespace STOLON
             {
                 TRegion newRegion = regionFactory.Invoke();
 
-                _regions.Add(newRegion);
+                WriteRegion(newRegion);
 
                 return newRegion;
             }
@@ -310,6 +310,14 @@ namespace STOLON
         public void Write<T>(T item) => EnsureLastRegionIsTextRegion().Write(item);
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
         public void WriteTexture(Texture2D texture)
+        {
+            WriteRegion(new WindowShellRegion(this, _kernel, _textures, new ImageWindow(_windowDeps, texture)
+            {
+                IsDrawnByKernel = false,
+            }));
+        }
+
+        public void WriteRegion(ShellRegion region)
         {
             bool reAddInputLine = false;
             bool isCursorPostText = false;
