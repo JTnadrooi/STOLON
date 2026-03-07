@@ -1,4 +1,5 @@
 ﻿using AsitLib.CommandLine;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -197,12 +198,15 @@ namespace STOLON
             _maxScrollAmount -= STOLON.VHeight;
             _maxScrollAmount = Math.Max(_maxScrollAmount, 0);
 
-            _scrollAmount -= _input.Mouse.ScrollDelta / 4;
-            _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);
-
-            if (_scrollAmount == lastMaxScrollAmount && lastMaxScrollAmount < _maxScrollAmount)
+            if (!Regions.Any(r => r is WindowShellRegion windowShellRegion && windowShellRegion.Window.IsResizing))
             {
-                _scrollAmount = _maxScrollAmount;
+                _scrollAmount -= _input.Mouse.ScrollDelta / 4;
+                _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);
+
+                if (_scrollAmount == lastMaxScrollAmount && lastMaxScrollAmount < _maxScrollAmount)
+                {
+                    _scrollAmount = _maxScrollAmount;
+                }
             }
 
             //Console.WriteLine("0----\n" +
@@ -329,10 +333,7 @@ namespace STOLON
                 reAddInputLine = true;
             }
 
-            _regions.Add(new WindowShellRegion(this, _kernel, _textures, new ImageWindow(_windowDeps, texture)
-            {
-                IsDrawnByKernel = false,
-            }));
+            _regions.Add(region);
 
             if (reAddInputLine)
             {
