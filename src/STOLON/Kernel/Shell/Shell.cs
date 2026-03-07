@@ -200,7 +200,7 @@ namespace STOLON
 
             if (!Regions.Any(r => r is WindowShellRegion windowShellRegion && windowShellRegion.Window.IsResizing))
             {
-                _scrollAmount -= _input.Mouse.ScrollDelta / 4;
+                _scrollAmount -= _input.Mouse.ScrollDelta / 3;
                 _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);
 
                 if (_scrollAmount == lastMaxScrollAmount && lastMaxScrollAmount < _maxScrollAmount)
