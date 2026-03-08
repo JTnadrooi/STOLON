@@ -6,12 +6,9 @@
         Menu = 1,
         WithBackground = 2,
     }
+
     public class EntityProfile : IMipmapped
     {
-        private Dictionary<int, Texture2D> mipmaps;
-        private Point _focus;
-        private Point _menuOffset;
-
         public Texture2D Texture512 => Mipmaps[512];
         public Texture2D Texture256 => this.TryGetMipmap(256, out Texture2D? t) ? t! : throw new Exception();
         public Texture2D Texture128 => this.TryGetMipmap(128, out Texture2D? t) ? t! : throw new Exception();
@@ -20,12 +17,17 @@
         public Point Focus { get => _focus; set => _focus = value; }
         public Point MenuOffset { get => _menuOffset; set => _menuOffset = value; }
 
+        private Dictionary<int, Texture2D> mipmaps;
+        private Point _focus;
+        private Point _menuOffset;
+
         public EntityProfile(string entityName, ITexture2DCollection textures, Point? focus = null, Point? menuOffset = null) : this(
             textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : throw new Exception(),
             textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
             textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
             focus)
         { }
+
         public EntityProfile(Texture2D t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
         {
             mipmaps = new Dictionary<int, Texture2D>();
@@ -52,20 +54,30 @@
     [Dependency(ServiceLifetime.Singleton)]
     public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
-
-        public string FullName { get; }
-        public EntityProfile Profile { get; }
-        public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
-        public abstract Computer? Computer { get; }
-        public string Description { get; }
         /// <summary>
-        /// The unique ID of this <see cref="Entity"/>, no capital letters.
+        /// Gets the full/display name of this <see cref="Entity"/>.
+        /// </summary>
+        public string FullName { get; }
+
+        public EntityProfile Profile { get; }
+
+        public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
+
+        public abstract Computer? Computer { get; }
+
+        public string Description { get; }
+
+        /// <summary>
+        /// Gets the unique Id of this <see cref="Entity"/>, no capitals.
         /// </summary>
         public string Id { get; }
+
         public string Name { get; }
+
         public string SymbolNotation { get; }
 
         public ConditionalNote[] AbilityNotes { get; }
+
         public ConditionalNote[] AllocationNotes { get; }
 
         public Entity(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null)
@@ -97,6 +109,7 @@
         }
         public bool Equals(Entity? other) => other != null && other.Id == Id;
     }
+
     public static class EntityDrawingExtensions
     {
         public static void DrawEntity(this DrawingContext context, Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
@@ -130,6 +143,7 @@
                 }
             }
         }
+
         public static void DrawSymbolNotation(this DrawingContext context, Font2D font, string symbolNotationStr, Rectangle bounds)
         {
             Vector2 dimensions = font.FastMeasure(symbolNotationStr);
@@ -146,8 +160,8 @@
 
             context.DrawString(font, symbolNotationStr, strPos, scale: scale);
         }
-
     }
+
     /// <summary>
     /// A class that can interact with a <see cref="Board"/>.
     /// </summary>
@@ -157,15 +171,11 @@
         /// The source <see cref="Entity"/>.
         /// </summary>
         public Entity? Source { get; }
+
         public Computer(Entity? source)
         {
             Source = source;
         }
-        /// <summary>
-        /// Do a move best for the <see cref="Source"/> <see cref="Entity"/> on the <paramref name="board"/>.
-        /// </summary>
-        /// <param name="board">The <see cref="Board"/> to do a move on.</param>
-        //public abstract void DoMove(Board board);
 
         /// <summary>
         /// Gets the <see cref="Player"/> this <see cref="Computer"/> plays for.
@@ -176,12 +186,8 @@
         {
             Player[] players = state.Players.ToArray();
             for (int i = 0; i < players.Length; i++)
-            {
                 if (players[i].Computer == this)
-                {
                     return players[i];
-                }
-            }
             throw new Exception();
         }
     }

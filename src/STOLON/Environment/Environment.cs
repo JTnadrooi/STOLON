@@ -23,7 +23,13 @@
 
         private Dictionary<string, Entity> _entityDict;
 
-        public Environment(IRichLogger logger, IAudioEngine audioEngine, ISceneManager sceneManager, Interface ui, IOverlayManager overlayManager, Kernel kernel, IEnumerable<Entity> entities)
+        public Environment(IRichLogger logger,
+            IAudioEngine audioEngine,
+            ISceneManager sceneManager,
+            Interface ui,
+            IOverlayManager overlayManager,
+            Kernel kernel,
+            IEnumerable<Entity> entities)
         {
             _logger = logger;
             _audioEngine = audioEngine;
