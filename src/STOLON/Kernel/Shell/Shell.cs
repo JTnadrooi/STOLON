@@ -174,11 +174,18 @@ namespace STOLON
                 y += r.VerticalOverlap;
             }
 
-            //if (!inUpdate) Console.WriteLine("AAA");
+            if (!inUpdate) Console.WriteLine("AAA");
         }
 
         public void Update(int elapsedMilliseconds)
         {
+            foreach (ShellRegion region in _regions)
+            {
+                region.Update(elapsedMilliseconds);
+            }
+
+            #region UPDATE_SCROLL_AMOUNT
+
             int lastMaxScrollAmount = _maxScrollAmount;
             _maxScrollAmount = 16;
             foreach (ShellRegion r in _regions)
@@ -206,12 +213,9 @@ namespace STOLON
             //      "last a" + lastMaxScrollAmount + "\n" +
             //      "1----");
 
-            UpdateRegionPositions(true);
+            #endregion
 
-            foreach (ShellRegion region in _regions)
-            {
-                region.Update(elapsedMilliseconds);
-            }
+            UpdateRegionPositions(true);
 
             if (_autocompletions is not null)
             {
