@@ -348,5 +348,16 @@ namespace STOLON
 
         public void Input<T>(T item) => EnsureLastRegionIsTextRegion().Input(item);
         public void Input(string str) => EnsureLastRegionIsTextRegion().Input(str);
+
+        /// <summary>
+        /// Scrolls the content to the specified position.
+        /// </summary>
+        /// <param name="scrollAmount">The scroll position, in pixels. The value is automatically clamped between 0 and the maximum scroll range.</param>
+        public void ScrollTo(int scrollAmount)
+        {
+            _scrollAmount = Math.Clamp(scrollAmount, 0, _maxScrollAmount);
+
+            UpdateRegionPositions(false);
+        }
     }
 }
