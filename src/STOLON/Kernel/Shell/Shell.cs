@@ -1,10 +1,5 @@
-﻿using AsitLib.CommandLine;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Text.RegularExpressions;
 
 namespace STOLON
 {
@@ -120,24 +115,6 @@ namespace STOLON
             }
         }
 
-        internal Vector2 GetRegionPos(ShellRegion region) // VERY SLOW, make regioninfo record and do in Update().
-        {
-            float x = _origin.X;
-            float y = STOLON.VHeight - RegionClearance + _scrollAmount;
-
-            foreach (ShellRegion r in _regions)
-            {
-                y -= r.Height + RegionClearance;
-                if (r == region)
-                {
-                    return new Vector2(x, y);
-                }
-                y += r.VerticalOverlap;
-            }
-
-            throw new InvalidOperationException();
-        }
-
         private bool TryGetCursor([NotNullWhen(true)] out TextPosition? cursor)
         {
             TextPosition? result = null;
@@ -186,6 +163,20 @@ namespace STOLON
             ((TextShellRegion)_regions.Last()).Input(_autocompletions[index][target.Length..]);
         }
 
+        internal void UpdateRegionPositions(bool inUpdate)
+        {
+            float y = STOLON.VHeight - RegionClearance + _scrollAmount;
+
+            foreach (ShellRegion r in _regions)
+            {
+                y -= r.Height + RegionClearance;
+                r.Position = new Vector2(_origin.X, y);
+                y += r.VerticalOverlap;
+            }
+
+            //if (!inUpdate) Console.WriteLine("AAA");
+        }
+
         public void Update(int elapsedMilliseconds)
         {
             int lastMaxScrollAmount = _maxScrollAmount;
@@ -214,6 +205,8 @@ namespace STOLON
             //      "max a" + _maxScrollAmount + "\n" +
             //      "last a" + lastMaxScrollAmount + "\n" +
             //      "1----");
+
+            UpdateRegionPositions(true);
 
             foreach (ShellRegion region in _regions)
             {

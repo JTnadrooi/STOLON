@@ -2,12 +2,31 @@
 {
     public abstract class ShellRegion : IComponent
     {
-        public abstract int Height { get; } // no buildin clearance svp
+        public abstract int Height { get; } // no built-in clearance svp, should be FAST.
         public abstract int Width { get; }
 
         protected Shell Shell { get; }
 
-        protected Vector2 Position => Shell.GetRegionPos(this);
+        private Vector2 _position;
+        private int _lastHeightForPosition;
+
+        public Vector2 Position
+        {
+            get
+            {
+                if (Height != _lastHeightForPosition)
+                {
+                    Shell.UpdateRegionPositions(false);
+                }
+                return _position;
+            }
+
+            internal set
+            {
+                _lastHeightForPosition = Height;
+                _position = value;
+            }
+        }
 
         public virtual int VerticalOverlap => 0;
 
