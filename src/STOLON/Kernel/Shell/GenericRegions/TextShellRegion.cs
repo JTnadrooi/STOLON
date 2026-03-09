@@ -435,6 +435,8 @@ namespace STOLON
             if (_lines.Last().EndsWith(NewLine)) _lines.Add(string.Empty);
 
             _verticalOverlap = (int)(_lines.Last().Length == 0 ? 13 : 0);
+
+            Shell.UpdateRegionPositions(false);
         }
 
         public override void Update(int elapsedMilliseconds)
@@ -612,11 +614,13 @@ namespace STOLON
         {
             if (Cursor is null) return;
 
-            void PutAndOffset(char c)
+            void PutAndOffsetCursor(char c)
             {
                 Put(c, Cursor.Value);
                 if (!Cursor.Value.IsPostText) Cursor = Cursor.Value.Offset(1);
             }
+
+            Shell.ScrollTo(int.MaxValue);
 
             switch (e.Character)
             {
@@ -651,7 +655,7 @@ namespace STOLON
                     Input(Autocomplete.Complete(input, Shell.Words).BestOption?[input.Length..] ?? string.Empty);
                     return;
                 default:
-                    PutAndOffset(e.Character);
+                    PutAndOffsetCursor(e.Character);
                     break;
             }
 
