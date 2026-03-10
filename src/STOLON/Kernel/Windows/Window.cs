@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using STOLON;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -511,9 +512,19 @@ namespace STOLON
             //    drawingContext.DrawArea(OuterBounds, Color.Green);
             //}
 
-            _topFoliage.Draw(drawingContext);
+            if (!IsLocked)
+            {
+                _topFoliage.Draw(drawingContext);
+            }
 
             drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
+        }
+
+        internal void PostDraw(DrawingContext drawingContext) // purelly so foliage draws over everything in the shell
+        {
+            Debug.Assert(IsLocked);
+
+            _topFoliage.Draw(drawingContext);
         }
 
         protected abstract void DrawContents(DrawingContext drawingContext);

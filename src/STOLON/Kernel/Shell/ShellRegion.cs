@@ -39,5 +39,10 @@
 
         public virtual void Update(int elapsedMilliseconds) { }
         public virtual void Draw(DrawingContext drawingContext) { }
+
+        /// <summary>
+        /// Called after all regions have been drawn. Override this method to draw elements that should overlap with other regions.
+        /// </summary>
+        public virtual void PostDraw(DrawingContext drawingContext) { }
     }
 }

@@ -86,5 +86,13 @@ namespace STOLON
                 drawingContext.Draw(_windowSlotTex, Position);
             }
         }
+
+        public override void PostDraw(DrawingContext drawingContext)
+        {
+            if (_isWindowLocked)
+            {
+                _window.PostDraw(drawingContext);
+            }
+        }
     }
 }

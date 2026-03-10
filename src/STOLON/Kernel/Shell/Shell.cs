@@ -283,6 +283,11 @@ namespace STOLON
                 region.Draw(drawingContext);
             }
 
+            foreach (ShellRegion region in _regions)
+            {
+                region.PostDraw(drawingContext);
+            }
+
             if (_autocompletions is not null && _autocompletions.Length != 0)
             {
                 drawingContext.DrawArea(_autocompletionRect, Color.Black);
