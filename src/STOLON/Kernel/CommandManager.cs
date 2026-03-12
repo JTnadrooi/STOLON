@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Autofac;
 
 namespace STOLON
 {
@@ -57,21 +56,19 @@ namespace STOLON
             }
         }
 
-        public TFlag SetFlag<TFlag>(TFlag flag) where TFlag : CommandFlag
-        {
-            ActiveFlag = flag;
-
-            return (TFlag)ActiveFlag;
-        }
-
         public TFlag SetFlag<TFlag>() where TFlag : CommandFlag, new() => (TFlag)SetFlag(typeof(TFlag));
         public object SetFlag(Type flagType)
         {
             if (!flagType.IsAssignableTo<CommandFlag>()) throw new ArgumentException("Invalid flagtype.", nameof(flagType));
 
-            ActiveFlag = (CommandFlag)Activator.CreateInstance(flagType)!;
+            return SetFlag((CommandFlag)Activator.CreateInstance(flagType)!);
+        }
 
-            return ActiveFlag;
+        public TFlag SetFlag<TFlag>(TFlag flag) where TFlag : CommandFlag
+        {
+            ActiveFlag = flag;
+
+            return (TFlag)ActiveFlag;
         }
 
         /// <summary>
