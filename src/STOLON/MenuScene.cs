@@ -302,6 +302,8 @@ namespace STOLON
                 "Stukadoor", // internship joke.
                 "The rest of your life is probably a loooong time..",
                 "Woo! Nyaa!", // Haiyore! Nyaruko-san reference
+                "Fuwa Fuwa Fuwa Fuwa", // Princess Advent reference (D4DJ)
+                "Marvelous~!", // Marvelous sunday reference (Uma musume)
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
