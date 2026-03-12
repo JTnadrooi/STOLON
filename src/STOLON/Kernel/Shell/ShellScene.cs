@@ -47,7 +47,7 @@ namespace STOLON
 
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.Draw(_textures["Entities\\north\\north-128"], new Vector2(500, 200));
+            //drawingContext.Draw(_textures["Entities\\north\\north-128"], new Vector2(500, 200));
             _shell.Draw(drawingContext);
         }
     }
