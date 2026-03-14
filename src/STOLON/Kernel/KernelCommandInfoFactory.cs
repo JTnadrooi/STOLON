@@ -1,4 +1,5 @@
 ﻿using AsitLib.CommandLine;
+using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace STOLON
@@ -11,9 +12,19 @@ namespace STOLON
 
             CommandInfo defaultResult = MethodCommandInfo.FromMethod(methodInfo, provider);
 
-            string[] ids = defaultResult.RawIds.ToArray();
+            List<string> ids = new List<string>(defaultResult.Ids);
 
-            return new KernelCommandInfo(ids, defaultResult.Description, methodInfo, defaultResult.IsGenericFlag)
+            if (commandAttribute.IsExternal)
+            {
+                ids = ids.Select(id => "%" + id).ToList(); // to list so linq gets executed first.
+            }
+
+            if (commandAttribute.IsGenericFlag)
+            {
+                ids.AddRange(ids.Select(id => ParseHelpers.GetGenericFlagSignature(id)).ToArray());
+            }
+
+            return new KernelCommandInfo(ids.ToArray(), defaultResult.Description, methodInfo)
             {
                 RequiredFlag = commandAttribute.RequiredFlag,
                 PassingPolicies = commandAttribute.PassingPolicies,

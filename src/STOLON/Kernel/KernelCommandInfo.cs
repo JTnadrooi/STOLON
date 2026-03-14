@@ -23,7 +23,9 @@ namespace STOLON
             }
         }
 
-        public KernelCommandInfo(string[] ids, string description, MethodInfo methodInfo, bool isGenericFlag) : base(ids, description, methodInfo, isGenericFlag)
+        public bool DebugOnly { get; init; }
+
+        public KernelCommandInfo(string[] ids, string description, MethodInfo methodInfo) : base(ids, description, methodInfo)
         {
 
         }

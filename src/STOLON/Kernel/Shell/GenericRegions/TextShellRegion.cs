@@ -471,7 +471,7 @@ namespace STOLON
                     _cursorLifetime = 0;
                 }
 
-                if (_cursorSelection.Lenght > 0) _cursorSelection = NormalizedRange.Empty;
+                if (_cursorSelection.Length > 0) _cursorSelection = NormalizedRange.Empty;
             }
 
             if (!_input.IsMouseOn<Shell>() && _input.IsClicked(MouseButton.Left))

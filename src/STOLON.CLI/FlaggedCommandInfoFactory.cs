@@ -11,7 +11,14 @@ namespace STOLON.CLI
 
             CommandInfo defaultResult = MethodCommandInfo.FromMethod(methodInfo, provider);
 
-            return new FlaggedCommandInfo(defaultResult.Ids.ToArray(), defaultResult.Description, methodInfo)
+            List<string> ids = new List<string>(defaultResult.Ids);
+
+            if (flaggedCommandAttribute.IsGenericFlag)
+            {
+                ids.AddRange(ids.Select(id => ParseHelpers.GetGenericFlagSignature(id)).ToArray());
+            }
+
+            return new FlaggedCommandInfo(ids.ToArray(), defaultResult.Description, methodInfo)
             {
                 Flags = flaggedCommandAttribute.Flags,
                 PassingPolicies = flaggedCommandAttribute.PassingPolicies,

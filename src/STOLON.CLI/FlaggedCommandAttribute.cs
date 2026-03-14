@@ -24,6 +24,8 @@ namespace STOLON.CLI
     {
         public CommandFlags Flags { get; init; }
 
+        public bool IsGenericFlag { get; init; }
+
         public FlaggedCommandAttribute(string desc) : base(desc) { }
     }
 }
