@@ -31,6 +31,8 @@ namespace STOLON
         public void InitializeAddress(string id)
         {
             InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(id));
+
+            _shell.WriteLine($"Set target to address '{id}'.");
         }
 
         [KernelCommand("Select a .", Id = "selc", RequiredFlag = typeof(InitAddressCommandFlag))]
