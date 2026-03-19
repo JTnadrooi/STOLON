@@ -36,19 +36,16 @@ namespace STOLON
         {
             try
             {
-                if (Engine.Commands.ContainsKey(command.Split(" ")[0])) // to be improved when asitlib adapts better exceptions.
-                {
-                    CommandResult result = Engine.Execute(command);
+                CommandResult result = Engine.Execute(command);
 
-                    if (!result.IsVoid)
-                    {
-                        _shell.Value.WriteLine(result.ToOutputString());
-                    }
-                }
-                else
+                if (!result.IsVoid)
                 {
-                    throw new CommandException($"'{command.Split(" ")[0]}' is not recognized as an internal or external command, operable program or batch file.");
+                    _shell.Value.WriteLine(result.ToOutputString());
                 }
+            }
+            catch (CommandNotFoundException e)
+            {
+                _shell.Value.WriteLine($"'{e.CommandId}' is not recognized as an internal or external command, operable program or batch file.");
             }
             catch (CommandException e)
             {
