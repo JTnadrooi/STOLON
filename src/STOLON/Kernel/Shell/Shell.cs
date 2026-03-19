@@ -315,12 +315,18 @@ namespace STOLON
 
         public void Write<T>(T item) => EnsureLastRegionIsTextRegion().Write(item);
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
+
         public void WriteTexture(Texture2D texture)
         {
-            WriteRegion(new WindowShellRegion(this, _kernel, _textures, new ImageWindow(_windowDeps, texture)
+            WriteWindow(new ImageWindow(_windowDeps, texture)
             {
                 IsDrawnByKernel = false,
-            }));
+            });
+        }
+
+        public void WriteWindow(Window window)
+        {
+            WriteRegion(new WindowShellRegion(this, _kernel, _textures, window));
         }
 
         public void WriteRegion(ShellRegion region)
