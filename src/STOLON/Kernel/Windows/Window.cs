@@ -205,15 +205,12 @@ namespace STOLON
             Controllers.Add("drag", new DragController(_input,
                 () => ShouldInitiateDrag(),
                 () => Position,
-                v =>
-                {
-                    if (!IsLocked)
-                        Position = v;
-                }));
+                v => Position = v));
             Controllers.Add("resize", new ResizeController(_input,
                 () =>
                 {
-                    return IsLocked ? GetMouseSides() & (Sides.Right | Sides.Bottom) : GetMouseSides(); // only right and bottom sides are resizable when locked.
+                    if (IsLocked) return GetMouseSides() & (Sides.Right | Sides.Bottom); // only right and bottom sides are resizable when locked.
+                    return GetMouseSides();
                 },
                 () => OuterBounds,
                 v => OuterBounds = v,
@@ -240,10 +237,8 @@ namespace STOLON
             _isInitialized = true;
         }
 
-        public void Resize(Sides sides, int newSize, bool throwIfNotResizable = true)
+        public void Resize(Sides sides, int newSize)
         {
-            if (throwIfNotResizable && !IsResizable) throw new InvalidObjectException("Cannot resize unresizable window.");
-
             //if ((sides & (Sides.Right | Sides.Left)) != 0 && OuterBounds.Width + newSize < (MinSize.Value.X ?? ) || )
             //{
 
@@ -287,6 +282,7 @@ namespace STOLON
         private Sides GetMouseSides()
         {
             if (!(_input.IsMouseOn(this) || _input.IsMouseOn<Shell>()) || MaybeHoveringButton()) return Sides.None;
+            if (!IsResizable) return Sides.None;
 
             Vector2 mousePos = _input.Mouse.Position;
             Rectangle bounds = OuterBounds;
