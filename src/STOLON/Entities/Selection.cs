@@ -28,23 +28,21 @@
         public int MaxEntries { get; }
 
         private readonly Dictionary<string, SelectionEntry> _entries;
-        private readonly List<Entity> _toParseEntries;
+        private readonly List<Entity> _selectedEntities;
         private int _totalVAllocation;
 
         public SelectionEntry this[string id] => Entries[id];
-        public SelectionEntry this[int i] => _entries[_toParseEntries[i].Id];
+        public SelectionEntry this[int i] => _entries[_selectedEntities[i].Id];
 
-        private readonly Environment _environment;
-        private readonly IRichLogger _logger;
+        private readonly ReadOnlyDictionary<string, Entity> _entities;
 
-        public EntitySelection(int maxEntries, IRichLogger logger, Environment environment)
+        public EntitySelection(Entity[] entities, int maxEntries)
         {
-            _logger = logger;
-            _environment = environment;
+            _entities = new ReadOnlyDictionary<string, Entity>(entities.ToDictionary(e => e.Id));
 
             _entries = new Dictionary<string, SelectionEntry>(maxEntries);
             Entries = _entries.AsReadOnly();
-            _toParseEntries = new List<Entity>(maxEntries);
+            _selectedEntities = new List<Entity>(maxEntries);
             _totalVAllocation = 0;
             IsPostAllocation = true;
             MaxEntries = maxEntries;
@@ -52,29 +50,23 @@
 
         public bool Add(string id)
         {
-            _logger.Log(">selecting entity " + id + ".");
             if (Contains(id))
             {
-                _logger.Fail();
                 return false;
             }
-            _toParseEntries.Add(_environment.Entities[id]);
+            _selectedEntities.Add(_entities[id]);
             RecalculateAllocations();
-            _logger.Success();
             return true;
         }
 
         public bool Remove(string id)
         {
-            _logger.Log(">deselecting entity " + id + ".");
             if (!Contains(id))
             {
-                _logger.Fail();
                 return false;
             }
-            _toParseEntries.Remove(_environment.Entities[id]);
+            _selectedEntities.Remove(_entities[id]);
             RecalculateAllocations();
-            _logger.Success();
             return true;
         }
 
@@ -83,30 +75,27 @@
             return Entries.ContainsKey(id);
         }
 
-        public int GetSlot(string id) => _toParseEntries.GetFirstIndexWhere(e => e.Id == id);
+        public int GetSlot(string id) => _selectedEntities.GetFirstIndexWhere(e => e.Id == id);
         private void RecalculateAllocations()
         {
-            _logger.Log(">updating allocations..");
-
             IsPostAllocation = false;
-            _entries.Clear();
-            for (int i = 0; i < _toParseEntries.Count; i++) // create source without virtual values.
-                _entries.Add(_toParseEntries[i].Id, new SelectionEntry(_toParseEntries[i], 100 / _toParseEntries.Count));
-
-            Stack<SelectionEntry> _entryBuffer = new Stack<SelectionEntry>(MaxEntries);
-            for (int i = 0; i < _toParseEntries.Count; i++) // create _entryBuffer with virtual values. (using _entries referenced in GetVirtualAllocation())
-                _entryBuffer.Push(new SelectionEntry(_toParseEntries[i], 100 / _toParseEntries.Count, _toParseEntries[i].GetVirtualAllocation(this)));
 
             _entries.Clear();
-            for (int i = 0; i < _toParseEntries.Count; i++) // make buffer the new source without ref change.
-                _entries.Add(_entryBuffer.Peek().Entity.Id, _entryBuffer.Pop());
+            for (int i = 0; i < _selectedEntities.Count; i++) // create source without virtual values.
+                _entries.Add(_selectedEntities[i].Id, new SelectionEntry(_selectedEntities[i], 100 / _selectedEntities.Count));
+
+            Stack<SelectionEntry> entryBuffer = new Stack<SelectionEntry>(MaxEntries);
+            for (int i = 0; i < _selectedEntities.Count; i++) // create entryBuffer with virtual values. (using _entries referenced in GetVirtualAllocation())
+                entryBuffer.Push(new SelectionEntry(_selectedEntities[i], 100 / _selectedEntities.Count, _selectedEntities[i].GetVirtualAllocation(this)));
+
+            _entries.Clear();
+            for (int i = 0; i < _selectedEntities.Count; i++) // make buffer the new source without ref change.
+                _entries.Add(entryBuffer.Peek().Entity.Id, entryBuffer.Pop());
 
             IsPostAllocation = true;
 
             _totalVAllocation = _entries.Sum(e => e.Value.VAllocation);
             if (_totalVAllocation == 99) _totalVAllocation = 100;
-
-            _logger.Success();
         }
         public int GetAllocation(string id) => _entries.TryGetValue(id, out SelectionEntry entry) ? entry.Allocation : 0;
         public int GetVirtualAllocation(string id) => IsPostAllocation ? (_entries.TryGetValue(id, out SelectionEntry entry) ? entry.VAllocation : 0) : throw new InvalidOperationException();
