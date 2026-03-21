@@ -20,9 +20,9 @@
             ]);
 
         public override int GetVirtualAllocation(EntitySelection info)
-            => new AllocationHelperChain(info, this)
-                .ApplyMultiplier(info.Contains("deceit"), 1.2f)
-                .ApplyMultiplier(info.Entries.Count > 3, 0.5f)
+            => new AllocationBuilder(info, this)
+                .ApplyMultiplierWhen(info.Contains("deceit"), 1.2f)
+                .ApplyMultiplierWhen(info.Entries.Count > 3, 0.5f)
                 .End();
         public override Computer? Computer => null;
     }
