@@ -173,8 +173,6 @@ namespace STOLON
                 r.Position = new Vector2(_origin.X, y);
                 y += r.VerticalOverlap;
             }
-
-            if (!inUpdate) Console.WriteLine("AAA");
         }
 
         public void Update(int elapsedMilliseconds)
