@@ -1,4 +1,5 @@
 ﻿using AsitLib.CommandLine;
+using System.ComponentModel.DataAnnotations;
 
 namespace STOLON
 {
@@ -6,20 +7,28 @@ namespace STOLON
     {
         private readonly CommandManager _commandManager;
         private readonly Shell _shell;
+        private readonly Entity[] _entities;
 
-        public GenericCommandProvider(CommandManager commandManager, Shell shell) : base("generic") // way too long id but it shoulden't be typed by the user.
+        public GenericCommandProvider(CommandManager commandManager, Shell shell, Entity[] entities) : base("generic") // way too long id but it shoulden't be typed by the user.
         {
             _commandManager = commandManager;
             _shell = shell;
+            _entities = entities;
         }
 
         [KernelCommand("Prints the reality version.", Aliases = ["v"], Id = "version", IsGenericFlag = true)] // not the game version, lore version.
         public void GetVersion() => _shell.WriteLine($"revise--1236979249_sto+a");
 
-        [KernelCommand(".", Id = "flag", RequiredFlag = typeof(InitAddressCommandFlag), IsExternal = true)]
+        [KernelCommand(".", Id = "flag", IsExternal = true)]
         public void GetActiveFlag()
         {
             _shell.WriteLine(_commandManager.ActiveFlag);
+        }
+
+        [KernelCommand(".", Id = "entity", Aliases = ["e"])]
+        public void ShowEntity([EntityId] string id)
+        {
+            _shell.WriteTexture(_entities.First(e => e.Id == id).Mipmaps[128]);
         }
     }
 }

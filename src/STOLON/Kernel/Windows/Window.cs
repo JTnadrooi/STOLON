@@ -22,6 +22,7 @@ namespace STOLON
         Any = Left | Top | Right | Bottom,
     }
 
+    [Dependency(ServiceLifetime.Singleton)]
     public sealed class WindowDependencies
     {
         public required Kernel Kernel { get; init; }
