@@ -27,7 +27,6 @@ namespace STOLON
             return new KernelCommandInfo(ids.ToArray(), defaultResult.Description, methodInfo)
             {
                 RequiredFlag = commandAttribute.RequiredFlag,
-                PassingPolicies = commandAttribute.PassingPolicies,
                 Target = provider,
                 Provider = provider,
             };

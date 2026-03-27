@@ -25,13 +25,19 @@ namespace STOLON
             //Shell.WriteLine("Hello world!\nWhat a lovelly day.\n> _");
             //Shell.WriteLine("^[s]initialising environment..\r\n    ^---searching for entities..\r\n        ^---called assembly scan for type 'STOLON.Entity\".\r\n        ^---found entity with id 'deceit\" and name 'Deceit\".\r\n        ^---found entity with id 'goldsilk\" and name 'Goldsilk\".\r\n        ^---found entity with id 'north\" and name 'North\".\r\n        ^---found entity with id 'silo\" and name 'Silo\".\r\n        ^---success.\r\n    ^[s]contructing stolon ui..\r\n        ^---success.: time taken: 1ms.\r\n    ^---searching for overlays..\r\n        ^---called assembly scan for type 'STOLON.IOverlay\".\r\n        ^---found overlay with id 'loading\".\r\n        ^---adding overlay of id loading..\r\n            ^---success.\r\n        ^---found overlay with id 'transition_dither\".\r\n        ^---adding overlay of id transition_dither..\r\n            ^---success.\r\n        ^---found overlay with id 'transition\".\r\n        ^---adding overlay of id transition..\r\n            ^---success.\r\n        ^---success.\r\n    ^---success.: time taken: 16ms.\r\n^---success.: time taken: 261ms.".Replace("\r", ""));
 
-            _shell.WriteLine("Hello. This is a long first line no?");
-            _shell.WriteLine("This is on the second line.");
-            _shell.WriteTexture(_textures["Entities\\north\\north-128"]);
+            //_shell.WriteLine("Hello. This is a long first line no?");
+            //_shell.WriteLine("This is on the second line.");
+            //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
             _shell.HasInputLine = true;
-            _shell.WriteLine("This is on the THIRD line!");
-            _shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
-            _shell.WriteTexture(_textures["Entities\\north\\north-128"]);
+            //_shell.WriteLine("This is on the THIRD line!");
+            //_shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
+            //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
+            //_shell.WriteLine("This is on the THIRD line!");
+            //_shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
+            //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
+            //_shell.WriteLine("This is on the THIRD line!");
+            //_shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
+            //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
         }
 
         protected override void UpdateInterface(int elapsedMilliseconds)

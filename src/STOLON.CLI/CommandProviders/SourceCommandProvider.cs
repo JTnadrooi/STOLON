@@ -12,7 +12,7 @@ namespace STOLON.CLI
             _logger = logger;
         }
 
-        [FlaggedCommand("Opens the local source code directory.", Flags = CommandFlags.DevOnly, PassingPolicies = OptionPassingPolicies.Named)]
+        [FlaggedCommand("Opens the local source code directory.", Flags = CommandFlags.DevOnly)]
         public void Main(string? subDir = null)
         {
             CLIHelpers.OpenDirectory(CLI.SourcePath! + subDir switch

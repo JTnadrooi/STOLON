@@ -7,7 +7,7 @@ namespace STOLON.CLI
     {
         public BuildCommandProvider() : base("build", CLI.InfoFactory, nameOfMainMethod: nameof(Main)) { }
 
-        [FlaggedCommand("Builds content.", Flags = CommandFlags.DevOnly, PassingPolicies = OptionPassingPolicies.Named)]
+        [FlaggedCommand("Builds content.", Flags = CommandFlags.DevOnly)]
         public void Main(bool debug = false, bool force = false)
         {
             Effects(debug, force);

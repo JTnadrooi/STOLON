@@ -4,17 +4,17 @@ namespace STOLON.CLI
 {
     public sealed class BypassDevCheckGlobalOption : GlobalOption
     {
-        public BypassDevCheckGlobalOption() : base("bypass-devcheck", "Bypasses the devcheck.")
+        public BypassDevCheckGlobalOption() : base(OptionInfo.FromType(typeof(bool), "bypass-devcheck"), "Bypasses the devcheck.")
         {
 
         }
 
-        public override void PreCommand(CommandContext context)
+        protected override void PreCommand(CommandContext context, object? optionValue)
         {
             CLI.DevOverride = true;
         }
 
-        public override void PostCommand(CommandContext context)
+        protected override void PostCommand(CommandContext context, object? optionValue)
         {
             CLI.DevOverride = null;
         }
@@ -26,9 +26,9 @@ namespace STOLON.CLI
 
         public override void PreCommand(CommandContext context)
         {
-            if (context.Command is FlaggedCommandInfo cmd)
+            if (context.Call.Command is FlaggedCommandInfo cmd)
             {
-                if (context.ArgumentsInfo.Arguments.Any(c => c.Target.IsLongForm && c.Target.SanitizedOptionToken == "bypass-devcheck")) return;
+                if (context.Call.Arguments.Any(c => c.Target.Id == "bypass-devcheck")) return;
 
                 if (cmd.HasFlag(CommandFlags.DevOnly))
                 {

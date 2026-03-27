@@ -21,7 +21,6 @@ namespace STOLON.CLI
             return new FlaggedCommandInfo(ids.ToArray(), defaultResult.Description, methodInfo)
             {
                 Flags = flaggedCommandAttribute.Flags,
-                PassingPolicies = flaggedCommandAttribute.PassingPolicies,
                 Target = provider,
                 Provider = provider,
             };
