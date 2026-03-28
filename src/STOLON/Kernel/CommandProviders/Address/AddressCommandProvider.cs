@@ -23,14 +23,10 @@ namespace STOLON
         {
             InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
 
+            flag.Selection.AddRange(withIds);
+
             if (withIds.Length > 0)
-            {
-                foreach (string id in withIds)
-                {
-                    flag.Selection.Add(id);
-                }
-                _shell.WriteLine($"Set target to address '{addrId}' with [{withIds.ToJoinedString(", ")}].");
-            }
+                _shell.WriteLine($"Set target to address '{addrId}' with [{withIds.Select(id => $"'{id}'").ToJoinedString(", ")}].");
             else
                 _shell.WriteLine($"Set target to address '{addrId}'.");
         }
@@ -46,25 +42,54 @@ namespace STOLON
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
-            foreach (string id in ids)
+            if (ids.Length == 0) // for the "selc" without input "overload"
             {
-                flag.Selection.Add(id);
+                _shell.WriteLine(flag.Selection);
 
-                _shell.WriteLine($"Added '{id}' to selection.");
+                return;
             }
 
-            _shell.WriteLine(flag.Selection);
-            _shell.WriteWindow(new SelectionWindow(_windowDeps));
+            try
+            {
+                flag.Selection.AddRange(ids);
+            }
+            catch (ArgumentException e)
+            {
+                throw new CommandArgumentException(e.Message);
+            }
+
+            if (ids.Length > 0)
+                _shell.WriteLine($"Added [{ids.Select(id => $"'{id}'").ToJoinedString(", ")}] to selection.");
+            else
+                _shell.WriteLine($"Added '{ids[0]}' to selection.");
+
+            //_shell.WriteLine(flag.Selection);
+            //_shell.WriteWindow(new SelectionWindow(_windowDeps));
         }
 
         [KernelCommand("Select a .", Id = "selc rm", Aliases = ["dselc"], RequiredFlag = typeof(InitAddressCommandFlag))]
-        public void RemoveFromSelection(string id)
+        public void RemoveFromSelection(string[] ids)
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
-            flag.Selection.Remove(id);
+            if (ids.Length == 0)
+            {
+                throw new CommandArgumentException("You must provide at least one id.");
+            }
 
-            _shell.WriteLine(flag.Selection);
+            try
+            {
+                flag.Selection.RemoveRange(ids);
+            }
+            catch (ArgumentException e)
+            {
+                throw new CommandArgumentException(e.Message);
+            }
+
+            if (ids.Length > 0)
+                _shell.WriteLine($"Removed [{ids.Select(id => $"'{id}'").ToJoinedString(", ")}] from selection.");
+            else
+                _shell.WriteLine($"Removed '{ids[0]}' from selection.");
         }
     }
 }
