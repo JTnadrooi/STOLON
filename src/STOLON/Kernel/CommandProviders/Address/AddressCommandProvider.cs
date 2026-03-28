@@ -18,8 +18,8 @@ namespace STOLON
             _windowDeps = windowDeps;
         }
 
-        [KernelCommand("Initialize an adress.", Id = "addr set", Aliases = ["sadr"])]
-        public void InitializeAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
+        [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
+        public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
         {
             InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
 
@@ -31,13 +31,13 @@ namespace STOLON
                 _shell.WriteLine($"Set target to address '{addrId}'.");
         }
 
-        [KernelCommand("Initialize an adress.", Id = "addr", Aliases = ["adr"], RequiredFlag = typeof(InitAddressCommandFlag))]
+        [KernelCommand("Gets the currently active address.", Id = "addr", Aliases = ["adr"], RequiredFlag = typeof(InitAddressCommandFlag))]
         public void GetAddress()
         {
             _shell.WriteLine($"Active address: '{((InitAddressCommandFlag)_commandManager.ActiveFlag!).Address}'.");
         }
 
-        [KernelCommand("Select a .", Id = "selc add", Aliases = ["selc"], RequiredFlag = typeof(InitAddressCommandFlag))]
+        [KernelCommand("Add entities to the selection.", Id = "selc add", Aliases = ["selc"], RequiredFlag = typeof(InitAddressCommandFlag))]
         public void AddToSelection(string[] ids)
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
@@ -67,7 +67,7 @@ namespace STOLON
             //_shell.WriteWindow(new SelectionWindow(_windowDeps));
         }
 
-        [KernelCommand("Select a .", Id = "selc rm", Aliases = ["dselc"], RequiredFlag = typeof(InitAddressCommandFlag))]
+        [KernelCommand("Removes entities from the selection.", Id = "selc rm", Aliases = ["dselc"], RequiredFlag = typeof(InitAddressCommandFlag))]
         public void RemoveFromSelection(string[] ids)
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
@@ -92,8 +92,8 @@ namespace STOLON
                 _shell.WriteLine($"Removed '{ids[0]}' from selection.");
         }
 
-        [KernelCommand("Select a .", Id = "addr init", Aliases = ["stadr"])]
-        public void StartAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
+        [KernelCommand("Initializes an address.", Id = "addr init", Aliases = ["stadr"])]
+        public void InitializeAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
         {
             if (_commandManager.ActiveFlag is not InitAddressCommandFlag flag)
                 flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
