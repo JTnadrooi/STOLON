@@ -42,7 +42,7 @@ namespace STOLON
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
-            if (ids.Length == 0) // for the "selc" without input "overload"
+            if (ids.Length == 0) // for the "selc" without ids "overload"
             {
                 _shell.WriteLine(flag.Selection);
 
@@ -90,6 +90,18 @@ namespace STOLON
                 _shell.WriteLine($"Removed [{ids.Select(id => $"'{id}'").ToJoinedString(", ")}] from selection.");
             else
                 _shell.WriteLine($"Removed '{ids[0]}' from selection.");
+        }
+
+        [KernelCommand("Select a .", Id = "addr init", Aliases = ["stadr"])]
+        public void StartAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
+        {
+            if (_commandManager.ActiveFlag is not InitAddressCommandFlag flag)
+                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
+
+            if (withIds.Length > 0)
+                flag.Selection.AddRange(withIds);
+
+            _shell.WriteLine($"Initialized address '{addrId}' with [{withIds.Select(id => $"'{id}'").ToJoinedString(", ")}].");
         }
     }
 }
