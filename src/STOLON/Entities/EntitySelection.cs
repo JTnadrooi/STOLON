@@ -96,34 +96,18 @@ namespace STOLON
             return true;
         }
 
-        public bool AddRange(params IEnumerable<string> ids)
+        public void AddRange(params IEnumerable<string> ids)
         {
-            bool allSucceeded = true;
-
             foreach (string id in ids)
-            {
                 if (!Add(id))
-                {
-                    allSucceeded = false;
-                }
-            }
-
-            return allSucceeded;
+                    throw new ArgumentException($"Entity with id '{id}' already in selection.", nameof(ids));
         }
 
-        public bool RemoveRange(params IEnumerable<string> ids)
+        public void RemoveRange(params IEnumerable<string> ids)
         {
-            bool allSucceeded = true;
-
             foreach (string id in ids)
-            {
                 if (!Remove(id))
-                {
-                    allSucceeded = false;
-                }
-            }
-
-            return allSucceeded;
+                    throw new ArgumentException($"Entity with id '{id}' not found.", nameof(ids));
         }
 
         public bool Contains(string id)
