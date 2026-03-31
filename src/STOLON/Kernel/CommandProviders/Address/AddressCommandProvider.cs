@@ -93,15 +93,22 @@ namespace STOLON
         }
 
         [KernelCommand("Initializes an address.", Id = "addr init", Aliases = ["stadr"])]
-        public void InitializeAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
+        public void InitializeAddress([Option(Id = "addr")] string? addrId, [Option(Id = "with")] string[] withIds)
         {
             if (_commandManager.ActiveFlag is not InitAddressCommandFlag flag)
+            {
+                if (addrId is null)
+                {
+                    throw new CommandArgumentException($"Missing argument {nameof(addrId)}."); // replace with helper method when I add them to AsitLib.
+                }
+
                 flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
+            }
 
             if (withIds.Length > 0)
                 flag.Selection.AddRange(withIds);
 
-            _shell.WriteLine($"Initialized address '{addrId}' with [{withIds.Select(id => $"'{id}'").ToJoinedString(", ")}].");
+            _shell.WriteLine($"Initialized address '{flag.Address}' with [{flag.Selection.Entries.Keys.Select(entry => $"'{entry}'").ToJoinedString(", ")}].");
         }
     }
 }
