@@ -7,21 +7,44 @@ namespace STOLON
         private readonly CommandManager _commandManager;
         private readonly Shell _shell;
         private readonly Entity[] _entities;
+        private readonly Address[] _addresses;
         private readonly WindowDependencies _windowDeps;
+        private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
+        private readonly ILogger _logger;
+        private readonly IInputManager _input;
 
-        public AddressCommandProvider(CommandManager commandManager, Shell shell, Entity[] entities, WindowDependencies windowDeps) : base("addr")
+        public AddressCommandProvider(
+            WindowDependencies windowDeps,
+            ITexture2DCollection textures,
+            IFont2DCollection fonts,
+            ILogger logger,
+            IInputManager input,
+            CommandManager commandManager,
+            Shell shell,
+            Entity[] entities,
+            Address[] addresses) : base("addr")
         {
             _commandManager = commandManager;
             _shell = shell;
             _entities = entities;
-
+            _addresses = addresses;
             _windowDeps = windowDeps;
+            _textures = textures;
+            _fonts = fonts;
+            _logger = logger;
+            _input = input;
+        }
+
+        private Address GetAddress(string address)
+        {
+            return _addresses.First(a => a.Id == address);
         }
 
         [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
         public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
         {
-            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
+            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, GetAddress(addrId)));
 
             flag.Selection.AddRange(withIds);
 
@@ -102,11 +125,13 @@ namespace STOLON
                     throw new CommandArgumentException($"Missing argument {nameof(addrId)}."); // replace with helper method when I add them to AsitLib.
                 }
 
-                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, addrId));
+                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, GetAddress(addrId)));
             }
 
             if (withIds.Length > 0)
                 flag.Selection.AddRange(withIds);
+
+            _shell.WriteWindow(new BoardWindow(_windowDeps, _textures, _fonts, _input, _logger, flag.Address));
 
             _shell.WriteLine($"Initialized address '{flag.Address}' with [{flag.Selection.Entries.Keys.Select(entry => $"'{entry}'").ToJoinedString(", ")}].");
         }
