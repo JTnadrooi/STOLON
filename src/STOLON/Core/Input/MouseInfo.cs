@@ -77,5 +77,15 @@
         public bool IsPressed(MouseButton button) => IsPressedImpl(_currentState, button);
 
         public bool IsClicked(MouseButton button) => IsPressedImpl(_currentState, button) && !IsPressedImpl(_previousState, button);
+
+        public int GetCoefficient()
+        {
+            int result = 0;
+
+            if (IsClicked(MouseButton.Left)) result += 1;
+            if (IsClicked(MouseButton.Right)) result += -1;
+
+            return result;
+        }
     }
 }
