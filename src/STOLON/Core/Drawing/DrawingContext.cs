@@ -15,8 +15,9 @@ namespace STOLON
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
         /// <summary>
-        /// Gets the <see cref="Matrix"/> used for inverting coordinates. Drawing is not done through this, it makes use of the <see cref="SpriteEffects.FlipVertically"/> sprite effect.
-        /// <br/>Current only usecase: Transforming <see cref="MouseState.Position"/>.
+        /// Gets the <see cref="Matrix"/> used for inverting coordinates. Drawing is also done using the <see cref="SpriteEffects.FlipVertically"/> sprite effect.<br/>
+        /// Used for transforming <see cref="MouseState.Position"/> and passed to secondary <see cref="SpriteBatch.Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, Effect, Matrix?)"/> calls. 
+        /// When using it for <see cref="SpriteBatch.Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, Effect, Matrix?)"/>, don't forget to use <see cref="SpriteEffects.FlipVertically"/>.
         /// </summary>
         public Matrix InvertYMatrix => _invertYMatrix;
 
