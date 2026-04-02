@@ -206,7 +206,13 @@ namespace STOLON
             Controllers.Add("drag", new DragController(_input,
                 () => ShouldInitiateDrag(),
                 () => Position,
-                v => Position = v));
+                v =>
+                {
+                    if (!IsLocked) // this is important because even when a drag is initiated, if IsLocked changes, 
+                    {
+                        Position = v;
+                    }
+                }));
             Controllers.Add("resize", new ResizeController(_input,
                 () =>
                 {
