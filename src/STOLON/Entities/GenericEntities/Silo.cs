@@ -1,4 +1,6 @@
-﻿namespace STOLON
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace STOLON
 {
     public class SiloEntity : Entity
     {
@@ -24,6 +26,15 @@
                 .ApplyMultiplierWhen(info.Contains("deceit"), 1.2f)
                 .ApplyMultiplierWhen(info.Entries.Count > 3, 0.5f)
                 .End();
-        public override Computer? Computer => null;
+
+        public override bool HasWon(BoardState state, GameInfo gameInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetMove(BoardState state, GameInfo gameInfo, [NotNullWhen(true)] out Move? move)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

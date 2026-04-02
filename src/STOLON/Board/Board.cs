@@ -1,420 +1,146 @@
 ﻿using Autofac;
 using MonoGame.Extended.BitmapFonts;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace STOLON
 {
-    ///// <summary>
-    ///// The representor of the board in the STOLON environment.
-    ///// </summary>
-    //public partial class Board : Service
-    //{
-    //    public Camera2D Camera { get; }
-    //    public float Zoom { get; private set; }
-    //    public const int TILE_SIZE = 96;
-
-    //    public float MaxDeltaZoom => SmoothnessModifier * 10f;
-    //    public float ZoomIntensity => (Zoom - _desiredZoom) / MaxDeltaZoom;
-    //    public Vector2 BoardCenter => _scene.Tiles[_scene.Tiles.GetLength(0) / 2, _scene.Tiles.GetLength(1) / 2].BoardPosition;
-    //    public float SmoothnessModifier => 0.003f;
-    //    public int TurnNumber { get; private set; }
-    //    public ref BoardState State => ref _scene;
-    //    public ReadOnlyDictionary<string, SearchTarget> SearchTargets => new ReadOnlyDictionary<string, SearchTarget>(_searchTargets);
-    //    public BoardState InitialState { get; }
-    //    public Stack<BoardState> History { get; private set; }
-
-    //    //public bool MouseIsOnBoard => _input.Domain == InputManager.MouseDomain.Board;
-    //    public bool MouseIsOnBoard => true;
-    //    public Vector2 WorldMousePos { get; private set; }
-
-    //    private SpriteBatch _boardSpriteBatch;
-    //    private BoardState _scene;
-
-    //    int _mouseStateCoefficient;
-    //    private float _desiredZoom;
-    //    private Vector2 _desiredCameraPos;
-    //    bool _firstFrame;
-
-    //    private Task? _computerMoveTask;
-    //    private bool _locked;
-
-    //    private BoardState.SearchTargetCollection _searchTargets;
-    //    private const float CONF_ZOOM_COEFFICIENT = 0.98f; // 0.98f
-
-    //    public UniqueMoveBoardMap UniqueMoveBoardMap { get; }
-
-    //    public Board(BoardState conf) : base(null)
-    //    {
-    //        Camera = new Camera2D();
-    //        TurnNumber = 0;
-
-    //        _scene = conf;
-    //        _boardSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
-    //        _desiredZoom = MathF.Max(0.45f, CONF_ZOOM_COEFFICIENT * (4f / conf.Dimensions.X)); // does not change.
-    //        _desiredCameraPos = BoardCenter;
-    //        Camera.Position = _desiredCameraPos;
-    //        _searchTargets = conf.WinSearchTargets;
-    //        _computerMoveTask = null!;
-    //        _firstFrame = false;
-
-    //        Zoom = 1f;
-    //        InitialState = conf.DeepCopy();
-    //        History = new Stack<BoardState>();
-    //        History.Push(InitialState);
-    //        UniqueMoveBoardMap = new UniqueMoveBoardMap();
-
-    //        for (int x = 0; x < conf.Dimensions.X; x++)
-    //        {
-    //            Vector2 topleft = new Vector2(x * Board.TILE_SIZE, 0);
-    //        }
-    //    }
-
-    //    public void Lock()
-    //    {
-    //        _locked = true;
-    //    }
-    //    public void Unlock()
-    //    {
-    //        _locked = false;
-    //    }
-
-    //    /// <summary>
-    //    /// Update method. 
-    //    /// </summary>
-    //    /// <param name="elapsedMilliseconds"></param>
-    //    public override void Update(int elapsedMilliseconds)
-    //    {
-    //        if (!_firstFrame) _firstFrame = true;
-
-    //        WorldMousePos = Camera.Unproject(_input.Mouse.Position);
-
-    //        _mouseStateCoefficient = _input.CurrentMouse.GetMouseStateCoefficient();
-
-    //        if (_input.IsPressed(Keys.LeftShift))
-    //        {
-    //            if (_mouseStateCoefficient == 0) _mouseStateCoefficient = 1;
-    //            if (_input.IsPressed(Keys.A))
-    //                _desiredCameraPos.X -= 1;
-    //            if (_input.IsPressed(Keys.D))
-    //                _desiredCameraPos.X += 1;
-    //            if (_input.IsPressed(Keys.W))
-    //                _desiredCameraPos.Y -= 1;
-    //            if (_input.IsPressed(Keys.S))
-    //                _desiredCameraPos.Y += 1;
-    //        }
-
-    //        if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2();
-    //        Zoom += (_desiredZoom - Zoom) * 0.1f + _mouseStateCoefficient * SmoothnessModifier;
-    //        Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (WorldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(_mouseStateCoefficient);
-    //        Camera.Zoom = Zoom;
-
-    //        Listen();
-
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["restartBoard"].IsClicked)
-    //        //{
-    //        //    StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
-    //        //            {
-    //        //                Reset();
-    //        //            }, "Resetting the Board..");
-    //        //}
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["skipMove"].IsClicked) EndMove();
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["boardSearch"].IsClicked)
-    //        //{
-    //        //    int ret = State.SearchAny();
-    //        //    if (ret != -1)
-    //        //        StolonGame.Instance.Environment.Overlayer.Activate("transition", null, () =>
-    //        //            {
-    //        //                Reset();
-    //        //            }, "4 Connected found for player " + GetPlayerTile(ret) + "!");
-
-    //        //}
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["centerCamera"].IsClicked) desiredCameraPos = BoardCenter;
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["undoMove"].IsClicked)
-    //        //{
-    //        //    if (state.Players.Any(p => p.IsComputer))
-    //        //    {
-    //        //        StolonGame.Instance.Environment.UI.Textframe.Queue(new DialogueInfo(StolonGame.Instance.Environment, "Not valid when against AI but coming soon!"));
-    //        //    }
-    //        //    Undo();
-    //        //}
-    //        if (_input.IsClicked(Keys.Z)) // debug keys
-    //        {
-    //        }
-    //        if (_input.IsClicked(Keys.X)) { }
-    //        if (_input.IsClicked(Keys.C)) { }
-    //        //if (StolonGame.Instance.UserInterface.UIElementUpdateData["exitGame"].IsClicked) StolonGame.Instance.SLExit();
-
-    //        //Instance.UserInterface.UIElements["currentPlayer"].Text = "Current: " + state.CurrentPlayer.Name + " " + GetPlayerTile(state.CurrentPlayerID);
-
-    //        base.Update(elapsedMilliseconds);
-    //    }
-    //    public void Undo()
-    //    {
-    //        _logger.Log(">attempting move undo");
-    //        _scene.Undo();
-    //        _logger.Success();
-
-    //    }
-    //    public void AfterMove()
-    //    {
-    //        _audioEngine.Play(STOLON.Audio["select_4"]);
-    //    }
-    //    public bool Listen()
-    //    {
-    //        if (_locked)
-    //        {
-    //            _computerMoveTask = null;
-    //            _environment.Overlayer.Deactivate("loading");
-    //            return false;
-    //        }
-    //        if (_computerMoveTask != null && _computerMoveTask.IsCompletedSuccessfully)
-    //        {
-    //            _environment.Overlayer.Deactivate("loading");
-    //            _computerMoveTask = null;
-    //        }
-    //        if (State.CurrentPlayer.IsComputer)
-    //        {
-    //            _computerMoveTask ??= new Task(() =>
-    //            {
-    //                State.CurrentPlayer.Computer!.DoMove(this);
-    //                AfterMove();
-    //            });
-
-    //            if (_computerMoveTask.Status == TaskStatus.Created)
-    //            {
-    //                _computerMoveTask.Start();
-    //                _environment.Overlayer.Activate("loading");
-    //            }
-    //        }
-    //        else if (Utils.IsMouseClicked(_input.CurrentMouse, _input.PreviousMouse) && MouseIsOnBoard)
-    //        {
-    //            _logger.Log(">attempting board alter after mouseclick");
-    //            Move? move = null;
-    //            for (int x = 0; x < _scene.Tiles.GetLength(0); x++)
-    //                for (int y = 0; y < _scene.Tiles.GetLength(1); y++)
-    //                    if (_scene.Tiles[x, y].HitBox.Contains(WorldMousePos) && !_scene.Tiles[x, y].IsSolid())
-    //                    {
-    //                        move = new Move(x, y);
-    //                        break;
-    //                    }
-    //            if (move.HasValue)
-    //            {
-    //                History.Push(State.DeepCopy());
-    //                State.Alter(move!.Value, true);
-    //                AfterMove();
-    //                _logger.Success();
-    //                return true;
-    //            }
-    //            else _logger.Fail();
-    //        }
-    //        return false;
-    //    }
-    //    public void Reset()
-    //    {
-    //        _logger.Log(">resetting board");
-
-    //        _computerMoveTask = null;
-    //        State = InitialState.DeepCopy();
-
-
-    //        _logger.Success();
-    //    }
-    //    public void EndMove()
-    //    {
-    //        State.GoNextPlayer();
-    //    }
-    //    public override void Draw(DrawingContext drawingContext)
-    //    {
-    //        _boardSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
-    //        for (int x = 0; x < _scene.Dimensions.X; x++)
-    //            for (int y = 0; y < _scene.Dimensions.Y; y++)
-    //            {
-    //                Tile tile = _scene.Tiles[x, y];
-    //                _boardSpriteBatch.Draw(tile.TileType.Texture, tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-    //                int playerid = tile.GetOccupiedByPlayerId();
-    //                if (playerid != -1)
-    //                {
-    //                    _boardSpriteBatch.Draw(_textures.GetReference("player" + playerid + "_item-96"), tile.BoardPosition, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-    //                }
-    //                else if (tile.HasAttribute<TileAttributes.TileAttributeGravDown>()) _boardSpriteBatch.DrawString(_fonts.Small, string.Empty, tile.BoardPosition + new Vector2(10), Color.White);
-    //                else if (tile.HasAttribute<TileAttributes.TileAttributeGravUp>()) _boardSpriteBatch.DrawString(_fonts.Small, "^", (tile.BoardPosition + new Vector2(10)).PixelLock(Camera), Color.White);
-    //                else _boardSpriteBatch.DrawString(_fonts.Small, "Z", tile.BoardPosition + new Vector2(10), Color.White);
-    //            }
-    //        _boardSpriteBatch.End();
-    //        base.Draw(drawingContext);
-    //    }
-    //    public string GetPlayerTile(int playerIndex) => playerIndex switch
-    //    {
-    //        0 => "[o]",
-    //        1 => "[x]",
-    //        2 => "[.]",
-    //        3 => "[-]",
-    //        4 => "[v]",
-    //        5 => "[~]",
-    //        _ => throw new Exception()
-    //    };
-    //    public void EndGame(int winner)
-    //    {
-    //        bool draw = winner < 0;
-    //        _logger.Log(">ending game with " + (draw ? "a draw" : "winner: " + _scene.Players[winner]));
-
-    //        _environment.Overlayer.Activate("transition", STOLON.Instance.GetVirtualBounds());
-    //        _logger.Success();
-    //    }
-    //}
-
-    public struct SearchTarget
+    [Dependency(ServiceLifetime.Singleton)]
+    public partial class Board : IComponent
     {
-        public bool PlayerBound { get; }
-        public Point[] Nodes { get; }
-        public int? TurnsRemaining { get; private set; }
-        public string Id { get; }
-        public Point[] InvertedNodes { get; }
-        public SearchTarget(string id, Point[] nodes, bool playerBound = true, int? turnsRemaining = null)
-        {
-            Nodes = Point.Zero.ToSingleArray().Concat(nodes).ToArray();
+        public Camera2D Camera { get; }
 
-            List<Point> rev = new List<Point>() { Point.Zero };
-            foreach (Point node in nodes)
+        public float MaxDeltaZoom => SmoothnessModifier * 10f;
+        public float ZoomIntensity => (Camera.Zoom - _desiredZoom) / MaxDeltaZoom;
+        public float SmoothnessModifier => 0.003f;
+        public int TurnCount { get; private set; }
+        public BoardState InitialState { get; }
+
+        private readonly SpriteBatch _worldSpriteBatch;
+        private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
+        private readonly IInputManager _input;
+        private readonly ILogger _logger;
+        private readonly BoardState _state;
+        private readonly float _desiredZoom;
+
+        private Vector2 _desiredCameraPos;
+        private RenderTarget2D _worldRenderTarget;
+
+        public const int TileSize = 96;
+
+        public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, BoardState initialBoardState)
+        {
+            _textures = textures;
+            _fonts = fonts;
+            _input = input;
+            _logger = logger;
+
+            InitialState = initialBoardState.DeepCopy();
+            TurnCount = 0;
+
+            _state = initialBoardState;
+            _worldSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
+            _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X);
+            _desiredCameraPos = Vector2.Zero;
+            _worldRenderTarget = new RenderTarget2D(_worldSpriteBatch.GraphicsDevice, 512, 512);
+
+            Camera = new Camera2D()
             {
-                rev.Add(node * new Point(-1, -1));
+                Position = _desiredCameraPos,
+                Zoom = 1f
+            };
+        }
+
+        public void Update(int elapsedMilliseconds)
+        {
+            Vector2 worldMousePos = Camera.Unproject(_input.Mouse.Position);
+
+            int mouseStateCoefficient = _input.Mouse.GetCoefficient();
+
+            if (_input.IsPressed(Keys.LeftShift))
+            {
+                if (mouseStateCoefficient == 0) mouseStateCoefficient = 1;
+                if (_input.IsPressed(Keys.A))
+                    _desiredCameraPos.X -= 1;
+                if (_input.IsPressed(Keys.D))
+                    _desiredCameraPos.X += 1;
+                if (_input.IsPressed(Keys.W))
+                    _desiredCameraPos.Y -= 1;
+                if (_input.IsPressed(Keys.S))
+                    _desiredCameraPos.Y += 1;
             }
-            InvertedNodes = rev.ToArray();
 
-            PlayerBound = playerBound;
-            TurnsRemaining = turnsRemaining;
-            Id = id;
-        }
-        public bool DecrementTurn()
-        {
-            if (!TurnsRemaining.HasValue) throw new Exception();
-            else TurnsRemaining--;
-            return TurnsRemaining == 0;
+            //if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2(); // do this smarterly.
+
+            Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * SmoothnessModifier;
+            Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(mouseStateCoefficient);
         }
 
-    }
-    /// <summary>
-    /// Represent a single move.
-    /// </summary>
-    public struct Move
-    {
-        /// <summary>
-        /// The origin of the <see cref="Move"/>, Y can often be infinitly large, X is limited by board width.
-        /// </summary>
-        public Point Origin { get; }
-        /// <summary>
-        /// Create a new move with set X and Y coordinates.
-        /// </summary>
-        /// <param name="x">The X coordinate.</param>
-        /// <param name="y">The Y coordinate</param>
-        public Move(int x, int y) : this(new Point(x, y)) { }
-        /// <summary>
-        /// Create a new move from a <see cref="Point"/>.
-        /// </summary>
-        /// <param name="origin"></param>
-        public Move(Point origin)
+        public void Draw(DrawingContext drawingContext)
         {
-            Origin = origin;
+            RenderTargetBinding[] previousTargets = _worldSpriteBatch.GraphicsDevice.GetRenderTargets(); // to change so it doesnt alloc an array every draw.
+
+            _worldSpriteBatch.GraphicsDevice.SetRenderTarget(_worldRenderTarget);
+
+            _worldSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
+
+            for (int x = 0; x < _state.Dimensions.X; x++)
+                for (int y = 0; y < _state.Dimensions.Y; y++)
+                {
+                    Tile tile = _state.Tiles[x, y];
+                    Vector2 tileWorldPos = Camera.Project(tile.Position.ToVector2() * new Vector2(TileSize));
+                    NumberHelper.OnPixel(ref tileWorldPos);
+
+                    _worldSpriteBatch.Draw(tile.GetTexture(_textures), tileWorldPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    int playerid = tile.GetOccupiedByPlayerIndex();
+                    if (playerid != -1)
+                    {
+                        _worldSpriteBatch.Draw(_textures.GetReference("player" + playerid + "_item-96"), tileWorldPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    }
+                    else if (tile.HasAttribute<GravDownTileAttribute>()) _worldSpriteBatch.DrawString(_fonts.Medium, string.Empty, tileWorldPos + new Vector2(10), Color.White);
+                    else if (tile.HasAttribute<GravUpTileAttribute>()) _worldSpriteBatch.DrawString(_fonts.Medium, "^", tileWorldPos + new Vector2(10), Color.White);
+                    else _worldSpriteBatch.DrawString(_fonts.Medium, "Z", tileWorldPos + new Vector2(10), Color.White);
+                }
+
+            _worldSpriteBatch.End();
+
+            _worldSpriteBatch.GraphicsDevice.SetRenderTargets(previousTargets);
+
+            drawingContext.ReApplyDrawingParameters(); // why this is needed is beyond me.
+
+            drawingContext.Draw(_worldRenderTarget, Vector2.Zero);
         }
 
-        public Tile ToTile(int playerId, BoardState state) => ToTile(playerId, state.Tiles);
-        public Tile ToTile(int playerId, Tile[,] tiles) => ToTile(playerId, tiles[Origin.X, Origin.Y].Attributes);
-        public Tile ToTile(int playerId, HashSet<TileAttributeBase> OGattributes)
+        public string GetPlayerSymbol(int playerIndex) => playerIndex switch
         {
-            HashSet<TileAttributeBase> a = TileAttributes.GetNewPlayerAttributes(playerId);
-            a.UnionWith(OGattributes);
-            return new Tile(new Point(Origin.X, Origin.Y), null, a);
-        }
-
-        public override bool Equals([NotNullWhen(true)] object? obj)
-        {
-            return Origin == ((Move)obj!).Origin;
-        }
-        public static Move GetRandomMove(Move[] uniqueMoves)
-        {
-            Random random = new Random();
-            return uniqueMoves[random.Next(0, uniqueMoves.Length)];
-        }
-
-        public static Move Invalid => new Move(-1, -1);
-        public static implicit operator Point(Move m) => m.Origin;
-        public static explicit operator Move(Point p) => new Move(p);
-
-
-        public static bool operator ==(Move left, Move right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Move left, Move right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            return Origin.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return Origin.ToString();
-        }
+            0 => "[o]",
+            1 => "[x]",
+            2 => "[.]",
+            3 => "[-]",
+            4 => "[v]",
+            5 => "[~]",
+            _ => throw new Exception()
+        };
     }
 
-
-
-    public class Tile : ICloneable
+    public abstract class Move
     {
-        public Vector2 BoardPosition => TiledPosition.ToVector2() * BoardMultiplier;
-        public RectangleF HitBox => new RectangleF(BoardPosition.X, BoardPosition.Y, BoardMultiplier, BoardMultiplier);
-        public Point TiledPosition { get; }
-        public TileType TileType { get; set; }
-        public HashSet<TileAttributeBase> Attributes { get; set; }
+        public abstract void Act(BoardState boardState);
+    }
 
-        public Tile(Point tiledPosition, TileType? tileType, HashSet<TileAttributeBase>? attributes = null)
+    public sealed class Tile : ICloneable
+    {
+        public Point Position { get; } // never changes, the rest is free to change though. It's cheaper to not allocate a new Tile every time a Tile changes.
+        public HashSet<TileAttribute> Attributes { get; set; }
+
+        public Tile(Point position, HashSet<TileAttribute>? attributes = null)
         {
-            TileType = tileType ?? TileType.Void;
-            TiledPosition = tiledPosition;
-            Attributes = attributes ?? new HashSet<TileAttributeBase>();
+            Position = position;
+            Attributes = attributes ?? new HashSet<TileAttribute>();
         }
-        public Tile Simulate(BoardState board)
-        {
-            int x = TiledPosition.X;
-            int y = TiledPosition.Y;
 
-            Point newPos = TiledPosition;
-
-            if (this.HasAttribute<TileAttributes.TileAttributeGravDown>())
-            {
-                int depth = board.Tiles.GetLength(1) - y - 1;
-                for (int i = 1; i <= depth; i++)
-                {
-                    Tile tile = board.Tiles[x, y + i];
-                    if (!tile.IsSolid() && tile.HasGravity())
-                    {
-                        newPos = tile.TiledPosition;
-                        continue;
-                    }
-                }
-            }
-            else if (this.HasAttribute<TileAttributes.TileAttributeGravUp>())
-            {
-                int depth = y;
-                for (int i = 1; i <= depth; i++)
-                {
-                    Tile tile = board.Tiles[x, y - i];
-                    if (!tile.IsSolid() && tile.HasGravity())
-                    {
-                        newPos = tile.TiledPosition;
-                        continue;
-                    }
-                }
-            }
-
-            return new Tile(newPos, TileType, Attributes);
-        }
-        public bool HasAttribute(TileAttributeBase attribute) => Attributes.Contains(attribute);
-        public bool HasAttribute(params TileAttributeBase[] attributes)
+        public bool HasAnyAttribute(params ReadOnlySpan<TileAttribute> attributes)
         {
             if (attributes.Length == 0) throw new Exception();
             for (int i = 0; i < attributes.Length; i++)
@@ -422,9 +148,43 @@ namespace STOLON
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasAttribute<TTileAttribute>() where TTileAttribute : TileAttribute
+            => HasAttribute(TileAttribute.Get<TTileAttribute>());
 
-        //public static float BoardMultiplier => Board.TILE_SIZE;
-        public static float BoardMultiplier => 1;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasAttribute(TileAttribute attribute)
+            => Attributes.Contains(attribute);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasGravity() => HasAttribute<GravDownTileAttribute>() || HasAttribute<GravUpTileAttribute>();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsSolid() => HasAttribute<SolidTileAttribute>();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOccupiedByPlayer() => GetOccupiedByPlayerIndex() != -1;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetOccupiedByPlayerIndex()
+        {
+            if (HasAttribute<Player0OccupiedTileAttribute>()) return 0;
+            if (HasAttribute<Player1OccupiedTileAttribute>()) return 1;
+            return -1;
+        }
+
+        public Texture2D GetTexture(ITexture2DCollection textures)
+        {
+            return textures.GetReference("box-96");
+        }
+
+        // for multithread magic.
+        public Tile Clone() => new Tile(Position, new HashSet<TileAttribute>(Attributes));
+
+        object ICloneable.Clone() => Clone();
+
+        public override int GetHashCode() => Position.GetHashCode();
+
         public static Tile[,] GetTiles(Point dimensions, bool random = false)
         {
             Tile[,] tiles = new Tile[dimensions.X, dimensions.Y];
@@ -434,36 +194,15 @@ namespace STOLON
             {
                 for (int y = 0; y < dimensions.Y; y++)
                 {
-                    HashSet<TileAttributeBase> tileAttributes = new HashSet<TileAttributeBase>(TileAttributes.DefaultAttributes);
+                    HashSet<TileAttribute> tileAttributes = new HashSet<TileAttribute>(TileAttribute.DefaultAttributes);
 
-                    if (y < (int)(dimensions.Y / 2)) tileAttributes.ReplaceAttribute<TileAttributes.TileAttributeGravDown, TileAttributes.TileAttributeGravUp>();
+                    if (y < (int)(dimensions.Y / 2)) TileAttribute.ReplaceAttribute<GravDownTileAttribute, GravUpTileAttribute>(tileAttributes);
 
-                    tiles[x, y] = new Tile(new Point(x, y), TileType.Void, tileAttributes);
+                    tiles[x, y] = new Tile(new Point(x, y), tileAttributes);
                 }
             }
+
             return tiles;
         }
-        public Tile Clone() => new Tile(TiledPosition, new TileType(TileType.Name, TileType.Texture), new HashSet<TileAttributeBase>(Attributes));
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
-        public override int GetHashCode()
-        {
-            return TiledPosition.GetHashCode();
-        }
     }
-    public class TileType
-    {
-        public string Name { get; }
-        public Texture2D Texture { get; }
-        public TileType(string name, Texture2D texture)
-        {
-            Name = name;
-            Texture = texture;
-        }
-
-        public static TileType Void { get; } = new TileType("void", STOLON.Services.Resolve<ITexture2DCollection>().GetReference("box-96"));
-    }
-
 }

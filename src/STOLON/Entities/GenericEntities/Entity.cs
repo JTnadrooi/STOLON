@@ -1,58 +1,12 @@
-﻿namespace STOLON
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace STOLON
 {
-    public enum EntityDrawMode
-    {
-        None = 0,
-        Menu = 1,
-        WithBackground = 2,
-    }
-
-    public class EntityProfile : IMipmapped
-    {
-        public Texture2D Texture512 => Mipmaps[512];
-        public Texture2D Texture256 => this.TryGetMipmap(256, out Texture2D? t) ? t! : throw new Exception();
-        public Texture2D Texture128 => this.TryGetMipmap(128, out Texture2D? t) ? t! : throw new Exception();
-
-        public IReadOnlyDictionary<int, Texture2D> Mipmaps => mipmaps;
-        public Point Focus { get => _focus; set => _focus = value; }
-        public Point MenuOffset { get => _menuOffset; set => _menuOffset = value; }
-
-        private Dictionary<int, Texture2D> mipmaps;
-        private Point _focus;
-        private Point _menuOffset;
-
-        public EntityProfile(string entityName, ITexture2DCollection textures, Point? focus = null, Point? menuOffset = null) : this(
-            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : throw new Exception(),
-            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
-            textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
-            focus)
-        { }
-
-        public EntityProfile(Texture2D t512, Texture2D? t256 = null, Texture2D? t128 = null, Point? focus = null, Point? menuOffset = null)
-        {
-            mipmaps = new Dictionary<int, Texture2D>();
-            mipmaps[512] = t512;
-            if (t256 != null) mipmaps[256] = t256;
-            if (t128 != null) mipmaps[128] = t128;
-            _focus = focus ?? Centering.GetCenter(t512).ToPoint();
-            _menuOffset = menuOffset ?? Point.Zero;
-        }
-
-        public static EntityProfile GetDebug(Texture2D? t512, Texture2D? t256 = null, Texture2D? t128 = null, ITexture2DCollection? textures = null, Point? focus = null, Point? menuOffset = null)
-            => new EntityProfile(t512 ?? textures[$"Debug\\temp-512"] ?? throw new InvalidOperationException(), t256, t128, focus, menuOffset);
-        public static EntityProfile GetDebug(string entityName, ITexture2DCollection textures, Point? focus = null, Point? menuOffset = null)
-            => new EntityProfile(
-                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-512", out Texture2D? val512) ? val512 : textures[$"Debug\\temp-512"],
-                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-256", out Texture2D? val256) ? val256 : null,
-                textures.TryGetValue($"Entities\\{entityName}\\{entityName}-128", out Texture2D? val128) ? val128 : null,
-            focus);
-    }
-
     /// <summary>
     /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
     [Dependency(ServiceLifetime.Singleton)]
-    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
+    public abstract class Entity : IDialogueProvider, IPlayer, IMipmapped, IEquatable<Entity>
     {
         /// <summary>
         /// Gets the full/display name of this <see cref="Entity"/>.
@@ -62,8 +16,6 @@
         public EntityProfile Profile { get; }
 
         public IReadOnlyDictionary<int, Texture2D> Mipmaps => Profile.Mipmaps;
-
-        public abstract Computer? Computer { get; }
 
         public string Description { get; }
 
@@ -98,16 +50,13 @@
         protected virtual (ConditionalNote[] allocationNotes, ConditionalNote[] abilityNotes) ResolveNotes()
             => (Array.Empty<ConditionalNote>(), Array.Empty<ConditionalNote>());
 
-        /// <summary>
-        /// Get the <see cref="Player"/> of this <see cref="Entity"/>.
-        /// </summary>
-        /// <returns>A new <see cref="Player"/> created from this <see cref="Entity"/>.</returns>
-        public Player GetPlayer() => new Player(Name, Computer ?? throw new InvalidOperationException($"Entity '{Name}' has no associated computer."));
         public virtual int GetVirtualAllocation(EntitySelection info)
-        {
-            return info.GetAllocation(this.Id);
-        }
-        public bool Equals(Entity? other) => other != null && other.Id == Id;
+            => info.GetAllocation(Id);
+
+        public abstract bool HasWon(BoardState state, GameInfo gameInfo);
+
+        public abstract bool TryGetMove(BoardState state, GameInfo gameInfo, [NotNullWhen(true)] out Move? move);
+        public bool Equals(Entity? other) => other is not null && other.Id == Id;
     }
 
     public static class EntityDrawingExtensions
@@ -159,36 +108,6 @@
             NumberHelper.OnPixel(ref strPos);
 
             context.DrawString(font, symbolNotationStr, strPos, scale: scale);
-        }
-    }
-
-    /// <summary>
-    /// A class that can interact with a <see cref="Board"/>.
-    /// </summary>
-    public abstract class Computer
-    {
-        /// <summary>
-        /// The source <see cref="Entity"/>.
-        /// </summary>
-        public Entity? Source { get; }
-
-        public Computer(Entity? source)
-        {
-            Source = source;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Player"/> this <see cref="Computer"/> plays for.
-        /// </summary>
-        /// <param name="state">The current state of the <see cref="Board"/>.</param>
-        /// <returns>The <see cref="Player"/> this <see cref="Computer"/> plays for.</returns>
-        public Player GetPlayer(BoardState state)
-        {
-            Player[] players = state.Players.ToArray();
-            for (int i = 0; i < players.Length; i++)
-                if (players[i].Computer == this)
-                    return players[i];
-            throw new Exception();
         }
     }
 }
