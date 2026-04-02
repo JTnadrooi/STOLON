@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.CompilerServices;
 
 namespace STOLON
 {
@@ -79,20 +80,6 @@ namespace STOLON
         }
 
         private RasterizerState? _rasterizerState;
-        //public RasterizerState? RasterizerState
-        //{
-        //    get => _rasterizerState;
-        //    set
-        //    {
-        //        if (_scissorArea.HasValue && !value.ScissorTestEnable) throw new InvalidOperationException("Value does not allow ScissorArea even though scissordrawing is active.");
-
-        //        if (_rasterizerState != value)
-        //        {
-        //            _rasterizerState = value;
-        //            UpdateDrawingParameters();
-        //        }
-        //    }
-        //}
 
         private Matrix? _transformMatrix;
         public Matrix? TransformMatrix
@@ -134,6 +121,16 @@ namespace STOLON
                     UpdateDrawingParameters();
                 }
             }
+        }
+
+        /// <summary>
+        /// Reapplies drawing parameters normally passed to the <see cref="SpriteBatch.Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, Effect, Matrix?)"/> method.
+        /// Call this after the <see cref="SpriteBatch.End"/> call of a secondary spritebatch when using it with differing drawing parameters.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ReApplyDrawingParameters() // why this is needed is still beyond me.
+        {
+            UpdateDrawingParameters();
         }
 
         private void UpdateDrawingParameters()
