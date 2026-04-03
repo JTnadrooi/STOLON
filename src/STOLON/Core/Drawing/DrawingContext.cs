@@ -166,6 +166,8 @@ namespace STOLON
         {
             bool changed = false;
 
+            samplerState ??= SamplerState.PointClamp;
+
             if (_sortMode != sortMode)
             {
                 _sortMode = sortMode;
