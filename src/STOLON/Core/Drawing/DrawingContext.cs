@@ -11,7 +11,7 @@ namespace STOLON
     }
 
     [Dependency(ServiceLifetime.Singleton)]
-    public class DrawingContext : IDisposable
+    public sealed class DrawingContext : IDisposable
     {
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
@@ -265,7 +265,9 @@ namespace STOLON
             _input = input;
 
             _logger.Log(">[s]initialising drawing context");
+
             SpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
+
             _graphics = STOLON.Instance.GraphicsDevice;
 
             _vrt1 = GetVirtual();
@@ -613,7 +615,7 @@ namespace STOLON
         //    DrawString(font, text, calcPos, color: color, effects: effects, layerDepth: layerDepth);
         //}
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {

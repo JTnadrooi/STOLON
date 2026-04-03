@@ -16,7 +16,6 @@ namespace STOLON
         public int TurnCount { get; private set; }
         public BoardState InitialState { get; }
 
-        private readonly SpriteBatch _worldSpriteBatch;
         private readonly ITexture2DCollection _textures;
         private readonly IFont2DCollection _fonts;
         private readonly IInputManager _input;
@@ -25,8 +24,6 @@ namespace STOLON
         private readonly float _desiredZoom;
 
         private Vector2 _desiredCameraPos;
-        private RenderTarget2D _worldRenderTarget;
-
         public const int TileSize = 96;
 
         public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, BoardState initialBoardState)
@@ -40,10 +37,8 @@ namespace STOLON
             TurnCount = 0;
 
             _state = initialBoardState;
-            _worldSpriteBatch = new SpriteBatch(STOLON.Instance.GraphicsDevice);
             _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X);
             _desiredCameraPos = Vector2.Zero;
-            _worldRenderTarget = new RenderTarget2D(_worldSpriteBatch.GraphicsDevice, 512, 512);
 
             Camera = new Camera2D()
             {
@@ -79,11 +74,16 @@ namespace STOLON
 
         public void Draw(DrawingContext drawingContext)
         {
-            RenderTargetBinding[] previousTargets = _worldSpriteBatch.GraphicsDevice.GetRenderTargets(); // to change so it doesnt alloc an array every draw.
+            Matrix original = drawingContext.TransformMatrix!.Value;
 
-            _worldSpriteBatch.GraphicsDevice.SetRenderTarget(_worldRenderTarget);
+            // extract the original offset from the current TransformMatrix.
+            Vector2 offset = new Vector2(drawingContext.TransformMatrix.Value.M41, drawingContext.TransformMatrix.Value.M42);
 
-            _worldSpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Camera.View);
+            // compensate for camera zoom.
+            Vector2 compensatedOffset = offset / Camera.Zoom;
+
+            // build a new transform: offset then camera.
+            drawingContext.TransformMatrix = Matrix.CreateTranslation(compensatedOffset.X, compensatedOffset.Y, 0) * Camera.View;
 
             for (int x = 0; x < _state.Dimensions.X; x++)
                 for (int y = 0; y < _state.Dimensions.Y; y++)
@@ -92,24 +92,18 @@ namespace STOLON
                     Vector2 tileWorldPos = Camera.Project(tile.Position.ToVector2() * new Vector2(TileSize));
                     NumberHelper.OnPixel(ref tileWorldPos);
 
-                    _worldSpriteBatch.Draw(tile.GetTexture(_textures), tileWorldPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    drawingContext.Draw(tile.GetTexture(_textures), tileWorldPos);
                     int playerid = tile.GetOccupiedByPlayerIndex();
                     if (playerid != -1)
                     {
-                        _worldSpriteBatch.Draw(_textures.GetReference("player" + playerid + "_item-96"), tileWorldPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                        drawingContext.Draw(_textures.GetReference("player" + playerid + "_item-96"), tileWorldPos);
                     }
-                    else if (tile.HasAttribute<GravDownTileAttribute>()) _worldSpriteBatch.DrawString(_fonts.Medium, string.Empty, tileWorldPos + new Vector2(10), Color.White);
-                    else if (tile.HasAttribute<GravUpTileAttribute>()) _worldSpriteBatch.DrawString(_fonts.Medium, "^", tileWorldPos + new Vector2(10), Color.White);
-                    else _worldSpriteBatch.DrawString(_fonts.Medium, "Z", tileWorldPos + new Vector2(10), Color.White);
+                    else if (tile.HasAttribute<GravDownTileAttribute>()) drawingContext.DrawString(_fonts.Medium, string.Empty, tileWorldPos + new Vector2(10));
+                    else if (tile.HasAttribute<GravUpTileAttribute>()) drawingContext.DrawString(_fonts.Medium, "^", tileWorldPos + new Vector2(10));
+                    else drawingContext.DrawString(_fonts.Medium, "Z", tileWorldPos + new Vector2(10));
                 }
 
-            _worldSpriteBatch.End();
-
-            _worldSpriteBatch.GraphicsDevice.SetRenderTargets(previousTargets);
-
-            drawingContext.ReApplyDrawingParameters(); // why this is needed is beyond me.
-
-            drawingContext.Draw(_worldRenderTarget, Vector2.Zero);
+            drawingContext.TransformMatrix = original;
         }
 
         public string GetPlayerSymbol(int playerIndex) => playerIndex switch
