@@ -448,7 +448,13 @@ namespace STOLON
 
             #region HANDLE_MOUSE
 
-            TryGetTextPosition(_input.Mouse.Position, out TextPosition? mouseTextPos, true);
+            TextPosition? mouseTextPos;
+
+            // TryGetTextPosition may throw an error when there is no text and it tries create a TextPosition instance with pos 0.
+            if (_hasInputLine)
+                TryGetTextPosition(_input.Mouse.Position, out mouseTextPos, true);
+            else
+                mouseTextPos = null;
 
             if (_input.IsMouseOn<Shell>() && _input.IsPressed(MouseButton.Left))
             {
