@@ -2,12 +2,13 @@
 {
     public class Camera2D
     {
-        private Point _dimensions;
         private float _zoom;
 
-        public Camera2D()
+        public Point Dimensions;
+
+        public Camera2D(Point? dimensions = null)
         {
-            _dimensions = STOLON.Instance.GetVirtualDimensions();
+            Dimensions = dimensions ?? STOLON.Instance.GetVirtualDimensions();
 
             MinZoom = 0.1f;
             MaxZoom = 100f;
@@ -20,8 +21,8 @@
         public float MinZoom { get; set; }
         public float Rotation { get; set; }
         public Matrix Projection => Matrix.CreateOrthographicOffCenter(0, ScreenSize.X, ScreenSize.Y, 0, -1, 1);
-        public Rectangle ScreenRectangle => new Rectangle(0, 0, _dimensions.X, _dimensions.Y);
-        public Vector2 ScreenSize => new Vector2(_dimensions.X, _dimensions.Y);
+        public Rectangle ScreenRectangle => new Rectangle(0, 0, Dimensions.X, Dimensions.Y);
+        public Vector2 ScreenSize => new Vector2(Dimensions.X, Dimensions.Y);
         public float Zoom
         {
             get => _zoom;
