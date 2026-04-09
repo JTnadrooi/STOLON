@@ -6,13 +6,10 @@ using System.Runtime.CompilerServices;
 namespace STOLON
 {
     [Dependency(ServiceLifetime.Singleton)]
-    public partial class Board : IComponent
+    public sealed class Board : IComponent
     {
         public Camera2D Camera { get; }
 
-        public float MaxDeltaZoom => SmoothnessModifier * 10f;
-        public float ZoomIntensity => (Camera.Zoom - _desiredZoom) / MaxDeltaZoom;
-        public float SmoothnessModifier => 0.003f;
         public BoardState InitialState { get; }
 
         private readonly ITexture2DCollection _textures;
@@ -51,25 +48,29 @@ namespace STOLON
             Vector2 worldMousePos = Camera.Unproject(_input.Mouse.Position);
 
             int mouseStateCoefficient = _input.Mouse.GetCoefficient();
+
             if (_input.IsPressed(Keys.LeftShift))
             {
                 if (mouseStateCoefficient == 0) mouseStateCoefficient = 1;
-                if (_input.IsPressed(Keys.A))
-                    _desiredCameraPos.X -= 1;
+
                 if (_input.IsPressed(Keys.D))
                     _desiredCameraPos.X += 1;
+                if (_input.IsPressed(Keys.A))
+                    _desiredCameraPos.X += -1;
+
                 if (_input.IsPressed(Keys.W))
-                    _desiredCameraPos.Y -= 1;
-                if (_input.IsPressed(Keys.S))
                     _desiredCameraPos.Y += 1;
+                if (_input.IsPressed(Keys.S))
+                    _desiredCameraPos.Y += -1;
             }
 
             _desiredZoom = 0.3f * Math.Min((float)Camera.Dimensions.X / BoardWindow.InitialSize, (float)Camera.Dimensions.Y / BoardWindow.InitialSize);
 
             //if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2(); // do this smarterly.
 
-            Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * SmoothnessModifier;
-            Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * SmoothnessModifier * Math.Abs(mouseStateCoefficient);
+            float smoothness = 0.003f;
+            Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * smoothness;
+            Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * smoothness * Math.Abs(mouseStateCoefficient);
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -192,7 +193,7 @@ namespace STOLON
                 {
                     HashSet<TileAttribute> tileAttributes = new HashSet<TileAttribute>(TileAttribute.DefaultAttributes);
 
-                    if (y < (int)(dimensions.Y / 2)) TileAttribute.ReplaceAttribute<GravDownTileAttribute, GravUpTileAttribute>(tileAttributes);
+                    if (y >= (int)(dimensions.Y / 2)) TileAttribute.ReplaceAttribute<GravDownTileAttribute, GravUpTileAttribute>(tileAttributes);
 
                     tiles[x, y] = new Tile(new Point(x, y), tileAttributes);
                 }
