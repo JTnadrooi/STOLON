@@ -445,7 +445,7 @@ namespace STOLON
             return OuterBounds.Location.ToVector2() + new Vector2(OuterBounds.Width - 2 - WindowButton.Size - (WindowButton.Size + 2) * index, OuterBounds.Height - WindowButton.Size - 2);
         }
 
-        public virtual void Update(int elapsedMilliseconds)
+        public void Update(int elapsedMilliseconds)
         {
             bool foundButton = false; // it should not be possible to click two buttons at once anyways.
             bool isMouseOnThis = _input.IsMouseOn(this);
