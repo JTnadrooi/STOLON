@@ -20,9 +20,10 @@ namespace STOLON
         private readonly IInputManager _input;
         private readonly ILogger _logger;
         private readonly BoardState _state;
-        private readonly float _desiredZoom;
 
+        private float _desiredZoom;
         private Vector2 _desiredCameraPos;
+
         public const int TileSize = 96;
 
         public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, BoardState initialBoardState)
@@ -35,8 +36,8 @@ namespace STOLON
             InitialState = initialBoardState.DeepCopy();
 
             _state = initialBoardState;
-            _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X);
-            _desiredCameraPos = Vector2.Zero;
+            _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X) * 0.6f;
+            _desiredCameraPos = new Vector2(initialBoardState.Dimensions.X / 2f, initialBoardState.Dimensions.Y / 2f) * TileSize;
 
             Camera = new Camera2D()
             {
@@ -50,7 +51,6 @@ namespace STOLON
             Vector2 worldMousePos = Camera.Unproject(_input.Mouse.Position);
 
             int mouseStateCoefficient = _input.Mouse.GetCoefficient();
-
             if (_input.IsPressed(Keys.LeftShift))
             {
                 if (mouseStateCoefficient == 0) mouseStateCoefficient = 1;
@@ -63,6 +63,8 @@ namespace STOLON
                 if (_input.IsPressed(Keys.S))
                     _desiredCameraPos.Y += 1;
             }
+
+            _desiredZoom = 0.3f * Math.Min((float)Camera.Dimensions.X / BoardWindow.InitialSize, (float)Camera.Dimensions.Y / BoardWindow.InitialSize);
 
             //if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2(); // do this smarterly.
 
@@ -87,7 +89,7 @@ namespace STOLON
                 for (int y = 0; y < _state.Dimensions.Y; y++)
                 {
                     Tile tile = _state.Tiles[x, y];
-                    Vector2 tileWorldPos = Camera.Project(tile.Position.ToVector2() * new Vector2(TileSize));
+                    Vector2 tileWorldPos = tile.Position.ToVector2() * new Vector2(TileSize);
                     NumberHelper.OnPixel(ref tileWorldPos);
 
                     drawingContext.Draw(tile.GetTexture(_textures), tileWorldPos);
@@ -100,6 +102,8 @@ namespace STOLON
                     else if (tile.HasAttribute<GravUpTileAttribute>()) drawingContext.DrawString(_fonts.Medium, "^", tileWorldPos + new Vector2(10));
                     else drawingContext.DrawString(_fonts.Medium, "Z", tileWorldPos + new Vector2(10));
                 }
+
+            drawingContext.DrawPoint(Camera.Position, Color.BlueViolet, 10);
 
             drawingContext.TransformMatrix = original;
         }
