@@ -71,7 +71,7 @@ namespace STOLON
         {
             if (_isWindowLocked)
             {
-                _window.Position = this.Position;
+                _window.Position = Position;
             }
         }
 
@@ -81,7 +81,7 @@ namespace STOLON
             {
                 _window.Draw(drawingContext);
             }
-            else  // window drawing is done by kernel.
+            else  // window drawing is done by kernel, so just draw slot.
             {
                 drawingContext.Draw(_windowSlotTex, Position);
             }
