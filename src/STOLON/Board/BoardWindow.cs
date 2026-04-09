@@ -14,13 +14,15 @@ namespace STOLON
         private readonly Address _address;
         private readonly Board _board;
 
+        public const int InitialSize = 256;
+
         public BoardWindow(
             WindowDependencies deps,
             ITexture2DCollection textures,
             IFont2DCollection fonts,
             IInputManager input,
             ILogger logger,
-            Address address) : base(deps, 256, 256)
+            Address address) : base(deps, InitialSize, InitialSize)
         {
             _fonts = fonts;
             _input = input;
@@ -35,6 +37,7 @@ namespace STOLON
 
         protected override void UpdateContents(int elapsedMilliseconds)
         {
+            _board.Camera.Dimensions = InnerBounds.Size;
             _board.Update(elapsedMilliseconds);
         }
 
