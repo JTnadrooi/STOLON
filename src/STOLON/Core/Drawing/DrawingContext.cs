@@ -123,93 +123,6 @@ namespace STOLON
             }
         }
 
-        /// <summary>
-        /// Reapplies drawing parameters normally passed to the <see cref="SpriteBatch.Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, Effect, Matrix?)"/> method.
-        /// Call this after the <see cref="SpriteBatch.End"/> call of a secondary spritebatch when using it with differing drawing parameters.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReApplyDrawingParameters() // why this is needed is still beyond me.
-        {
-            UpdateDrawingParameters();
-        }
-
-        private void UpdateDrawingParameters()
-        {
-            bool isSpriteBatchInitiallyActive = _isSpriteBatchActive; // because it will not be active after the EndBatch call so this has to be stored for a sec.
-
-            if (isSpriteBatchInitiallyActive) EndBatch();
-
-            if (_scissorArea.HasValue) // I cannot put this before the EndBatch call for reasons unknown.
-            {
-                SpriteBatch.GraphicsDevice.ScissorRectangle = _scissorArea.Value;
-                _rasterizerState = s_scissorRasterizerState;
-            }
-            else
-            {
-                SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
-                _rasterizerState = s_defaultRasterizerState;
-            }
-
-            if (isSpriteBatchInitiallyActive) BeginBatch();
-
-            // if not started, the next begin call will handle it.
-        }
-
-        public void SetDrawingParameters( // for bulk changes.
-            SpriteSortMode sortMode = SpriteSortMode.Deferred,
-            BlendState? blendState = null,
-            SamplerState? samplerState = null,
-            DepthStencilState? depthStencilState = null,
-            Rectangle? scissorArea = null,
-            Matrix? transformMatrix = null,
-            bool forceUpdate = false)
-        {
-            bool changed = false;
-
-            samplerState ??= SamplerState.PointClamp;
-
-            if (_sortMode != sortMode)
-            {
-                _sortMode = sortMode;
-                changed = true;
-            }
-
-            if (_blendState != blendState)
-            {
-                _blendState = blendState;
-                changed = true;
-            }
-
-            if (_samplerState != samplerState)
-            {
-                _samplerState = samplerState;
-                changed = true;
-            }
-
-            if (_depthStencilState != depthStencilState)
-            {
-                _depthStencilState = depthStencilState;
-                changed = true;
-            }
-
-            if (_scissorArea != scissorArea)
-            {
-                _scissorArea = scissorArea;
-                changed = true;
-            }
-
-            if (_transformMatrix != transformMatrix)
-            {
-                _transformMatrix = transformMatrix;
-                changed = true;
-            }
-
-            if (changed || forceUpdate)
-            {
-                UpdateDrawingParameters();
-            }
-        }
-
         #endregion
 
         private static readonly RasterizerState s_scissorRasterizerState = new RasterizerState
@@ -301,9 +214,98 @@ namespace STOLON
             _logger.Success();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private RenderTarget2D GetVirtual() => new RenderTarget2D(_graphics, STOLON.VWidth, STOLON.VHeight);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private RenderTarget2D GetDesired(Point res) => new RenderTarget2D(_graphics, res.X, res.Y);
+
+        private void UpdateDrawingParameters()
+        {
+            bool isSpriteBatchInitiallyActive = _isSpriteBatchActive; // because it will not be active after the EndBatch call so this has to be stored for a sec.
+
+            if (isSpriteBatchInitiallyActive) EndBatch();
+
+            if (_scissorArea.HasValue) // I cannot put this before the EndBatch call for reasons unknown.
+            {
+                SpriteBatch.GraphicsDevice.ScissorRectangle = _scissorArea.Value;
+                _rasterizerState = s_scissorRasterizerState;
+            }
+            else
+            {
+                SpriteBatch.GraphicsDevice.ScissorRectangle = STOLON.Instance.GetVirtualBounds();
+                _rasterizerState = s_defaultRasterizerState;
+            }
+
+            if (isSpriteBatchInitiallyActive) BeginBatch();
+
+            // if not started, the next begin call will handle it.
+        }
+
+        ///// <summary>
+        ///// Reapplies drawing parameters normally passed to the <see cref="SpriteBatch.Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, Effect, Matrix?)"/> method.
+        ///// Call this after the <see cref="SpriteBatch.End"/> call of a secondary spritebatch when using it with differing drawing parameters.
+        ///// </summary>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //public void ReApplyDrawingParameters() // why this is needed is still beyond me.
+        //{
+        //    UpdateDrawingParameters();
+        //}
+
+        public void SetDrawingParameters( // for bulk changes.
+            SpriteSortMode sortMode = SpriteSortMode.Deferred,
+            BlendState? blendState = null,
+            SamplerState? samplerState = null,
+            DepthStencilState? depthStencilState = null,
+            Rectangle? scissorArea = null,
+            Matrix? transformMatrix = null,
+            bool forceUpdate = false)
+        {
+            bool changed = false;
+
+            samplerState ??= SamplerState.PointClamp;
+
+            if (_sortMode != sortMode)
+            {
+                _sortMode = sortMode;
+                changed = true;
+            }
+
+            if (_blendState != blendState)
+            {
+                _blendState = blendState;
+                changed = true;
+            }
+
+            if (_samplerState != samplerState)
+            {
+                _samplerState = samplerState;
+                changed = true;
+            }
+
+            if (_depthStencilState != depthStencilState)
+            {
+                _depthStencilState = depthStencilState;
+                changed = true;
+            }
+
+            if (_scissorArea != scissorArea)
+            {
+                _scissorArea = scissorArea;
+                changed = true;
+            }
+
+            if (_transformMatrix != transformMatrix)
+            {
+                _transformMatrix = transformMatrix;
+                changed = true;
+            }
+
+            if (changed || forceUpdate)
+            {
+                UpdateDrawingParameters();
+            }
+        }
 
         public void UpdateResolution()
         {
