@@ -13,7 +13,6 @@ namespace STOLON
         public float MaxDeltaZoom => SmoothnessModifier * 10f;
         public float ZoomIntensity => (Camera.Zoom - _desiredZoom) / MaxDeltaZoom;
         public float SmoothnessModifier => 0.003f;
-        public int TurnCount { get; private set; }
         public BoardState InitialState { get; }
 
         private readonly ITexture2DCollection _textures;
@@ -34,7 +33,6 @@ namespace STOLON
             _logger = logger;
 
             InitialState = initialBoardState.DeepCopy();
-            TurnCount = 0;
 
             _state = initialBoardState;
             _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X);
