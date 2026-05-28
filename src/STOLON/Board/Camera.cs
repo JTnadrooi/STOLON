@@ -44,19 +44,22 @@
             Zoom = 1;
         }
 
-        public Vector2 Unproject(Vector2 screenPosition) => Position + (screenPosition - ScreenSize / 2) / Zoom;
-        public Vector2 Project(Vector2 worldPosition) => (worldPosition - Position) * Zoom - ScreenSize / 2;
+        public Vector2 Project(Vector2 worldPosition)
+        {
+            return (worldPosition - Position) * Zoom + ScreenSize / 2;
+        }
+
+        public Vector2 Unproject(Vector2 screenPosition)
+        {
+            return Position + (screenPosition - ScreenSize / 2) / Zoom;
+        }
 
         public void OnPixel(ref Vector2 worldPosition)
         {
-            // pretty sure this does nothing
-            Vector2 screen = Vector2.Transform(worldPosition, View);
-
-            screen.X = MathF.Round(screen.X);
-            screen.Y = MathF.Round(screen.Y);
-
-            Matrix inverseView = Matrix.Invert(View);
-            worldPosition = Vector2.Transform(screen, inverseView);
+            Vector2 screenPosition = Project(worldPosition);
+            screenPosition.X = MathF.Round(screenPosition.X);
+            screenPosition.Y = MathF.Round(screenPosition.Y);
+            worldPosition = Unproject(screenPosition);
         }
 
         public override string ToString() => string.Format("Camera, pos: {0} area: {1}", Position, GetVisibleArea());
