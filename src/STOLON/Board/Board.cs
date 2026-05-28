@@ -77,31 +77,54 @@ namespace STOLON
         {
             Matrix original = drawingContext.TransformMatrix!.Value;
 
-            // extract the original offset from the current TransformMatrix
-            Vector2 offset = new Vector2(drawingContext.TransformMatrix.Value.M41, drawingContext.TransformMatrix.Value.M42);
-
             // compensate for camera zoom
-            Vector2 compensatedOffset = offset / Camera.Zoom;
-
-            // build a new transform: offset then camera
+            // and build a new transform: offset then camera
+            Vector2 compensatedOffset = new Vector2(drawingContext.TransformMatrix.Value.M41, drawingContext.TransformMatrix.Value.M42) / Camera.Zoom;
             drawingContext.TransformMatrix = Matrix.CreateTranslation(compensatedOffset.X, compensatedOffset.Y, 0) * Camera.View;
 
+            float totalWidth = _state.Dimensions.X * TileSize;
+            float totalHeight = _state.Dimensions.Y * TileSize;
+
+            for (int row = 0; row <= _state.Dimensions.Y; row++)
+            {
+                float y = row * TileSize;
+                Vector2 start = new Vector2(0, y);
+                Vector2 end = new Vector2(totalWidth, y);
+                Camera.OnPixel(ref start);
+                Camera.OnPixel(ref end);
+                drawingContext.DrawLine(start, end, Color.White, thickness: Camera.AntiScale.X);
+            }
+
+            for (int col = 0; col <= _state.Dimensions.X; col++)
+            {
+                float x = col * TileSize;
+                Vector2 start = new Vector2(x, 0);
+                Vector2 end = new Vector2(x, totalHeight);
+                Camera.OnPixel(ref start);
+                Camera.OnPixel(ref end);
+                drawingContext.DrawLine(start, end, Color.White, thickness: Camera.AntiScale.X);
+            }
+
             for (int x = 0; x < _state.Dimensions.X; x++)
+            {
                 for (int y = 0; y < _state.Dimensions.Y; y++)
                 {
                     Tile tile = _state.Tiles[x, y];
                     Vector2 tileWorldPos = tile.Position.ToVector2() * new Vector2(TileSize);
-
                     Camera.OnPixel(ref tileWorldPos);
 
-                    drawingContext.Draw(tile.GetTexture(_textures), tileWorldPos);
-                    int playerid = tile.GetOccupiedByPlayerIndex();
-                    if (playerid != -1)
+                    int playerId = tile.GetOccupiedByPlayerIndex();
+                    if (playerId != -1)
                     {
-                        drawingContext.Draw(_textures.GetReference("player" + playerid + "_item-96"), tileWorldPos);
+                        drawingContext.Draw(_textures.GetReference("player" + playerId + "_item-96"), tileWorldPos);
                     }
-                    if (tile.HasAttribute<GravUpTileAttribute>()) drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+
+                    if (tile.HasAttribute<GravUpTileAttribute>())
+                    {
+                        drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                    }
                 }
+            }
 
             drawingContext.TransformMatrix = original;
         }
