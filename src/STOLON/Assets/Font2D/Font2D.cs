@@ -135,7 +135,16 @@ namespace STOLON
                     previousGlyph = null;
                 }
 
-                context.SpriteBatch.Draw(currentGlyph.Character.TextureRegion, position, color ?? Color.White, rotation, position - currentGlyph.Position + (origin ?? Vector2.Zero), scale, context.InvertY(effects), layerDepth);
+                context.SpriteBatch.Draw(
+                    currentGlyph.Character.TextureRegion,
+                    currentGlyph.Position,
+                    color ?? Color.White,
+                    rotation,
+                    origin ?? Vector2.Zero,
+                    scale,
+                    context.InvertY(effects),
+                    layerDepth
+                );
             }
             //throw new Exception("a");
         }
