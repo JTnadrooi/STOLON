@@ -77,13 +77,13 @@ namespace STOLON
         {
             Matrix original = drawingContext.TransformMatrix!.Value;
 
-            // extract the original offset from the current TransformMatrix.
+            // extract the original offset from the current TransformMatrix
             Vector2 offset = new Vector2(drawingContext.TransformMatrix.Value.M41, drawingContext.TransformMatrix.Value.M42);
 
-            // compensate for camera zoom.
+            // compensate for camera zoom
             Vector2 compensatedOffset = offset / Camera.Zoom;
 
-            // build a new transform: offset then camera.
+            // build a new transform: offset then camera
             drawingContext.TransformMatrix = Matrix.CreateTranslation(compensatedOffset.X, compensatedOffset.Y, 0) * Camera.View;
 
             for (int x = 0; x < _state.Dimensions.X; x++)
@@ -91,7 +91,8 @@ namespace STOLON
                 {
                     Tile tile = _state.Tiles[x, y];
                     Vector2 tileWorldPos = tile.Position.ToVector2() * new Vector2(TileSize);
-                    NumberHelper.OnPixel(ref tileWorldPos);
+
+                    Camera.OnPixel(ref tileWorldPos);
 
                     drawingContext.Draw(tile.GetTexture(_textures), tileWorldPos);
                     int playerid = tile.GetOccupiedByPlayerIndex();
@@ -99,12 +100,8 @@ namespace STOLON
                     {
                         drawingContext.Draw(_textures.GetReference("player" + playerid + "_item-96"), tileWorldPos);
                     }
-                    else if (tile.HasAttribute<GravDownTileAttribute>()) drawingContext.DrawString(_fonts.Medium, string.Empty, tileWorldPos + new Vector2(10));
-                    else if (tile.HasAttribute<GravUpTileAttribute>()) drawingContext.DrawString(_fonts.Medium, "^", tileWorldPos + new Vector2(10));
-                    else drawingContext.DrawString(_fonts.Medium, "Z", tileWorldPos + new Vector2(10));
+                    if (tile.HasAttribute<GravUpTileAttribute>()) drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
                 }
-
-            drawingContext.DrawPoint(Camera.Position, Color.BlueViolet, 10);
 
             drawingContext.TransformMatrix = original;
         }

@@ -31,7 +31,6 @@ namespace STOLON
 
             _board = new Board(textures, fonts, input, logger, address.GetInitialBoardState());
 
-
             AddButton(new ToggleLockWindowButton(textures));
         }
 
