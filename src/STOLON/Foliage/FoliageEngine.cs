@@ -415,7 +415,7 @@ namespace STOLON
             {
                 int hash = seed;
                 hash = hash * 397 ^ index;
-                hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF); // might wanna remove this later. (causes alot of texture switches when changing point to point distances)
+                //hash = hash * 397 ^ (sizeX << 16) | (sizeY & 0xFFFF); // might wanna remove this later. (causes alot of texture switches when changing point to point distances)
                 hash = hash * 397 ^ (mirrored ? 1 : 0);
                 hash = Math.Abs(hash);
                 foliageTextureIndex = hash % availableFoliageTextures.Length;
