@@ -304,6 +304,7 @@ namespace STOLON
                 "Woo! Nyaa!", // Haiyore! Nyaruko-san reference
                 "Fuwa Fuwa Fuwa Fuwa", // Princess Advent reference (D4DJ)
                 "Marvelous~!", // Marvelous sunday reference (Uma musume)
+                "Are you sure whatever you're doing is worth it?", // subnautica reference
             };
 
             _splashText = _splashTexts[new Random().Next(0, _splashTexts.Length)];
