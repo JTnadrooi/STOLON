@@ -85,6 +85,8 @@ namespace STOLON
             => context.DrawString(font, text, position, new Vector2(scale), rotation, origin, color, effects, layerDepth);
         public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
+            // WANRING !! this method breaks if you input a string with a newline before a space. if you're fixing this now then hello future nadrooi! 
+
             int GetUnicodeCodePoint(string text, ref int index) => (!char.IsHighSurrogate(text[index]) || ++index >= text.Length) ? text[index] : char.ConvertToUtf32(text[index - 1], text[index]);
             unsafe int CountNewline(string input)
             {
@@ -103,7 +105,6 @@ namespace STOLON
             }
 
             ArgumentNullException.ThrowIfNull(text);
-            //if (!text.StartsWith("IN THE")) return;
 
             BitmapFont.BitmapFontGlyph currentGlyph;
             BitmapFont.BitmapFontGlyph? previousGlyph = null;
@@ -112,9 +113,16 @@ namespace STOLON
             for (int i = 0; i < text.Length; i++)
             {
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
+
+                if (unicodeCodePoint == '\r')
+                {
+                    positionDelta.X = 0f;
+                    continue;
+                }
+
                 currentGlyph.CharacterID = unicodeCodePoint;
                 if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
-                    throw new InvalidOperationException($"unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}', char: '{text[i]}'.)");
+                    throw new InvalidOperationException($"Unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}', char: '{text[i]}'.)");
 
                 currentGlyph.Position = position + positionDelta;
 
