@@ -29,5 +29,29 @@ namespace STOLON
         {
 
         }
+
+        public override string GetHelpString()
+        {
+            StringBuilder sb = new StringBuilder(Id).Append(" ");
+            OptionInfo[] options = GetOptions();
+
+            if (HasAliases) sb.Append($"[{Ids.Skip(1).ToJoinedString(", ")}] ");
+            sb.Append($"# {Description}");
+
+            if (options.Length != 0)
+            {
+                string optionsString = GetOptions().Select(p =>
+                    $"\n|   {p.OptionType.Name.ToLower()}:{p.Id!.ToLower()}{(p.HasDefaultValue ? $"(def:{p.DefaultValue?.ToString() ?? StringHelpers.NULL_STRING}) " : " ")}")
+                    .ToJoinedString();
+
+                sb.Append(optionsString);
+            }
+
+
+            return sb.ToString() + "\n|";
+
+            //return "a\na\na\na\na";
+            //return "a\na\n. a\n. a\na";
+        }
     }
 }
