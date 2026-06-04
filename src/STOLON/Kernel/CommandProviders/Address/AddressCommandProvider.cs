@@ -42,7 +42,7 @@ namespace STOLON
         }
 
         [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
-        public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with")] string[] withIds)
+        public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with", Aliases = ["w"])] string[] withIds)
         {
             InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, GetAddress(addrId)));
 
@@ -116,7 +116,7 @@ namespace STOLON
         }
 
         [KernelCommand("Initializes an address.", Id = "addr init", Aliases = ["stadr"])]
-        public void InitializeAddress([Option(Id = "addr")] string? addrId, [Option(Id = "with")] string[] withIds)
+        public void InitializeAddress([Option(Id = "addr")] string? addrId, [Option(Id = "with", Aliases = ["w"])] string[] withIds)
         {
             if (_commandManager.ActiveFlag is not InitAddressCommandFlag flag)
             {
