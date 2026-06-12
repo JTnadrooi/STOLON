@@ -100,7 +100,7 @@ namespace STOLON
         private bool _fastLeave;
 
         private const int LOGO_ROW_COUNT = 5;
-        private IPlayer[]? _boardPlayers;
+        private Entity[]? _boardEntities;
 
         private readonly ICachedAudioResourceCollection _audio;
         private readonly ITexture2DCollection _textures;
@@ -349,7 +349,8 @@ namespace STOLON
                         _millisecondsSinceStartup = 10001;
                         _done = true;
                         _removeTweener.Update(10);
-                        _boardPlayers = [new UserPlayer(_input, "player0"), new UserPlayer(_input, "player1")];
+                        //_boardEntities = [new UserMoveProvider(_input, null, "player0"), new UserMoveProvider(_input, null, "player1")];
+                        _boardEntities = null;
                         _fastLeave = true;
                         Leave();
                     }
@@ -428,7 +429,7 @@ namespace STOLON
 
             if (_ui.UpdateDump["xp_start"].IsClicked(_input))
             {
-                _boardPlayers = [new UserPlayer(_input, "player0"), new UserPlayer(_input, "player1")];
+                //_boardEntities = [new UserMoveProvider(_input, null, "player0"), new UserMoveProvider(_input, null, "player1")];
                 Leave();
             }
             if (_ui.UpdateDump["vol_up"].IsClicked(_input))
@@ -447,7 +448,7 @@ namespace STOLON
             }
             if (_ui.UpdateDump["com_start"].IsClicked(_input))
             {
-                _boardPlayers = [new UserPlayer(_input, "player0"), _environment.Entities["goldsilk"]];
+                //_boardEntities = [new UserMoveProvider(_input, null, "player0"), _environment.Entities["goldsilk"]];
                 Leave();
             }
             if (_ui.UpdateDump["special_thanks"].IsClicked(_input))
@@ -470,7 +471,7 @@ namespace STOLON
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
                 _sceneManager.ChangeScene<ShellScene>();
-                _boardPlayers = null;
+                _boardEntities = null;
             }), _fastLeave ? 10 : 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 

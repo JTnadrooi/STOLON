@@ -16,6 +16,8 @@ namespace STOLON
 
         public const int InitialSize = 256;
 
+        public Board Board => _board;
+
         public BoardWindow(
             WindowDependencies deps,
             ITexture2DCollection textures,

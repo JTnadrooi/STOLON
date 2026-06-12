@@ -9,26 +9,26 @@ namespace STOLON
     {
         public Point Dimensions => _dimensions;
         public Tile[,] Tiles => _tiles;
-        public IPlayer[] Players => _players;
-        public IPlayer CurrentPlayer => Players[_currentPlayerIndex];
+        public Entity[] Entities => _entities;
+        public Entity CurrentEntity => Entities[_currentPlayerIndex];
 
         public readonly Stack<UndoObj> _undoStack;
         public readonly Collection<UndoObj> _undoSet;
-        private readonly FrozenDictionary<IPlayer, int>? _playerIndexCache;
+        private readonly FrozenDictionary<Entity, int>? _entityIndexCache;
         private readonly Tile[,] _tiles;
-        private readonly IPlayer[] _players;
+        private readonly Entity[] _entities;
         private readonly Point _dimensions;
 
         public int _currentPlayerIndex;
 
-        public BoardState(Tile[,] tiles, IPlayer[] players, int currentPlayer = 0)
+        public BoardState(Tile[,] tiles, Entity[] entities, int currentPlayer = 0)
         {
             _tiles = tiles;
-            _players = players;
+            _entities = entities;
             _dimensions = new Point(tiles.GetLength(0), tiles.GetLength(1));
             _undoStack = new Stack<UndoObj>();
             _undoSet = new Collection<UndoObj>();
-            _playerIndexCache = players.Select((p, i) => new KeyValuePair<IPlayer, int>(p, i)).ToFrozenDictionary();
+            _entityIndexCache = entities.Select((p, i) => new KeyValuePair<Entity, int>(p, i)).ToFrozenDictionary();
 
             _currentPlayerIndex = currentPlayer;
         }
@@ -46,7 +46,7 @@ namespace STOLON
                 for (int y = 0; y < _dimensions.Y; y++)
                     resultTiles[x, y] = _tiles[x, y].Clone();
 
-            BoardState result = new BoardState(resultTiles, _players, _currentPlayerIndex);
+            BoardState result = new BoardState(resultTiles, _entities, _currentPlayerIndex);
 
             return result;
         }
@@ -102,7 +102,7 @@ namespace STOLON
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetIndex(UserPlayer player) => _playerIndexCache[player];
+        public int GetEntityIndex(Entity entity) => _entityIndexCache[entity];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Alter(Point tilePos, HashSet<TileAttribute> newAttributes) // SO SLOWWWW
@@ -127,8 +127,8 @@ namespace STOLON
             Alter(undoObj.Sim.Position, undoObj.Sim.Attributes);
         }
 
-        public static BoardState GetDefault(IPlayer[] players)
-            => new BoardState(Tile.GetTiles(new Vector2(8).ToPoint()), players);
+        public static BoardState GetDefault(Entity[] entities)
+            => new BoardState(Tile.GetTiles(new Vector2(8).ToPoint()), entities);
 
         public readonly struct UndoObj
         {

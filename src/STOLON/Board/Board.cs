@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 
 namespace STOLON
 {
-    [Dependency(ServiceLifetime.Singleton)]
     public sealed class Board : IComponent
     {
         public Camera2D Camera { get; }
@@ -71,6 +70,12 @@ namespace STOLON
             float smoothness = 0.003f;
             Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * smoothness;
             Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * smoothness * Math.Abs(mouseStateCoefficient);
+
+            IMove[] availableMoves = _state.CurrentEntity.GetAvailableMoves(_state);
+            if (_state.CurrentEntity.MoveProvider.TryGetMove(_state, availableMoves, out IMove? move))
+            {
+                move.Apply(_state, _state.CurrentEntity);
+            }
         }
 
         public void Draw(DrawingContext drawingContext)
@@ -127,6 +132,8 @@ namespace STOLON
             }
 
             drawingContext.TransformMatrix = original;
+
+            //drawingContext.RegisterDraw(this, new Rectangle());
         }
 
         public string GetPlayerSymbol(int playerIndex) => playerIndex switch
@@ -141,9 +148,9 @@ namespace STOLON
         };
     }
 
-    public abstract class Move
+    public interface IMove
     {
-        public abstract void Act(BoardState boardState);
+        void Apply(BoardState boardState, Entity performer);
     }
 
     public sealed class Tile : ICloneable
@@ -193,6 +200,11 @@ namespace STOLON
         public Texture2D GetTexture(ITexture2DCollection textures)
         {
             return textures.GetReference("box-96");
+        }
+
+        public Rectangle GetHitbox()
+        {
+            return new Rectangle(Position, new Point(Board.TileSize));
         }
 
         // for multithread magic.

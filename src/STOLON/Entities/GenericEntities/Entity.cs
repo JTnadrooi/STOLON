@@ -6,12 +6,15 @@ namespace STOLON
     /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
     /// </summary>
     [Dependency(ServiceLifetime.Singleton)]
-    public abstract class Entity : IDialogueProvider, IPlayer, IMipmapped, IEquatable<Entity>
+    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
     {
         /// <summary>
         /// Gets the full/display name of this <see cref="Entity"/>.
         /// </summary>
         public string FullName { get; }
+
+        private IMoveProvider? _moveProvider;
+        public IMoveProvider MoveProvider => _moveProvider ?? throw new InvalidOperationException(this.GetType().Name + " instance has no MoveProvider.");
 
         public EntityProfile Profile { get; }
 
@@ -32,7 +35,7 @@ namespace STOLON
 
         public ConditionalNote[] AllocationNotes { get; }
 
-        public Entity(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null)
+        public Entity(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null, IMoveProvider? moveProvider = null)
         {
             Id = id;
             Name = name;
@@ -42,6 +45,7 @@ namespace STOLON
 
             Profile = ResolveProfile(textures);
             (AllocationNotes, AbilityNotes) = ResolveNotes();
+            _moveProvider = moveProvider;
         }
 
         protected virtual EntityProfile ResolveProfile(ITexture2DCollection textures)
@@ -53,9 +57,15 @@ namespace STOLON
         public virtual int GetVirtualAllocation(EntitySelection info)
             => info.GetAllocation(Id);
 
-        public abstract bool HasWon(BoardState state, GameInfo gameInfo);
+        public virtual bool HasWon(BoardState state)
+        {
+            throw new NotImplementedException();
+        }
 
-        public abstract bool TryGetMove(BoardState state, GameInfo gameInfo, [NotNullWhen(true)] out Move? move);
+        public virtual IMove[] GetAvailableMoves(BoardState state)
+        {
+            throw new NotImplementedException();
+        }
         public bool Equals(Entity? other) => other is not null && other.Id == Id;
     }
 

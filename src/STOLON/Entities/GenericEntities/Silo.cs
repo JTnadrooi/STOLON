@@ -4,7 +4,7 @@ namespace STOLON
 {
     public class SiloEntity : Entity
     {
-        public SiloEntity(ITexture2DCollection textures) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA")
+        public SiloEntity(ITexture2DCollection textures, IMoveProvider? moveProvider = null) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA", moveProvider: moveProvider)
         { }
 
         protected override EntityProfile ResolveProfile(ITexture2DCollection textures)
@@ -27,14 +27,14 @@ namespace STOLON
                 .ApplyMultiplierWhen(info.Entries.Count > 3, 0.5f)
                 .End();
 
-        public override bool HasWon(BoardState state, GameInfo gameInfo)
+        public override bool HasWon(BoardState state)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
-        public override bool TryGetMove(BoardState state, GameInfo gameInfo, [NotNullWhen(true)] out Move? move)
+        public override IMove[] GetAvailableMoves(BoardState state)
         {
-            throw new NotImplementedException();
+            return [];
         }
     }
 }
