@@ -396,7 +396,7 @@ namespace STOLON
             for (; true; screenshotIndex++)
                 if (!File.Exists($"Screenshots\\sl_screenshot{screenshotIndex}.png")) break;
 
-            _logger.Log("<found avalible with id: " + screenshotIndex);
+            _logger.Log("<found available with id: " + screenshotIndex);
 
             string path = $"Screenshots\\sl_screenshot{screenshotIndex}.png";
 
