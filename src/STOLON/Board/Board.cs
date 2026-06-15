@@ -204,7 +204,7 @@ namespace STOLON
 
         public Rectangle GetHitbox()
         {
-            return new Rectangle(Position, new Point(Board.TileSize));
+            return new Rectangle(Position * new Point(Board.TileSize), new Point(Board.TileSize));
         }
 
         // for multithread magic.
