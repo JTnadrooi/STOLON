@@ -71,7 +71,7 @@ namespace STOLON
             Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * smoothness;
             Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * smoothness * Math.Abs(mouseStateCoefficient);
 
-            IMove[] availableMoves = _state.CurrentEntity.GetAvailableMoves(_state);
+            ReadOnlySpan<IMove> availableMoves = _state.CurrentEntity.GetAvailableMoves(_state);
             if (_state.CurrentEntity.MoveProvider.TryGetMove(_state, availableMoves, out IMove? move))
             {
                 move.Apply(_state, _state.CurrentEntity);

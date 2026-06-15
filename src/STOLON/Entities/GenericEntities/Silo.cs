@@ -42,7 +42,7 @@ namespace STOLON
             return false;
         }
 
-        public override IMove[] GetAvailableMoves(BoardState state)
+        public override ReadOnlySpan<IMove> GetAvailableMoves(BoardState state)
         {
             return [];
         }

@@ -79,7 +79,7 @@ namespace STOLON
             throw new NotImplementedException();
         }
 
-        public virtual IMove[] GetAvailableMoves(BoardState state)
+        public virtual ReadOnlySpan<IMove> GetAvailableMoves(BoardState state)
         {
             throw new NotImplementedException();
         }

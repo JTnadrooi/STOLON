@@ -48,7 +48,7 @@ namespace STOLON
             SearchTargets = SearchTarget.GetDefaultTargets();
         }
 
-        public bool TryGetMove(BoardState state, IMove[] availableMoves, [NotNullWhen(true)] out IMove? bestMove)
+        public bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? bestMove)
         {
             BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w.GetType() == typeof(BoardWindow));
             Board board = window.Board;
