@@ -27,11 +27,8 @@ namespace STOLON
                     break;
             }
 
-            Console.WriteLine(boardState.GetEntityIndex(performer));
-
             boardState.Alter(_position, attributes);
             boardState.GoNextPlayer();
-            Console.WriteLine(boardState._currentPlayerIndex);
         }
     }
 
@@ -53,21 +50,22 @@ namespace STOLON
 
         public bool TryGetMove(BoardState state, IMove[] availableMoves, [NotNullWhen(true)] out IMove? bestMove)
         {
-            Board board = ((BoardWindow)_kernel.Windows.First(w => w.GetType() == typeof(BoardWindow))).Board;
-            Vector2 worldMousePos = board.Camera.Unproject(_input.Mouse.Position);
+            BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w.GetType() == typeof(BoardWindow));
+            Board board = window.Board;
+            Vector2 worldMousePos = board.Camera.Unproject(_input.Mouse.Position - window.Position);
 
             if (_input.Mouse.IsClicked(MouseButton.Left))
             //if (_input.Mouse.IsClicked(MouseButton.Left) && _input.IsMouseOn<Board>())
             {
-                //for (int x = 0; x < state.Tiles.GetLength(0); x++)
-                //    for (int y = 0; y < state.Tiles.GetLength(1); y++)
-                //        if (state.Tiles[x, y].GetHitbox().Contains(worldMousePos) && !state.Tiles[x, y].IsSolid())
-                //        {
-                //            bestMove = new GravityAffectedMove(x, y);
-                //            return true;
-                //        }
-                bestMove = new GravityAffectedMove(0, 0);
-                return true;
+                for (int x = 0; x < state.Tiles.GetLength(0); x++)
+                    for (int y = 0; y < state.Tiles.GetLength(1); y++)
+                        if (state.Tiles[x, y].GetHitbox().Contains(worldMousePos))
+                        {
+                            bestMove = new GravityAffectedMove(x, y);
+                            return true;
+                        }
+                bestMove = null;
+                return false;
             }
 
             bestMove = null;
