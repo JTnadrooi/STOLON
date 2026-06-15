@@ -4,14 +4,14 @@ namespace STOLON
 {
     public readonly struct SelectionEntry
     {
-        public Entity Entity { get; }
+        public EntityDefinition Entity { get; }
         public int Allocation { get; }
         public int VAllocation => IsPostAllocation ? _valloc : throw new InvalidOperationException();
         public bool IsPostAllocation { get; }
 
         private readonly int _valloc;
 
-        public SelectionEntry(Entity entity, int alloc, int? valloc = null)
+        public SelectionEntry(EntityDefinition entity, int alloc, int? valloc = null)
         {
             Entity = entity;
             Allocation = alloc;
@@ -32,21 +32,21 @@ namespace STOLON
         public IEnumerable<SelectionEntry> Values => Entries.Values;
 
         private readonly Dictionary<string, SelectionEntry> _entries;
-        private readonly List<Entity> _selectedEntities;
+        private readonly List<EntityDefinition> _selectedEntities;
         private int _totalVAllocation;
 
         public SelectionEntry this[string id] => Entries[id];
         public SelectionEntry this[int i] => _entries[_selectedEntities[i].Id];
 
-        private readonly ReadOnlyDictionary<string, Entity> _entities;
+        private readonly ReadOnlyDictionary<string, EntityDefinition> _entityDefinitions;
 
-        public EntitySelection(Entity[] entities, int maxEntries)
+        public EntitySelection(EntityDefinition[] entityDefinitions, int maxEntries)
         {
-            _entities = new ReadOnlyDictionary<string, Entity>(entities.ToDictionary(e => e.Id));
+            _entityDefinitions = new ReadOnlyDictionary<string, EntityDefinition>(entityDefinitions.ToDictionary(e => e.Id));
 
             _entries = new Dictionary<string, SelectionEntry>(maxEntries);
             Entries = _entries.AsReadOnly();
-            _selectedEntities = new List<Entity>(maxEntries);
+            _selectedEntities = new List<EntityDefinition>(maxEntries);
             _totalVAllocation = 0;
             IsPostAllocation = true;
             MaxEntries = maxEntries;
@@ -80,7 +80,7 @@ namespace STOLON
             {
                 return false;
             }
-            _selectedEntities.Add(_entities[id]);
+            _selectedEntities.Add(_entityDefinitions[id]);
             RecalculateAllocations();
             return true;
         }
@@ -91,7 +91,7 @@ namespace STOLON
             {
                 return false;
             }
-            _selectedEntities.Remove(_entities[id]);
+            _selectedEntities.Remove(_entityDefinitions[id]);
             RecalculateAllocations();
             return true;
         }

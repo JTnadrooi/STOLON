@@ -11,17 +11,11 @@
         private readonly ISceneManager _sceneManager;
         private readonly IOverlayManager _overlayManager;
         private readonly Interface _ui;
-        private readonly IEnumerable<Entity> _entities;
+        private readonly IEnumerable<EntityDefinition> _entities;
         private readonly Kernel _kernel;
 
-        /// <summary>
-        /// A <see cref="Dictionary{TKey, TValue}"/> listing all <see cref="Entity"/> objects and their <see cref="Entity.Id"/>.
-        /// </summary>
-        public ReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_entityDict);
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
-
-        private Dictionary<string, Entity> _entityDict;
 
         public Environment(IRichLogger logger,
             IAudioEngine audioEngine,
@@ -29,7 +23,7 @@
             Interface ui,
             IOverlayManager overlayManager,
             Kernel kernel,
-            IEnumerable<Entity> entities)
+            IEnumerable<EntityDefinition> entities)
         {
             _logger = logger;
             _audioEngine = audioEngine;
@@ -39,16 +33,14 @@
             _entities = entities;
             _kernel = kernel;
 
-            _entityDict = new Dictionary<string, Entity>();
             _sceneManager = sceneManager;
         }
 
         public void Initialize()
         {
             _logger.Log(">[s]initialising environment");
-            foreach (Entity entity in _entities)
+            foreach (EntityDefinition entity in _entities)
             {
-                _entityDict.Add(entity.Id, entity);
                 _logger.Log($"registered entity with id '{entity.Id}\" and name '{entity.Name}\".");
             }
 

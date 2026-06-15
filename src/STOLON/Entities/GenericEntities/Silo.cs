@@ -2,10 +2,12 @@
 
 namespace STOLON
 {
-    public class SiloEntity : Entity
+    public class SiloEntityDefinition : EntityDefinition
     {
-        public SiloEntity(ITexture2DCollection textures, IMoveProvider? moveProvider = null) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA", moveProvider: moveProvider)
-        { }
+        public SiloEntityDefinition(ITexture2DCollection textures) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA")
+        {
+
+        }
 
         protected override EntityProfile ResolveProfile(ITexture2DCollection textures)
             => new EntityProfile("silo", textures, new Point(245, 180));
@@ -26,6 +28,14 @@ namespace STOLON
                 .ApplyMultiplierWhen(info.Contains("deceit"), 1.2f)
                 .ApplyMultiplierWhen(info.Entries.Count > 3, 0.5f)
                 .End();
+    }
+
+    public class SiloEntity : Entity
+    {
+        public SiloEntity(EntityDefinition definition, ITexture2DCollection textures, IMoveProvider moveProvider) : base(definition, moveProvider)
+        {
+
+        }
 
         public override bool HasWon(BoardState state)
         {

@@ -27,7 +27,11 @@ namespace STOLON
                     break;
             }
 
+            Console.WriteLine(boardState.GetEntityIndex(performer));
+
             boardState.Alter(_position, attributes);
+            boardState.GoNextPlayer();
+            Console.WriteLine(boardState._currentPlayerIndex);
         }
     }
 

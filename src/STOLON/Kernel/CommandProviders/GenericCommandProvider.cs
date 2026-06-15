@@ -7,13 +7,13 @@ namespace STOLON
     {
         private readonly CommandManager _commandManager;
         private readonly Shell _shell;
-        private readonly Entity[] _entities;
+        private readonly EntityDefinition[] _entityDefinitions;
 
-        public GenericCommandProvider(CommandManager commandManager, Shell shell, Entity[] entities) : base("generic") // way too long id but it shoulden't be typed by the user.
+        public GenericCommandProvider(CommandManager commandManager, Shell shell, EntityDefinition[] entityDefinitions) : base("generic") // way too long id but it shoulden't be typed by the user.
         {
             _commandManager = commandManager;
             _shell = shell;
-            _entities = entities;
+            _entityDefinitions = entityDefinitions;
         }
 
         [KernelCommand("Prints the reality version.", Aliases = ["v"], Id = "version", IsGenericFlag = true)] // not the game version, lore version.
@@ -28,7 +28,7 @@ namespace STOLON
         [KernelCommand(".", Id = "entity", Aliases = ["e"])]
         public void ShowEntity([EntityId] string id)
         {
-            _shell.WriteTexture(_entities.First(e => e.Id == id).Mipmaps[128]);
+            _shell.WriteTexture(_entityDefinitions.First(e => e.Id == id).Mipmaps[128]);
         }
     }
 }

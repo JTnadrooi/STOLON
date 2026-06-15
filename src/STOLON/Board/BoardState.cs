@@ -41,14 +41,15 @@ namespace STOLON
         public BoardState DeepCopy() // for multithread magic
         {
             Tile[,] resultTiles = new Tile[_tiles.GetLength(0), _tiles.GetLength(1)];
-
             for (int x = 0; x < _dimensions.X; x++)
                 for (int y = 0; y < _dimensions.Y; y++)
                     resultTiles[x, y] = _tiles[x, y].Clone();
 
-            BoardState result = new BoardState(resultTiles, _entities, _currentPlayerIndex);
+            Entity[] resultEntities = new Entity[_entities.Length];
+            for (int i = 0; i < _entities.Length; i++)
+                resultEntities[i] = _entities[i].NodeCopy();
 
-            return result;
+            return new BoardState(resultTiles, resultEntities, _currentPlayerIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

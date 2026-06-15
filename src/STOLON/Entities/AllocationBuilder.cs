@@ -8,7 +8,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="AllocationBuilder"/> struct using the initial allocation from the specified <paramref name="entity"/>.
         /// </summary>
-        public AllocationBuilder(EntitySelection selection, Entity entity) : this(selection.GetAllocation(entity.Id)) { }
+        public AllocationBuilder(EntitySelection selection, EntityDefinition entity) : this(selection.GetAllocation(entity.Id)) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AllocationBuilder"/> struct with the specified initial allocation value.

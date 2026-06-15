@@ -1,20 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace STOLON
 {
-    /// <summary>
-    /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
-    /// </summary>
     [Dependency(ServiceLifetime.Singleton)]
-    public abstract class Entity : IDialogueProvider, IMipmapped, IEquatable<Entity>
+    public abstract class EntityDefinition : IDialogueProvider, IMipmapped, IEquatable<EntityDefinition>
     {
         /// <summary>
         /// Gets the full/display name of this <see cref="Entity"/>.
         /// </summary>
         public string FullName { get; }
-
-        private IMoveProvider? _moveProvider;
-        public IMoveProvider MoveProvider => _moveProvider ?? throw new InvalidOperationException(this.GetType().Name + " instance has no MoveProvider.");
 
         public EntityProfile Profile { get; }
 
@@ -35,7 +31,7 @@ namespace STOLON
 
         public ConditionalNote[] AllocationNotes { get; }
 
-        public Entity(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null, IMoveProvider? moveProvider = null)
+        public EntityDefinition(string id, string name, string symbolNotation, ITexture2DCollection textures, string? description = null, string? fullName = null)
         {
             Id = id;
             Name = name;
@@ -45,7 +41,6 @@ namespace STOLON
 
             Profile = ResolveProfile(textures);
             (AllocationNotes, AbilityNotes) = ResolveNotes();
-            _moveProvider = moveProvider;
         }
 
         protected virtual EntityProfile ResolveProfile(ITexture2DCollection textures)
@@ -54,8 +49,30 @@ namespace STOLON
         protected virtual (ConditionalNote[] allocationNotes, ConditionalNote[] abilityNotes) ResolveNotes()
             => (Array.Empty<ConditionalNote>(), Array.Empty<ConditionalNote>());
 
+        public bool Equals(EntityDefinition? other) => other is not null && other.Id == Id;
+
         public virtual int GetVirtualAllocation(EntitySelection info)
             => info.GetAllocation(Id);
+    }
+
+    /// <summary>
+    /// Represent the character/other that can interact with the board. Be it as part of a group or solo.
+    /// </summary>
+    public abstract class Entity
+    {
+        public EntityDefinition Definition { get; }
+
+        private IMoveProvider _moveProvider;
+        public IMoveProvider MoveProvider => _moveProvider ?? throw new InvalidOperationException(this.GetType().Name + " instance has no MoveProvider.");
+
+        public ImmutableArray<ConditionalNote> ActiveNotes { get; }
+
+        public Entity(EntityDefinition definition, IMoveProvider moveProvider)
+        {
+            _moveProvider = moveProvider;
+
+            Definition = definition;
+        }
 
         public virtual bool HasWon(BoardState state)
         {
@@ -66,14 +83,18 @@ namespace STOLON
         {
             throw new NotImplementedException();
         }
-        public bool Equals(Entity? other) => other is not null && other.Id == Id;
+
+        public virtual Entity NodeCopy()
+        {
+            return this;
+        }
     }
 
     public static class EntityDrawingExtensions
     {
-        public static void DrawEntity(this DrawingContext context, Entity entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+        public static void DrawEntity(this DrawingContext context, EntityDefinition entity, int res, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => context.DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
-        public static void DrawEntity(this DrawingContext context, Entity entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
+        public static void DrawEntity(this DrawingContext context, EntityDefinition entity, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => context.DrawEntity(entity.Profile, res, position, scale, rotation, origin, effects, layerDepth, drawMode);
         public static void DrawEntity(this DrawingContext context, EntityProfile entityProfile, int res, Vector2 position, float scale = 1f, float rotation = 0f, Vector2? origin = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f, EntityDrawMode drawMode = EntityDrawMode.None)
             => context.DrawEntity(entityProfile, res, position, new Vector2(scale), rotation, origin, effects, layerDepth, drawMode);

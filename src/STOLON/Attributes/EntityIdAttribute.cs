@@ -9,7 +9,7 @@ namespace STOLON
 {
     public sealed class EntityIdAttribute : ValidationAttribute
     {
-        private static readonly Entity[]? s_entities;
+        private static readonly EntityDefinition[]? s_entities;
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
@@ -24,7 +24,7 @@ namespace STOLON
         {
             if (STOLON.IsInitiated)
             {
-                s_entities = STOLON.Services.Resolve<Entity[]>();
+                s_entities = STOLON.Services.Resolve<EntityDefinition[]>();
             }
         }
     }

@@ -13,11 +13,11 @@
         public ConditionalNotePolarity Polarity { get; }
         public bool IsPositiveOrNeutral => Polarity == ConditionalNotePolarity.Neutral || Polarity == ConditionalNotePolarity.Positive;
         public bool IsNegative => Polarity == ConditionalNotePolarity.Negative;
-        public Entity Source { get; }
+        public EntityDefinition Source { get; }
 
         private Func<EntitySelection, bool> _isActive;
 
-        public ConditionalNote(Entity source, string text, Func<EntitySelection, bool> isActive, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
+        public ConditionalNote(EntityDefinition source, string text, Func<EntitySelection, bool> isActive, ConditionalNotePolarity polarity = ConditionalNotePolarity.Neutral)
         {
             _isActive = isActive;
             Text = text;

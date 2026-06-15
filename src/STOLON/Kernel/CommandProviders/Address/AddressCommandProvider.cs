@@ -6,7 +6,7 @@ namespace STOLON
     {
         private readonly CommandManager _commandManager;
         private readonly Shell _shell;
-        private readonly Entity[] _entities;
+        private readonly EntityDefinition[] _entityDefinitions;
         private readonly Address[] _addresses;
         private readonly WindowDependencies _windowDeps;
         private readonly ITexture2DCollection _textures;
@@ -22,12 +22,12 @@ namespace STOLON
             IInputManager input,
             CommandManager commandManager,
             Shell shell,
-            Entity[] entities,
+            EntityDefinition[] entityDefinitions,
             Address[] addresses) : base("addr")
         {
             _commandManager = commandManager;
             _shell = shell;
-            _entities = entities;
+            _entityDefinitions = entityDefinitions;
             _addresses = addresses;
             _windowDeps = windowDeps;
             _textures = textures;
@@ -44,7 +44,7 @@ namespace STOLON
         [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
         public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with", Aliases = ["w"])] string[] withIds)
         {
-            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, GetAddress(addrId)));
+            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entityDefinitions, GetAddress(addrId)));
 
             flag.Selection.AddRange(withIds);
 
@@ -125,7 +125,7 @@ namespace STOLON
                     throw new CommandArgumentException($"Missing argument {nameof(addrId)}."); // replace with helper method when I add them to AsitLib.
                 }
 
-                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entities, GetAddress(addrId)));
+                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entityDefinitions, GetAddress(addrId)));
             }
 
             if (withIds.Length > 0)

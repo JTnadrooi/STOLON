@@ -38,6 +38,14 @@ namespace STOLON
             //_shell.WriteLine("This is on the THIRD line!");
             //_shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
             //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
+
+            _shell.WriteWindow(new BoardWindow(
+                STOLON.Services.Resolve<WindowDependencies>(),
+                STOLON.Services.Resolve<ITexture2DCollection>(),
+                STOLON.Services.Resolve<IFont2DCollection>(),
+                STOLON.Services.Resolve<IInputManager>(),
+                STOLON.Services.Resolve<ILogger>(),
+                new A16Address(STOLON.Services.Resolve<ITexture2DCollection>(), STOLON.Services.Resolve<IInputManager>(), STOLON.Services.Resolve<Kernel>(), STOLON.Services.Resolve<EntityDefinition[]>())));
         }
 
         protected override void UpdateInterface(int elapsedMilliseconds)

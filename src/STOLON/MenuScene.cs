@@ -127,7 +127,8 @@ namespace STOLON
             ISceneManager sceneManager,
             ITaskHeap tasks,
             ITextframe textframe,
-            IInputManager input) : base("main_menu")
+            IInputManager input,
+            IEnumerable<EntityDefinition> entityDefinitions) : base("main_menu")
         {
             _logger = logger;
             _ui = ui;
@@ -162,7 +163,7 @@ namespace STOLON
             _showSplashtexts = _config.GetBool("graphics.splashtexts_show");
             _showEntityProfiles = _config.GetBool("graphics.entities_show_on_menu");
 
-            _entityProfiles = [_environment.Entities.Values.First().Profile, _environment.Entities.Values.Last().Profile];
+            _entityProfiles = [entityDefinitions.First().Profile, entityDefinitions.Last().Profile];
 
             _mainOrderContainer = new MenuOrderContainer(_input, [
                 new UIElement("story_start", UIElement.TopId, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
