@@ -13,11 +13,11 @@ namespace STOLON
             _position = new Point(tileX, tileY);
         }
 
-        public void Apply(BoardState boardState, Entity performer)
+        public void Apply(BoardState state, Entity performer)
         {
             HashSet<TileAttribute> attributes = new HashSet<TileAttribute>();
 
-            switch (boardState.GetEntityIndex(performer))
+            switch (state.GetEntityIndex(performer))
             {
                 case 0:
                     attributes.Add(new Player0OccupiedTileAttribute());
@@ -26,9 +26,39 @@ namespace STOLON
                     attributes.Add(new Player1OccupiedTileAttribute());
                     break;
             }
+            attributes.Add(new SolidTileAttribute());
 
-            boardState.Alter(_position, attributes);
-            boardState.GoNextPlayer();
+            Point alterPos = _position;
+            while (true)
+            {
+                Tile alterTile = state.Tiles[alterPos.X, alterPos.Y];
+                if (alterTile.HasAttribute<GravDownTileAttribute>())
+                {
+                    if (alterPos.Y - 1 >= 0)
+                    {
+                        Tile nextTile = state.Tiles[alterPos.X, alterPos.Y - 1];
+                        if (!nextTile.IsSolid())
+                            alterPos = new Point(alterPos.X, alterPos.Y - 1);
+                        else break;
+                    }
+                    else break;
+                }
+                else if (alterTile.HasAttribute<GravUpTileAttribute>())
+                {
+                    if (alterPos.Y + 1 <= state.Dimensions.Y - 1)
+                    {
+                        Tile nextTile = state.Tiles[alterPos.X, alterPos.Y + 1];
+                        if (!nextTile.IsSolid())
+                            alterPos = new Point(alterPos.X, alterPos.Y + 1);
+                        else break;
+                    }
+                    else break;
+                }
+                else break;
+            }
+
+            state.Alter(alterPos, attributes);
+            state.GoNextPlayer();
         }
     }
 
@@ -37,15 +67,12 @@ namespace STOLON
         private readonly IInputManager _input;
         private readonly Kernel _kernel;
 
-        public ImmutableArray<SearchTarget> SearchTargets { get; }
-
         public bool IsComputer { get; }
 
         public UserMoveProvider(IInputManager input, Kernel kernel)
         {
             _input = input;
             _kernel = kernel;
-            SearchTargets = SearchTarget.GetDefaultTargets();
         }
 
         public bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? bestMove)
@@ -59,13 +86,14 @@ namespace STOLON
             {
                 for (int x = 0; x < state.Tiles.GetLength(0); x++)
                     for (int y = 0; y < state.Tiles.GetLength(1); y++)
-                        if (state.Tiles[x, y].GetHitbox().Contains(worldMousePos))
+                    {
+                        Tile tile = state.Tiles[x, y];
+                        if (tile.GetHitbox().Contains(worldMousePos) && !tile.IsSolid())
                         {
                             bestMove = new GravityAffectedMove(x, y);
                             return true;
                         }
-                bestMove = null;
-                return false;
+                    }
             }
 
             bestMove = null;
