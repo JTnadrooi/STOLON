@@ -59,6 +59,12 @@ namespace STOLON
 
             state.Alter(alterPos, attributes);
             state.GoNextPlayer();
+            state.RegisterMove(this, performer);
+        }
+
+        public void Undo(BoardState state, Entity performer)
+        {
+
         }
     }
 

@@ -157,6 +157,7 @@ namespace STOLON
     public interface IMove
     {
         void Apply(BoardState state, Entity performer);
+        void Undo(BoardState state, Entity performer);
     }
 
     public sealed class Tile : ICloneable

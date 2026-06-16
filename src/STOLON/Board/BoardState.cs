@@ -12,8 +12,7 @@ namespace STOLON
         public Entity[] Entities => _entities;
         public Entity CurrentEntity => Entities[_currentPlayerIndex];
 
-        public readonly Stack<UndoObj> _undoStack;
-        public readonly Collection<UndoObj> _undoSet;
+        public readonly Stack<(IMove, Entity)> _moveStack;
         private readonly FrozenDictionary<Entity, int>? _entityIndexCache;
         private readonly Tile[,] _tiles;
         private readonly Entity[] _entities;
@@ -26,8 +25,7 @@ namespace STOLON
             _tiles = tiles;
             _entities = entities;
             _dimensions = new Point(tiles.GetLength(0), tiles.GetLength(1));
-            _undoStack = new Stack<UndoObj>();
-            _undoSet = new Collection<UndoObj>();
+            _moveStack = new Stack<(IMove, Entity)>();
             _entityIndexCache = entities.Select((p, i) => new KeyValuePair<Entity, int>(p, i)).ToFrozenDictionary();
 
             _currentPlayerIndex = currentPlayer;
@@ -114,38 +112,18 @@ namespace STOLON
         public BoardPreview GetPreview(Font2D font)
             => new BoardPreview(this, font);
 
+        public void RegisterMove(IMove move, Entity performer)
+        {
+            _moveStack.Push((move, performer));
+        }
+
         public void Undo()
         {
-            UndoObj undoObj = _undoStack.Pop();
-            _undoSet.Remove(undoObj);
-
-            if (undoObj.NextPlayer) _currentPlayerIndex = _currentPlayerIndex == 0 ? 1 : 0;
-
-            undoObj.Sim.Attributes.Remove((TileAttribute)TileAttribute.Attributes["Player" + _currentPlayerIndex + "Occupied"]);
-            undoObj.Sim.Attributes.Remove(TileAttribute.Get<SolidTileAttribute>());
-
-            Alter(undoObj.Sim.Position, undoObj.Sim.Attributes);
+            (IMove move, Entity entity) = _moveStack.Pop();
+            move.Undo(this, entity);
         }
 
         public static BoardState GetDefault(Entity[] entities)
             => new BoardState(Tile.GetTiles(new Vector2(8).ToPoint()), entities);
-
-        public readonly struct UndoObj
-        {
-            public Tile Sim { get; }
-
-            public bool NextPlayer { get; }
-
-            public UndoObj(Tile sim, bool nextPlayer)
-            {
-                Sim = sim;
-                NextPlayer = nextPlayer;
-            }
-
-            public override int GetHashCode()
-            {
-                return Sim.GetHashCode();
-            }
-        }
     }
 }
