@@ -68,23 +68,23 @@ namespace STOLON
             return false;
         }
 
-        public bool SearchFor(ReadOnlySpan<SearchTarget> searchTargets)
+        public bool SearchFor(ReadOnlySpan<SearchTarget> searchTargets, int playerId = -1)
         {
             foreach (SearchTarget target in searchTargets)
-                if (SearchFor(target)) return true;
+                if (SearchFor(target, playerId)) return true;
             return false;
         }
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)] // maybe remove if method becomes too big. (method became too big)
-        public bool SearchFor(in SearchTarget target)
+        public bool SearchFor(in SearchTarget target, int playerId = -1)
         {
             for (int x = 0; x < _dimensions.X; x++)
-            {
                 for (int y = 0; y < _dimensions.Y; y++)
                 {
                     int occupiedPlayerId = _tiles[x, y].GetOccupiedByPlayerIndex();
 
                     if (occupiedPlayerId == -1) continue;
+                    if (playerId != -1 && playerId != occupiedPlayerId) continue;
 
                     int score = 0;
 
@@ -98,7 +98,6 @@ namespace STOLON
 
                     if (score == target.Nodes.Length) return true;
                 }
-            }
             return false;
         }
 
