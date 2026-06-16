@@ -15,6 +15,7 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly IInputManager _input;
         private readonly ILogger _logger;
+        private readonly Shell _shell;
         private readonly BoardState _state;
 
         private float _desiredZoom;
@@ -22,13 +23,13 @@ namespace STOLON
 
         public const int TileSize = 96;
 
-        public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, BoardState initialBoardState)
+        public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, Shell shell, BoardState initialBoardState)
         {
             _textures = textures;
             _fonts = fonts;
             _input = input;
             _logger = logger;
-
+            _shell = shell;
             InitialState = initialBoardState.DeepCopy();
 
             _state = initialBoardState;
@@ -71,10 +72,15 @@ namespace STOLON
             Camera.Zoom += (_desiredZoom - Camera.Zoom) * 0.1f + mouseStateCoefficient * smoothness;
             Camera.Position += (_desiredCameraPos - Camera.Position) * 0.1f + (worldMousePos - Camera.Position) * smoothness * Math.Abs(mouseStateCoefficient);
 
-            ReadOnlySpan<IMove> availableMoves = _state.CurrentEntity.GetAvailableMoves(_state);
-            if (_state.CurrentEntity.MoveProvider.TryGetMove(_state, availableMoves, out IMove? move))
+            Entity currentEntity = _state.CurrentEntity; // done to prevent Move.Apply changing it
+            ReadOnlySpan<IMove> availableMoves = currentEntity.GetAvailableMoves(_state);
+            if (currentEntity.MoveProvider.TryGetMove(_state, availableMoves, out IMove? move))
             {
-                move.Apply(_state, _state.CurrentEntity);
+                move.Apply(_state, currentEntity);
+                if (currentEntity.HasWon(_state))
+                {
+                    _shell.WriteLine("Winner!");
+                }
             }
         }
 

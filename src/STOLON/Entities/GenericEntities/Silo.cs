@@ -39,7 +39,7 @@ namespace STOLON
 
         public override bool HasWon(BoardState state)
         {
-            return false;
+            return state.SearchFor(SearchTarget.GetDefaultTargets(), state.GetEntityIndex(this));
         }
 
         public override ReadOnlySpan<IMove> GetAvailableMoves(BoardState state)

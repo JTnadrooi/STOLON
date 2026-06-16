@@ -24,6 +24,7 @@ namespace STOLON
             IFont2DCollection fonts,
             IInputManager input,
             ILogger logger,
+            Shell shell,
             Address address) : base(deps, InitialSize, InitialSize)
         {
             _fonts = fonts;
@@ -31,7 +32,7 @@ namespace STOLON
             _logger = logger;
             _address = address;
 
-            _board = new Board(textures, fonts, input, logger, address.GetInitialBoardState());
+            _board = new Board(textures, fonts, input, logger, shell, address.GetInitialBoardState());
 
             AddButton(new ToggleLockWindowButton(textures));
         }

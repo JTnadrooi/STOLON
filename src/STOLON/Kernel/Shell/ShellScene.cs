@@ -45,6 +45,7 @@ namespace STOLON
                 STOLON.Services.Resolve<IFont2DCollection>(),
                 STOLON.Services.Resolve<IInputManager>(),
                 STOLON.Services.Resolve<ILogger>(),
+                STOLON.Services.Resolve<Shell>(),
                 new A16Address(STOLON.Services.Resolve<ITexture2DCollection>(), STOLON.Services.Resolve<IInputManager>(), STOLON.Services.Resolve<Kernel>(), STOLON.Services.Resolve<EntityDefinition[]>())));
         }
 

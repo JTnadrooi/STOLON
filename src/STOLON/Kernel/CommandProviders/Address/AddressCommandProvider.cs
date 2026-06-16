@@ -131,7 +131,7 @@ namespace STOLON
             if (withIds.Length > 0)
                 flag.Selection.AddRange(withIds);
 
-            _shell.WriteWindow(new BoardWindow(_windowDeps, _textures, _fonts, _input, _logger, flag.Address));
+            _shell.WriteWindow(new BoardWindow(_windowDeps, _textures, _fonts, _input, _logger, _shell, flag.Address));
 
             _shell.WriteLine($"Initialized address '{flag.Address}' with [{flag.Selection.Entries.Keys.Select(entry => $"'{entry}'").ToJoinedString(", ")}].");
         }
