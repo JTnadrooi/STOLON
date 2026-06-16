@@ -21,7 +21,7 @@ namespace STOLON
             _siloDefinition = entityDefinitions.First(d => d.Id == "silo");
         }
 
-        public override BoardState GetInitialBoardState()
+        public override BoardState GetInitialState()
         {
             return BoardState.GetDefault([new SiloEntity(_siloDefinition, _textures, new UserMoveProvider(_input, _kernel)), new SiloEntity(_siloDefinition, _textures, new UserMoveProvider(_input, _kernel))]);
         }

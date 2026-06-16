@@ -23,18 +23,18 @@ namespace STOLON
 
         public const int TileSize = 96;
 
-        public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, Shell shell, BoardState initialBoardState)
+        public Board(ITexture2DCollection textures, IFont2DCollection fonts, IInputManager input, ILogger logger, Shell shell, BoardState initialState)
         {
             _textures = textures;
             _fonts = fonts;
             _input = input;
             _logger = logger;
             _shell = shell;
-            InitialState = initialBoardState.DeepCopy();
+            InitialState = initialState.DeepCopy();
 
-            _state = initialBoardState;
-            _desiredZoom = MathF.Max(0.45f, 4f / initialBoardState.Dimensions.X) * 0.6f;
-            _desiredCameraPos = new Vector2(initialBoardState.Dimensions.X / 2f, initialBoardState.Dimensions.Y / 2f) * TileSize;
+            _state = initialState;
+            _desiredZoom = MathF.Max(0.45f, 4f / initialState.Dimensions.X) * 0.6f;
+            _desiredCameraPos = new Vector2(initialState.Dimensions.X / 2f, initialState.Dimensions.Y / 2f) * TileSize;
 
             Camera = new Camera2D()
             {

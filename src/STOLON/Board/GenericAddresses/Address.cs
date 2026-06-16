@@ -18,6 +18,6 @@ namespace STOLON
             Id = id;
         }
 
-        public abstract BoardState GetInitialBoardState();
+        public abstract BoardState GetInitialState();
     }
 }

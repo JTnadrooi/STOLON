@@ -32,7 +32,7 @@ namespace STOLON
             _logger = logger;
             _address = address;
 
-            _board = new Board(textures, fonts, input, logger, shell, address.GetInitialBoardState());
+            _board = new Board(textures, fonts, input, logger, shell, address.GetInitialState());
 
             AddButton(new ToggleLockWindowButton(textures));
         }
