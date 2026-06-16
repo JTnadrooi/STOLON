@@ -21,7 +21,7 @@ namespace STOLON
             return new SearchTarget(invertedNodes.ToArray());
         }
 
-        public static ImmutableArray<SearchTarget> GetDefaultTargets()
+        public static ReadOnlySpan<SearchTarget> GetDefaultTargets()
         {
             return new SearchTarget[] {
                     new SearchTarget(new Point[]
@@ -52,7 +52,7 @@ namespace STOLON
                         new Point(2, -2),
                         new Point(3, -3),
                     }),
-            }.ToImmutableArray();
+            };
         }
 
         // uncomment code below for type load error, very funny.
