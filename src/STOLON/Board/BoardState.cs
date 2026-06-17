@@ -51,7 +51,7 @@ namespace STOLON
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tile GetTileAt(Point p) => _tiles[p.X, p.Y];
+        public ref Tile GetTileAt(Point p) => ref _tiles[p.X, p.Y];
 
         public bool TryGetTileAt(Point p, [NotNullWhen(true)] out Tile? tile)
         {
@@ -90,7 +90,7 @@ namespace STOLON
                     {
                         if (TryGetTileAt(new Point(target.Nodes[i].X + x, target.Nodes[i].Y + y), out Tile? tile))
                         {
-                            if (tile.GetOccupiedByPlayerIndex() == occupiedPlayerId) score++;
+                            if (tile.Value.GetOccupiedByPlayerIndex() == occupiedPlayerId) score++;
                         }
                     }
 
@@ -103,9 +103,9 @@ namespace STOLON
         public int GetEntityIndex(Entity entity) => _entityIndexCache[entity];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Alter(Point tilePos, HashSet<TileAttribute> newAttributes) // SO SLOWWWW
+        public bool Alter(Point tilePos, TileAttributes newAttributes)
         {
-            Tiles[tilePos.X, tilePos.Y].Attributes = new HashSet<TileAttribute>(newAttributes);
+            Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, newAttributes);
             return true;
         }
 

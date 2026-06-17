@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using MonoGame.Extended.BitmapFonts;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -120,7 +121,7 @@ namespace STOLON
             {
                 for (int y = 0; y < _state.Dimensions.Y; y++)
                 {
-                    Tile tile = _state.Tiles[x, y];
+                    ref Tile tile = ref _state.Tiles[x, y];
                     Vector2 tileWorldPos = tile.Position.ToVector2() * new Vector2(TileSize);
                     Camera.OnPixel(ref tileWorldPos);
 
@@ -130,7 +131,7 @@ namespace STOLON
                         drawingContext.Draw(_textures.GetReference("player" + playerId + "_item-96"), tileWorldPos);
                     }
 
-                    if (tile.HasAttribute<GravUpTileAttribute>())
+                    if (tile.HasAttribute(TileAttributes.GravUp))
                     {
                         drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
                     }
@@ -160,38 +161,41 @@ namespace STOLON
         void Undo(BoardState state, Entity performer);
     }
 
-    public sealed class Tile : ICloneable
+    [Flags]
+    public enum TileAttributes
+    {
+        None = 0,
+        Player0Occupied = 1 << 0,
+        Player1Occupied = 1 << 1,
+        GravDown = 1 << 2,
+        GravUp = 1 << 3,
+        Solid = 1 << 4,
+
+        Default = GravDown,
+    }
+
+    public readonly struct Tile : ICloneable
     {
         public Point Position { get; } // never changes, the rest is free to change though. It's cheaper to not allocate a new Tile every time a Tile changes.
-        public HashSet<TileAttribute> Attributes { get; set; }
+        public TileAttributes Attributes { get; }
 
-        public Tile(Point position, HashSet<TileAttribute>? attributes = null)
+        public const int MaxAttributeCount = 32;
+
+        public Tile(Point position, TileAttributes attributes)
         {
             Position = position;
-            Attributes = attributes ?? new HashSet<TileAttribute>();
-        }
-
-        public bool HasAnyAttribute(params ReadOnlySpan<TileAttribute> attributes)
-        {
-            if (attributes.Length == 0) throw new Exception();
-            for (int i = 0; i < attributes.Length; i++)
-                if (HasAttribute(attributes[i])) return true;
-            return false;
+            Attributes = attributes;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasAttribute<TTileAttribute>() where TTileAttribute : TileAttribute
-            => HasAttribute(TileAttribute.Get<TTileAttribute>());
+        public bool HasAttribute(TileAttributes attribute)
+            => (Attributes & attribute) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasAttribute(TileAttribute attribute)
-            => Attributes.Contains(attribute);
+        public bool HasGravity() => HasAttribute(TileAttributes.GravDown) || HasAttribute(TileAttributes.GravUp);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasGravity() => HasAttribute<GravDownTileAttribute>() || HasAttribute<GravUpTileAttribute>();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsSolid() => HasAttribute<SolidTileAttribute>();
+        public bool IsSolid() => HasAttribute(TileAttributes.Solid);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOccupiedByPlayer() => GetOccupiedByPlayerIndex() != -1;
@@ -199,8 +203,8 @@ namespace STOLON
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetOccupiedByPlayerIndex()
         {
-            if (HasAttribute<Player0OccupiedTileAttribute>()) return 0;
-            if (HasAttribute<Player1OccupiedTileAttribute>()) return 1;
+            if (HasAttribute(TileAttributes.Player0Occupied)) return 0;
+            if (HasAttribute(TileAttributes.Player1Occupied)) return 1;
             return -1;
         }
 
@@ -215,7 +219,7 @@ namespace STOLON
         }
 
         // for multithread magic.
-        public Tile Clone() => new Tile(Position, new HashSet<TileAttribute>(Attributes));
+        public Tile Clone() => new Tile(Position, Attributes);
 
         object ICloneable.Clone() => Clone();
 
@@ -230,11 +234,18 @@ namespace STOLON
             {
                 for (int y = 0; y < dimensions.Y; y++)
                 {
-                    HashSet<TileAttribute> tileAttributes = new HashSet<TileAttribute>(TileAttribute.DefaultAttributes);
+                    TileAttributes attributes = TileAttributes.Default;
 
-                    if (y >= (int)(dimensions.Y / 2)) TileAttribute.ReplaceAttribute<GravDownTileAttribute, GravUpTileAttribute>(tileAttributes);
+                    if (y >= (int)(dimensions.Y / 2))
+                    {
+                        if (y >= dimensions.Y / 2)
+                        {
+                            attributes &= ~TileAttributes.GravDown;
+                            attributes |= TileAttributes.GravUp;
+                        }
+                    }
 
-                    tiles[x, y] = new Tile(new Point(x, y), tileAttributes);
+                    tiles[x, y] = new Tile(new Point(x, y), attributes);
                 }
             }
 

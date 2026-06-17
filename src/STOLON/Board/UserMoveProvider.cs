@@ -15,39 +15,31 @@ namespace STOLON
 
         public void Apply(BoardState state, Entity performer)
         {
-            HashSet<TileAttribute> attributes = new HashSet<TileAttribute>();
+            TileAttributes attributes = TileAttributes.None;
 
-            switch (state.GetEntityIndex(performer))
-            {
-                case 0:
-                    attributes.Add(new Player0OccupiedTileAttribute());
-                    break;
-                case 1:
-                    attributes.Add(new Player1OccupiedTileAttribute());
-                    break;
-            }
-            attributes.Add(new SolidTileAttribute());
+            attributes |= TileAttribute.GetOccupiedTileAttributeFor(state.GetEntityIndex(performer));
+            attributes |= TileAttributes.Solid;
 
             Point alterPos = _position;
             while (true)
             {
-                Tile alterTile = state.Tiles[alterPos.X, alterPos.Y];
-                if (alterTile.HasAttribute<GravDownTileAttribute>())
+                ref Tile alterTile = ref state.Tiles[alterPos.X, alterPos.Y];
+                if (alterTile.HasAttribute(TileAttributes.GravDown))
                 {
                     if (alterPos.Y - 1 >= 0)
                     {
-                        Tile nextTile = state.Tiles[alterPos.X, alterPos.Y - 1];
+                        ref Tile nextTile = ref state.Tiles[alterPos.X, alterPos.Y - 1];
                         if (!nextTile.IsSolid())
                             alterPos = new Point(alterPos.X, alterPos.Y - 1);
                         else break;
                     }
                     else break;
                 }
-                else if (alterTile.HasAttribute<GravUpTileAttribute>())
+                else if (alterTile.HasAttribute(TileAttributes.GravUp))
                 {
                     if (alterPos.Y + 1 <= state.Dimensions.Y - 1)
                     {
-                        Tile nextTile = state.Tiles[alterPos.X, alterPos.Y + 1];
+                        ref Tile nextTile = ref state.Tiles[alterPos.X, alterPos.Y + 1];
                         if (!nextTile.IsSolid())
                             alterPos = new Point(alterPos.X, alterPos.Y + 1);
                         else break;
@@ -64,7 +56,7 @@ namespace STOLON
 
         public void Undo(BoardState state, Entity performer)
         {
-
+            throw new NotImplementedException();
         }
     }
 
@@ -93,7 +85,7 @@ namespace STOLON
                 for (int x = 0; x < state.Tiles.GetLength(0); x++)
                     for (int y = 0; y < state.Tiles.GetLength(1); y++)
                     {
-                        Tile tile = state.Tiles[x, y];
+                        ref Tile tile = ref state.Tiles[x, y];
                         if (tile.GetHitbox().Contains(worldMousePos) && !tile.IsSolid())
                         {
                             bestMove = new GravityAffectedMove(x, y);
