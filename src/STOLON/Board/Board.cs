@@ -155,7 +155,7 @@ namespace STOLON
         };
     }
 
-    public interface IMove
+    public interface IMove : IEquatable<IMove>
     {
         void Apply(BoardState state, Entity performer);
         void Undo(BoardState state, Entity performer);
@@ -222,6 +222,25 @@ namespace STOLON
         public Tile Clone() => new Tile(Position, Attributes);
 
         object ICloneable.Clone() => Clone();
+
+        public override string ToString()
+        {
+            if (Attributes == TileAttributes.None)
+                return $"{{Position: {Position}, Attributes: None}}";
+
+            List<string> parts = new List<string>();
+
+            foreach (TileAttributes value in Enum.GetValues(typeof(TileAttributes)))
+            {
+                if (value == TileAttributes.None)
+                    continue;
+
+                if ((Attributes & value) != 0)
+                    parts.Add(value.ToString());
+            }
+
+            return $"{{Position: {Position}, Attributes: {string.Join(", ", parts)}}}";
+        }
 
         public override int GetHashCode() => Position.GetHashCode();
 

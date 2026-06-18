@@ -6,11 +6,11 @@ namespace STOLON
 {
     public sealed class GravityAffectedMove : IMove
     {
-        private readonly Point _position;
+        public readonly Point Position;
 
         public GravityAffectedMove(int tileX, int tileY)
         {
-            _position = new Point(tileX, tileY);
+            Position = new Point(tileX, tileY);
         }
 
         public void Apply(BoardState state, Entity performer)
@@ -20,7 +20,7 @@ namespace STOLON
             attributes |= TileAttribute.GetOccupiedTileAttributeFor(state.GetEntityIndex(performer));
             attributes |= TileAttributes.Solid;
 
-            Point alterPos = _position;
+            Point alterPos = Position;
             while (true)
             {
                 ref Tile alterTile = ref state.Tiles[alterPos.X, alterPos.Y];
@@ -48,6 +48,7 @@ namespace STOLON
                 }
                 else break;
             }
+            attributes |= state.Tiles[alterPos.X, alterPos.Y].Attributes;
 
             state.Alter(alterPos, attributes);
             state.GoNextPlayer();
@@ -57,6 +58,16 @@ namespace STOLON
         public void Undo(BoardState state, Entity performer)
         {
             throw new NotImplementedException();
+        }
+
+        public bool Equals(IMove? other)
+        {
+            return other is GravityAffectedMove gravityAffectedMove && gravityAffectedMove.Position == Position;
+        }
+
+        public override string ToString()
+        {
+            return Position.ToString();
         }
     }
 
@@ -73,28 +84,56 @@ namespace STOLON
             _kernel = kernel;
         }
 
-        public bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? bestMove)
+        public bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? pickedMove)
         {
             BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w.GetType() == typeof(BoardWindow));
             Board board = window.Board;
-            Vector2 worldMousePos = board.Camera.Unproject(_input.Mouse.Position - window.Position);
+            Vector2 windowMousePos = _input.Mouse.Position - window.Position;
+            Vector2 worldMousePos = board.Camera.Unproject(windowMousePos);
 
             if (_input.Mouse.IsClicked(MouseButton.Left))
             //if (_input.Mouse.IsClicked(MouseButton.Left) && _input.IsMouseOn<Board>())
             {
-                for (int x = 0; x < state.Tiles.GetLength(0); x++)
-                    for (int y = 0; y < state.Tiles.GetLength(1); y++)
+                foreach (IMove move in availableMoves)
+                {
+                    switch (move)
                     {
-                        ref Tile tile = ref state.Tiles[x, y];
-                        if (tile.GetHitbox().Contains(worldMousePos) && !tile.IsSolid())
-                        {
-                            bestMove = new GravityAffectedMove(x, y);
-                            return true;
-                        }
+                        case GravityAffectedMove gravMove:
+                            Tile? tile;
+                            Point currentPos = gravMove.Position;
+                            while (true)
+                            {
+                                if (state.TryGetTileAt(currentPos, out tile))
+                                {
+                                    if (tile.Value.IsSolid())
+                                    {
+                                        break;
+                                    }
+                                    if (tile.Value.GetHitbox().Contains(worldMousePos))
+                                    {
+                                        pickedMove = move;
+                                        return true;
+                                    }
+                                    if (tile.Value.HasAttribute(TileAttributes.GravDown))
+                                    {
+                                        currentPos = new Point(currentPos.X, currentPos.Y - 1);
+                                    }
+                                    else if (tile.Value.HasAttribute(TileAttributes.GravUp))
+                                    {
+                                        currentPos = new Point(currentPos.X, currentPos.Y + 1);
+                                    }
+                                }
+                                else break;
+                            }
+                            break;
+                        default:
+                            break;
                     }
+                }
+
             }
 
-            bestMove = null;
+            pickedMove = null;
             return false;
         }
     }

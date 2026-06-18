@@ -53,6 +53,7 @@ namespace STOLON
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref Tile GetTileAt(Point p) => ref _tiles[p.X, p.Y];
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetTileAt(Point p, [NotNullWhen(true)] out Tile? tile)
         {
             if (p.X >= 0 && p.X < _tiles.GetLength(0) &&

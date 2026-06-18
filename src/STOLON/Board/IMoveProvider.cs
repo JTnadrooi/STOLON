@@ -6,6 +6,6 @@ namespace STOLON
     {
         // called every frame for current turn IPlayer
         // might remove gameInfo param/type
-        bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? bestMove);
+        bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? pickedMove);
     }
 }
