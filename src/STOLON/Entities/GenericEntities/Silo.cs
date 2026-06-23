@@ -44,58 +44,14 @@ namespace STOLON
 
         public override IMove[] GetAvailableMoves(BoardState state)
         {
-            List<(IMove move, int length, Point? landingPos)> moveStore = new List<(IMove move, int length, Point? landingPos)>();
+            List<IMove> availableMoves = Entity.GetUniqueGravityAffectedMoves(state).ToList();
 
-            for (int x = 0; x < state.Tiles.GetLength(0); x++)
-                for (int y = 0; y < state.Tiles.GetLength(1); y++)
-                {
-                    Tile? tile;
-                    Point currentPos = new Point(x, y);
-                    Point? landingPos = null;
-                    int length = 0;
-                    while (true)
-                    {
-                        if (state.TryGetTileAt(currentPos, out tile))
-                        {
-                            if (tile.Value.IsSolid())
-                            {
-                                break;
-                            }
+            for (int i = 0; i < state.Dimensions.X; i++)
+            {
+                availableMoves.Add(new ColumnDisableMove(i));
+            }
 
-                            landingPos = currentPos;
-
-                            if (tile.Value.HasAttribute(TileAttributes.GravDown))
-                            {
-                                currentPos = new Point(currentPos.X, currentPos.Y - 1);
-                                length++;
-                            }
-                            else if (tile.Value.HasAttribute(TileAttributes.GravUp))
-                            {
-                                currentPos = new Point(currentPos.X, currentPos.Y + 1);
-                                length++;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    if (length > 0)
-                        moveStore.Add((new GravityAffectedMove(x, y), length, landingPos));
-                }
-
-            //Console.WriteLine(moveStore.ToJoinedString(",\n"));
-            //throw new Exception();
-
-            IMove[] moves = moveStore
-                .GroupBy(t => t.landingPos) // group moves with same landing pos
-                .Select(g => g.OrderByDescending(t => t.length).First()) // pick the longest move from the same-landing-pos group
-                .Select(t => t.move) // extract move
-                .ToArray();
-            //Console.WriteLine(moves.ToJoinedString(", "));
-
-            return moves;
+            return availableMoves.ToArray();
         }
     }
 }

@@ -439,6 +439,8 @@ namespace STOLON
 
         public void EndScene()
         {
+            DebugDrawing.DrawAll(this);
+
             SpriteBatch.End();
 
             RenderTarget2D finalVTarget = _vrt1;

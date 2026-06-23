@@ -4,13 +4,49 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace STOLON
 {
+    public sealed class ColumnDisableMove : IMove
+    {
+        public readonly int ColumnIndex;
+
+        public ColumnDisableMove(int columnIndex)
+        {
+            ColumnIndex = columnIndex;
+        }
+
+        public void Apply(BoardState state, Entity performer)
+        {
+            for (int i = 0; i < state.Dimensions.Y; i++)
+            {
+                state.AlterAdd(new Point(ColumnIndex, i), TileAttributes.Disabled1);
+            }
+            state.GoNextPlayer();
+            state.RegisterMove(this, performer);
+            Console.WriteLine(this);
+        }
+
+        public void Undo(BoardState state, Entity performer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(IMove? other)
+        {
+            return other is ColumnDisableMove otherMove && otherMove.ColumnIndex == ColumnIndex;
+        }
+
+        public override string ToString()
+        {
+            return ColumnIndex.ToString();
+        }
+    }
+
     public sealed class GravityAffectedMove : IMove
     {
-        public readonly Point Position;
+        public readonly Point Origin;
 
-        public GravityAffectedMove(int tileX, int tileY)
+        public GravityAffectedMove(int originX, int originY)
         {
-            Position = new Point(tileX, tileY);
+            Origin = new Point(originX, originY);
         }
 
         public void Apply(BoardState state, Entity performer)
@@ -20,7 +56,7 @@ namespace STOLON
             attributes |= TileAttribute.GetOccupiedTileAttributeFor(state.GetEntityIndex(performer));
             attributes |= TileAttributes.Solid;
 
-            Point alterPos = Position;
+            Point alterPos = Origin;
             while (true)
             {
                 ref Tile alterTile = ref state.Tiles[alterPos.X, alterPos.Y];
@@ -62,12 +98,12 @@ namespace STOLON
 
         public bool Equals(IMove? other)
         {
-            return other is GravityAffectedMove gravityAffectedMove && gravityAffectedMove.Position == Position;
+            return other is GravityAffectedMove otherMove && otherMove.Origin == Origin;
         }
 
         public override string ToString()
         {
-            return Position.ToString();
+            return Origin.ToString();
         }
     }
 
@@ -91,46 +127,51 @@ namespace STOLON
             Vector2 windowMousePos = _input.Mouse.Position - window.Position;
             Vector2 worldMousePos = board.Camera.Unproject(windowMousePos);
 
-            if (_input.Mouse.IsClicked(MouseButton.Left))
-            //if (_input.Mouse.IsClicked(MouseButton.Left) && _input.IsMouseOn<Board>())
+            foreach (IMove move in availableMoves)
             {
-                foreach (IMove move in availableMoves)
+                switch (move)
                 {
-                    switch (move)
-                    {
-                        case GravityAffectedMove gravMove:
-                            Tile? tile;
-                            Point currentPos = gravMove.Position;
-                            while (true)
+                    case GravityAffectedMove gravMove:
+                        Tile? tile;
+                        Point currentPos = gravMove.Origin;
+                        while (true)
+                        {
+                            if (state.TryGetTileAt(currentPos, out tile))
                             {
-                                if (state.TryGetTileAt(currentPos, out tile))
+                                if (tile.Value.IsSolid())
                                 {
-                                    if (tile.Value.IsSolid())
-                                    {
-                                        break;
-                                    }
-                                    if (tile.Value.GetHitbox().Contains(worldMousePos))
-                                    {
-                                        pickedMove = move;
-                                        return true;
-                                    }
-                                    if (tile.Value.HasAttribute(TileAttributes.GravDown))
-                                    {
-                                        currentPos = new Point(currentPos.X, currentPos.Y - 1);
-                                    }
-                                    else if (tile.Value.HasAttribute(TileAttributes.GravUp))
-                                    {
-                                        currentPos = new Point(currentPos.X, currentPos.Y + 1);
-                                    }
+                                    break;
                                 }
-                                else break;
+                                if (_input.Mouse.IsClicked(MouseButton.Left) && tile.Value.GetHitbox().Contains(worldMousePos))
+                                {
+                                    pickedMove = move;
+                                    return true;
+                                }
+                                if (tile.Value.HasAttribute(TileAttributes.GravDown))
+                                {
+                                    currentPos = new Point(currentPos.X, currentPos.Y - 1);
+                                }
+                                else if (tile.Value.HasAttribute(TileAttributes.GravUp))
+                                {
+                                    currentPos = new Point(currentPos.X, currentPos.Y + 1);
+                                }
                             }
-                            break;
-                        default:
-                            break;
-                    }
+                            else break;
+                        }
+                        break;
+                    case ColumnDisableMove columnDisableMove:
+                        for (int y = 0; y < state.Dimensions.Y; y++)
+                        {
+                            if (_input.Mouse.IsClicked(MouseButton.Right) && state.Tiles[columnDisableMove.ColumnIndex, y].GetHitbox().Contains(worldMousePos))
+                            {
+                                pickedMove = move;
+                                return true;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
-
             }
 
             pickedMove = null;

@@ -104,6 +104,20 @@ namespace STOLON
         public int GetEntityIndex(Entity entity) => _entityIndexCache[entity];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool AlterRemove(Point tilePos, TileAttributes attributesToRemove)
+        {
+            Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, Tiles[tilePos.X, tilePos.Y].Attributes & ~attributesToRemove);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool AlterAdd(Point tilePos, TileAttributes additionalAttributes)
+        {
+            Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, Tiles[tilePos.X, tilePos.Y].Attributes | additionalAttributes);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Alter(Point tilePos, TileAttributes newAttributes)
         {
             Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, newAttributes);
@@ -116,6 +130,25 @@ namespace STOLON
         public void RegisterMove(IMove move, Entity performer)
         {
             _moveStack.Push((move, performer));
+            Update();
+        }
+
+        // not every frame ofc
+        private void Update()
+        {
+            for (int x = 0; x < Tiles.GetLength(0); x++)
+                for (int y = 0; y < Tiles.GetLength(1); y++)
+                {
+                    if (Tiles[x, y].HasAttribute(TileAttributes.Disabled0))
+                    {
+                        AlterRemove(new Point(x, y), TileAttributes.Disabled);
+                    }
+                    if (Tiles[x, y].HasAttribute(TileAttributes.Disabled1))
+                    {
+                        AlterRemove(new Point(x, y), TileAttributes.Disabled);
+                        AlterAdd(new Point(x, y), TileAttributes.Disabled0);
+                    }
+                }
         }
 
         public void Undo()
