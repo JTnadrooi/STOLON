@@ -65,7 +65,7 @@ namespace STOLON
                     _desiredCameraPos.Y += -1;
             }
 
-            _desiredZoom = 0.3f * Math.Min((float)Camera.Dimensions.X / BoardWindow.InitialSize, (float)Camera.Dimensions.Y / BoardWindow.InitialSize);
+            _desiredZoom = 0.3f * Math.Min((float)Camera.Dimensions.X / BoardWindow.InitialSizeX, (float)Camera.Dimensions.Y / BoardWindow.InitialSizeY);
 
             //if (_input.IsPressed(MouseButton.Right)) _desiredCameraPos += (_input.PreviousMouse.Position - _input.CurrentMouse.Position).ToVector2(); // do this smarterly.
 
@@ -131,9 +131,16 @@ namespace STOLON
                         drawingContext.Draw(_textures.GetReference("player" + playerId + "_item-96"), tileWorldPos);
                     }
 
-                    if (tile.HasAttribute(TileAttributes.GravUp))
+                    if (!tile.IsOccupiedByPlayer())
                     {
-                        drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                        if (tile.HasAttribute(TileAttributes.GravUp))
+                        {
+                            drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                        }
+                        if (tile.HasAttribute(TileAttributes.Disabled))
+                        {
+                            drawingContext.Draw(_textures.GetReference("att-Disabled"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                        }
                     }
                 }
             }
@@ -161,6 +168,11 @@ namespace STOLON
         void Undo(BoardState state, Entity performer);
     }
 
+    public static class Move
+    {
+
+    }
+
     [Flags]
     public enum TileAttributes
     {
@@ -171,7 +183,11 @@ namespace STOLON
         GravUp = 1 << 3,
         Solid = 1 << 4,
 
+        Disabled0 = 1 << 5,
+        Disabled1 = 1 << 6,
+
         Default = GravDown,
+        Disabled = Disabled0 | Disabled1,
     }
 
     public readonly struct Tile : ICloneable

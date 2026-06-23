@@ -14,7 +14,8 @@ namespace STOLON
         private readonly Address _address;
         private readonly Board _board;
 
-        public const int InitialSize = 256;
+        public const int InitialSizeX = 352;
+        public const int InitialSizeY = 256;
 
         public Board Board => _board;
 
@@ -25,7 +26,7 @@ namespace STOLON
             IInputManager input,
             ILogger logger,
             Shell shell,
-            Address address) : base(deps, InitialSize, InitialSize)
+            Address address) : base(deps, InitialSizeX, InitialSizeY)
         {
             _fonts = fonts;
             _input = input;
@@ -33,6 +34,7 @@ namespace STOLON
             _address = address;
 
             _board = new Board(textures, fonts, input, logger, shell, address.GetInitialState());
+
 
             AddButton(new ToggleLockWindowButton(textures));
         }
