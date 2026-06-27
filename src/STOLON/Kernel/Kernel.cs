@@ -47,6 +47,12 @@ namespace STOLON
             _drawingOrder.Add(window); // Initially same order
         }
 
+        //internal void DeregisterWindow(Window window)
+        //{
+        //    _windows.Remove(window);
+        //    _drawingOrder.Remove(window);
+        //}
+
         internal bool Focus(Window window)
         {
             ThrowIfNotRegistered(window);
@@ -89,9 +95,27 @@ namespace STOLON
 
         public void Update(int elapsedMilliseconds)
         {
-            foreach (Window window in _windows)
+            for (int i = 0; i < _windows.Count; i++)
             {
+                Window window = _windows[i];
+
                 window.Update(elapsedMilliseconds);
+
+                if (_input.Keyboard.IsClicked(Keys.C) && _input.Keyboard.IsPressed(Keys.LeftControl))
+                {
+                    window.Close();
+                }
+
+                if (window.Status == WindowStatus.PendingClosed)
+                {
+                    //DeregisterWindow(_windows[i]);
+                    window.TryUnlock();
+
+                    _drawingOrder.Remove(window);
+                    _windows.RemoveAt(i);
+
+                    window.SetStatus(WindowStatus.PendingClosed);
+                }
             }
         }
 

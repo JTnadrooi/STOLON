@@ -32,6 +32,13 @@ namespace STOLON
         public required FoliageEngine FoliageEngine { get; init; }
     }
 
+    public enum WindowStatus
+    {
+        Open,
+        Closed,
+        PendingClosed,
+    }
+
     public abstract class Window : IComponent
     {
         private readonly record struct WindowButtonDrawInfo(WindowButton Button, Rectangle Bounds);
@@ -45,6 +52,8 @@ namespace STOLON
         public bool IsDraggable { get; set; }
         public bool IsResizable { get; set; }
         public bool IsBorderless { get; set; }
+
+        public WindowStatus Status { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // hmm
         private Point AdjustSizeForBorder(Point size)
@@ -201,6 +210,7 @@ namespace STOLON
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
             Position = Vector2.Zero;
+            Status = WindowStatus.Open;
 
             Controllers = new ControllerCollection();
             Controllers.Add("drag", new DragController(_input,
@@ -244,6 +254,11 @@ namespace STOLON
             _isInitialized = true;
         }
 
+        internal void SetStatus(WindowStatus status)
+        {
+            Status = status;
+        }
+
         public void Resize(Sides sides, int newSize)
         {
             //if ((sides & (Sides.Right | Sides.Left)) != 0 && OuterBounds.Width + newSize < (MinSize.Value.X ?? ) || )
@@ -272,6 +287,11 @@ namespace STOLON
                 int delta = newSize - OuterBounds.Height;
                 OuterBounds = new Rectangle(OuterBounds.X, OuterBounds.Y - delta, OuterBounds.Width, newSize);
             }
+        }
+
+        public void Close()
+        {
+            Status = WindowStatus.PendingClosed;
         }
 
         #region DRAG_CHECKS

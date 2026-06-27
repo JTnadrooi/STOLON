@@ -10,10 +10,11 @@ namespace STOLON
 
         public override int Height => IsLockActive() ? _window.OuterBounds.Height : _windowSlotTex.Height;
         public override int Width => IsLockActive() ? _window.OuterBounds.Width : _windowSlotTex.Width;
-        public Window Window => _window;
+        public Window? Window => _window;
 
-        private Window _window;
+        private Window? _window;
         private Texture2D _windowSlotTex;
+        private Texture2D _windowClosedTex;
         private Vector2 _borderCompensatingOffset;
 
         private bool _isWindowLocked;
@@ -26,7 +27,8 @@ namespace STOLON
             _kernel = kernel;
 
             _window = window;
-            _windowSlotTex = textures["UI\\Window\\window_slot"];
+            _windowSlotTex = textures["UI\\Window\\window_closed"];
+            _windowClosedTex = textures["UI\\Window\\window_slot"];
 
             _window.BoundRegion = this;
 
@@ -73,6 +75,12 @@ namespace STOLON
             {
                 _window.Position = Position;
             }
+
+            if (_window.Status == WindowStatus.Closed)
+            {
+                _window = null;
+                _isWindowLocked = false;
+            }
         }
 
         public override void Draw(DrawingContext drawingContext)
@@ -81,9 +89,14 @@ namespace STOLON
             {
                 _window.Draw(drawingContext);
             }
-            else  // window drawing is done by kernel, so just draw slot.
+            else  // window drawing is done by kernel, so just draw slot
             {
-                drawingContext.Draw(_windowSlotTex, Position);
+                if (_window is null) // window closed
+                {
+                    drawingContext.Draw(_windowClosedTex, Position);
+                }
+                else
+                    drawingContext.Draw(_windowSlotTex, Position);
             }
         }
 
