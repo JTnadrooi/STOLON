@@ -35,8 +35,10 @@ namespace STOLON
 
             _board = new Board(textures, fonts, input, logger, shell, address.GetInitialState());
 
-
+            AddButton(new CloseWindowButton(textures));
             AddButton(new ToggleLockWindowButton(textures));
+
+            BindChildWindow(new ImageWindow(deps, _board.State.Entities[0].Definition.Mipmaps[128]));
         }
 
         protected override void UpdateContents(int elapsedMilliseconds)

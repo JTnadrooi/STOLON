@@ -18,5 +18,10 @@
         {
             Texture = _hoverTexture;
         }
+
+        protected override void OnClick(Window source)
+        {
+            source.Close();
+        }
     }
 }

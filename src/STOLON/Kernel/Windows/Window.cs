@@ -180,6 +180,8 @@ namespace STOLON
 
         public Matrix TransformMatrix { get; private set; }
         public Border Border { get; }
+        public Window? ParentWindow => _parentWindow;
+        public ReadOnlyCollection<Window> ChildWindows { get; }
         protected IReadOnlyDictionary<Type, WindowButton> Buttons => _buttons;
 
         private Rectangle _innerBounds;
@@ -189,6 +191,9 @@ namespace STOLON
         private Font2D _nameFont;
         private bool _isInitialized;
         private Foliage _topFoliage;
+        private Rectangle _maybeButtonsBounds;
+        private List<Window> _childWindows;
+        private Window? _parentWindow;
 
         private const int ButtonSpacing = 2;
         private const int ResizeBorderAllowance = 6;
@@ -204,6 +209,10 @@ namespace STOLON
 
             _buttons = new TypeDictionary<WindowButton>();
             _orderedButtons = Array.Empty<WindowButtonDrawInfo>();
+            _childWindows = new List<Window>();
+            _parentWindow = null;
+
+            ChildWindows = _childWindows.AsReadOnly();
 
             IsDrawnByKernel = true;
             Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
@@ -292,6 +301,38 @@ namespace STOLON
         public void Close()
         {
             Status = WindowStatus.PendingClosed;
+
+            foreach (Window childWindow in _childWindows)
+            {
+                childWindow.Close();
+            }
+        }
+
+        public void BindChildWindow(Window child)
+        {
+            _childWindows.Add(child);
+            child.RegisterParent(this);
+        }
+
+        public void UnbindChildWindow(Window child)
+        {
+            _childWindows.Remove(child);
+            child.UnregisterParent(this);
+        }
+
+        private void UnregisterParent(Window window)
+        {
+            _parentWindow = null;
+        }
+
+        internal void RegisterParent(Window parent)
+        {
+            if (_parentWindow is not null)
+            {
+                throw new InvalidOperationException($"Window already has parent.");
+            }
+
+            _parentWindow = parent;
         }
 
         #region DRAG_CHECKS
@@ -400,8 +441,6 @@ namespace STOLON
             return screenPosition - InnerBounds.Location.ToVector2();
         }
 
-        private Rectangle _maybeButtonsBounds;
-
         private Rectangle GetMaybeButtonBounds()
         {
             int mbbWidth = _orderedButtons.Length * (WindowButton.Size + ButtonSpacing) + ButtonSpacing;
@@ -417,7 +456,7 @@ namespace STOLON
 
         public bool TryLock()
         {
-            if (BoundRegion is null) throw new InvalidOperationException("Can't lock unbound region.");
+            if (BoundRegion is null) return false;
 
             return BoundRegion.TryLockWindow();
         }
@@ -431,7 +470,7 @@ namespace STOLON
 
         public bool TryUnlock()
         {
-            if (BoundRegion is null) throw new InvalidOperationException("Can't unlock unbound region.");
+            if (BoundRegion is null) return false;
 
             return BoundRegion.TryUnlockWindow();
         }
