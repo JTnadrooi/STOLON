@@ -27,8 +27,8 @@ namespace STOLON
             _kernel = kernel;
 
             _window = window;
-            _windowSlotTex = textures["UI\\Window\\window_closed"];
-            _windowClosedTex = textures["UI\\Window\\window_slot"];
+            _windowSlotTex = textures["UI\\Window\\window_slot"];
+            _windowClosedTex = textures["UI\\Window\\window_closed"];
 
             _window.BoundRegion = this;
 
