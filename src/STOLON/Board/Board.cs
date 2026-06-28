@@ -11,6 +11,7 @@ namespace STOLON
         public Camera2D Camera { get; }
 
         public BoardState InitialState { get; }
+        public BoardState State => _state;
 
         private readonly ITexture2DCollection _textures;
         private readonly IFont2DCollection _fonts;
