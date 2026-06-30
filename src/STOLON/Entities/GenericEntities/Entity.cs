@@ -53,6 +53,8 @@ namespace STOLON
 
         public virtual int GetVirtualAllocation(EntitySelection info)
             => info.GetAllocation(Id);
+
+        public abstract Entity GetDefaultEntity(IMoveProvider moveProvider);
     }
 
     /// <summary>

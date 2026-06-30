@@ -13,6 +13,7 @@ namespace STOLON
         private readonly IFont2DCollection _fonts;
         private readonly ILogger _logger;
         private readonly IInputManager _input;
+        private readonly Kernel _kernel;
 
         public AddressCommandProvider(
             WindowDependencies windowDeps,
@@ -22,6 +23,7 @@ namespace STOLON
             IInputManager input,
             CommandManager commandManager,
             Shell shell,
+            Kernel kernel,
             EntityDefinition[] entityDefinitions,
             Address[] addresses) : base("addr")
         {
@@ -34,6 +36,7 @@ namespace STOLON
             _fonts = fonts;
             _logger = logger;
             _input = input;
+            _kernel = kernel;
         }
 
         private Address GetAddress(string address)
@@ -41,15 +44,27 @@ namespace STOLON
             return _addresses.First(a => a.Id == address);
         }
 
-        [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
-        public void SetAddress([Option(Id = "addr")] string addrId, [Option(Id = "with", Aliases = ["w"])] string[] withIds)
+        private Entity GetEntity(string id)
         {
-            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entityDefinitions, GetAddress(addrId)));
+            return _entityDefinitions.First(d => d.Id == id).GetDefaultEntity(new UserMoveProvider(_input, _kernel));
+        }
 
-            flag.Selection.AddRange(withIds);
+        [KernelCommand("Set the target adress.", Id = "addr set", Aliases = ["sadr"])]
+        public void SetAddress([Option(Id = "addr")] string addrId, [Option(Aliases = ["p1"])] string? player1, [Option(Aliases = ["p2"])] string? player2)
+        {
+            InitAddressCommandFlag flag = _commandManager.SetFlag(new InitAddressCommandFlag(GetAddress(addrId)));
 
-            if (withIds.Length > 0)
-                _shell.WriteLine($"Set target to address '{addrId}' with [{withIds.Select(id => $"'{id}'").ToJoinedString(", ")}].");
+            if (player1 is not null)
+            {
+                flag.Player1 = GetEntity(player1);
+            }
+            if (player2 is not null)
+            {
+                flag.Player2 = GetEntity(player2);
+            }
+
+            if (player1 is not null || player2 is not null)
+                _shell.WriteLine($"Set target to address '{addrId}' with {flag.Player1.Definition.Id ?? "NO_SELECT"} (player1) and {flag.Player2.Definition.Id ?? "NO_SELECT"} (player2).");
             else
                 _shell.WriteLine($"Set target to address '{addrId}'.");
         }
@@ -61,62 +76,48 @@ namespace STOLON
         }
 
         [KernelCommand("Add entities to the selection.", Id = "selc add", Aliases = ["selc"], RequiredFlag = typeof(InitAddressCommandFlag))]
-        public void AddToSelection(string[] ids)
+        public void AddToSelection(int playerIndex, string? id)
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
-            if (ids.Length == 0) // for the "selc" without ids "overload"
+            if (id is null) // for the "selc" without ids "overload"
             {
-                _shell.WriteLine(flag.Selection);
+                _shell.WriteLine(flag.GetPlayer(playerIndex));
 
                 return;
             }
 
             try
             {
-                flag.Selection.AddRange(ids);
+                flag.SetPlayer(playerIndex, GetEntity(id));
             }
             catch (ArgumentException e)
             {
                 throw new CommandArgumentException(e.Message);
             }
 
-            if (ids.Length > 0)
-                _shell.WriteLine($"Added [{ids.Select(id => $"'{id}'").ToJoinedString(", ")}] to selection.");
-            else
-                _shell.WriteLine($"Added '{ids[0]}' to selection.");
-
-            //_shell.WriteLine(flag.Selection);
-            //_shell.WriteWindow(new SelectionWindow(_windowDeps));
+            _shell.WriteLine($"Added '{id}' to player {playerIndex}'s selection.");
         }
 
         [KernelCommand("Removes entities from the selection.", Id = "selc rm", Aliases = ["dselc"], RequiredFlag = typeof(InitAddressCommandFlag))]
-        public void RemoveFromSelection(string[] ids)
+        public void ClearPlayer([Option(Aliases = ["player", "p"])] int playerIndex)
         {
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
-            if (ids.Length == 0)
-            {
-                throw new CommandArgumentException("You must provide at least one id.");
-            }
-
             try
             {
-                flag.Selection.RemoveRange(ids);
+                flag.SetPlayer(playerIndex, null);
             }
             catch (ArgumentException e)
             {
                 throw new CommandArgumentException(e.Message);
             }
 
-            if (ids.Length > 0)
-                _shell.WriteLine($"Removed [{ids.Select(id => $"'{id}'").ToJoinedString(", ")}] from selection.");
-            else
-                _shell.WriteLine($"Removed '{ids[0]}' from selection.");
+            _shell.WriteLine($"Cleared player {playerIndex}'s selection.");
         }
 
         [KernelCommand("Initializes an address.", Id = "addr init", Aliases = ["stadr"])]
-        public void InitializeAddress([Option(Id = "addr")] string? addrId, [Option(Id = "with", Aliases = ["w"])] string[] withIds)
+        public void InitializeAddress([Option(Id = "addr")] string? addrId, [Option(Aliases = ["p1"])] string? player1, [Option(Aliases = ["p2"])] string? player2)
         {
             if (_commandManager.ActiveFlag is not InitAddressCommandFlag flag)
             {
@@ -125,15 +126,21 @@ namespace STOLON
                     throw new CommandArgumentException($"Missing argument {nameof(addrId)}."); // replace with helper method when I add them to AsitLib.
                 }
 
-                flag = _commandManager.SetFlag(new InitAddressCommandFlag(_entityDefinitions, GetAddress(addrId)));
+                flag = _commandManager.SetFlag(new InitAddressCommandFlag(GetAddress(addrId)));
             }
 
-            if (withIds.Length > 0)
-                flag.Selection.AddRange(withIds);
+            if (player1 is not null)
+            {
+                flag.Player1 = GetEntity(player1);
+            }
+            if (player2 is not null)
+            {
+                flag.Player2 = GetEntity(player2);
+            }
 
             _shell.WriteWindow(new BoardWindow(_windowDeps, _textures, _fonts, _input, _logger, _shell, flag.Address));
 
-            _shell.WriteLine($"Initialized address '{flag.Address}' with [{flag.Selection.Entries.Keys.Select(entry => $"'{entry}'").ToJoinedString(", ")}].");
+            _shell.WriteLine($"Initialized address '{flag.Address}' with {flag.Player1.Definition.Id ?? "NO_SELECT"} (player1) and {flag.Player2.Definition.Id ?? "NO_SELECT"} (player2).");
         }
     }
 }

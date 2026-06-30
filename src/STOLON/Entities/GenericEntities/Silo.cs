@@ -4,9 +4,11 @@ namespace STOLON
 {
     public class SiloEntityDefinition : EntityDefinition
     {
+        private readonly ITexture2DCollection _textures;
+
         public SiloEntityDefinition(ITexture2DCollection textures) : base("silo", "Silo", "Sl", textures, "Silo desc", "Silo 28SHA")
         {
-
+            _textures = textures;
         }
 
         protected override EntityProfile ResolveProfile(ITexture2DCollection textures)
@@ -28,6 +30,11 @@ namespace STOLON
                 .ApplyMultiplierWhen(info.Contains("deceit"), 1.2f)
                 .ApplyMultiplierWhen(info.Entries.Count > 3, 0.5f)
                 .End();
+
+        public override Entity GetDefaultEntity(IMoveProvider moveProvider)
+        {
+            return new SiloEntity(this, _textures, moveProvider);
+        }
     }
 
     public class SiloEntity : Entity
