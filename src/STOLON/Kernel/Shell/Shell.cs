@@ -322,6 +322,14 @@ namespace STOLON
             });
         }
 
+        public void WriteEntityDefinition(EntityDefinition entityDefinition)
+        {
+            WriteWindow(new ImageWindow(_windowDeps, entityDefinition)
+            {
+                IsDrawnByKernel = false,
+            });
+        }
+
         public void WriteWindow(Window window)
         {
             WriteRegion(new WindowShellRegion(this, _kernel, _textures, window));

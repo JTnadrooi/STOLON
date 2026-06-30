@@ -12,11 +12,15 @@ namespace STOLON
 
         private Vector2 _imgPos;
 
-        public ImageWindow(WindowDependencies deps, Texture2D image)
-            : base(deps, image.Width, image.Height)
+        public ImageWindow(WindowDependencies deps, EntityDefinition entity, int mipmapSize = 128) : this(deps, entity.Mipmaps[mipmapSize], entity.Name)
+        {
+
+        }
+
+        public ImageWindow(WindowDependencies deps, Texture2D image, string? name = null) : base(deps, image.Width, image.Height)
         {
             Image = image;
-            Name = "Img: North";
+            Name = name is null ? string.Empty : ("Img: " + name);
 
             MaxSize = Image.Bounds.Size;
             IsResizable = true;
