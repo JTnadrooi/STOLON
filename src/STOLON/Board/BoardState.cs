@@ -8,24 +8,25 @@ namespace STOLON
     {
         public Point Dimensions => _dimensions;
         public Tile[,] Tiles => _tiles;
-        public Entity[] Entities => _entities;
-        public Entity CurrentEntity => Entities[_currentPlayerIndex];
+        public Entity CurrentEntity => _currentPlayerIndex == 0 ? Player1 : Player2;
+        public Entity Player1 => _player1;
+        public Entity Player2 => _player2;
 
         public readonly Stack<(IMove, Entity)> _moveStack;
-        private readonly FrozenDictionary<Entity, int>? _entityIndexCache;
         private readonly Tile[,] _tiles;
-        private readonly Entity[] _entities;
+        private readonly Entity _player1;
+        private readonly Entity _player2;
         private readonly Point _dimensions;
 
         public int _currentPlayerIndex;
 
-        public BoardState(Tile[,] tiles, Entity[] entities, int currentPlayer = 0)
+        public BoardState(Tile[,] tiles, Entity player1, Entity player2, int currentPlayer = 0)
         {
             _tiles = tiles;
-            _entities = entities;
+            _player1 = player1;
+            _player2 = player2;
             _dimensions = new Point(tiles.GetLength(0), tiles.GetLength(1));
             _moveStack = new Stack<(IMove, Entity)>();
-            _entityIndexCache = entities.Select((p, i) => new KeyValuePair<Entity, int>(p, i)).ToFrozenDictionary();
 
             _currentPlayerIndex = currentPlayer;
         }
@@ -42,11 +43,7 @@ namespace STOLON
                 for (int y = 0; y < _dimensions.Y; y++)
                     resultTiles[x, y] = _tiles[x, y].Clone();
 
-            Entity[] resultEntities = new Entity[_entities.Length];
-            for (int i = 0; i < _entities.Length; i++)
-                resultEntities[i] = _entities[i].NodeCopy();
-
-            return new BoardState(resultTiles, resultEntities, _currentPlayerIndex);
+            return new BoardState(resultTiles, _player1.NodeCopy(), _player2.NodeCopy(), _currentPlayerIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,7 +97,7 @@ namespace STOLON
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetEntityIndex(Entity entity) => _entityIndexCache[entity];
+        public int GetEntityIndex(Entity entity) => entity == Player1 ? 0 : 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AlterRemove(Point tilePos, TileAttributes attributesToRemove)
@@ -156,7 +153,7 @@ namespace STOLON
             move.Undo(this, entity);
         }
 
-        public static BoardState GetDefault(Entity[] entities)
-            => new BoardState(Tile.GetTiles(new Vector2(8).ToPoint()), entities);
+        public static BoardState GetDefault(Entity player1, Entity player2)
+            => new BoardState(Tile.GetTiles(new Vector2(8).ToPoint()), player1, player2);
     }
 }

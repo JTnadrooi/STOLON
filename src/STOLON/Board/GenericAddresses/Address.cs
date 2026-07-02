@@ -18,6 +18,6 @@ namespace STOLON
             Id = id;
         }
 
-        public abstract BoardState GetInitialState();
+        public abstract BoardState GetInitialState(Entity player1, Entity player2);
     }
 }

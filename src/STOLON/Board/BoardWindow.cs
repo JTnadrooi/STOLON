@@ -21,25 +21,22 @@ namespace STOLON
 
         public BoardWindow(
             WindowDependencies deps,
-            ITexture2DCollection textures,
-            IFont2DCollection fonts,
-            IInputManager input,
             ILogger logger,
             Shell shell,
-            Address address) : base(deps, InitialSizeX, InitialSizeY)
+            Address address, Entity player1, Entity player2) : base(deps, InitialSizeX, InitialSizeY)
         {
-            _fonts = fonts;
-            _input = input;
+            _fonts = deps.Fonts;
+            _input = deps.Input;
             _logger = logger;
             _address = address;
 
-            _board = new Board(textures, fonts, input, logger, shell, address.GetInitialState());
+            _board = new Board(deps.Textures, deps.Fonts, deps.Input, logger, shell, address.GetInitialState(player1, player2));
 
-            AddButton(new CloseWindowButton(textures));
-            AddButton(new ToggleLockWindowButton(textures));
+            AddButton(new CloseWindowButton(deps.Textures));
+            AddButton(new ToggleLockWindowButton(deps.Textures));
 
-            BindChildWindow(new ImageWindow(deps, _board.State.Entities[0].Definition));
-            BindChildWindow(new ImageWindow(deps, _board.State.Entities[1].Definition));
+            BindChildWindow(new ImageWindow(deps, _board.State.Player1.Definition));
+            BindChildWindow(new ImageWindow(deps, _board.State.Player2.Definition));
         }
 
         protected override void UpdateContents(int elapsedMilliseconds)

@@ -39,14 +39,13 @@ namespace STOLON
             //_shell.WriteLine("This is on the FOURTH line! (It can't get any crazier than this!1!)");
             //_shell.WriteTexture(_textures["Entities\\north\\north-128"]);
 
+            SiloEntityDefinition siloDefinition = STOLON.Services.Resolve<SiloEntityDefinition>();
+
             _shell.WriteWindow(new BoardWindow(
                 STOLON.Services.Resolve<WindowDependencies>(),
-                STOLON.Services.Resolve<ITexture2DCollection>(),
-                STOLON.Services.Resolve<IFont2DCollection>(),
-                STOLON.Services.Resolve<IInputManager>(),
                 STOLON.Services.Resolve<ILogger>(),
                 STOLON.Services.Resolve<Shell>(),
-                new A16Address(STOLON.Services.Resolve<ITexture2DCollection>(), STOLON.Services.Resolve<IInputManager>(), STOLON.Services.Resolve<Kernel>(), STOLON.Services.Resolve<EntityDefinition[]>())));
+                new A16Address(), siloDefinition.GetDefaultEntity(new UserMoveProvider(_input, STOLON.Services.Resolve<Kernel>())), siloDefinition.GetDefaultEntity(new UserMoveProvider(_input, STOLON.Services.Resolve<Kernel>()))));
         }
 
         protected override void UpdateInterface(int elapsedMilliseconds)
