@@ -35,8 +35,8 @@ namespace STOLON
             AddButton(new CloseWindowButton(deps.Textures));
             AddButton(new ToggleLockWindowButton(deps.Textures));
 
-            BindChildWindow(new ImageWindow(deps, _board.State.Player1.Definition));
-            BindChildWindow(new ImageWindow(deps, _board.State.Player2.Definition));
+            BindChildWindow(new PlayerWindow(deps, _board, _board.State.Player1));
+            BindChildWindow(new PlayerWindow(deps, _board, _board.State.Player2));
         }
 
         protected override void UpdateContents(int elapsedMilliseconds)
