@@ -45,6 +45,7 @@ namespace STOLON
                 STOLON.Services.Resolve<WindowDependencies>(),
                 STOLON.Services.Resolve<ILogger>(),
                 STOLON.Services.Resolve<Shell>(),
+                STOLON.Services.Resolve<CommandManager>(),
                 new A16Address(), siloDefinition.GetDefaultEntity(new UserMoveProvider(_input, STOLON.Services.Resolve<Kernel>())), siloDefinition.GetDefaultEntity(new UserMoveProvider(_input, STOLON.Services.Resolve<Kernel>()))));
         }
 

@@ -13,6 +13,7 @@ namespace STOLON
         private readonly ILogger _logger;
         private readonly Address _address;
         private readonly Board _board;
+        private readonly CommandManager _commandManager;
 
         public const int InitialSizeX = 352;
         public const int InitialSizeY = 256;
@@ -23,14 +24,19 @@ namespace STOLON
             WindowDependencies deps,
             ILogger logger,
             Shell shell,
+            CommandManager commandManager,
             Address address, Entity player1, Entity player2) : base(deps, InitialSizeX, InitialSizeY)
         {
             _fonts = deps.Fonts;
             _input = deps.Input;
             _logger = logger;
+            _commandManager = commandManager;
             _address = address;
 
             _board = new Board(deps.Textures, deps.Fonts, deps.Input, logger, shell, address.GetInitialState(player1, player2));
+
+            //((BoardCommandProvider)_commandManager.Engine.Providers["board"]))
+            _commandManager.SetFlag(new BoardCommandFlag(_board, player1));
 
             AddButton(new CloseWindowButton(deps.Textures));
             AddButton(new ToggleLockWindowButton(deps.Textures));

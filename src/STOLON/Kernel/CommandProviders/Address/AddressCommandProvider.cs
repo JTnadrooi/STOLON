@@ -143,7 +143,7 @@ namespace STOLON
                 throw new CommandException("Cannot initialize address without both players set.");
             }
 
-            _shell.WriteWindow(new BoardWindow(_windowDeps, _logger, _shell, flag.Address, flag.Player1, flag.Player2));
+            _shell.WriteWindow(new BoardWindow(_windowDeps, _logger, _shell, _commandManager, flag.Address, flag.Player1, flag.Player2));
 
             _shell.WriteLine($"Initialized address '{flag.Address}' with {flag.Player1.Definition.Id ?? "NO_SELECT"} (player1) and {flag.Player2.Definition.Id ?? "NO_SELECT"} (player2).");
         }
