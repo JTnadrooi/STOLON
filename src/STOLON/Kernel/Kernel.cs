@@ -21,6 +21,10 @@ namespace STOLON
 
         private readonly Dictionary<Type, Window> _singleInstanceWindows;
 
+        private const int NewWindowPosOffset = 20;
+        private const int NewWindowPosAttempts = 10;
+        private const int NewWindowPosCheckDistance = 5;
+
         public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input, CommandManager commandManager)
         {
             _logger = logger;
@@ -91,6 +95,27 @@ namespace STOLON
             _drawingOrder.Add(window);
 
             return true;
+        }
+
+        public Point GetFreeWindowPos(int windowWidth, int windowHeight)
+        {
+            List<Point> windowPositions = _windows.Select(w => w.Position.ToPoint()).ToList();
+
+            Console.WriteLine(windowPositions.ToJoinedString(", "));
+
+            for (int i = 0; i < NewWindowPosOffset; i++)
+            {
+                Vector2 testPos = Centering.Center(new Point(windowWidth, windowHeight), STOLON.Bounds) + new Vector2(i * NewWindowPosOffset);
+
+                bool overlaps = _windows.Select(w => w.Position).Any(pos => Vector2.Distance(pos, testPos) < NewWindowPosCheckDistance);
+
+                if (!overlaps)
+                {
+                    return testPos.ToPoint();
+                }
+            }
+
+            throw new InvalidOperationException($"All '{NewWindowPosAttempts}' free window spots have been taken.");
         }
 
         public TWindow GetWindow<TWindow>() where TWindow : Window

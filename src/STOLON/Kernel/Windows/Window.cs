@@ -223,9 +223,10 @@ namespace STOLON
             IsSingleInstance = false;
             Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
             Name = string.Empty;
-            InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);
-            Position = Vector2.Zero;
             Status = WindowStatus.Open;
+
+            Point freeWindowPos = deps.Kernel.GetFreeWindowPos(innerSizeX, innerSizeY);
+            InnerBounds = new Rectangle(freeWindowPos.X, freeWindowPos.Y, innerSizeX, innerSizeY);
 
             Controllers = new ControllerCollection();
             Controllers.Add("drag", new DragController(_input,
