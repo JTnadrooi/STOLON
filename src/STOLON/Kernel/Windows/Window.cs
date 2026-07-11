@@ -49,9 +49,14 @@ namespace STOLON
         private readonly IInputManager _input;
         private readonly FoliageEngine _foliageEngine;
 
-        public bool IsDraggable { get; set; }
-        public bool IsResizable { get; set; }
-        public bool IsBorderless { get; set; }
+        public bool IsDraggable { get; protected set; }
+        public bool IsResizable { get; protected set; }
+        public bool IsBorderless { get; protected set; }
+
+        /// <summary>
+        /// Gets if there can only be one instance of this <see cref="Window"/>. Should be constant and the same for each <see cref="Window"/> of the same type.
+        /// </summary>
+        public bool IsSingleInstance { get; protected set; }
 
         public WindowStatus Status { get; private set; }
 
@@ -215,6 +220,7 @@ namespace STOLON
             ChildWindows = _childWindows.AsReadOnly();
 
             IsDrawnByKernel = true;
+            IsSingleInstance = false;
             Border = new Border(_textures["UI\\Window\\window-border"], 15, 1, 1, 1);
             Name = string.Empty;
             InnerBounds = new Rectangle(0, 0, innerSizeX, innerSizeY);

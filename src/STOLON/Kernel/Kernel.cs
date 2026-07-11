@@ -1,4 +1,4 @@
-﻿using AsitLib.CommandLine;
+using AsitLib.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,8 @@ namespace STOLON
         private readonly List<Window> _windows;
         private readonly List<Window> _drawingOrder;
 
+        private readonly Dictionary<Type, Window> _singleInstanceWindows;
+
         public Kernel(IRichLogger logger, ITexture2DCollection textures, IInputManager input, CommandManager commandManager)
         {
             _logger = logger;
@@ -27,6 +29,7 @@ namespace STOLON
 
             _windows = new List<Window>();
             _drawingOrder = new List<Window>();
+            _singleInstanceWindows = new Dictionary<Type, Window>();
 
             Windows = _windows;
 
@@ -41,10 +44,32 @@ namespace STOLON
 
         internal void RegisterWindow(Window window)
         {
+            if (window.IsSingleInstance)
+            {
+                Type windowType = window.GetType();
+
+                if (_singleInstanceWindows.ContainsKey(windowType))
+                {
+                    throw new InvalidOperationException("Single instance window already registered.");
+                }
+
+                _singleInstanceWindows.Add(windowType, window);
+            }
+
             _windows.Add(window);
             //if (!)
             //throw new ArgumentException("Window is already registered.");
             _drawingOrder.Add(window); // Initially same order
+
+        }
+
+        private void DeregisterWindow(Window window, int index)
+        {
+            _drawingOrder.Remove(window);
+            _windows.RemoveAt(index);
+
+            Type windowType = window.GetType();
+            _singleInstanceWindows.Remove(windowType);
         }
 
         //internal void DeregisterWindow(Window window)
@@ -66,6 +91,21 @@ namespace STOLON
             _drawingOrder.Add(window);
 
             return true;
+        }
+
+        public TWindow GetWindow<TWindow>() where TWindow : Window
+        {
+            Type windowType = typeof(TWindow);
+
+            if (_singleInstanceWindows.TryGetValue(windowType, out Window? windowFromCache))
+            {
+                return (TWindow)windowFromCache;
+            }
+            else if (_windows.TryGetFirst(w => w is TWindow, out Window? windowFromWindows))
+            {
+                return (TWindow)windowFromWindows;
+            }
+            else throw new InvalidOperationException($"Window with type '{windowType.ToString()}' not registerd.");
         }
 
         /// <summary>
@@ -111,8 +151,8 @@ namespace STOLON
                     //DeregisterWindow(_windows[i]);
                     window.TryUnlock();
 
-                    _drawingOrder.Remove(window);
-                    _windows.RemoveAt(i);
+                    DeregisterWindow(window, i);
+                    i--;
 
                     window.SetStatus(WindowStatus.PendingClosed);
                 }

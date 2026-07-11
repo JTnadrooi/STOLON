@@ -35,6 +35,8 @@ namespace STOLON
 
             _board = new Board(deps.Textures, deps.Fonts, deps.Input, logger, shell, address.GetInitialState(player1, player2));
 
+            IsSingleInstance = true;
+
             //((BoardCommandProvider)_commandManager.Engine.Providers["board"]))
             _commandManager.SetFlag(new BoardCommandFlag(_board, player1));
 
