@@ -44,7 +44,7 @@
                 _logger.Log($"registered entity with id '{entity.Id}\" and name '{entity.Name}\".");
             }
 
-            _sceneManager.ChangeScene<MenuScene>();
+            _sceneManager.ChangeScene<ShellScene>();
 
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
