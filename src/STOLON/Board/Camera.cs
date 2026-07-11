@@ -28,6 +28,7 @@
                 if (_zoom > MaxZoom) _zoom = MaxZoom;
             }
         }
+
         public Matrix View => Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
                                 Matrix.CreateScale(Zoom) *
                                 Matrix.CreateRotationZ(Rotation) *
@@ -57,8 +58,7 @@
         public void OnPixel(ref Vector2 worldPosition)
         {
             Vector2 screenPosition = Project(worldPosition);
-            screenPosition.X = MathF.Round(screenPosition.X);
-            screenPosition.Y = MathF.Round(screenPosition.Y);
+            NumberHelper.OnPixel(ref screenPosition);
             worldPosition = Unproject(screenPosition);
         }
 

@@ -101,8 +101,6 @@ namespace STOLON
         {
             List<Point> windowPositions = _windows.Select(w => w.Position.ToPoint()).ToList();
 
-            Console.WriteLine(windowPositions.ToJoinedString(", "));
-
             for (int i = 0; i < NewWindowPosOffset; i++)
             {
                 Vector2 testPos = Centering.Center(new Point(windowWidth, windowHeight), STOLON.Bounds) + new Vector2(i * NewWindowPosOffset);
