@@ -544,6 +544,7 @@ namespace STOLON
             }
 
             TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
+
             UpdateContents(elapsedMilliseconds);
         }
 
@@ -553,11 +554,14 @@ namespace STOLON
         {
             drawingContext.DrawArea(InnerBounds, Color.Black);
 
+            DrawingContext.DrawingParameters drawContextDrawingParameters = drawingContext.GetDrawingParameters();
+
             drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: TransformMatrix);
+
 
             DrawContents(drawingContext);
 
-            drawingContext.SetDrawingParameters(); // resets them.
+            drawingContext.SetDrawingParameters(drawContextDrawingParameters);
 
             drawingContext.DrawBorderAround(Border, InnerBounds);
 

@@ -13,6 +13,32 @@ namespace STOLON
     [Dependency(ServiceLifetime.Singleton)]
     public sealed class DrawingContext : IDisposable
     {
+        public struct DrawingParameters
+        {
+            internal SpriteSortMode SortMode;
+            internal BlendState? BlendState;
+            internal SamplerState? SamplerState;
+            internal DepthStencilState? DepthStencilState;
+            internal Rectangle? ScissorArea;
+            internal Matrix? TransformMatrix;
+
+            public DrawingParameters(
+                SpriteSortMode sortMode,
+                BlendState? blendState,
+                SamplerState? samplerState,
+                DepthStencilState? depthStencilState,
+                Rectangle? scissorArea,
+                Matrix? transformMatrix)
+            {
+                SortMode = sortMode;
+                BlendState = blendState;
+                SamplerState = samplerState;
+                DepthStencilState = depthStencilState;
+                ScissorArea = scissorArea;
+                TransformMatrix = transformMatrix;
+            }
+        }
+
         public ReadOnlyDictionary<string, Shader> Shaders { get; }
 
         /// <summary>
@@ -305,6 +331,30 @@ namespace STOLON
             {
                 UpdateDrawingParameters();
             }
+        }
+
+        public DrawingParameters GetDrawingParameters()
+        {
+            return new DrawingParameters(
+                _sortMode,
+                _blendState,
+                _samplerState,
+                _depthStencilState,
+                _scissorArea,
+                _transformMatrix
+            );
+        }
+
+        public void SetDrawingParameters(DrawingParameters drawingParameters, bool forceUpdate = false)
+        {
+            SetDrawingParameters(drawingParameters.SortMode,
+                drawingParameters.BlendState,
+                drawingParameters.SamplerState,
+                drawingParameters.DepthStencilState,
+                drawingParameters.ScissorArea,
+                drawingParameters.TransformMatrix,
+                forceUpdate
+            );
         }
 
         public void UpdateResolution()
