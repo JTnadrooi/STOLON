@@ -19,8 +19,14 @@ namespace STOLON
             {
                 state.AlterAdd(new Point(ColumnIndex, i), TileAttributes.Disabled1);
             }
-            state.GoNextPlayer();
+
+            if (performer is SiloEntity silo)
+            {
+                silo.LastAbilityUse = state.CurrentMoveIndex;
+            }
+
             state.RegisterMove(this, performer);
+
             Console.WriteLine(this);
         }
 

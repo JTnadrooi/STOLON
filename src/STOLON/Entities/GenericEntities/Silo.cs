@@ -39,9 +39,11 @@ namespace STOLON
 
     public class SiloEntity : Entity
     {
+        internal int LastAbilityUse;
+
         public SiloEntity(EntityDefinition definition, ITexture2DCollection textures, IMoveProvider moveProvider) : base(definition, moveProvider)
         {
-
+            LastAbilityUse = int.MinValue;
         }
 
         public override bool HasWon(BoardState state)
@@ -51,11 +53,19 @@ namespace STOLON
 
         public override IMove[] GetAvailableMoves(BoardState state)
         {
-            List<IMove> availableMoves = Entity.GetUniqueGravityAffectedMoves(state).ToList();
+            List<IMove> availableMoves = GravityAffectedMove.GetUniqueMoves(state).ToList();
 
-            for (int i = 0; i < state.Dimensions.X; i++)
+            //if (state._currentPlayerIndex == 0)
+            //{
+            //    Console.WriteLine(LastAbilityUse + " " + state.CurrentMoveIndex);
+            //}
+
+            if (state.CurrentMoveIndex > LastAbilityUse + 1 * state.PlayerCount)
             {
-                availableMoves.Add(new ColumnDisableMove(i));
+                for (int i = 0; i < state.Dimensions.X; i++)
+                {
+                    availableMoves.Add(new ColumnDisableMove(i));
+                }
             }
 
             return availableMoves.ToArray();
