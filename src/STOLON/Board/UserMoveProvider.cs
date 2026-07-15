@@ -17,7 +17,7 @@ namespace STOLON
         {
             for (int i = 0; i < state.Dimensions.Y; i++)
             {
-                state.AlterAdd(new Point(ColumnIndex, i), TileAttributes.Disabled1);
+                state.AddAttributes(new Point(ColumnIndex, i), TileAttributes.Disabled1);
             }
 
             if (performer is SiloEntity silo)
@@ -138,7 +138,7 @@ namespace STOLON
 
         public bool TryGetMove(BoardState state, ReadOnlySpan<IMove> availableMoves, [NotNullWhen(true)] out IMove? pickedMove)
         {
-            BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w.GetType() == typeof(BoardWindow));
+            BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w is BoardWindow);
             Board board = window.Board;
             Vector2 windowMousePos = _input.Mouse.Position - window.Position;
             Vector2 worldMousePos = board.Camera.Unproject(windowMousePos);

@@ -12,6 +12,8 @@ namespace STOLON
         public Entity Player1 => _player1;
         public Entity Player2 => _player2;
 
+        public int CurrentMoveIndex { get; private set; }
+
         public readonly Stack<(IMove, Entity)> _moveStack;
         private readonly Tile[,] _tiles;
         private readonly Entity _player1;
@@ -19,6 +21,8 @@ namespace STOLON
         private readonly Point _dimensions;
 
         public int _currentPlayerIndex;
+
+        public int PlayerCount => 2;
 
         public BoardState(Tile[,] tiles, Entity player1, Entity player2, int currentPlayer = 0)
         {
@@ -34,6 +38,13 @@ namespace STOLON
         public void GoNextPlayer()
         {
             _currentPlayerIndex = _currentPlayerIndex == 0 ? 1 : 0;  // 2 player support only for now...
+            CurrentMoveIndex++;
+        }
+
+        public void GoPreviousPlayer()
+        {
+            _currentPlayerIndex = _currentPlayerIndex == 0 ? 1 : 0;  // 2 player support only for now...
+            CurrentMoveIndex--;
         }
 
         public BoardState DeepCopy() // for multithread magic
@@ -52,8 +63,8 @@ namespace STOLON
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetTileAt(Point p, [NotNullWhen(true)] out Tile? tile)
         {
-            if (p.X >= 0 && p.X < _tiles.GetLength(0) &&
-                p.Y >= 0 && p.Y < _tiles.GetLength(1))
+            if (p.X >= 0 && p.X < Dimensions.X &&
+                p.Y >= 0 && p.Y < Dimensions.Y)
             {
                 tile = _tiles[p.X, p.Y];
                 return true;
@@ -100,21 +111,21 @@ namespace STOLON
         public int GetEntityIndex(Entity entity) => entity == Player1 ? 0 : 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AlterRemove(Point tilePos, TileAttributes attributesToRemove)
+        public bool RemoveAttributes(Point tilePos, TileAttributes attributesToRemove)
         {
             Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, Tiles[tilePos.X, tilePos.Y].Attributes & ~attributesToRemove);
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AlterAdd(Point tilePos, TileAttributes additionalAttributes)
+        public bool AddAttributes(Point tilePos, TileAttributes additionalAttributes)
         {
             Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, Tiles[tilePos.X, tilePos.Y].Attributes | additionalAttributes);
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Alter(Point tilePos, TileAttributes newAttributes)
+        public bool SetAttributes(Point tilePos, TileAttributes newAttributes)
         {
             Tiles[tilePos.X, tilePos.Y] = new Tile(tilePos, newAttributes);
             return true;
@@ -126,23 +137,23 @@ namespace STOLON
         public void RegisterMove(IMove move, Entity performer)
         {
             _moveStack.Push((move, performer));
-            Update();
+            UpdateTiles();
         }
 
         // not every frame ofc
-        private void Update()
+        private void UpdateTiles()
         {
             for (int x = 0; x < Tiles.GetLength(0); x++)
                 for (int y = 0; y < Tiles.GetLength(1); y++)
                 {
                     if (Tiles[x, y].HasAttribute(TileAttributes.Disabled0))
                     {
-                        AlterRemove(new Point(x, y), TileAttributes.Disabled);
+                        RemoveAttributes(new Point(x, y), TileAttributes.Disabled);
                     }
                     if (Tiles[x, y].HasAttribute(TileAttributes.Disabled1))
                     {
-                        AlterRemove(new Point(x, y), TileAttributes.Disabled);
-                        AlterAdd(new Point(x, y), TileAttributes.Disabled0);
+                        RemoveAttributes(new Point(x, y), TileAttributes.Disabled);
+                        AddAttributes(new Point(x, y), TileAttributes.Disabled0);
                     }
                 }
         }
