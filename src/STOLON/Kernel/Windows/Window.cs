@@ -565,6 +565,7 @@ namespace STOLON
 
             drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: TransformMatrix);
 
+            drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
 
             DrawContents(drawingContext);
 
@@ -589,8 +590,6 @@ namespace STOLON
             {
                 _topFoliage.Draw(drawingContext);
             }
-
-            drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
         }
 
         internal void PostDraw(DrawingContext drawingContext) // purelly so foliage draws over everything in the shell
