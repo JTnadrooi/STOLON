@@ -1,4 +1,4 @@
-using Autofac;
+﻿using Autofac;
 using MonoGame.Extended.BitmapFonts;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -78,7 +78,16 @@ namespace STOLON
             ReadOnlySpan<IMove> availableMoves = currentEntity.GetAvailableMoves(_state);
             if (currentEntity.MoveProvider.TryGetMove(_state, availableMoves, out IMove? move))
             {
-                move.Apply(_state, currentEntity);
+                if (currentEntity.MoveProvider is UserMoveProvider)
+                {
+                    string? moveCommand = move.GetCommand();
+                    if (moveCommand is not null)
+                    {
+                        _shell.ExecuteCommand(moveCommand);
+                    }
+                    else move.Apply(_state, currentEntity);
+                }
+                else move.Apply(_state, currentEntity);
                 if (currentEntity.HasWon(_state))
                 {
                     _shell.WriteLine("Winner!");
@@ -151,7 +160,7 @@ namespace STOLON
             //drawingContext.RegisterDraw(this, new Rectangle());
         }
 
-        public string GetPlayerSymbol(int playerIndex) => playerIndex switch
+        public static string GetPlayerSymbol(int playerIndex) => playerIndex switch
         {
             0 => "[o]",
             1 => "[x]",
