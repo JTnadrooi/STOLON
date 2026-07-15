@@ -374,6 +374,15 @@ namespace STOLON
             Put(str, _text.Length);
         }
 
+        public void ExecuteCommand(string moveCommand)
+        {
+            Input(moveCommand);
+
+            string command = GetInputAsProcessing();
+
+            _commandManager.Execute(command);
+        }
+
         #endregion
 
         private void Put<T>(T item, TextPosition pos) => Put(item.ToString()!, pos);

@@ -1,4 +1,4 @@
-﻿using MonoGame.Extended;
+using MonoGame.Extended;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,6 +27,11 @@ namespace STOLON
         public void Undo(BoardState state, Entity performer)
         {
             throw new NotImplementedException();
+        }
+
+        public string GetCommand()
+        {
+            return "s@ " + ColumnIndex;
         }
 
         public bool Equals(IMove? other)
@@ -94,6 +99,11 @@ namespace STOLON
         public void Undo(BoardState state, Entity performer)
         {
             throw new NotImplementedException();
+        }
+
+        public string GetCommand()
+        {
+            return "@ " + Board.GetCoordsFromPoint(Origin);
         }
 
         public bool Equals(IMove? other)

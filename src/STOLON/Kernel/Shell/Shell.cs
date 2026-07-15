@@ -380,5 +380,7 @@ namespace STOLON
 
             UpdateRegionPositions(false);
         }
+
+        public void ExecuteCommand(string moveCommand) => EnsureLastRegionIsTextRegion().ExecuteCommand(moveCommand);
     }
 }

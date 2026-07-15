@@ -195,6 +195,8 @@ namespace STOLON
     {
         void Apply(BoardState state, Entity performer);
         void Undo(BoardState state, Entity performer);
+
+        string GetCommand();
     }
 
     public static class Move
