@@ -102,5 +102,10 @@ namespace STOLON
         {
             return ReferenceEquals(element, _mouseFocus);
         }
+
+        public bool IsMouseOn<TElement>(Func<TElement, bool> predicate) where TElement : class, IDrawable
+        {
+            return IsMouseOn<TElement>() && predicate.Invoke((TElement)_mouseFocus!);
+        }
     }
 }
