@@ -1,4 +1,4 @@
-﻿using AsitLib.CommandLine;
+using AsitLib.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +38,13 @@ namespace STOLON
         {
             BoardCommandFlag flag = (BoardCommandFlag)_commandManager.ActiveFlag!;
 
-            Point movePos = GetPointFromCoords(coords);
+if (flag.IsCurrentEntityUserControlled)
+            {
+            Point movePos = Board.GetPointFromCoords(coords);
             IMove move = new GravityAffectedMove(movePos.X, movePos.Y);
 
-            move.Apply(flag.Board.State, flag.TargetEntity);
+            move.Apply(flag.Board.State, flag.Board.State.CurrentEntity);
+}
         }
     }
 }

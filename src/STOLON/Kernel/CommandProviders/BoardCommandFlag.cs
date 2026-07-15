@@ -9,12 +9,12 @@ namespace STOLON
     public class BoardCommandFlag : CommandFlag
     {
         public Board Board { get; }
-        public Entity TargetEntity { get; }
 
         public BoardCommandFlag(Board board, Entity targetEntity)
         {
             Board = board;
-            TargetEntity = targetEntity;
         }
+
+        public bool IsCurrentEntityUserControlled => Board.State.CurrentEntity.MoveProvider is UserMoveProvider;
     }
 }

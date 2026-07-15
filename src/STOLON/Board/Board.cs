@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using MonoGame.Extended.BitmapFonts;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -161,6 +161,34 @@ namespace STOLON
             5 => "[~]",
             _ => throw new Exception()
         };
+
+        public static Point GetPointFromCoords(string coords) // ex: a1
+        {
+            if (string.IsNullOrWhiteSpace(coords) || coords.Length != 2)
+                throw new ArgumentException("Invalid coordinates");
+
+            char file = char.ToLower(coords[0]);
+            char rank = coords[1];
+
+            if (file < 'a' || rank < '1')
+                throw new ArgumentException("Invalid coordinates");
+
+            int x = file - 'a';
+            int y = rank - '1';
+
+            return new Point(x, y);
+        }
+
+        public static string GetCoordsFromPoint(Point point)
+        {
+            if (point.X < 0 || point.Y < 0)
+                throw new ArgumentException("Invalid point");
+
+            char file = (char)('a' + point.X);
+            char rank = (char)('1' + point.Y);
+
+            return $"{file}{rank}";
+        }
     }
 
     public interface IMove : IEquatable<IMove>
