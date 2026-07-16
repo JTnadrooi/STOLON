@@ -82,7 +82,7 @@ namespace STOLON
 
             if (id is null) // for the "selc" without ids "overload"
             {
-                _shell.WriteLine(flag.GetPlayer(playerIndex));
+                _shell.WriteLine(flag.GetPlayer(playerIndex).ToString()!);
 
                 return;
             }

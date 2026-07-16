@@ -191,7 +191,6 @@ namespace STOLON
             }
         }
 
-        public void Write<T>(T item) => EnsureLastRegionIsTextRegion().Write(item);
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
 
         public void WriteTexture(Texture2D texture)
@@ -238,10 +237,8 @@ namespace STOLON
             }
         }
 
-        public void WriteLine<T>(T item) => EnsureLastRegionIsTextRegion().WriteLine(item);
         public void WriteLine(string str) => EnsureLastRegionIsTextRegion().WriteLine(str);
 
-        public void Input<T>(T item) => EnsureLastRegionIsTextRegion().Input(item);
         public void Input(string str) => EnsureLastRegionIsTextRegion().Input(str);
 
         /// <summary>

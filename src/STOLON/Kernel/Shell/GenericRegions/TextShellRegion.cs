@@ -289,71 +289,61 @@ namespace STOLON
 
         #region WRITE_METHODS
 
-        public void Write<T>(T item) => Write(item.ToString()!);
-        public void Write(string str)
+        /// <summary>
+        /// Writes the specified <paramref name="text"/> to the read‑only history.
+        /// If an input line exists, the text is inserted just before it; otherwise it is appended to the end.
+        /// </summary>
+        /// <param name="text">The text to write.</param>
+        public void Write(string text)
         {
+            if (string.IsNullOrEmpty(text)) return;
+
+            int insertPos;
             if (!_hasInputLine)
             {
-                Append(str);
-                ExtendReadonlyRange(str.Length);
-                return;
-            }
-
-            int inputLineIndex = _buffer.LineCount - 1;
-            if (inputLineIndex == 0)
-            {
-                // no history line, insert a new line at the beginning
-                _buffer.InsertText(0, str + NewLine);
+                insertPos = _buffer.Length;
             }
             else
             {
-                // append to the line before the input line
-                int targetLineIndex = inputLineIndex - 1;
-                int insertPos = _buffer.GetIndexFromLineColumn(targetLineIndex, _buffer.Lines[targetLineIndex].Length);
-                _buffer.InsertText(insertPos, str);
+                // Insert before the last (input) line
+                insertPos = _buffer.GetIndexFromLineColumn(_buffer.LineCount - 1, 0);
             }
+
+            _buffer.InsertText(insertPos, text);
             UpdateDisplayMetrics();
-            if (Cursor is not null)
-                Cursor = Cursor.Value.Offset(str.Length);
-            ExtendReadonlyRange(str.Length);
+
+            ExtendReadonlyRange(text.Length);
+            if (Cursor.HasValue)
+                Cursor = Cursor.Value.Offset(text.Length);
         }
 
-        public void WriteLine<T>(T item) => WriteLine(item.ToString()!);
-        public void WriteLine(string str)
+        /// <summary>
+        /// Writes the specified <paramref name="text"/> followed by a newline to the read‑only history.
+        /// </summary>
+        /// <param name="text">The text to write.</param>
+        public void WriteLine(string text) => Write(text + NewLine);
+
+        /// <summary>
+        /// Appends the specified <paramref name="text"/> to the current input line.
+        /// This method does <strong>not</strong> extend the readonly range, leaving the text editable.
+        /// </summary>
+        /// <param name="text">The text to input.</param>
+        /// <exception cref="InvalidOperationException">Thrown if there is no input line (<see cref="HasInputLine"/> is <see langword="false"/>).</exception>
+        public void Input(string text)
         {
             if (!_hasInputLine)
-            {
-                AppendLine(str);
-                ExtendReadonlyRange(str.Length + 1);
-                return;
-            }
+                throw new InvalidOperationException("No input line available.");
 
-            int inputLineIndex = _buffer.LineCount - 1;
-            int insertPos = _buffer.GetIndexFromLineColumn(inputLineIndex, 0); // start of input line
-            _buffer.InsertText(insertPos, str + NewLine);
+            if (string.IsNullOrEmpty(text)) return;
+
+            _buffer.InsertText(_buffer.Length, text);
             UpdateDisplayMetrics();
-            if (Cursor is not null)
-                Cursor = Cursor.Value.Offset(str.Length + 1);
-            ExtendReadonlyRange(str.Length + 1);
+
+            if (Cursor.HasValue)
+                Cursor = Cursor.Value.Offset(text.Length);
         }
 
-        public void AppendLine<T>(T item) => AppendLine(item.ToString()!);
-        public void AppendLine(string str) => Append(str + NewLine);
-
-        public void Append<T>(T item) => Append(item.ToString()!);
-        public void Append(string str)
-        {
-            if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str));
-            Put(str, _buffer.Length);
-        }
-
-        public void Input<T>(T item) => Input(item.ToString()!);
-        public void Input(string str)
-        {
-            if (!_hasInputLine) throw new InvalidOperationException("No input is allowed at this time.");
-            if (str.Contains('\r')) throw new ArgumentException("Cannot write invalid newline. ('\\r'.)", nameof(str));
-            Put(str, _buffer.Length);
-        }
+        #endregion
 
         public void SimulateUserCommand(string command)
         {
@@ -361,22 +351,6 @@ namespace STOLON
             Input(command);
             command = GetInputAsProcessing();
             _commandManager.Execute(command);
-        }
-
-        #endregion
-
-        private void Put<T>(T item, TextPosition pos) => Put(item.ToString()!, pos);
-        private void Put(string str, TextPosition pos)
-        {
-            if (pos.IsPostText) Put(str, _buffer.Length);
-            else Put(str, pos.ClampedIndex);
-        }
-
-        public void Put<T>(T item, int pos) => Put(item.ToString()!, pos);
-        public void Put(string str, int pos)
-        {
-            _buffer.InsertText(pos, str);
-            UpdateDisplayMetrics();
         }
 
         public string GetInput()
@@ -402,12 +376,6 @@ namespace STOLON
             ClearInput();
             WriteLine(InputLinePrefix + input);
             return input;
-        }
-
-        public void RemoveAt(int pos)
-        {
-            _buffer.DeleteText(pos, 1);
-            UpdateDisplayMetrics();
         }
 
         private void UpdateDisplayMetrics()
@@ -559,12 +527,6 @@ namespace STOLON
         {
             if (Cursor is null) return;
 
-            void PutAndOffsetCursor(char c)
-            {
-                Put(c, Cursor.Value);
-                if (!Cursor.Value.IsPostText) Cursor = Cursor.Value.Offset(1);
-            }
-
             Shell.ScrollTo(int.MaxValue);
 
             switch (e.Character)
@@ -575,14 +537,14 @@ namespace STOLON
                     {
                         int lastIndex = _buffer.Length - 1;
                         if (lastIndex >= ReadonlyRange.End)
-                            RemoveAt(lastIndex);
+                            _buffer.DeleteText(lastIndex, 1);
                     }
                     else
                     {
                         int newPos = Cursor.Value.Index - 1;
                         if (newPos >= ReadonlyRange.End)
                         {
-                            RemoveAt(newPos);
+                            _buffer.DeleteText(newPos, 1);
                             Cursor = new TextPosition(this, newPos);
                         }
                     }
@@ -592,10 +554,16 @@ namespace STOLON
                     _commandManager.Execute(command);
                     break;
                 default:
-                    PutAndOffsetCursor(e.Character);
+                    int insertPos = Cursor.Value.IsPostText ? _buffer.Length : Cursor.Value.Index;
+                    _buffer.InsertText(insertPos, e.Character.ToString());
+                    if (Cursor.Value.IsPostText)
+                        Cursor = TextPosition.GetPostText(this);
+                    else
+                        Cursor = new TextPosition(this, insertPos + 1);
                     break;
             }
             _cursorSelection = NormalizedRange.Empty;
+            UpdateDisplayMetrics();
         }
 
         #endregion
