@@ -171,6 +171,22 @@ namespace STOLON
             _ => throw new Exception()
         };
 
+        public static int GetColumnIndexFromChar(char column)
+        {
+            if (!char.IsLetter(column) || char.ToLowerInvariant(column) < 'a' || char.ToLowerInvariant(column) > 'z')
+                throw new ArgumentOutOfRangeException(nameof(column), "Column must be a letter.");
+
+            return char.ToLowerInvariant(column) - 'a' + 1;
+        }
+
+        public static char GetCharFromColumnIndex(int columnIndex)
+        {
+            if (columnIndex < 1 || columnIndex > 26)
+                throw new ArgumentOutOfRangeException(nameof(columnIndex), "Column index must be between 1 and 26.");
+
+            return (char)('a' + columnIndex - 1);
+        }
+
         public static Point GetPointFromCoords(string coords) // ex: a1
         {
             if (string.IsNullOrWhiteSpace(coords) || coords.Length != 2)

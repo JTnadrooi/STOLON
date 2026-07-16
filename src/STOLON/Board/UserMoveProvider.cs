@@ -37,7 +37,7 @@ namespace STOLON
 
         public string GetCommand()
         {
-            return "s@ " + ColumnIndex;
+            return "a@ " + Board.GetCharFromColumnIndex(ColumnIndex);
         }
 
         public bool Equals(IMove? other)
