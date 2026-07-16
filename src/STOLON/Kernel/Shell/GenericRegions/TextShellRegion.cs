@@ -665,12 +665,6 @@ namespace STOLON
 
                     _commandManager.Execute(command);
                     break;
-                case '\t':
-                    string input = GetInput().Split(" ").Last();
-
-                    //Console.WriteLine(Autocomplete.Complete(input, Shell.Words).Options.ToJoinedString(", "));
-                    Input(Autocomplete.Complete(input, Shell.Words).BestOption?[input.Length..] ?? string.Empty);
-                    return;
                 default:
                     PutAndOffsetCursor(e.Character);
                     break;
