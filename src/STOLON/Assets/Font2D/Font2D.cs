@@ -1,4 +1,5 @@
 ﻿using MonoGame.Extended.BitmapFonts;
+using System.Runtime.CompilerServices;
 
 namespace STOLON
 {
@@ -86,66 +87,50 @@ namespace STOLON
         public static void DrawString(this DrawingContext context, Font2D font, string text, Vector2 position, Vector2 scale, float rotation = 0f, Vector2? origin = null, Color? color = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
         {
             // WANRING !! this method breaks if you input a string with a newline before a space. if you're fixing this now then hello future nadrooi! 
+            // edit: this may be caused by the shell/textregion classes, not by this
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             int GetUnicodeCodePoint(string text, ref int index) => (!char.IsHighSurrogate(text[index]) || ++index >= text.Length) ? text[index] : char.ConvertToUtf32(text[index - 1], text[index]);
-            unsafe int CountNewline(string input)
-            {
-                int count = 0;
-                fixed (char* ptr = input)
-                {
-                    char* current = ptr;
-                    char* end = ptr + input.Length;
-                    while (current < end)
-                    {
-                        if (*current == '\n') count++;
-                        current++;
-                    }
-                }
-                return count;
-            }
 
             ArgumentNullException.ThrowIfNull(text);
 
-            BitmapFont.BitmapFontGlyph currentGlyph;
-            BitmapFont.BitmapFontGlyph? previousGlyph = null;
-            Vector2 positionDelta = new Vector2(0, CountNewline(text) * font.CoreFont.LineHeight * scale.Y + font.CoreFont.LineHeight * scale.Y);
+            float scaledLineHeight = font.CoreFont.LineHeight * scale.Y;
+            float scaledLetterSpacing = font.CoreFont.LetterSpacing * scale.X;
+
+            Vector2 positionDelta = new Vector2(0, ((ReadOnlySpan<char>)text).FastCount('\n') * scaledLineHeight + scaledLineHeight);
 
             for (int i = 0; i < text.Length; i++)
             {
                 int unicodeCodePoint = GetUnicodeCodePoint(text, ref i);
 
+                // carriage return; just reset horizontal position
                 if (unicodeCodePoint == '\r')
                 {
                     positionDelta.X = 0f;
                     continue;
                 }
 
-                currentGlyph.CharacterID = unicodeCodePoint;
-                if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out currentGlyph.Character))
-                    throw new InvalidOperationException($"Unsupported unicodeCodePoint '{unicodeCodePoint}'. (int; '{(int)text[i]}', char: '{text[i]}'.)");
-
-                currentGlyph.Position = position + positionDelta;
-
-                currentGlyph.Position.X += currentGlyph.Character.XOffset;
-                currentGlyph.Position.Y -= (currentGlyph.Character.YOffset + currentGlyph.Character.TextureRegion.Size.Height);
-                positionDelta.X += currentGlyph.Character.XAdvance + font.CoreFont.LetterSpacing;
-
-                //if (currentGlyph.Character.YOffset != 0)
-                //{
-                //    Console.WriteLine(currentGlyph.Character.YOffset + " " + text[i].ToString());
-                //}
-
-                previousGlyph = currentGlyph;
-                if (unicodeCodePoint == 10) // newline.
+                // newline; move to next line and reset horizontal
+                if (unicodeCodePoint == '\n')
                 {
-                    positionDelta.Y -= font.CoreFont.LineHeight;
+                    positionDelta.Y -= scaledLineHeight;
                     positionDelta.X = 0f;
-                    previousGlyph = null;
+                    continue;
                 }
 
+                // fetch glyph
+                if (!font.CoreFont.TryGetCharacter(unicodeCodePoint, out var character))
+                    throw new InvalidOperationException($"Unsupported codepoint '{unicodeCodePoint}'.");
+
+                // compute glyph position with scaled offsets
+                Vector2 glyphPos = position + positionDelta;
+                glyphPos.X += character.XOffset * scale.X;
+                glyphPos.Y -= (character.YOffset + character.TextureRegion.Size.Height) * scale.Y;
+
+                // draw the glyph
                 context.SpriteBatch.Draw(
-                    currentGlyph.Character.TextureRegion,
-                    currentGlyph.Position,
+                    character.TextureRegion,
+                    glyphPos,
                     color ?? Color.White,
                     rotation,
                     origin ?? Vector2.Zero,
@@ -153,8 +138,10 @@ namespace STOLON
                     context.InvertY(effects),
                     layerDepth
                 );
+
+                // advance horizontal position for next glyph
+                positionDelta.X += (character.XAdvance + font.CoreFont.LetterSpacing) * scale.X;
             }
-            //throw new Exception("a");
         }
     }
 }
