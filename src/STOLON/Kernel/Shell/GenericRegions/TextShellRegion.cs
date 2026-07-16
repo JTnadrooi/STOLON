@@ -374,11 +374,13 @@ namespace STOLON
             Put(str, _text.Length);
         }
 
-        public void ExecuteCommand(string moveCommand)
+        public void SimulateUserCommand(string command)
         {
-            Input(moveCommand);
+            ClearInput();
 
-            string command = GetInputAsProcessing();
+            Input(command);
+
+            command = GetInputAsProcessing();
 
             _commandManager.Execute(command);
         }

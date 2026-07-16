@@ -381,6 +381,6 @@ namespace STOLON
             UpdateRegionPositions(false);
         }
 
-        public void ExecuteCommand(string moveCommand) => EnsureLastRegionIsTextRegion().ExecuteCommand(moveCommand);
+        public void SimulateUserCommand(string command) => EnsureLastRegionIsTextRegion().SimulateUserCommand(command);
     }
 }

@@ -83,7 +83,7 @@ namespace STOLON
                     string? moveCommand = move.GetCommand();
                     if (moveCommand is not null)
                     {
-                        _shell.ExecuteCommand(moveCommand);
+                        _shell.SimulateUserCommand(moveCommand);
                     }
                     else move.Apply(_state, currentEntity);
                 }
@@ -145,13 +145,16 @@ namespace STOLON
                     {
                         if (tile.HasAttribute(TileAttributes.GravUp))
                         {
-                            drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                            drawingContext.Draw(_textures.GetReference("att-GravUp"), tileWorldPos + new Vector2(10, TileSize - 10 - 8), scale: Camera.AntiScale);
                         }
                         if (tile.HasAttribute(TileAttributes.Disabled))
                         {
-                            drawingContext.Draw(_textures.GetReference("att-Disabled"), tileWorldPos + new Vector2(20, TileSize - 20), scale: Camera.AntiScale);
+                            drawingContext.Draw(_textures.GetReference("att-Disabled"), tileWorldPos + new Vector2(10, TileSize - 10 - 8), scale: Camera.AntiScale);
                         }
+                        drawingContext.DrawString(_fonts.Medium, Board.GetCoordsFromPoint(new Point(x, y)), tileWorldPos + new Vector2(10, 10), scale: Camera.AntiScale);
                     }
+
+                    //drawingContext.Draw(_textures.GetReference("att-Disabled"), tileWorldPos + new Vector2(10, 10), scale: Camera.AntiScale);
                 }
             }
 
