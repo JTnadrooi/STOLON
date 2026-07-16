@@ -1,6 +1,7 @@
 ﻿using AsitLib.CommandLine;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace STOLON
 {
@@ -130,56 +131,87 @@ namespace STOLON
         /// </summary>
         private class TextBuffer
         {
-            private string _text;
-            private List<string> _lines;
+            private readonly StringBuilder _textBuilder;
+            private string? _cachedText;
+            private List<int>? _lineStarts; // start index of each line (first character of each line)
 
-            public string Text => _text;
-            public IReadOnlyList<string> Lines => _lines;
-            public int Length => _text.Length;
-            public int LineCount => _lines.Count;
+            public string Text => _cachedText ??= _textBuilder.ToString();
+            public int Length => _textBuilder.Length;
+            public int LineCount => _lineStarts.Count;
 
             public TextBuffer(string initialText = "")
             {
-                _text = initialText;
-                _lines = _text.Split('\n').ToList();
+                _textBuilder = new StringBuilder(initialText);
+                _cachedText = initialText;
+                RebuildLineStarts();
             }
 
-            private void RebuildLines() => _lines = _text.Split('\n').ToList();
+            private void RebuildLineStarts()
+            {
+                _lineStarts = new List<int> { 0 };
+                for (int i = 0; i < _textBuilder.Length; i++)
+                {
+                    if (_textBuilder[i] == '\n')
+                        _lineStarts.Add(i + 1);
+                }
+            }
+
+            private void InvalidateCache()
+            {
+                _cachedText = null;
+            }
 
             public void InsertText(int index, string text)
             {
-                _text = _text.Insert(index, text);
-                RebuildLines();
+                if (string.IsNullOrEmpty(text)) return;
+                _textBuilder.Insert(index, text);
+                InvalidateCache();
+                RebuildLineStarts();
+            }
+
+            public void InsertChar(int index, char c)
+            {
+                _textBuilder.Insert(index, c);
+                InvalidateCache();
+                RebuildLineStarts();
             }
 
             public void DeleteText(int index, int length)
             {
-                if (index + length > _text.Length)
+                if (length == 0) return;
+                if (index + length > _textBuilder.Length)
                     throw new ArgumentOutOfRangeException(nameof(length));
-                _text = _text.Remove(index, length);
-                RebuildLines();
+                _textBuilder.Remove(index, length);
+                InvalidateCache();
+                RebuildLineStarts();
             }
 
             public (int line, int column) GetLineColumn(int index)
             {
-                int current = 0;
-                for (int i = 0; i < _lines.Count; i++)
+                // binary search to find the largest line start <= index
+                int line = _lineStarts.BinarySearch(index);
+                if (line < 0)
                 {
-                    int lineLen = _lines[i].Length;
-                    if (index <= current + lineLen)
-                        return (i, index - current);
-                    current += lineLen + 1; // +1 for the newline
+                    // bitwise complement gives insertion point
+                    line = ~line - 1;
                 }
-                throw new ArgumentOutOfRangeException(nameof(index));
+                // if index exactly equals a line start, we want that line, so BinarySearch returns that index directly.
+                // in case of negative, we got the previous line.
+                int column = index - _lineStarts[line];
+                return (line, column);
             }
 
             public int GetIndexFromLineColumn(int line, int column)
             {
-                int index = 0;
-                for (int i = 0; i < line; i++)
-                    index += _lines[i].Length + 1;
-                index += column;
-                return index;
+                return _lineStarts[line] + column;
+            }
+
+            public int GetLineStart(int line) => _lineStarts[line];
+
+            public bool IsLastLineEmpty()
+            {
+                if (_textBuilder.Length == 0) return true;
+                return _textBuilder[^1] == '\n'; // last line is empty if buffer is empty or ends with '\n' (since each '\n' starts a new line after it).
             }
         }
 
@@ -356,8 +388,10 @@ namespace STOLON
         public string GetInput()
         {
             if (!_hasInputLine) throw new InvalidOperationException("Cannot get input for textregion without an input line.");
-            string lastLine = _buffer.Lines[^1];
-            return lastLine[InputLinePrefix.Length..];
+            // compute input text by extracting from readonly end to end
+            int start = ReadonlyRange.End;
+            int length = _buffer.Length - start;
+            return _buffer.Text.Substring(start, length);
         }
 
         private void ClearInput()
@@ -381,7 +415,7 @@ namespace STOLON
         private void UpdateDisplayMetrics()
         {
             _height = (int)(_buffer.LineCount * Font.Dimensions.Y);
-            _verticalOverlap = (int)(_buffer.Lines.Count > 0 && _buffer.Lines[^1].Length == 0 ? 13 : 0);
+            _verticalOverlap = _buffer.LineCount > 0 && _buffer.IsLastLineEmpty() ? 13 : 0;
             Shell.UpdateRegionPositions(false);
         }
 
@@ -453,24 +487,27 @@ namespace STOLON
                 return false;
             }
 
-            string line = _buffer.Lines[charLineIndex];
+            // get line start and length without allocating a substring
+            int lineStart = _buffer.GetLineStart(charLineIndex);
+            int nextLineStart = (charLineIndex + 1 < _buffer.LineCount) ? _buffer.GetLineStart(charLineIndex + 1) : _buffer.Length;
+            int lineLength = nextLineStart - lineStart - 1; // exclude newline character
 
             if (clamp)
             {
-                if (charLineIndex == _buffer.LineCount - 1 && charIndexOnLine > line.Length)
+                if (charLineIndex == _buffer.LineCount - 1 && charIndexOnLine > lineLength)
                 {
                     position = TextPosition.GetPostText(this);
                     return true;
                 }
-                charIndexOnLine = Math.Clamp(charIndexOnLine, 0, line.Length == 0 ? 0 : line.Length - 1);
+                charIndexOnLine = Math.Clamp(charIndexOnLine, 0, lineLength == 0 ? 0 : lineLength - 1);
             }
-            else if (charIndexOnLine > line.Length || charIndexOnLine < 0)
+            else if (charIndexOnLine > lineLength || charIndexOnLine < 0)
             {
                 position = null;
                 return false;
             }
 
-            int result = _buffer.GetIndexFromLineColumn(charLineIndex, charIndexOnLine);
+            int result = lineStart + charIndexOnLine;
             if (result == _buffer.Length)
             {
                 position = TextPosition.GetPostText(this);
@@ -555,7 +592,7 @@ namespace STOLON
                     break;
                 default:
                     int insertPos = Cursor.Value.IsPostText ? _buffer.Length : Cursor.Value.Index;
-                    _buffer.InsertText(insertPos, e.Character.ToString());
+                    _buffer.InsertChar(insertPos, e.Character);
                     if (Cursor.Value.IsPostText)
                         Cursor = TextPosition.GetPostText(this);
                     else
@@ -570,7 +607,10 @@ namespace STOLON
 
         public override void Draw(DrawingContext drawingContext)
         {
-            drawingContext.DrawString(Font, ReplaceAt(_buffer.Text, _cursorSelection, '_'), Position, scale: _textScale);
+            string displayText = _buffer.Text;
+            if (_cursorSelection.Length > 0)
+                displayText = ReplaceAt(displayText, _cursorSelection, '_');
+            drawingContext.DrawString(Font, displayText, Position, scale: _textScale);
             if (((int)(_cursorLifetime * 0.03f)) % 2 == 0 && Cursor is not null)
                 drawingContext.Draw(_textures["UI\\cursor"], GetCursorScreenPos() + new Vector2(0, 2));
         }
@@ -580,10 +620,14 @@ namespace STOLON
         private static string ReplaceAt(string input, Range range, char replacement)
         {
             (int offset, int length) = range.GetOffsetAndLength(input.Length);
-            Span<char> span = input.ToCharArray().AsSpan();
-            for (int i = offset; i < offset + length; i++)
-                if (span[i] != NewLine) span[i] = replacement;
-            return new string(span);
+            if (length == 0) return input;
+            return string.Create(input.Length, (input, offset, length, replacement), static (span, state) =>
+            {
+                state.input.AsSpan().CopyTo(span);
+                Span<char> slice = span.Slice(state.offset, state.length);
+                for (int i = 0; i < slice.Length; i++)
+                    if (slice[i] != '\n') slice[i] = state.replacement;
+            });
         }
 
         #endregion
