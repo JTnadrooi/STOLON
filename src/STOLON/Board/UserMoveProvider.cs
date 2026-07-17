@@ -243,8 +243,7 @@ namespace STOLON
         {
             BoardWindow window = (BoardWindow)_kernel.Windows.First(w => w is BoardWindow);
             Board board = window.Board;
-            Vector2 windowMousePos = _input.Mouse.Position - window.Position;
-            Vector2 worldMousePos = board.Camera.Unproject(windowMousePos);
+            Vector2 worldMousePos = _input.Mouse.GetTransformedMousePosition(window.Transform * board.Camera.Transform);
 
             foreach (IMove move in availableMoves)
             {

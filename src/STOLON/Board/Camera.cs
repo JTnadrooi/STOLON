@@ -29,7 +29,8 @@
             }
         }
 
-        public Matrix View => Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
+        public Matrix Transform => Matrix.Invert(DrawTransform);
+        public Matrix DrawTransform => Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
                                 Matrix.CreateScale(Zoom) *
                                 Matrix.CreateRotationZ(Rotation) *
                                 Matrix.CreateTranslation(ScreenSize.X / 2, ScreenSize.Y / 2, 0);

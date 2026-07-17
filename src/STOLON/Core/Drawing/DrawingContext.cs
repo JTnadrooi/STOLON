@@ -395,10 +395,43 @@ namespace STOLON
             _logger.Log($"updated fx pipeline res with new scale '{Scale}'");
         }
 
-        public void RegisterDraw<TElement>(TElement element, in Rectangle hitbox) where TElement : class, IDrawable
+        public void RegisterDraw<TElement>(TElement element, Rectangle hitbox, in Matrix transform) where TElement : class, IDrawable
+        {
+            static Rectangle TransformRectangle(in Rectangle rect, in Matrix transform)
+            {
+                // get the four corners as vectors
+                Vector2 tl = new Vector2(rect.Left, rect.Top);
+                Vector2 tr = new Vector2(rect.Right, rect.Top);
+                Vector2 bl = new Vector2(rect.Left, rect.Bottom);
+                Vector2 br = new Vector2(rect.Right, rect.Bottom);
+
+                // apply the transformation matrix
+                tl = Vector2.Transform(tl, transform);
+                tr = Vector2.Transform(tr, transform);
+                bl = Vector2.Transform(bl, transform);
+                br = Vector2.Transform(br, transform);
+
+                // find the min/max to create the new bounding rectangle
+                Vector2 min = Vector2.Min(Vector2.Min(tl, tr), Vector2.Min(bl, br));
+                Vector2 max = Vector2.Max(Vector2.Max(tl, tr), Vector2.Max(bl, br));
+
+                return new Rectangle(
+                    (int)Math.Floor(min.X),
+                    (int)Math.Floor(min.Y),
+                    (int)Math.Ceiling(max.X - min.X),
+                    (int)Math.Ceiling(max.Y - min.Y)
+                );
+            }
+
+            RegisterDraw(element, TransformRectangle(hitbox, transform));
+        }
+
+        public void RegisterDraw<TElement>(TElement element, Rectangle screenHitbox) where TElement : class, IDrawable
+        {
 #pragma warning disable CS0612 
-            => _input.RegisterDraw(element, hitbox);
+            _input.RegisterDraw(element, screenHitbox);
 #pragma warning restore CS0612
+        }
 
         public void DisableShader(string name)
         {

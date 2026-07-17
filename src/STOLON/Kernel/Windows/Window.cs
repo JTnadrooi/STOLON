@@ -183,7 +183,8 @@ namespace STOLON
 
         public bool IsResizing => ((ResizeController)Controllers["resize"]).IsResizing;
 
-        public Matrix TransformMatrix { get; private set; }
+        public Matrix Transform { get; private set; }
+        public Matrix DrawTransform { get; private set; }
         public Border Border { get; }
         public Window? ParentWindow => _parentWindow;
         public ReadOnlyCollection<Window> ChildWindows { get; }
@@ -550,7 +551,8 @@ namespace STOLON
                     TryUnlock();
             }
 
-            TransformMatrix = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
+            DrawTransform = Matrix.CreateTranslation(InnerBounds.Location.X, InnerBounds.Location.Y, 0);
+            Transform = Matrix.Invert(DrawTransform);
 
             UpdateContents(elapsedMilliseconds);
         }
@@ -563,7 +565,7 @@ namespace STOLON
 
             DrawingContext.DrawingParameters drawContextDrawingParameters = drawingContext.GetDrawingParameters();
 
-            drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: TransformMatrix);
+            drawingContext.SetDrawingParameters(scissorArea: InnerBounds, transformMatrix: DrawTransform);
 
             drawingContext.RegisterDraw(this, IsResizable ? _resizeBounds : OuterBounds);
 
@@ -578,8 +580,7 @@ namespace STOLON
                 drawingContext.Draw(_orderedButtons[i].Button.Texture, GetButtonPos(i));
             }
 
-            drawingContext.DrawString(_nameFont, Name,
-                OuterBounds.Location.ToVector2() + new Vector2(3, (int)(OuterBounds.Height - 15 + _nameFont.Dimensions.Y / 2 - 3)));
+            drawingContext.DrawString(_nameFont, Name, OuterBounds.Location.ToVector2() + new Vector2(3, (int)(OuterBounds.Height - 15 + _nameFont.Dimensions.Y / 2 - 3)));
 
             //if (_input.IsMouseFocus(this))
             //{

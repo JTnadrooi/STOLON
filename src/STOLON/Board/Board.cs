@@ -102,7 +102,7 @@ namespace STOLON
             // compensate for camera zoom
             // and build a new transform: offset then camera
             Vector2 compensatedOffset = new Vector2(drawingContext.TransformMatrix.Value.M41, drawingContext.TransformMatrix.Value.M42) / Camera.Zoom;
-            drawingContext.TransformMatrix = Matrix.CreateTranslation(compensatedOffset.X, compensatedOffset.Y, 0) * Camera.View;
+            drawingContext.TransformMatrix = Matrix.CreateTranslation(compensatedOffset.X, compensatedOffset.Y, 0) * Camera.DrawTransform;
 
             float totalWidth = _state.Dimensions.X * TileSize;
             float totalHeight = _state.Dimensions.Y * TileSize;

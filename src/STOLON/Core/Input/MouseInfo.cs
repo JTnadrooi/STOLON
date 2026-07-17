@@ -87,5 +87,10 @@
 
             return result;
         }
+
+        public Vector2 GetTransformedMousePosition(Matrix transform)
+        {
+            return Vector2.Transform(Position, transform);
+        }
     }
 }
