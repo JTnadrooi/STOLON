@@ -22,7 +22,7 @@ namespace STOLON
         [KernelCommand(".", Id = "flag", IsExternal = true)]
         public void GetActiveFlag()
         {
-            _shell.WriteLine(_commandManager.ActiveFlag.ToString() ?? StringHelpers.NULL_STRING);
+            _shell.WriteLine(_commandManager.ActiveFlag?.ToString() ?? "No flag active.");
         }
 
         [KernelCommand(".", Id = "entity", Aliases = ["e"])]
