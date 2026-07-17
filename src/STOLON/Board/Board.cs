@@ -83,7 +83,7 @@ namespace STOLON
                     string? moveCommand = move.GetCommand();
                     if (moveCommand is not null)
                     {
-                        _shell.SimulateUserCommand(moveCommand);
+                        _shell.Command(moveCommand);
                     }
                     else move.Apply(_state, currentEntity);
                 }

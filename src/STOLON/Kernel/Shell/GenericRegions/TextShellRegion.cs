@@ -377,7 +377,7 @@ namespace STOLON
 
         #endregion
 
-        public void SimulateUserCommand(string command)
+        public void Command(string command)
         {
             ClearInput();
             Input(command);
