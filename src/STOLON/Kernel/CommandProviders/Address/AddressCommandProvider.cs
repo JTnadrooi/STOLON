@@ -78,6 +78,8 @@ namespace STOLON
         [KernelCommand("Add entities to the selection.", Id = "selc add", Aliases = ["selc"], RequiredFlag = typeof(InitAddressCommandFlag))]
         public void AddToSelection(int playerIndex, string? id)
         {
+            playerIndex--;
+
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
             if (id is null) // for the "selc" without ids "overload"
@@ -102,6 +104,8 @@ namespace STOLON
         [KernelCommand("Removes entities from the selection.", Id = "selc rm", Aliases = ["dselc"], RequiredFlag = typeof(InitAddressCommandFlag))]
         public void ClearPlayer([Option(Aliases = ["player", "p"])] int playerIndex)
         {
+            playerIndex--;
+
             InitAddressCommandFlag flag = (InitAddressCommandFlag)_commandManager.ActiveFlag!;
 
             try
