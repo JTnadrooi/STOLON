@@ -37,6 +37,7 @@ namespace STOLON
 
             IsSingleInstance = true;
             MinSize = new Point((int)(InitialSizeX * .8), (int)(InitialSizeY * .8));
+            Name = "Board";
 
             //((BoardCommandProvider)_commandManager.Engine.Providers["board"]))
             _commandManager.SetFlag(new BoardCommandFlag(_board, player1));
