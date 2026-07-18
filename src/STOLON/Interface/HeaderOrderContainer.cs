@@ -25,7 +25,8 @@
         public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
         {
             Vector2 pos = _origin + new Vector2(_leftSpace, 0);
-            Rectangle bounds = element.GetBounds(pos.ToPoint(), PaddingX, PaddingY, 5, (int)(32 / 2 - _font.Dimensions.Y / 2 - PaddingY), _font, out Point textPos);
+            Rectangle bounds = element.GetBounds(pos.ToPoint(), PaddingX, PaddingY, 5, (int)(32 / 2 - _font.Dimensions.Y / 2 - PaddingY), _font);
+            Point textPos = element.GetTextPos(bounds, PaddingX, PaddingY);
             _leftSpace += bounds.Width + 5;
 
             isHovered = false;

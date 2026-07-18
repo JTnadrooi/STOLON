@@ -7,6 +7,8 @@
         public Vector2 Position { get; set; }
         public UIPath Path { get; protected set; }
 
+        public Matrix Transform { get; set; }
+
         public IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateDataView;
         public IReadOnlyDictionary<string, UIElement> Elements => _elementMap;
         public IReadOnlySet<string> Parents => _parents;
@@ -33,6 +35,8 @@
 
             foreach (UIElement element in elements)
             {
+                if (!VerifyElement(element)) throw new ArgumentException($"Cannot add invalid element '{element.Id}'.", nameof(elements));
+
                 baseElements.Add(element);
                 idSet.Add(element.Id);
             }
@@ -64,6 +68,10 @@
         public abstract UIElementDrawData GetDrawData(UIElement element, int orderIndex, out bool isHovered);
         public virtual void AfterOrdering() { }
         protected virtual void OnPathChanged(UIPath previous, UIPath current) { }
+        protected virtual bool VerifyElement(UIElement element)
+        {
+            return true;
+        }
 
         public UIPath GetSelfPath(string id)
         {
@@ -163,7 +171,12 @@
         public virtual void Draw(DrawingContext drawingContext)
         {
             for (int i = 0; i < _drawDump.Length; i++)
-                if (_drawDump[i].Source != null) drawingContext.DrawElement(_drawDump[i]);
+            {
+                UIElementDrawData drawData = _drawDump[i];
+
+                if (_drawDump[i].Source != null) drawData.Draw(drawingContext);
+                drawingContext.RegisterDraw(drawData, drawData.Rectangle, Transform);
+            }
         }
     }
 

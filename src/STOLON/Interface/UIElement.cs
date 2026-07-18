@@ -22,23 +22,31 @@
     {
         public bool IsTop => ParentId == TopId;
         public const string TopId = "_";
+
         /// <summary>
         /// The type of the <see cref="UIElement"/>.
         /// </summary>
         public UIElementType Type { get; }
+
         /// <summary>
         /// The text in this <see cref="UIElement"/>.
         /// </summary>
-        public string Text { get; set; }
+        public string? Text { get; set; }
+
+        public Texture2D? Texture { get; }
+
         public bool Skip { get; set; }
+
         /// <summary>
         /// The ID of the <see cref="UIElement"/>.
         /// </summary>
         public string Id { get; }
+
         /// <summary>
         /// The order of this <see cref="UIElement"/>. From top to bottom. Yet to be implemented.
         /// </summary>
         public string? Order { get; }
+
         /// <summary>
         /// The <see cref="UIElement.Id"/> of the <see cref="UIElement"/> this is a child of. 
         /// </summary>
@@ -50,7 +58,7 @@
 
         public UIElement(string id, string parentId = UIElement.TopId, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
         {
-            Text = text ?? id;
+            Text = text;
             Type = type;
             Id = id;
             Order = order;
@@ -58,24 +66,60 @@
             DrawArguments = drawArgs;
             Skip = false;
         }
-        public Rectangle GetBounds(Point pos, int padding, int margin, Font2D font, out Point textPos) => GetBounds(pos, padding, padding, margin, margin, font, out textPos);
-        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, Font2D font, out Point textPos)
-        {
-            Vector2 contentSize = font.FastMeasure(Text);
-            int recW = (int)contentSize.X + 2 * paddingX;
-            int recH = (int)contentSize.Y + 2 * paddingY;
 
-            textPos = new Point(pos.X + paddingX + marginX, pos.Y + paddingY + marginY);
-            return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
+        public UIElement(string id, string parentId = UIElement.TopId, Texture2D? texture = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
+        {
+            Texture = texture;
+            Type = type;
+            Id = id;
+            Order = order;
+            ParentId = parentId;
+            DrawArguments = drawArgs;
+            Skip = false;
         }
 
-        public override string ToString() => $"{{Id: {Id}, Type: {Type}, Text: {Text}, Order: {Order}, ParentId: {ParentId}}}";
+        public Rectangle GetBounds(Point pos, int padding, int margin, Font2D font) => GetBounds(pos, padding, padding, margin, margin, font);
+        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, Font2D font)
+        {
+            if (Text is not null)
+            {
+                Vector2 contentSize = font.FastMeasure(Text);
+                int recW = (int)contentSize.X + 2 * paddingX;
+                int recH = (int)contentSize.Y + 2 * paddingY;
+
+                return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
+            }
+
+            if (Texture is not null)
+            {
+                return new Rectangle(pos + new Point(marginX, marginY), Texture.Bounds.Size + new Point(2 * paddingX, 2 * paddingY));
+            }
+
+            throw new InvalidObjectException("Cannot have UIElement with both media null.");
+        }
+
+        public Point GetTextPos(Rectangle preCalculatedBounds, int paddingX, int paddingY)
+        {
+            return new Point(preCalculatedBounds.X + paddingX, preCalculatedBounds.Y + paddingY);
+        }
+
+        public override string ToString()
+        {
+            if (Text is not null)
+            {
+                return $"{{Id: {Id}, Type: {Type}, Text: {Text}, Order: {Order}, ParentId: {ParentId}}}";
+            }
+            else
+            {
+                return $"{{Id: {Id}, Type: {Type}, Texture: {Texture.Name}, Order: {Order}, ParentId: {ParentId}}}";
+            }
+        }
     }
 
     /// <summary>
     /// The data element relevant for draw methods.
     /// </summary>
-    public struct UIElementDrawData
+    public class UIElementDrawData : IDrawable
     {
         /// <summary>
         /// The position of the "drawdataified" <see cref="UIElement"/>.
@@ -96,21 +140,35 @@
         /// <summary>
         /// The text to draw inside the <see cref="Rectangle"/>.
         /// </summary>
-        public string Text { get; }
+        public string? Text { get; }
+        /// <summary>
+        /// The texture to draw inside the <see cref="Rectangle"/>.
+        /// </summary>
+        public Texture2D? Texture { get; }
         public UIElement? Source { get; }
         public bool IsEmpty => Source == null;
         public bool Hide { get; }
         public bool DrawBackground { get; }
-        public Font2D Font { get; }
+        public Font2D? Font { get; }
+
         /// <summary>
         /// Create a new <see cref="UIElementDrawData"/> object.
         /// </summary>
-        /// <param name="sourceId">The source <see cref="UIElement.Id"/>.</param>
-        /// <param name="text"></param>
-        /// <param name="type"></param>
-        /// <param name="position"></param>
-        /// <param name="rectangle"></param>
-        /// <param name="drawRectangle"></param>
+        public UIElementDrawData(UIElement? source, Texture2D texture, UIElementType type, Vector2 position, Rectangle rectangle, bool drawRectangle, bool hide = false, bool drawBg = false)
+        {
+            Position = position;
+            Type = type;
+            Texture = texture;
+            Rectangle = rectangle;
+            DrawRectangle = drawRectangle;
+            Source = source;
+            Hide = hide;
+            DrawBackground = drawBg;
+        }
+
+        /// <summary>
+        /// Create a new <see cref="UIElementDrawData"/> object.
+        /// </summary>
         public UIElementDrawData(UIElement? source, string text, Font2D font, UIElementType type, Vector2 position, Rectangle rectangle, bool drawRectangle, bool hide = false, bool drawBg = false)
         {
             Position = position;
@@ -124,7 +182,21 @@
             DrawBackground = drawBg;
         }
 
-        public override string ToString() => $"{{Id: '{Source}\", Text: '{Text}\", Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
+        public override string ToString()
+        {
+            if (Text is not null) return $"{{Id: '{Source}', Text: '{Text}', Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
+            else return $"{{Id: '{Source}', Texture: '{Texture.Name}', Type: {Type}, Position: {Position}, Rectangle: {Rectangle}, DrawRectangle: {DrawRectangle}, Draw: {Hide}, Font: {Font?.ToString() ?? "null"}}}";
+        }
+
+        public void Draw(DrawingContext drawingContext)
+        {
+            if (Source is null) throw new InvalidOperationException("Cannot draw sourceless UI-element drawdata.");
+            if (Hide) return;
+            if (DrawBackground) drawingContext.DrawArea(Rectangle, Color.Black);
+            if (Text is not null) drawingContext.DrawString(Font!, Text, Position);
+            if (Texture is not null) drawingContext.Draw(Texture, Position);
+            if (DrawRectangle) drawingContext.DrawRectangle(Rectangle, Color.White, 1);
+        }
     }
     /// <summary>
     /// The data element relevant for update methods. <i>(Knowing when an <see cref="UIElement"/> is clicked.)</i>
@@ -156,17 +228,5 @@
         }
 
         public static UIElementUpdateData Empty = new UIElementUpdateData(false, null);
-    }
-
-    public static class UIElementDrawingExtensions
-    {
-        public static void DrawElement(this DrawingContext context, UIElementDrawData drawData)
-        {
-            if (drawData.Source == null) throw new InvalidOperationException();
-            if (drawData.Hide) return;
-            if (drawData.DrawBackground) context.DrawArea(drawData.Rectangle, Color.Black);
-            context.DrawString(drawData.Font, drawData.Text, drawData.Position);
-            if (drawData.DrawRectangle) context.DrawRectangle(drawData.Rectangle, Color.White, Interface.LineWidth);
-        }
     }
 }
