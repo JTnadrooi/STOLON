@@ -9,6 +9,7 @@
         /// Its relevant when this <see cref="UIElement"/> gets clicked.
         /// </summary>
         Listen,
+
         /// <summary>
         /// Its not relevant when this <see cref="UIElement"/> gets clicked.
         /// </summary>
@@ -16,24 +17,16 @@
     }
 
     /// <summary>
-    /// Reprecents a button or textplane in the UI. Add new elements to the <see cref="Interface"/> using the <see cref="Interface.AddElement(UIElement)"/> method.
+    /// Reprecents a button or textplane in the UI. Add new elements to the <see cref="UIPath"/> using the <see cref="UIPath.AddElement(UIElement)"/> method.
     /// </summary>
-    public class UIElement
+    public abstract class UIElement
     {
         public bool IsTop => ParentId == TopId;
-        public const string TopId = "_";
 
         /// <summary>
         /// The type of the <see cref="UIElement"/>.
         /// </summary>
         public UIElementType Type { get; }
-
-        /// <summary>
-        /// The text in this <see cref="UIElement"/>.
-        /// </summary>
-        public string? Text { get; set; }
-
-        public Texture2D? Texture { get; }
 
         public bool Skip { get; set; }
 
@@ -52,50 +45,39 @@
         /// </summary>
         public string ParentId { get; }
 
-        public object?[] DrawArguments { get; }
+        public const string TopId = "_";
+        public const string BackPrefix = "_back_";
 
-        public const int DEFAULT_RECTANGLE_CLEARANCE = 2;
+        public UIElement(string id, string parentId = UIElement.TopId, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null)
+        {
+            Type = type;
+            Id = id;
+            Order = order;
+            ParentId = parentId;
+            Skip = false;
+        }
 
-        public UIElement(string id, string parentId = UIElement.TopId, string? text = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
+        public abstract Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY);
+    }
+
+    public class TextElement : UIElement
+    {
+        public string Text { get; set; }
+        public Font2D Font { get; set; }
+
+        public TextElement(string id, string text, Font2D font, string parentId = "_", UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null) : base(id, parentId, type, order, clickSound)
         {
             Text = text;
-            Type = type;
-            Id = id;
-            Order = order;
-            ParentId = parentId;
-            DrawArguments = drawArgs;
-            Skip = false;
+            Font = font;
         }
 
-        public UIElement(string id, string parentId = UIElement.TopId, Texture2D? texture = null, UIElementType type = UIElementType.Listen, string? order = null, CachedAudio? clickSound = null, params object?[] drawArgs)
+        public override Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY)
         {
-            Texture = texture;
-            Type = type;
-            Id = id;
-            Order = order;
-            ParentId = parentId;
-            DrawArguments = drawArgs;
-            Skip = false;
-        }
+            Vector2 contentSize = Font.FastMeasure(Text);
+            int recW = (int)contentSize.X + 2 * paddingX;
+            int recH = (int)contentSize.Y + 2 * paddingY;
 
-        public Rectangle GetBounds(Point pos, int padding, int margin, Font2D font) => GetBounds(pos, padding, padding, margin, margin, font);
-        public Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY, Font2D font)
-        {
-            if (Text is not null)
-            {
-                Vector2 contentSize = font.FastMeasure(Text);
-                int recW = (int)contentSize.X + 2 * paddingX;
-                int recH = (int)contentSize.Y + 2 * paddingY;
-
-                return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
-            }
-
-            if (Texture is not null)
-            {
-                return new Rectangle(pos + new Point(marginX, marginY), Texture.Bounds.Size + new Point(2 * paddingX, 2 * paddingY));
-            }
-
-            throw new InvalidObjectException("Cannot have UIElement with both media null.");
+            return new Rectangle(pos + new Point(marginX, marginY), new Point(recW, recH));
         }
 
         public Point GetTextPos(Rectangle preCalculatedBounds, int paddingX, int paddingY)
@@ -103,18 +85,27 @@
             return new Point(preCalculatedBounds.X + paddingX, preCalculatedBounds.Y + paddingY);
         }
 
-        public override string ToString()
+        public static TextElement GetDefaultBackElement(Font2D font, string parentId)
         {
-            if (Text is not null)
-            {
-                return $"{{Id: {Id}, Type: {Type}, Text: {Text}, Order: {Order}, ParentId: {ParentId}}}";
-            }
-            else
-            {
-                return $"{{Id: {Id}, Type: {Type}, Texture: {Texture.Name}, Order: {Order}, ParentId: {ParentId}}}";
-            }
+            return new TextElement(BackPrefix + parentId, "Back", font, parentId, UIElementType.Listen);
         }
     }
+
+    public class TextureElement : UIElement
+    {
+        public Texture2D Texture { get; set; }
+
+        public TextureElement(string id, Texture2D texture, string parentId = "_", UIElementType type = UIElementType.Listen, string? order = null) : base(id, parentId, type, order)
+        {
+            Texture = texture;
+        }
+
+        public override Rectangle GetBounds(Point pos, int paddingX, int paddingY, int marginX, int marginY)
+        {
+            return new Rectangle(pos + new Point(marginX, marginY), Texture.Bounds.Size + new Point(2 * paddingX, 2 * paddingY));
+        }
+    }
+
 
     /// <summary>
     /// The data element relevant for draw methods.
@@ -125,22 +116,27 @@
         /// The position of the "drawdataified" <see cref="UIElement"/>.
         /// </summary>
         public Vector2 Position { get; }
+
         /// <summary>
         /// If a bounding <see cref="RectangleF"/> must be drawn.
         /// </summary>
         public bool DrawRectangle { get; }
+
         /// <summary>
         /// The bounding rectangle to draw.
         /// </summary>
         public Rectangle Rectangle { get; }
+
         /// <summary>
         /// The type of the <see cref="UIElement"/>. Sometimes relevant for drawing.
         /// </summary>
         public UIElementType Type { get; }
+
         /// <summary>
         /// The text to draw inside the <see cref="Rectangle"/>.
         /// </summary>
         public string? Text { get; }
+
         /// <summary>
         /// The texture to draw inside the <see cref="Rectangle"/>.
         /// </summary>
@@ -198,6 +194,7 @@
             if (DrawRectangle) drawingContext.DrawRectangle(Rectangle, Color.White, 1);
         }
     }
+
     /// <summary>
     /// The data element relevant for update methods. <i>(Knowing when an <see cref="UIElement"/> is clicked.)</i>
     /// </summary>

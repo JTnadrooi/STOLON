@@ -3,43 +3,63 @@ using Autofac;
 
 namespace STOLON
 {
-    public class MenuOrderContainer : OrderContainer
+    public class MenuOrderContainer : OrderContainer<TextElement>
     {
         private bool _capitalize = true;
         private Vector2 _origin;
-
-        private readonly Font2D _font;
         private readonly IInputManager _input;
+        private readonly Font2D _font;
 
-        public MenuOrderContainer(IInputManager input, IEnumerable<UIElement> elements, Font2D font, Vector2? position = null) : base(input, elements, position)
+        public MenuOrderContainer(IInputManager input, Font2D font, IEnumerable<TextElement> elements, Vector2? position = null) : base(input, elements, position, backElementFactory: parentId => TextElement.GetDefaultBackElement(font, parentId))
         {
-            _font = font;
             _input = input;
+            _font = font;
         }
 
         public override void PrepareOrdering(Vector2 origin, int elementCount) => _origin = origin;
 
-        public override UIElementDrawData GetDrawData(UIElement element, int index, out bool isHovered)
+        public override UIElementDrawData GetDrawData(TextElement element, int index, out bool isHovered)
         {
-            Vector2 elementPos = Centering.CenterX((int)_font.FastMeasure(element.Text).X,
-                                index * (-_font.Dimensions.Y * 2 - 2) + _origin.Y,
+            static char GetDecorator(string elementId, bool isPrefix)
+            {
+                return isPrefix ? (elementId switch
+                {
+                    "quit" => 'x',
+                    "specialThanks" => '!',
+                    _ => '>',
+                }) : (elementId switch
+                {
+                    "quit" => 'x',
+                    "specialThanks" => '!',
+                    _ => '<',
+                });
+            }
+
+            Vector2 elementPos = Centering.CenterX((int)element.Font.FastMeasure(element.Text).X,
+                                index * (-element.Font.Dimensions.Y * 2 - 2) + _origin.Y,
                                 STOLON.VWidth, Vector2.One);
             NumberHelper.OnPixel(ref elementPos);
 
-            Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)_font.FastMeasure(element.Text).X, (int)_font.Dimensions.Y));
-            string elementText = element.Text;
-            if (_capitalize) elementText = elementText.ToUpper();
-
-            string postPre = element.Id switch
-            {
-                "quit" => "x",
-                "specialThanks" => "!",
-                _ => ">",
-            };
+            Rectangle elementBounds = new Rectangle(elementPos.ToPoint(), new Point((int)element.Font.FastMeasure(element.Text).X, (int)element.Font.Dimensions.Y));
             isHovered = elementBounds.Contains(_input.Mouse.Position);
-            return new UIElementDrawData(element, isHovered
-                ? (postPre + " " + elementText + " " + postPre.Replace(">", "<"))
-                : elementText, _font, element.Type, elementPos + (isHovered ? new Point(-(int)_font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
+
+            StringBuilder elementSb = new StringBuilder(element.Text.Length + 8);
+
+            if (isHovered)
+            {
+                elementSb.Append(GetDecorator(element.Id, true));
+                elementSb.Append(' ');
+            }
+
+            elementSb.Append(_capitalize ? element.Text.ToUpper() : element.Text);
+
+            if (isHovered)
+            {
+                elementSb.Append(' ');
+                elementSb.Append(GetDecorator(element.Id, false));
+            }
+
+            return new UIElementDrawData(element, elementSb.ToString(), element.Font, element.Type, elementPos + (isHovered ? new Point(-(int)element.Font.FastMeasure(2).X, 0) : Point.Zero).ToVector2(), Rectangle.Empty, false);
         }
     }
     public class MenuScene : Scene
@@ -88,7 +108,7 @@ namespace STOLON
 
         private Point[] _ditherTexturePositions;
 
-        private OrderContainer _mainOrderContainer;
+        private OrderContainer<TextElement> _mainOrderContainer;
 
         private Tweener<float> _logoEaseTweener;
         private Tweener<float> _removeTweener;
@@ -97,7 +117,6 @@ namespace STOLON
         private Vector2 _splashTextPos;
         private string _splashText;
         private Action? _onLeave;
-        private bool _fastLeave;
 
         private const int LogoRowAmount = 5;
 
@@ -108,7 +127,6 @@ namespace STOLON
         private readonly IConfiguration _config;
         private readonly Environment _environment;
         private readonly IRichLogger _logger;
-        private readonly Interface _ui;
         private readonly ITaskHeap _tasks;
         private readonly ISceneManager _sceneManager;
         private readonly ITextframe _textframe;
@@ -116,7 +134,6 @@ namespace STOLON
 
         public MenuScene(
             IRichLogger logger,
-            Interface ui,
             ITexture2DCollection textures,
             ICachedAudioResourceCollection audio,
             IFont2DCollection fonts,
@@ -130,7 +147,6 @@ namespace STOLON
             IEnumerable<EntityDefinition> entityDefinitions) : base("main_menu")
         {
             _logger = logger;
-            _ui = ui;
             _audio = audio;
             _textures = textures;
             _fonts = fonts;
@@ -150,7 +166,6 @@ namespace STOLON
             _drawLogoLines = true;
             _drawLogoDummyTiles = true;
             _drawLogoFilledTiles = false;
-            _fastLeave = false;
 
             _logoFlashTime = 0;
             _flashStart = null;
@@ -164,18 +179,18 @@ namespace STOLON
 
             _entityProfiles = [entityDefinitions.First().Profile, entityDefinitions.Last().Profile];
 
-            _mainOrderContainer = new MenuOrderContainer(_input, [
-                new UIElement("story_start", UIElement.TopId, "Story", UIElementType.Listen, clickSound: _audio["exit_3"]),
-                new UIElement("com_start", UIElement.TopId, "COM", UIElementType.Listen, clickSound: _audio["coin_4"]),
-                new UIElement("xp_start", UIElement.TopId, "2P", UIElementType.Listen, clickSound: _audio["coin_4"]),
-                new UIElement("options", UIElement.TopId, "Options", UIElementType.Listen),
-                new UIElement("special_thanks", UIElement.TopId, "Special Thanks", UIElementType.Listen),
-                new UIElement("quit", UIElement.TopId, "Quit", UIElementType.Listen),
-                new UIElement("sound", "options", "Sound", UIElementType.Listen),
-                new UIElement("graphics", "options", "Graphics", UIElementType.Listen, clickSound: _audio["exit_3"]),
-                new UIElement("vol_up", "sound", "Volume UP", UIElementType.Listen),
-                new UIElement("vol_down", "sound", "Volume DOWN", UIElementType.Listen),
-            ], _fonts.Medium);
+            _mainOrderContainer = new MenuOrderContainer(_input, _fonts.Medium, [
+                new TextElement("story_start",  "Story", font: _fonts.Medium, clickSound: _audio["exit_3"]),
+                new TextElement("com_start","COM",font: _fonts.Medium, clickSound: _audio["coin_4"]),
+                new TextElement("xp_start", "2P", font: _fonts.Medium, clickSound: _audio["coin_4"]),
+                new TextElement("options","Options", font: _fonts.Medium),
+                new TextElement("special_thanks", "Special Thanks", font: _fonts.Medium),
+                new TextElement("quit", "Quit", font: _fonts.Medium),
+                new TextElement("sound", "Sound", parentId: "options", font: _fonts.Medium),
+                new TextElement("graphics", "Graphics", parentId: "options",  font: _fonts.Medium, clickSound: _audio["exit_3"]),
+                new TextElement("vol_up",  "Volume UP", parentId: "sound", font: _fonts.Medium),
+                new TextElement("vol_down", "Volume DOWN", parentId: "sound",font: _fonts.Medium),
+            ]);
 
             //switch (_skipTo)
             //{
@@ -341,21 +356,20 @@ namespace STOLON
             logoYoffset -= (int)((logoYoffset - logoYScreenCenter) * _removeTweener.Value);
             const int MENU_LOGO_BOUNDS_CLEARING = 8;
 
-            switch (_sceneManager.SkipTarget)
-            {
-                case "shell":
-                    if (_millisecondsSinceStartup < 10000)
-                    {
-                        _millisecondsSinceStartup = 10001;
-                        _done = true;
-                        _removeTweener.Update(10);
-                        //_boardEntities = [new UserMoveProvider(_input, null, "player0"), new UserMoveProvider(_input, null, "player1")];
-                        _fastLeave = true;
-                        Leave();
-                    }
-                    break;
-            }
-            if (_sceneManager.ShouldSkipAnimation(this) && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
+            //switch (_sceneManager.SkipTarget)
+            //{
+            //    case "shell":
+            //        if (_millisecondsSinceStartup < 10000)
+            //        {
+            //            _millisecondsSinceStartup = 10001;
+            //            _done = true;
+            //            _removeTweener.Update(10);
+            //            //_boardEntities = [new UserMoveProvider(_input, null, "player0"), new UserMoveProvider(_input, null, "player1")];
+            //            Leave();
+            //        }
+            //        break;
+            //}
+            //if (_sceneManager.ShouldSkipAnimation(this) && _millisecondsSinceStartup < 10000) _millisecondsSinceStartup = 10001;
 
             #region inFlash
             _millisecondsSinceStartup += elapsedMilliseconds;
@@ -426,35 +440,35 @@ namespace STOLON
             _mainOrderContainer.Update(elapsedMilliseconds);
             //UIOrdering.Order(_ui.Elements.Values.ToArray(), _ui.MenuPath, _ui.DrawData, _ui.UpdateData, , );
 
-            if (_ui.UpdateDump["xp_start"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["xp_start"].IsClicked(_input))
             {
                 //_boardEntities = [new UserMoveProvider(_input, null, "player0"), new UserMoveProvider(_input, null, "player1")];
                 Leave();
             }
-            if (_ui.UpdateDump["vol_up"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["vol_up"].IsClicked(_input))
             {
                 _audioEngine.MasterVolume += 0.1001f;
                 _logger.Log("new volume: " + _audioEngine.MasterVolume);
             }
-            if (_ui.UpdateDump["vol_down"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["vol_down"].IsClicked(_input))
             {
                 _audioEngine.MasterVolume -= 0.1001f;
                 _logger.Log("new volume: " + _audioEngine.MasterVolume);
             }
-            if (_ui.UpdateDump["story_start"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["story_start"].IsClicked(_input))
             {
                 _textframe.Queue(new DialogueInfo(_environment, "Not yet implemented."));
             }
-            if (_ui.UpdateDump["com_start"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["com_start"].IsClicked(_input))
             {
                 //_boardEntities = [new UserMoveProvider(_input, null, "player0"), _environment.Entities["goldsilk"]];
                 Leave();
             }
-            if (_ui.UpdateDump["special_thanks"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["special_thanks"].IsClicked(_input))
             {
                 _textframe.Queue(new DialogueInfo(_environment, "Please read the github README."));
             }
-            if (_ui.UpdateDump["quit"].IsClicked(_input))
+            if (_mainOrderContainer.UpdateData["quit"].IsClicked(_input))
             {
                 STOLON.Instance.Exit();
             }
@@ -470,7 +484,7 @@ namespace STOLON
                 //STOLON.StateManager.ChangeState<BoardGameState>(true);
                 //((BoardGameState)STOLON.StateManager.Current).SetBoard(_boardPlayers!);
                 _sceneManager.ChangeScene<ShellScene>();
-            }), _fastLeave ? 10 : 2000, false);
+            }), 2000, false);
             _millisecondsSinceMenuRemoveStart += elapsedMilliseconds;
 
             _splashTextPos = Centering.CenterX((int)(_fonts.Small.FastMeasure(_splashText).X),
@@ -495,7 +509,7 @@ namespace STOLON
                     drawingContext.Draw(_dither32, _ditherTexturePositions[i].ToVector2(), effects: (i >= _ditherTexturePositions.Length / 2f) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
                 drawingContext.DrawArea(_logoBoundingBox, Color.Black);
-                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, Interface.LineWidth);
+                drawingContext.DrawRectangle(_logoBoundingBox, Color.White, 2);
 
             }
             if (_drawLogoDummyTiles) drawingContext.Draw(_logoMarks, _logoDrawPos);
@@ -505,8 +519,8 @@ namespace STOLON
             drawingContext.DrawArea(_logoTileHider, Color.Black);
             if (_drawLogoLines) drawingContext.Draw(_logoLines, _logoDrawPos);
 
-            drawingContext.DrawLine(RemoveLine1x, STOLON.VHeight, RemoveLine1x, _removeLineYAmount, Color.White, Interface.LineWidth);
-            drawingContext.DrawLine(RemoveLine2x, STOLON.VHeight, RemoveLine2x, _removeLineYAmount, Color.White, Interface.LineWidth);
+            drawingContext.DrawLine(RemoveLine1x, STOLON.VHeight, RemoveLine1x, _removeLineYAmount, Color.White, 2);
+            drawingContext.DrawLine(RemoveLine2x, STOLON.VHeight, RemoveLine2x, _removeLineYAmount, Color.White, 2);
 
             if (_showEntityProfiles)
             {

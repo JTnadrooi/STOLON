@@ -10,9 +10,9 @@
         private readonly IAudioEngine _audioEngine;
         private readonly ISceneManager _sceneManager;
         private readonly IOverlayManager _overlayManager;
-        private readonly Interface _ui;
         private readonly IEnumerable<EntityDefinition> _entities;
         private readonly Kernel _kernel;
+        private readonly Textframe _textframe;
 
         public string SymbolNotation => "Ev";
         public string Name => "Environment";
@@ -20,19 +20,18 @@
         public Environment(IRichLogger logger,
             IAudioEngine audioEngine,
             ISceneManager sceneManager,
-            Interface ui,
             IOverlayManager overlayManager,
             Kernel kernel,
+            Textframe textframe,
             IEnumerable<EntityDefinition> entities)
         {
             _logger = logger;
             _audioEngine = audioEngine;
             _sceneManager = sceneManager;
             _overlayManager = overlayManager;
-            _ui = ui;
             _entities = entities;
             _kernel = kernel;
-
+            _textframe = textframe;
             _sceneManager = sceneManager;
         }
 
@@ -44,7 +43,7 @@
                 _logger.Log($"registered entity with id '{entity.Id}\" and name '{entity.Name}\".");
             }
 
-            _sceneManager.ChangeScene<ShellScene>();
+            _sceneManager.ChangeScene<MenuScene>();
 
             //StolonGame.Instance.AudioEngine.SetPlayList(new Playlist(
             //    "debug1",
@@ -55,7 +54,7 @@
 
         public void Update(int elapsedMilliseconds)
         {
-            _ui.Update(elapsedMilliseconds);
+            _textframe.Update(elapsedMilliseconds);
             _sceneManager.Update(elapsedMilliseconds);
             _kernel.Update(elapsedMilliseconds);
             _audioEngine.Update(elapsedMilliseconds);
@@ -66,7 +65,7 @@
         {
             _sceneManager.Draw(drawingContext);
             _kernel.Draw(drawingContext);
-            _ui.Draw(drawingContext);
+            _textframe.Draw(drawingContext);
 
             _overlayManager.Draw(drawingContext);
         }

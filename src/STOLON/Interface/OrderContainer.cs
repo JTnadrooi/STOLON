@@ -1,39 +1,46 @@
-﻿namespace STOLON
-{
-    public abstract class OrderContainer : IComponent
-    {
-        private const string BackPrefix = "_back_";
+﻿using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
+namespace STOLON
+{
+    public abstract class OrderContainer<TUIElement> : IComponent where TUIElement : UIElement
+    {
         public Vector2 Position { get; set; }
         public UIPath Path { get; protected set; }
 
         public Matrix Transform { get; set; }
 
         public IReadOnlyDictionary<string, UIElementUpdateData> UpdateData => _updateDataView;
-        public IReadOnlyDictionary<string, UIElement> Elements => _elementMap;
+        public IReadOnlyDictionary<string, TUIElement> Elements => _elementMap;
         public IReadOnlySet<string> Parents => _parents;
 
         public UIElementUpdateData this[string elementId] => UpdateData[elementId];
 
-        private readonly UIElement[] _elements;
+        private readonly TUIElement[] _elements;
         private readonly UIElementDrawData[] _drawDump;
         private readonly Dictionary<string, UIElementUpdateData> _updateDump;
         private readonly IReadOnlyDictionary<string, UIElementUpdateData> _updateDataView;
-        private readonly Dictionary<string, UIElement> _elementMap;
+        private readonly Dictionary<string, TUIElement> _elementMap;
         private readonly HashSet<string> _parents;
         private readonly List<int> _visibleIndices;
         private readonly IInputManager _input;
 
-        protected OrderContainer(IInputManager input, IEnumerable<UIElement> elements, Vector2? position = null, IDictionary<string, UIElementUpdateData>? updateData = null, UIPath? path = null)
+        protected OrderContainer(
+            IInputManager input,
+            IEnumerable<TUIElement> elements,
+            Vector2? position = null,
+            IDictionary<string, UIElementUpdateData>? updateData = null,
+            UIPath? path = null,
+            Func<string, TUIElement>? backElementFactory = null)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
 
             _input = input;
 
-            List<UIElement> baseElements = new List<UIElement>();
+            List<TUIElement> baseElements = new List<TUIElement>();
             HashSet<string> idSet = new HashSet<string>();
 
-            foreach (UIElement element in elements)
+            foreach (TUIElement element in elements)
             {
                 if (!VerifyElement(element)) throw new ArgumentException($"Cannot add invalid element '{element.Id}'.", nameof(elements));
 
@@ -47,7 +54,8 @@
                 if (baseElements[i].ParentId != UIElement.TopId && idSet.Contains(baseElements[i].ParentId))
                     _parents.Add(baseElements[i].ParentId);
 
-            foreach (string parentId in _parents) baseElements.Add(new UIElement(BackPrefix + parentId, parentId, "Back", UIElementType.Listen));
+            if (backElementFactory is not null)
+                foreach (string parentId in _parents) baseElements.Add(backElementFactory.Invoke(parentId));
 
             _elements = baseElements.ToArray();
             _drawDump = new UIElementDrawData[_elements.Length];
@@ -57,7 +65,7 @@
 
             _updateDataView = new ReadOnlyDictionary<string, UIElementUpdateData>(_updateDump);
 
-            _elementMap = new Dictionary<string, UIElement>(_elements.Length);
+            _elementMap = new Dictionary<string, TUIElement>(_elements.Length);
             for (int i = 0; i < _elements.Length; i++) _elementMap[_elements[i].Id] = _elements[i];
 
             Position = position ?? Vector2.Zero;
@@ -65,10 +73,10 @@
         }
 
         public virtual void PrepareOrdering(Vector2 origin, int visibleElementCount) { }
-        public abstract UIElementDrawData GetDrawData(UIElement element, int orderIndex, out bool isHovered);
+        public abstract UIElementDrawData GetDrawData(TUIElement element, int orderIndex, out bool isHovered);
         public virtual void AfterOrdering() { }
         protected virtual void OnPathChanged(UIPath previous, UIPath current) { }
-        protected virtual bool VerifyElement(UIElement element)
+        protected virtual bool VerifyElement(TUIElement element)
         {
             return true;
         }
@@ -86,7 +94,7 @@
             {
                 if (!visited.Add(currentId)) throw new InvalidOperationException($"Cycle detected while resolving path for '{id}'.");
                 stack.Push(currentId);
-                if (!_elementMap.TryGetValue(currentId, out UIElement? element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
+                if (!_elementMap.TryGetValue(currentId, out TUIElement? element)) throw new InvalidOperationException($"Element with id '{currentId}' not found.");
 
                 if (element.ParentId == UIElement.TopId)
                 {
@@ -99,6 +107,7 @@
 
             return new UIPath(stack);
         }
+
         public UIPath GetParentPath(string id)
         {
             if (id == UIElement.TopId) throw new InvalidOperationException("Id equal to UIElement.TOP_ID has no parent.");
@@ -130,10 +139,15 @@
             PrepareOrdering(Position, _visibleIndices.Count);
 
             int orderIndex = 0;
+            for (int i = 0; i < _elements.Length; i++)
+            {
+                TUIElement element = _elements[i];
+                _updateDump[element.Id] = new UIElementUpdateData(false, element);
+            }
             for (int i = 0; i < _visibleIndices.Count; i++)
             {
                 int idx = _visibleIndices[i];
-                UIElement element = _elements[idx];
+                TUIElement element = _elements[idx];
                 _drawDump[idx] = GetDrawData(element, orderIndex++, out bool isHovered);
 
                 _updateDump[element.Id] = new UIElementUpdateData(isHovered, element);
@@ -156,7 +170,7 @@
             {
                 UIPath oldPath = Path;
 
-                if (clickedId.Length > BackPrefix.Length && clickedId.StartsWith(BackPrefix)) Path = GetParentPath(clickedId.Substring(BackPrefix.Length));
+                if (clickedId.Length > UIElement.BackPrefix.Length && clickedId.StartsWith(UIElement.BackPrefix)) Path = GetParentPath(clickedId.Substring(UIElement.BackPrefix.Length));
                 else if (_parents.Contains(clickedId)) Path = GetSelfPath(clickedId);
 
                 if (!Equals(oldPath, Path))
@@ -173,6 +187,7 @@
             for (int i = 0; i < _drawDump.Length; i++)
             {
                 UIElementDrawData drawData = _drawDump[i];
+                if (drawData == null) continue;
 
                 if (_drawDump[i].Source != null) drawData.Draw(drawingContext);
                 drawingContext.RegisterDraw(drawData, drawData.Rectangle, Transform);

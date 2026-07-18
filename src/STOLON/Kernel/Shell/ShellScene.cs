@@ -6,15 +6,13 @@ namespace STOLON
     {
         private readonly ITexture2DCollection _textures;
         private readonly IRichLogger _logger;
-        private readonly Interface _ui;
         private readonly Shell _shell;
         private readonly ITextframe _textframe;
         private readonly IInputManager _input;
 
-        public ShellScene(IRichLogger logger, Interface ui, ITexture2DCollection textures, Shell shell, ITextframe textframe, IInputManager input) : base("shell")
+        public ShellScene(IRichLogger logger, ITexture2DCollection textures, Shell shell, ITextframe textframe, IInputManager input) : base("shell")
         {
             _logger = logger;
-            _ui = ui;
             _textures = textures;
             _shell = shell;
             _textframe = textframe;
