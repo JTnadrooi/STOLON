@@ -218,7 +218,7 @@ namespace STOLON
 
         public WindowShellRegion WriteWindow(Window window)
         {
-            return WriteRegion(new WindowShellRegion(this, _kernel, _textures, window));
+            return WriteRegion(new WindowShellRegion(this, _kernel, _textures, _fonts, window));
         }
 
         public TShellRegion WriteRegion<TShellRegion>(TShellRegion region) where TShellRegion : ShellRegion

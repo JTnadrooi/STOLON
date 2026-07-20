@@ -1,11 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace STOLON
 {
     public class WindowShellRegion : ShellRegion
     {
         private readonly ITexture2DCollection _textures;
+        private readonly IFont2DCollection _fonts;
         private readonly Kernel _kernel;
 
         public override int Height => IsLockActive() ? _window.OuterBounds.Height : _windowSlotTex.Height;
@@ -16,15 +18,20 @@ namespace STOLON
         private Texture2D _windowSlotTex;
         private Texture2D _windowClosedTex;
         private Vector2 _borderCompensatingOffset;
+        private Vector2 _windowSlotNamePos;
 
         private bool _isWindowLocked;
+        private Font2D _font;
 
-        public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, Window window) : base(shell)
+        public WindowShellRegion(Shell shell, Kernel kernel, ITexture2DCollection textures, IFont2DCollection fonts, Window window) : base(shell)
         {
             if (window.BoundRegion is not null) throw new InvalidOperationException("Cannot bind 'window'; 'window' already belongs to region.");
 
             _textures = textures;
+            _fonts = fonts;
             _kernel = kernel;
+
+            _font = fonts.Medium;
 
             _window = window;
             _windowSlotTex = textures["UI\\Window\\window_slot"];
@@ -81,6 +88,13 @@ namespace STOLON
                 _window = null;
                 _isWindowLocked = false;
             }
+            else if (_window.Status == WindowStatus.Open)
+            {
+                Vector2 textSize = _font.FastMeasure(_window.Name);
+                _windowSlotNamePos = Centering.Center(textSize.ToPoint(), _windowSlotTex.Bounds.At(Position.ToPoint()));
+                _windowSlotNamePos += new Vector2(0, -1);
+                NumberHelper.OnPixel(ref _windowSlotNamePos);
+            }
         }
 
         public override void Draw(DrawingContext drawingContext)
@@ -96,7 +110,10 @@ namespace STOLON
                     drawingContext.Draw(_windowClosedTex, Position);
                 }
                 else
+                {
                     drawingContext.Draw(_windowSlotTex, Position);
+                    drawingContext.DrawString(_font, _window.Name, _windowSlotNamePos);
+                }
             }
         }
 
