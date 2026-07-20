@@ -28,7 +28,7 @@ namespace STOLON
         [KernelCommand(".", Id = "entity", Aliases = ["e"])]
         public void ShowEntity([EntityId] string id)
         {
-            _shell.WriteTexture(_entityDefinitions.First(e => e.Id == id).Mipmaps[128]);
+            _shell.WriteEntityDefinition(_entityDefinitions.First(e => e.Id == id));
         }
     }
 }
