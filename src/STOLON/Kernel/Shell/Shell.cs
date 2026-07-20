@@ -193,17 +193,24 @@ namespace STOLON
 
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
 
-        public void WriteTexture(Texture2D texture)
+        public void WriteTexture(Texture2D texture, bool directEmbed = false)
         {
-            WriteWindow(new ImageWindow(_windowDeps, texture)
+            if (directEmbed)
             {
-                IsDrawnByKernel = false,
-            });
+                WriteRegion(new TextureShellRegion(this, texture));
+            }
+            else
+            {
+                WriteWindow(new TextureWindow(_windowDeps, texture)
+                {
+                    IsDrawnByKernel = false,
+                });
+            }
         }
 
         public void WriteEntityDefinition(EntityDefinition entityDefinition)
         {
-            WriteWindow(new ImageWindow(_windowDeps, entityDefinition)
+            WriteWindow(new TextureWindow(_windowDeps, entityDefinition)
             {
                 IsDrawnByKernel = false,
             });
