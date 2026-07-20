@@ -142,7 +142,7 @@ namespace STOLON
             _maxScrollAmount -= STOLON.VHeight;
             _maxScrollAmount = Math.Max(_maxScrollAmount, 0);
 
-            if (!Regions.Any(r => r is WindowShellRegion windowShellRegion && windowShellRegion.Window.IsResizing))
+            if (!Regions.Any(r => r is WindowShellRegion windowShellRegion && !windowShellRegion.IsWindowClosed && windowShellRegion.Window.IsResizing))
             {
                 _scrollAmount -= _input.Mouse.ScrollDelta / 3;
                 _scrollAmount = Math.Clamp(_scrollAmount, 0, _maxScrollAmount);

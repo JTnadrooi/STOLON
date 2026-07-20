@@ -177,7 +177,7 @@ namespace STOLON
                     DeregisterWindow(window, i);
                     i--;
 
-                    window.SetStatus(WindowStatus.PendingClosed);
+                    window.SetStatus(WindowStatus.Closed);
                 }
             }
         }

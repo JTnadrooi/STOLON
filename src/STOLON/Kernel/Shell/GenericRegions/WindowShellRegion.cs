@@ -13,6 +13,7 @@ namespace STOLON
         public override int Height => IsLockActive() ? _window.OuterBounds.Height : _windowSlotTex.Height;
         public override int Width => IsLockActive() ? _window.OuterBounds.Width : _windowSlotTex.Width;
         public Window? Window => _window;
+        public bool IsWindowClosed => _window is null;
 
         private Window? _window;
         private Texture2D _windowSlotTex;
@@ -78,22 +79,22 @@ namespace STOLON
 
         public override void Update(int elapsedMilliseconds)
         {
-            if (_isWindowLocked)
-            {
-                _window.Position = Position;
-            }
-
-            if (_window.Status == WindowStatus.Closed)
+            if (_window?.Status == WindowStatus.Closed)
             {
                 _window = null;
                 _isWindowLocked = false;
             }
-            else if (_window.Status == WindowStatus.Open)
+            else if (_window?.Status == WindowStatus.Open)
             {
                 Vector2 textSize = _font.FastMeasure(_window.Name);
                 _windowSlotNamePos = Centering.Center(textSize.ToPoint(), _windowSlotTex.Bounds.At(Position.ToPoint()));
                 _windowSlotNamePos += new Vector2(0, -1);
                 NumberHelper.OnPixel(ref _windowSlotNamePos);
+            }
+
+            if (_isWindowLocked)
+            {
+                _window.Position = Position;
             }
         }
 
