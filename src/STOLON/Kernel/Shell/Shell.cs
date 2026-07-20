@@ -193,35 +193,35 @@ namespace STOLON
 
         public void Write(string str) => EnsureLastRegionIsTextRegion().Write(str);
 
-        public void WriteTexture(Texture2D texture, bool directEmbed = false)
+        public ShellRegion WriteTexture(Texture2D texture, bool directEmbed = false)
         {
             if (directEmbed)
             {
-                WriteRegion(new TextureShellRegion(this, texture));
+                return WriteRegion(new TextureShellRegion(this, texture));
             }
             else
             {
-                WriteWindow(new TextureWindow(_windowDeps, texture)
+                return WriteWindow(new TextureWindow(_windowDeps, texture)
                 {
                     IsDrawnByKernel = false,
                 });
             }
         }
 
-        public void WriteEntityDefinition(EntityDefinition entityDefinition)
+        public WindowShellRegion WriteEntityDefinition(EntityDefinition entityDefinition)
         {
-            WriteWindow(new TextureWindow(_windowDeps, entityDefinition)
+            return WriteWindow(new TextureWindow(_windowDeps, entityDefinition)
             {
                 IsDrawnByKernel = false,
             });
         }
 
-        public void WriteWindow(Window window)
+        public WindowShellRegion WriteWindow(Window window)
         {
-            WriteRegion(new WindowShellRegion(this, _kernel, _textures, window));
+            return WriteRegion(new WindowShellRegion(this, _kernel, _textures, window));
         }
 
-        public void WriteRegion(ShellRegion region)
+        public TShellRegion WriteRegion<TShellRegion>(TShellRegion region) where TShellRegion : ShellRegion
         {
             bool reAddInputLine = false;
             bool isCursorPostText = false;
@@ -242,6 +242,8 @@ namespace STOLON
                 if (isCursorPostText)
                     (_regions[^1] as TextShellRegion).Cursor = TextPosition.GetPostText((TextShellRegion)_regions[^1]);
             }
+
+            return region;
         }
 
         public void WriteLine(string str) => EnsureLastRegionIsTextRegion().WriteLine(str);
