@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace STOLON
 {
@@ -10,6 +11,8 @@ namespace STOLON
         private readonly ITextframe _textframe;
         private readonly IInputManager _input;
 
+        private const int DivLength = 96;
+
         public ShellScene(IRichLogger logger, ITexture2DCollection textures, Shell shell, ITextframe textframe, IInputManager input) : base("shell")
         {
             _logger = logger;
@@ -18,11 +21,14 @@ namespace STOLON
             _textframe = textframe;
             _input = input;
 
-            _textframe.Hide = true;
+            //_textframe.Hide = true;
             _textures = textures;
             _shell.HasInputLine = true;
 
-            SiloEntityDefinition siloDefinition = STOLON.Services.Resolve<SiloEntityDefinition>();
+            _shell.WriteRegion(new LogoShellRegion(_shell, _textures));
+            _shell.WriteLine(new string('=', DivLength));
+            _shell.WriteLine(STOLON.GetSplashText());
+            _shell.WriteLine(new string('=', DivLength));
 
             _shell.Command("sadr a16 silo silo");
             _shell.Command("stadr");
